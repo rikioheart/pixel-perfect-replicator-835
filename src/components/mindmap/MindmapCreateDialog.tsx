@@ -113,6 +113,11 @@ export function MindmapCreateDialog({
           return;
         }
         if (created) {
+          // Lie le projet à son nœud de mindmap.
+          await supabase
+            .from("projects")
+            .update({ mindmap_node_id: created.id })
+            .eq("id", created.id);
           await logAudit({
             actorId: userId || null,
             action: "project.create",
