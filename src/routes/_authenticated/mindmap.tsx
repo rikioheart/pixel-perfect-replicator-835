@@ -34,6 +34,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  fetchMindmapLayout,
+  resetMindmapLayout,
+  saveMindmapLayout,
+} from "@/lib/mindmap-layout";
+import {
   canUndo,
   logAudit,
   undoAction,
@@ -246,6 +251,14 @@ function MindmapPage() {
     setUndoStack((stack) => [...stack, action].slice(-20));
 
 
+  const [savingLayout, setSavingLayout] = useState(false);
+  const [layoutDirty, setLayoutDirty] = useState(false);
+
+  const { data: layout } = useQuery({
+    queryKey: ["mindmap-layout"],
+    queryFn: fetchMindmapLayout,
+  });
+
   const { data, isLoading } = useQuery({
     queryKey: ["mindmap"],
     queryFn: async () => {
@@ -333,9 +346,46 @@ function MindmapPage() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   useEffect(() => {
-    setNodes(graph.nodes);
+    const saved = layout?.positions ?? {};
+    setNodes(
+      graph.nodes.map((node) =>
+        saved[node.id] ? { ...node, position: saved[node.id]! } : node,
+      ) as MindmapNode[],
+    );
     setEdges(graph.edges);
-  }, [graph, setNodes, setEdges]);
+    setLayoutDirty(false);
+  }, [graph, layout, setNodes, setEdges]);
+
+  const handleSaveLayout = async () => {
+    setSavingLayout(true);
+    try {
+      const result = await saveMindmapLayout({
+        layoutId: layout?.id ?? null,
+        nodes: nodes.map((n) => ({ id: n.id, type: n.type, position: n.position })),
+        edges: edges.map((e) => ({ id: e.id, source: e.source, target: e.target })),
+        userId: user?.id ?? null,
+      });
+      if (!result.ok) {
+        toast.error(result.error ?? "Enregistrement impossible.");
+        return;
+      }
+      setLayoutDirty(false);
+      toast.success("Disposition de la mindmap enregistrée.");
+      void queryClient.invalidateQueries({ queryKey: ["mindmap-layout"] });
+    } finally {
+      setSavingLayout(false);
+    }
+  };
+
+  const handleResetLayout = async () => {
+    const result = await resetMindmapLayout(layout?.id ?? null);
+    if (!result.ok) {
+      toast.error(result.error ?? "Réinitialisation impossible.");
+      return;
+    }
+    toast.success("Disposition automatique rétablie.");
+    void queryClient.invalidateQueries({ queryKey: ["mindmap-layout"] });
+  };
 
   const selectedProject =
     (data?.projects ?? []).find((project) => project.id === selectedProjectId) ?? null;
@@ -501,6 +551,26 @@ function MindmapPage() {
       subtitle="Cartographie interactive des projets, tâches et responsables"
       actions={
         <div className="flex flex-wrap gap-2">
+          {isBureau ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleResetLayout()}
+                disabled={!layout?.id || savingLayout}
+              >
+                Disposition auto
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void handleSaveLayout()}
+                disabled={savingLayout || (!layoutDirty && !!layout?.id)}
+              >
+                {savingLayout ? "Enregistrement…" : "Enregistrer la disposition"}
+              </Button>
+            </>
+          ) : null}
           <Button
             variant="ghost"
             size="sm"
@@ -623,6 +693,7 @@ function MindmapPage() {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              onNodeDragStop={() => setLayoutDirty(true)}
 
               nodeTypes={mindmapNodeTypes}
               fitView
