@@ -34,7 +34,7 @@ export function NotificationBell() {
     if (!notification.is_read) await markRead(notification.id);
     setOpen(false);
     if (notification.link_url) {
-      void navigate({ to: notification.link_url });
+      void navigate({ to: notification.link_url as never });
     }
   };
 
