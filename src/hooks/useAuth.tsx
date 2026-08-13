@@ -109,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     roles,
     isBureau: roles.includes("ADMIN_BUREAU"),
     loading,
+    rolesReady,
     refresh: async () => {
       await loadContext(session?.user.id);
     },
