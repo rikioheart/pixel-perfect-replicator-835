@@ -88,23 +88,38 @@ export function MindmapCreateDialog({
           toast.error("Le titre du projet est obligatoire.");
           return;
         }
-        const { error } = await supabase.from("projects").insert({
-          title: project.title.trim(),
-          slug: `${slugify(project.title)}-${Date.now().toString(36)}`,
-          description: project.description || null,
-          category_id: project.category_id || null,
-          status: project.status,
-          priority: project.priority,
-          deadline: project.deadline || null,
-          parent_project_id: parentId === ROOT_ID ? null : parentId,
-          owner_id: userId || null,
-          created_by: userId || null,
-        });
+        const { data: created, error } = await supabase
+          .from("projects")
+          .insert({
+            title: project.title.trim(),
+            slug: `${slugify(project.title)}-${Date.now().toString(36)}`,
+            description: project.description || null,
+            category_id: project.category_id || null,
+            status: project.status,
+            priority: project.priority,
+            deadline: project.deadline || null,
+            parent_project_id: parentId === ROOT_ID ? null : parentId,
+            owner_id: userId || null,
+            created_by: userId || null,
+          })
+          .select("id")
+          .single();
         if (error) {
           toast.error(error.message);
           return;
         }
+        if (created) {
+          await logAudit({
+            actorId: userId || null,
+            action: "project.create",
+            entityType: "project",
+            entityId: created.id,
+            newValues: { title: project.title.trim(), status: project.status },
+            metadata: { summary: `Projet « ${project.title.trim()} » créé` },
+          });
+        }
         toast.success("Projet créé et relié à la carte.");
+
       } else {
         if (!task.title.trim()) {
           toast.error("Le titre de la tâche est obligatoire.");
