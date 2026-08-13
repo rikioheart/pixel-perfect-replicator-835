@@ -1,0 +1,1 @@
+DELETE FROM auth.users WHERE email IN ('bureau@lavoixduchien.fr','membre@lavoixduchien.fr');
