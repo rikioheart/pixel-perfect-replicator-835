@@ -16,8 +16,16 @@ export const AUDIT_ACTION_LABEL: Record<string, string> = {
   "project.delete": "Suppression du projet",
   "project.link": "Rattachement du projet",
   "task.create": "Création d'une tâche",
+  "task.update": "Modification d'une tâche",
   "task.link": "Rattachement d'une tâche",
+  "project.create.undo": "Création de projet annulée",
+  "project.update.undo": "Modification de projet annulée",
+  "project.delete.undo": "Suppression de projet annulée",
+  "project.link.undo": "Rattachement de projet annulé",
+  "task.create.undo": "Création de tâche annulée",
+  "task.link.undo": "Rattachement de tâche annulé",
 };
+
 
 export async function logAudit(params: {
   actorId: string | null;
