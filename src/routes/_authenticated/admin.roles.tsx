@@ -27,6 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MEMBER_FUNCTION_LABEL, memberFullName } from "@/lib/members";
+import { useConfigOptions } from "@/lib/config-options";
+import { logAudit } from "@/lib/mindmap-actions";
 
 export const Route = createFileRoute("/_authenticated/admin/roles")({
   head: () => ({
@@ -475,3 +477,85 @@ function RolesPage() {
 }
 
 export default RolesPage;
+
+/**
+ * Niveau d'accès et niveau d'implication sont volontairement séparés du rôle
+ * principal et des fonctions associatives : ils se cumulent sans s'écraser.
+ */
+function MemberLevels({
+  memberId,
+  memberName,
+  accessLevel,
+  involvementLevel,
+}: {
+  memberId: string;
+  memberName: string;
+  accessLevel: string;
+  involvementLevel: string | null;
+}) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const access = useConfigOptions("ACCESS_LEVEL");
+  const involvement = useConfigOptions("INVOLVEMENT_LEVEL");
+
+  const save = async (patch: { access_level?: string; involvement_level?: string }) => {
+    const { error } = await supabase.from("profiles").update(patch).eq("id", memberId);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await logAudit({
+      actorId: user?.id ?? null,
+      action: "MEMBER_LEVEL_UPDATED",
+      entityType: "profile",
+      entityId: memberId,
+      newValues: patch,
+      metadata: { member_name: memberName },
+    });
+    toast.success("Niveau mis à jour.");
+    await queryClient.invalidateQueries({ queryKey: ["roles-members"] });
+  };
+
+  return (
+    <>
+      <div>
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Niveau d'accès
+        </p>
+        <Select value={accessLevel} onValueChange={(value) => save({ access_level: value })}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Niveau d'accès" />
+          </SelectTrigger>
+          <SelectContent>
+            {access.options.map((option) => (
+              <SelectItem key={option.id} value={option.code}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Niveau d'implication
+        </p>
+        <Select
+          value={involvementLevel ?? ""}
+          onValueChange={(value) => save({ involvement_level: value })}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Niveau d'implication" />
+          </SelectTrigger>
+          <SelectContent>
+            {involvement.options.map((option) => (
+              <SelectItem key={option.id} value={option.code}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </>
+  );
+}
