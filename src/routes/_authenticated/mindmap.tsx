@@ -10,7 +10,9 @@ import {
   useEdgesState,
   useNodesState,
   type Edge,
+  type Connection,
 } from "@xyflow/react";
+
 import "@xyflow/react/dist/style.css";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
