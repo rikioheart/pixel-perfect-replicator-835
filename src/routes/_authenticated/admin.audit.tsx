@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -22,12 +23,12 @@ export const Route = createFileRoute("/_authenticated/admin/audit")({
       {
         name: "description",
         content:
-          "Traçabilité complète des actions du cockpit : créations, modifications, rattachements et habilitations.",
+          "Traçabilité complète des actions du cockpit : créations, modifications, suppressions, rattachements et habilitations.",
       },
       { property: "og:title", content: "Journal d'activité — La Voix du Chien" },
       {
         property: "og:description",
-        content: "Historique horodaté des actions réalisées par les membres et le Bureau.",
+        content: "Historique horodaté, filtrable et paginé des actions réalisées dans le cockpit.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -43,11 +44,38 @@ const ACTION_LABEL: Record<string, string> = {
   "project.link": "Rattachement de projet",
   "task.create": "Création de tâche",
   "task.update": "Modification de tâche",
+  "task.status": "Changement de statut de tâche",
   "task.link": "Rattachement de tâche",
   "role.assign": "Attribution de rôle",
   "role.revoke": "Retrait de rôle",
+  "function.assign": "Attribution de fonction",
+  "function.revoke": "Clôture de fonction",
+  "project.create.undo": "Annulation — création de projet",
+  "project.update.undo": "Annulation — modification de projet",
+  "project.delete.undo": "Annulation — suppression de projet",
+  "project.link.undo": "Annulation — rattachement de projet",
+  "task.create.undo": "Annulation — création de tâche",
+  "task.link.undo": "Annulation — rattachement de tâche",
   "action.undo": "Annulation d'action",
 };
+
+const CATEGORY_OF_ACTION = (action: string): string => {
+  if (action.endsWith(".undo")) return "UNDO";
+  if (action.startsWith("project.")) return "PROJET";
+  if (action.startsWith("task.")) return "TACHE";
+  if (action.startsWith("role.") || action.startsWith("function.")) return "HABILITATION";
+  return "AUTRE";
+};
+
+const CATEGORY_LABEL: Record<string, string> = {
+  PROJET: "Projets",
+  TACHE: "Tâches",
+  HABILITATION: "Habilitations",
+  UNDO: "Annulations",
+  AUTRE: "Autres",
+};
+
+const PAGE_SIZE = 20;
 
 function formatDateTime(value: string) {
   return new Date(value).toLocaleString("fr-FR", {
@@ -59,22 +87,41 @@ function formatDateTime(value: string) {
   });
 }
 
+type LogRow = {
+  id: string;
+  actor_id: string | null;
+  action: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  old_values: unknown;
+  new_values: unknown;
+  metadata: unknown;
+  created_at: string;
+};
+
 function AuditPage() {
   const { isBureau } = useAuth();
   const [search, setSearch] = useState("");
-  const [entity, setEntity] = useState("ALL");
+  const [category, setCategory] = useState("ALL");
+  const [action, setAction] = useState("ALL");
+  const [actor, setActor] = useState("ALL");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [page, setPage] = useState(1);
 
   const { data: logs } = useQuery({
     queryKey: ["audit-logs"],
     enabled: isBureau,
     queryFn: async () =>
-      (
+      ((
         await supabase
           .from("audit_logs")
-          .select("id, actor_id, action, entity_type, entity_id, metadata, created_at")
+          .select(
+            "id, actor_id, action, entity_type, entity_id, old_values, new_values, metadata, created_at",
+          )
           .order("created_at", { ascending: false })
-          .limit(300)
-      ).data ?? [],
+          .limit(1000)
+      ).data ?? []) as LogRow[],
   });
 
   const { data: actors } = useQuery({
@@ -85,31 +132,86 @@ function AuditPage() {
         .data ?? [],
   });
 
+  const { data: projects } = useQuery({
+    queryKey: ["audit-projects"],
+    enabled: isBureau,
+    queryFn: async () => (await supabase.from("projects").select("id, title")).data ?? [],
+  });
+
   const actorName = (id: string | null) => {
     if (!id) return "Système";
-    const actor = (actors ?? []).find((a) => a.id === id);
-    return actor ? memberFullName(actor) : "Utilisateur";
+    const found = (actors ?? []).find((a) => a.id === id);
+    return found ? memberFullName(found) : "Utilisateur";
   };
 
-  const entityTypes = useMemo(
-    () =>
-      Array.from(new Set((logs ?? []).map((l) => l.entity_type).filter(Boolean))) as string[],
+  const projectTitle = (id: string | null) =>
+    id ? ((projects ?? []).find((p) => p.id === id)?.title ?? null) : null;
+
+  const actionTypes = useMemo(
+    () => Array.from(new Set((logs ?? []).map((l) => l.action))).sort(),
     [logs],
   );
 
+  const contextOf = (log: LogRow) => {
+    const meta = (log.metadata ?? {}) as Record<string, unknown>;
+    const next = (log.new_values ?? {}) as Record<string, unknown>;
+    const prev = (log.old_values ?? {}) as Record<string, unknown>;
+    const summary =
+      (typeof meta["summary"] === "string" && meta["summary"]) ||
+      (typeof meta["title"] === "string" && meta["title"]) ||
+      (typeof next["title"] === "string" && (next["title"] as string)) ||
+      (typeof prev["title"] === "string" && (prev["title"] as string)) ||
+      null;
+    const parts: string[] = [];
+    const linkedProject = projectTitle(log.entity_id);
+    if (linkedProject) parts.push(`Projet : ${linkedProject}`);
+    if (typeof next["status"] === "string")
+      parts.push(
+        `Statut : ${typeof prev["status"] === "string" ? `${prev["status"]} → ` : ""}${next["status"]}`,
+      );
+    if (typeof next["parent_project_id"] === "string")
+      parts.push(`Lien vers : ${projectTitle(next["parent_project_id"] as string) ?? "projet"}`);
+    if (typeof next["task_id"] === "string") parts.push("Lien de tâche");
+    return { summary: summary as string | null, context: parts };
+  };
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
+    const fromTime = from ? new Date(`${from}T00:00:00`).getTime() : null;
+    const toTime = to ? new Date(`${to}T23:59:59`).getTime() : null;
     return (logs ?? []).filter((log) => {
-      if (entity !== "ALL" && log.entity_type !== entity) return false;
+      if (category !== "ALL" && CATEGORY_OF_ACTION(log.action) !== category) return false;
+      if (action !== "ALL" && log.action !== action) return false;
+      if (actor !== "ALL" && (log.actor_id ?? "SYSTEM") !== actor) return false;
+      const time = new Date(log.created_at).getTime();
+      if (fromTime && time < fromTime) return false;
+      if (toTime && time > toTime) return false;
       if (!term) return true;
-      const label = ACTION_LABEL[log.action] ?? log.action;
-      return `${label} ${log.action} ${actorName(log.actor_id)} ${JSON.stringify(
-        log.metadata ?? {},
-      )}`
+      const { summary, context } = contextOf(log);
+      return `${ACTION_LABEL[log.action] ?? log.action} ${log.action} ${actorName(
+        log.actor_id,
+      )} ${summary ?? ""} ${context.join(" ")}`
         .toLowerCase()
         .includes(term);
     });
-  }, [logs, search, entity, actors]);
+  }, [logs, search, category, action, actor, from, to, actors, projects]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, category, action, actor, from, to]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const resetFilters = () => {
+    setSearch("");
+    setCategory("ALL");
+    setAction("ALL");
+    setActor("ALL");
+    setFrom("");
+    setTo("");
+  };
 
   if (!isBureau) {
     return (
@@ -124,53 +226,119 @@ function AuditPage() {
   return (
     <AppShell
       title="Journal d'activité"
-      subtitle="Traçabilité des actions sur les projets, tâches et habilitations"
-      actions={
-        <div className="flex gap-2">
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher"
-            className="w-48"
-          />
-          <Select value={entity} onValueChange={setEntity}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Toutes les entités</SelectItem>
-              {entityTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      }
+      subtitle="Traçabilité des actions sur les projets, tâches, liens et habilitations"
     >
+      <div className="mb-4 grid gap-2 rounded-lg border border-border bg-card p-4 md:grid-cols-3 lg:grid-cols-6">
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Rechercher (projet, tâche, auteur…)"
+          className="lg:col-span-2"
+        />
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger>
+            <SelectValue placeholder="Catégorie" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Toutes catégories</SelectItem>
+            {Object.entries(CATEGORY_LABEL).map(([code, label]) => (
+              <SelectItem key={code} value={code}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={action} onValueChange={setAction}>
+          <SelectTrigger>
+            <SelectValue placeholder="Type d'action" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Tous les types</SelectItem>
+            {actionTypes.map((code) => (
+              <SelectItem key={code} value={code}>
+                {ACTION_LABEL[code] ?? code}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={actor} onValueChange={setActor}>
+          <SelectTrigger>
+            <SelectValue placeholder="Utilisateur" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Tous les utilisateurs</SelectItem>
+            <SelectItem value="SYSTEM">Système</SelectItem>
+            {(actors ?? []).map((a) => (
+              <SelectItem key={a.id} value={a.id}>
+                {memberFullName(a)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="flex gap-2">
+          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+        <span>
+          {filtered.length} action{filtered.length > 1 ? "s" : ""} trouvée
+          {filtered.length > 1 ? "s" : ""}
+        </span>
+        <Button variant="ghost" size="sm" onClick={resetFilters}>
+          Réinitialiser les filtres
+        </Button>
+      </div>
+
       <div className="divide-y divide-border rounded-lg border border-border bg-card">
-        {filtered.map((log) => {
-          const meta = (log.metadata ?? {}) as Record<string, unknown>;
-          const title = typeof meta["title"] === "string" ? (meta["title"] as string) : null;
+        {pageRows.map((log) => {
+          const { summary, context } = contextOf(log);
           return (
             <div key={log.id} className="flex flex-wrap items-start justify-between gap-3 p-4">
               <div className="min-w-0">
                 <p className="text-sm font-medium">
                   {ACTION_LABEL[log.action] ?? log.action}
-                  {title ? <span className="text-muted-foreground"> — {title}</span> : null}
+                  {summary ? <span className="text-muted-foreground"> — {summary}</span> : null}
                 </p>
+                {context.length > 0 ? (
+                  <p className="text-xs text-muted-foreground">{context.join(" · ")}</p>
+                ) : null}
                 <p className="text-xs text-muted-foreground">
                   {actorName(log.actor_id)} · {formatDateTime(log.created_at)}
                 </p>
               </div>
-              {log.entity_type ? <Badge variant="outline">{log.entity_type}</Badge> : null}
+              <Badge variant="outline">
+                {CATEGORY_LABEL[CATEGORY_OF_ACTION(log.action)] ?? log.entity_type}
+              </Badge>
             </div>
           );
         })}
-        {filtered.length === 0 ? (
-          <p className="p-6 text-sm text-muted-foreground">Aucune action enregistrée.</p>
+        {pageRows.length === 0 ? (
+          <p className="p-6 text-sm text-muted-foreground">Aucune action ne correspond.</p>
         ) : null}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={safePage <= 1}
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+        >
+          Précédent
+        </Button>
+        <span className="text-sm text-muted-foreground">
+          Page {safePage} / {pageCount}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={safePage >= pageCount}
+          onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+        >
+          Suivant
+        </Button>
       </div>
     </AppShell>
   );
