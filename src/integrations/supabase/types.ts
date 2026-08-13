@@ -14,6 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounting: {
+        Row: {
+          activity_id: string | null
+          association_share: number
+          created_at: string
+          event_id: string | null
+          gross_revenue: number
+          id: string
+          label: string | null
+          professional_id: string | null
+          professional_share: number
+          recorded_on: string
+          updated_at: string
+        }
+        Insert: {
+          activity_id?: string | null
+          association_share?: number
+          created_at?: string
+          event_id?: string | null
+          gross_revenue?: number
+          id?: string
+          label?: string | null
+          professional_id?: string | null
+          professional_share?: number
+          recorded_on?: string
+          updated_at?: string
+        }
+        Update: {
+          activity_id?: string | null
+          association_share?: number
+          created_at?: string
+          event_id?: string | null
+          gross_revenue?: number
+          id?: string
+          label?: string | null
+          professional_id?: string | null
+          professional_share?: number
+          recorded_on?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounting_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activities: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          created_by: string | null
+          date: string | null
+          description: string | null
+          eligible_for_loyalty: boolean
+          id: string
+          location: string | null
+          price_member: number
+          price_public: number
+          professional_ids: string[]
+          status: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          date?: string | null
+          description?: string | null
+          eligible_for_loyalty?: boolean
+          id?: string
+          location?: string | null
+          price_member?: number
+          price_public?: number
+          professional_ids?: string[]
+          status?: string
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          date?: string | null
+          description?: string | null
+          eligible_for_loyalty?: boolean
+          id?: string
+          location?: string | null
+          price_member?: number
+          price_public?: number
+          professional_ids?: string[]
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -47,6 +158,213 @@ export type Database = {
           metadata?: Json | null
           new_values?: Json | null
           old_values?: Json | null
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          content: string | null
+          cover_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published_at: string | null
+          slug: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          content?: string | null
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          content?: string | null
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      contests: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          prizes: Json
+          start_date: string | null
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          winners: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          prizes?: Json
+          start_date?: string | null
+          status?: string
+          title: string
+          type?: string
+          updated_at?: string
+          winners?: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          prizes?: Json
+          start_date?: string | null
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          winners?: Json
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+          url: string
+          visibility: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+          url: string
+          visibility?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          url?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
+      dogs: {
+        Row: {
+          birth_date: string | null
+          breed: string | null
+          character: string | null
+          created_at: string
+          id: string
+          name: string
+          needs: string | null
+          owner_id: string
+          photo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          breed?: string | null
+          character?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          needs?: string | null
+          owner_id: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          breed?: string | null
+          character?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          needs?: string | null
+          owner_id?: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          event_type: string
+          financial_summary: Json
+          id: string
+          location: string | null
+          professional_ids: string[]
+          start_date: string | null
+          status: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: string
+          financial_summary?: Json
+          id?: string
+          location?: string | null
+          professional_ids?: string[]
+          start_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_type?: string
+          financial_summary?: Json
+          id?: string
+          location?: string | null
+          professional_ids?: string[]
+          start_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
         }
         Relationships: []
       }
@@ -89,6 +407,179 @@ export type Database = {
           recipient_id?: string
           sender_id?: string | null
           title?: string
+        }
+        Relationships: []
+      }
+      inventory: {
+        Row: {
+          alert_threshold: number
+          category: string | null
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+          quantity: number
+          updated_at: string
+        }
+        Insert: {
+          alert_threshold?: number
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+          quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          alert_threshold?: number
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+          quantity?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      loyalty_cards: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          qr_code: string
+          total_stamps: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          qr_code?: string
+          total_stamps?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          qr_code?: string
+          total_stamps?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      loyalty_rules: {
+        Row: {
+          activity_id: string | null
+          created_at: string
+          id: string
+          stamps_given: number
+        }
+        Insert: {
+          activity_id?: string | null
+          created_at?: string
+          id?: string
+          stamps_given?: number
+        }
+        Update: {
+          activity_id?: string | null
+          created_at?: string
+          id?: string
+          stamps_given?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_rules_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loyalty_stamps: {
+        Row: {
+          activity_id: string | null
+          card_id: string
+          created_at: string
+          id: string
+          note: string | null
+          professional_id: string | null
+          stamps: number
+        }
+        Insert: {
+          activity_id?: string | null
+          card_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          professional_id?: string | null
+          stamps?: number
+        }
+        Update: {
+          activity_id?: string | null
+          card_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          professional_id?: string | null
+          stamps?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_stamps_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loyalty_stamps_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mairies: {
+        Row: {
+          city: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          notes: string | null
+          organization: string
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          organization: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          notes?: string | null
+          organization?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -157,6 +648,93 @@ export type Database = {
           },
         ]
       }
+      participations: {
+        Row: {
+          activity_id: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          registration_status: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          registration_status?: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          registration_status?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participations_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partners: {
+        Row: {
+          active: boolean
+          advantages: string | null
+          contact: string | null
+          created_at: string
+          id: string
+          name: string
+          promo_codes: Json
+          type: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          active?: boolean
+          advantages?: string | null
+          contact?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          promo_codes?: Json
+          type?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          active?: boolean
+          advantages?: string | null
+          contact?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          promo_codes?: Json
+          type?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           action: string
@@ -181,6 +759,98 @@ export type Database = {
           id?: string
           module?: string
           name?: string
+        }
+        Relationships: []
+      }
+      pro_details: {
+        Row: {
+          can_grant_stamps: boolean
+          company_name: string
+          contract_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          partnership_percentage: number
+          professional_category: string | null
+          profile_id: string
+          social_links: Json
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          can_grant_stamps?: boolean
+          company_name: string
+          contract_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          partnership_percentage?: number
+          professional_category?: string | null
+          profile_id: string
+          social_links?: Json
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          can_grant_stamps?: boolean
+          company_name?: string
+          contract_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          partnership_percentage?: number
+          professional_category?: string | null
+          profile_id?: string
+          social_links?: Json
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_details_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professional_proposals: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          review_comment: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_by: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          review_comment?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_by: string
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          review_comment?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_by?: string
+          title?: string
+          type?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -300,6 +970,38 @@ export type Database = {
           },
         ]
       }
+      project_teams: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          project_id: string
+          role_in_project: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          project_id: string
+          role_in_project?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          project_id?: string
+          role_in_project?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_teams_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           archived_at: string | null
@@ -378,6 +1080,42 @@ export type Database = {
           },
         ]
       }
+      reimbursements: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          label: string
+          person_id: string
+          processed_by: string | null
+          receipt_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          label: string
+          person_id: string
+          processed_by?: string | null
+          receipt_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          label?: string
+          person_id?: string
+          processed_by?: string | null
+          receipt_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           permission_id: string
@@ -434,6 +1172,44 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      task_history: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          task_id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          task_id: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          task_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_history_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       task_submissions: {
         Row: {
@@ -592,6 +1368,83 @@ export type Database = {
           },
         ]
       }
+      terrain_reservations: {
+        Row: {
+          created_at: string
+          date: string
+          end_time: string
+          id: string
+          professional_id: string
+          purpose: string | null
+          resource_id: string
+          start_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          end_time: string
+          id?: string
+          professional_id: string
+          purpose?: string | null
+          resource_id: string
+          start_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          end_time?: string
+          id?: string
+          professional_id?: string
+          purpose?: string | null
+          resource_id?: string
+          start_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terrain_reservations_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "terrain_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      terrain_resources: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_by: string | null
@@ -643,6 +1496,7 @@ export type Database = {
         Returns: boolean
       }
       is_bureau: { Args: { _user_id: string }; Returns: boolean }
+      is_professional: { Args: { _user_id: string }; Returns: boolean }
       is_project_member: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean

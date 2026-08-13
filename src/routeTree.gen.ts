@@ -11,16 +11,30 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
+import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
+import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
+import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
+import { Route as AuthenticatedLoyaltyRouteImport } from './routes/_authenticated/loyalty'
 import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
+import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events.index'
+import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events.$eventId'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
 import { Route as AuthenticatedMembersMemberIdRouteImport } from './routes/_authenticated/members.$memberId'
 import { Route as AuthenticatedMembersNewRouteImport } from './routes/_authenticated/members.new'
+import { Route as AuthenticatedProfessionalsIndexRouteImport } from './routes/_authenticated/professionals.index'
+import { Route as AuthenticatedProfessionalsProIdRouteImport } from './routes/_authenticated/professionals.$proId'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects.index'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
 import { Route as ApiPublicResetDemoRouteImport } from './routes/api/public/reset-demo'
@@ -34,6 +48,36 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBlogRoute = AuthenticatedBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLoyaltyRoute = AuthenticatedLoyaltyRouteImport.update({
+  id: '/loyalty',
+  path: '/loyalty',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMemberRoute = AuthenticatedMemberRouteImport.update({
   id: '/member',
   path: '/member',
@@ -44,9 +88,30 @@ const AuthenticatedMindmapRoute = AuthenticatedMindmapRouteImport.update({
   path: '/mindmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPartnersRoute = AuthenticatedPartnersRouteImport.update({
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTerrainRoute = AuthenticatedTerrainRouteImport.update({
+  id: '/terrain',
+  path: '/terrain',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -70,6 +135,18 @@ const AuthenticatedAdminValidationRoute =
     path: '/admin/validation',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEventsIndexRoute =
+  AuthenticatedEventsIndexRouteImport.update({
+    id: '/events/',
+    path: '/events/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEventsEventIdRoute =
+  AuthenticatedEventsEventIdRouteImport.update({
+    id: '/events/$eventId',
+    path: '/events/$eventId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMembersIndexRoute =
   AuthenticatedMembersIndexRouteImport.update({
     id: '/members/',
@@ -87,6 +164,18 @@ const AuthenticatedMembersNewRoute = AuthenticatedMembersNewRouteImport.update({
   path: '/members/new',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfessionalsIndexRoute =
+  AuthenticatedProfessionalsIndexRouteImport.update({
+    id: '/professionals/',
+    path: '/professionals/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProfessionalsProIdRoute =
+  AuthenticatedProfessionalsProIdRouteImport.update({
+    id: '/professionals/$proId',
+    path: '/professionals/$proId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProjectsIndexRoute =
   AuthenticatedProjectsIndexRouteImport.update({
     id: '/projects/',
@@ -107,103 +196,187 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
+  '/blog': typeof AuthenticatedBlogRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/finance': typeof AuthenticatedFinanceRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
+  '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/partners': typeof AuthenticatedPartnersRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
+  '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/events/': typeof AuthenticatedEventsIndexRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
+  '/professionals/': typeof AuthenticatedProfessionalsIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
+  '/blog': typeof AuthenticatedBlogRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/finance': typeof AuthenticatedFinanceRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
+  '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/partners': typeof AuthenticatedPartnersRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
+  '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/events': typeof AuthenticatedEventsIndexRoute
   '/members': typeof AuthenticatedMembersIndexRoute
+  '/professionals': typeof AuthenticatedProfessionalsIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
+  '/_authenticated/blog': typeof AuthenticatedBlogRoute
+  '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
+  '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
+  '/_authenticated/loyalty': typeof AuthenticatedLoyaltyRoute
   '/_authenticated/member': typeof AuthenticatedMemberRoute
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/partners': typeof AuthenticatedPartnersRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
+  '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
+  '/_authenticated/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
+  '/_authenticated/professionals/': typeof AuthenticatedProfessionalsIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/activities'
+    | '/blog'
+    | '/documents'
+    | '/finance'
+    | '/inventory'
+    | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/notifications'
+    | '/partners'
+    | '/profile'
     | '/tasks'
+    | '/terrain'
     | '/admin/audit'
     | '/admin/roles'
     | '/admin/validation'
+    | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
+    | '/professionals/$proId'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin/'
+    | '/events/'
     | '/members/'
+    | '/professionals/'
     | '/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/activities'
+    | '/blog'
+    | '/documents'
+    | '/finance'
+    | '/inventory'
+    | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/notifications'
+    | '/partners'
+    | '/profile'
     | '/tasks'
+    | '/terrain'
     | '/admin/audit'
     | '/admin/roles'
     | '/admin/validation'
+    | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
+    | '/professionals/$proId'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin'
+    | '/events'
     | '/members'
+    | '/professionals'
     | '/projects'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_authenticated/activities'
+    | '/_authenticated/blog'
+    | '/_authenticated/documents'
+    | '/_authenticated/finance'
+    | '/_authenticated/inventory'
+    | '/_authenticated/loyalty'
     | '/_authenticated/member'
     | '/_authenticated/mindmap'
+    | '/_authenticated/notifications'
+    | '/_authenticated/partners'
+    | '/_authenticated/profile'
     | '/_authenticated/tasks'
+    | '/_authenticated/terrain'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/roles'
     | '/_authenticated/admin/validation'
+    | '/_authenticated/events/$eventId'
     | '/_authenticated/members/$memberId'
     | '/_authenticated/members/new'
+    | '/_authenticated/professionals/$proId'
     | '/_authenticated/projects/$projectId'
     | '/api/public/reset-demo'
     | '/_authenticated/admin/'
+    | '/_authenticated/events/'
     | '/_authenticated/members/'
+    | '/_authenticated/professionals/'
     | '/_authenticated/projects/'
   fileRoutesById: FileRoutesById
 }
@@ -229,6 +402,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/activities': {
+      id: '/_authenticated/activities'
+      path: '/activities'
+      fullPath: '/activities'
+      preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/blog': {
+      id: '/_authenticated/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof AuthenticatedBlogRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documents': {
+      id: '/_authenticated/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance': {
+      id: '/_authenticated/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory': {
+      id: '/_authenticated/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/loyalty': {
+      id: '/_authenticated/loyalty'
+      path: '/loyalty'
+      fullPath: '/loyalty'
+      preLoaderRoute: typeof AuthenticatedLoyaltyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/member': {
       id: '/_authenticated/member'
       path: '/member'
@@ -243,11 +458,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMindmapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/partners': {
+      id: '/_authenticated/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof AuthenticatedPartnersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tasks': {
       id: '/_authenticated/tasks'
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof AuthenticatedTasksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/terrain': {
+      id: '/_authenticated/terrain'
+      path: '/terrain'
+      fullPath: '/terrain'
+      preLoaderRoute: typeof AuthenticatedTerrainRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
@@ -278,6 +521,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminValidationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events/': {
+      id: '/_authenticated/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof AuthenticatedEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events/$eventId': {
+      id: '/_authenticated/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof AuthenticatedEventsEventIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/members/': {
       id: '/_authenticated/members/'
       path: '/members'
@@ -297,6 +554,20 @@ declare module '@tanstack/react-router' {
       path: '/members/new'
       fullPath: '/members/new'
       preLoaderRoute: typeof AuthenticatedMembersNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/professionals/': {
+      id: '/_authenticated/professionals/'
+      path: '/professionals'
+      fullPath: '/professionals/'
+      preLoaderRoute: typeof AuthenticatedProfessionalsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/professionals/$proId': {
+      id: '/_authenticated/professionals/$proId'
+      path: '/professionals/$proId'
+      fullPath: '/professionals/$proId'
+      preLoaderRoute: typeof AuthenticatedProfessionalsProIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/projects/': {
@@ -324,32 +595,60 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
+  AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
+  AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
+  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
+  AuthenticatedLoyaltyRoute: typeof AuthenticatedLoyaltyRoute
   AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
+  AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
+  AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
+  AuthenticatedProfessionalsProIdRoute: typeof AuthenticatedProfessionalsProIdRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
   AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
+  AuthenticatedProfessionalsIndexRoute: typeof AuthenticatedProfessionalsIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
+  AuthenticatedBlogRoute: AuthenticatedBlogRoute,
+  AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
+  AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
+  AuthenticatedLoyaltyRoute: AuthenticatedLoyaltyRoute,
   AuthenticatedMemberRoute: AuthenticatedMemberRoute,
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
+  AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
+  AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
+  AuthenticatedProfessionalsProIdRoute: AuthenticatedProfessionalsProIdRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
   AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
+  AuthenticatedProfessionalsIndexRoute: AuthenticatedProfessionalsIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
 }
 
