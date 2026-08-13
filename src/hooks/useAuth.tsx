@@ -72,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .map((row) => (row as { roles: { code: string } | null }).roles?.code)
       .filter((code): code is string => Boolean(code));
     setRoles(codes);
+    setRolesReady(true);
   };
 
   useEffect(() => {
