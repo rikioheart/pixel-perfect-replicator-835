@@ -513,7 +513,7 @@ function MemberLevels({
       metadata: { member_name: memberName },
     });
     toast.success("Niveau mis à jour.");
-    await queryClient.invalidateQueries({ queryKey: ["roles-members"] });
+    await queryClient.invalidateQueries({ queryKey: ["rbac-members"] });
   };
 
   return (
