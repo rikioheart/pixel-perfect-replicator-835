@@ -187,11 +187,12 @@ export function AppShell({
         </header>
 
         <div className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden">
-          {items.map((item) => (
+          {groups.flatMap((group) => group.items).map((item) => (
             <Button key={item.to} asChild variant="ghost" size="sm">
               <Link to={item.to}>{item.label}</Link>
             </Button>
           ))}
+
         </div>
 
         <main className="flex-1 p-6">{children}</main>
