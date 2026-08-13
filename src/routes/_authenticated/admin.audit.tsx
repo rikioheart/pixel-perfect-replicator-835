@@ -156,10 +156,41 @@ function AuditPage() {
   const projectTitle = (id: string | null) =>
     id ? ((projects ?? []).find((p) => p.id === id)?.title ?? null) : null;
 
+  const taskOf = (id: string | null) =>
+    id ? ((tasks ?? []).find((t) => t.id === id) ?? null) : null;
+
   const actionTypes = useMemo(
     () => Array.from(new Set((logs ?? []).map((l) => l.action))).sort(),
     [logs],
   );
+
+  /** Tous les identifiants d'entités (projet ou tâche) référencés par une entrée. */
+  const relatedIds = (log: LogRow): string[] => {
+    const bags = [log.metadata, log.new_values, log.old_values] as Array<
+      Record<string, unknown> | null
+    >;
+    const ids = new Set<string>();
+    if (log.entity_id) ids.add(log.entity_id);
+    for (const bag of bags) {
+      if (!bag || typeof bag !== "object") continue;
+      for (const key of ["project_id", "parent_project_id", "task_id", "target_id", "source_id"]) {
+        const value = (bag as Record<string, unknown>)[key];
+        if (typeof value === "string") ids.add(value);
+      }
+    }
+    return Array.from(ids);
+  };
+
+  /** Entité principale de l'entrée, pour la navigation directe. */
+  const entityRefOf = (log: LogRow) => {
+    for (const id of relatedIds(log)) {
+      const task = taskOf(id);
+      if (task) return { value: `T:${id}`, label: task.title, kind: "task" as const, id };
+      const title = projectTitle(id);
+      if (title) return { value: `P:${id}`, label: title, kind: "project" as const, id };
+    }
+    return null;
+  };
 
   const contextOf = (log: LogRow) => {
     const meta = (log.metadata ?? {}) as Record<string, unknown>;
@@ -174,6 +205,8 @@ function AuditPage() {
     const parts: string[] = [];
     const linkedProject = projectTitle(log.entity_id);
     if (linkedProject) parts.push(`Projet : ${linkedProject}`);
+    const linkedTask = taskOf(log.entity_id);
+    if (linkedTask) parts.push(`Tâche : ${linkedTask.title}`);
     if (typeof next["status"] === "string")
       parts.push(
         `Statut : ${typeof prev["status"] === "string" ? `${prev["status"]} → ` : ""}${next["status"]}`,
@@ -184,14 +217,24 @@ function AuditPage() {
     return { summary: summary as string | null, context: parts };
   };
 
+  /** Identifiants acceptés pour le filtre entité sélectionné. */
+  const entityScope = useMemo(() => {
+    if (entity === "ALL") return null;
+    const [kind, id] = [entity.slice(0, 1), entity.slice(2)];
+    if (kind === "T") return new Set([id]);
+    const childTaskIds = (tasks ?? []).filter((t) => t.project_id === id).map((t) => t.id);
+    return new Set([id, ...childTaskIds]);
+  }, [entity, tasks]);
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     const fromTime = from ? new Date(`${from}T00:00:00`).getTime() : null;
     const toTime = to ? new Date(`${to}T23:59:59`).getTime() : null;
-    return (logs ?? []).filter((log) => {
+    const rows = (logs ?? []).filter((log) => {
       if (category !== "ALL" && CATEGORY_OF_ACTION(log.action) !== category) return false;
       if (action !== "ALL" && log.action !== action) return false;
       if (actor !== "ALL" && (log.actor_id ?? "SYSTEM") !== actor) return false;
+      if (entityScope && !relatedIds(log).some((id) => entityScope.has(id))) return false;
       const time = new Date(log.created_at).getTime();
       if (fromTime && time < fromTime) return false;
       if (toTime && time > toTime) return false;
@@ -203,11 +246,28 @@ function AuditPage() {
         .toLowerCase()
         .includes(term);
     });
-  }, [logs, search, category, action, actor, from, to, actors, projects]);
+    return rows.sort((a, b) => {
+      const diff = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return chronological ? diff : -diff;
+    });
+  }, [
+    logs,
+    search,
+    category,
+    action,
+    actor,
+    from,
+    to,
+    actors,
+    projects,
+    tasks,
+    entityScope,
+    chronological,
+  ]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, category, action, actor, from, to]);
+  }, [search, category, action, actor, from, to, entity, chronological]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
