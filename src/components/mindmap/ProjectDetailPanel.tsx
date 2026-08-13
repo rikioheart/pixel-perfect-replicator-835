@@ -498,27 +498,25 @@ export function ProjectDetailPanel({
                   </p>
                 ) : (
                   <ul className="space-y-2">
-                    {(history.data ?? []).map((entry) => {
-                      const summary =
-                        typeof entry.metadata?.['summary'] === "string"
-                          ? (entry.metadata['summary'] as string)
-                          : null;
-                      return (
-                        <li key={entry.id} className="rounded-md border border-border p-2.5">
-                          <p className="text-sm font-medium">
-                            {AUDIT_ACTION_LABEL[entry.action] ?? entry.action}
-                          </p>
-                          {summary ? (
-                            <p className="mt-0.5 text-xs text-muted-foreground">{summary}</p>
-                          ) : null}
-                          <p className="mt-1 text-[11px] text-muted-foreground">
-                            {new Date(entry.created_at).toLocaleString("fr-FR")} ·{" "}
-                            {entry.actor_id ? (people[entry.actor_id] ?? "Membre") : "Système"}
-                          </p>
-                        </li>
-                      );
-                    })}
+                    {(history.data ?? []).map((entry) => (
+                      <li key={entry.id} className="rounded-md border border-border p-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-medium">{entry.label}</p>
+                          <Badge variant="outline" className="shrink-0 text-[10px]">
+                            {entry.scope === "task" ? "Tâche" : "Projet"}
+                          </Badge>
+                        </div>
+                        {entry.summary ? (
+                          <p className="mt-0.5 text-xs text-muted-foreground">{entry.summary}</p>
+                        ) : null}
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {new Date(entry.at).toLocaleString("fr-FR")} ·{" "}
+                          {entry.actorId ? (people[entry.actorId] ?? "Membre") : "Système"}
+                        </p>
+                      </li>
+                    ))}
                   </ul>
+
                 )}
               </TabsContent>
             </Tabs>
