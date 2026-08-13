@@ -1,0 +1,12 @@
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, text) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.is_bureau(uuid) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.has_permission(uuid, text) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.is_project_member(uuid, uuid) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.can_view_project(uuid, uuid) FROM public, anon;
+REVOKE EXECUTE ON FUNCTION public.claim_bureau_bootstrap() FROM public, anon;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_bureau(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_permission(uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_project_member(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.can_view_project(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.claim_bureau_bootstrap() TO authenticated;
