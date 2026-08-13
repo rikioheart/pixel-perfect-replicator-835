@@ -81,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!active) return;
       setSession(nextSession);
+      setRolesReady(false); // wait for fresh roles before any role-based redirect
       setTimeout(() => {
         void loadContext(nextSession?.user.id);
       }, 0);
