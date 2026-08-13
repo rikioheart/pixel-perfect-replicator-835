@@ -9,6 +9,7 @@ import {
   LogOut,
   PawPrint,
   Users,
+  Network,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const navItems = [
   { to: "/members", label: "Adhérents", icon: Users, bureauOnly: true },
   { to: "/projects", label: "Projets", icon: FolderKanban, bureauOnly: false },
   { to: "/tasks", label: "Tâches", icon: ListChecks, bureauOnly: false },
+  { to: "/mindmap", label: "Mindmap", icon: Network, bureauOnly: false },
   { to: "/admin/validation", label: "Validations", icon: ShieldCheck, bureauOnly: true },
 ] as const;
 
