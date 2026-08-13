@@ -37,14 +37,14 @@ export const Route = createFileRoute("/")({
 });
 
 function AuthPage() {
-  const { session, isBureau, loading } = useAuth();
+  const { session, isBureau, loading, rolesReady } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && session) {
+    if (!loading && rolesReady && session) {
       void navigate({ to: isBureau ? "/admin" : "/member" });
     }
-  }, [session, isBureau, loading, navigate]);
+  }, [session, isBureau, loading, rolesReady, navigate]);
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
