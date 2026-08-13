@@ -144,11 +144,33 @@ export function TaskCard({
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
+          {allowedProofs.length > 0 ? (
+            <select
+              aria-label="Type de preuve"
+              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+              value={proofType}
+              onChange={(e) => setProofType(e.target.value)}
+            >
+              <option value="">Type de preuve (facultatif)</option>
+              {allowedProofs.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : null}
           <Input
-            placeholder="Lien vers la preuve (document, photo, page…)"
+            placeholder={
+              requiresFile
+                ? "Lien vers la pièce jointe (obligatoire)"
+                : "Lien vers la preuve (document, photo, page…)"
+            }
             value={proofUrl}
             onChange={(e) => setProofUrl(e.target.value)}
           />
+          {selectedProof?.description ? (
+            <p className="text-xs text-muted-foreground">{selectedProof.description}</p>
+          ) : null}
           <Button size="sm" onClick={submitProof}>
             Envoyer au Bureau
           </Button>
