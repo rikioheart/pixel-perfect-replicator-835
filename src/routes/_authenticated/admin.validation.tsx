@@ -44,7 +44,7 @@ function ValidationPage() {
         await supabase
           .from("tasks")
           .select(
-            "id, title, description, priority, deadline, submitted_at, projects(title), task_submissions(id, comment, proof_url, submitted_at)",
+            "id, title, description, priority, deadline, submitted_at, projects(title), task_submissions(id, comment, proof_url, proof_type, submitted_at)",
           )
           .eq("status", "PENDING_VALIDATION")
           .order("submitted_at", { ascending: true })
@@ -118,6 +118,11 @@ function ValidationPage() {
                   task.task_submissions.map((submission) => (
                     <div key={submission.id} className="space-y-1">
                       <p>{submission.comment || "Sans commentaire"}</p>
+                      {submission.proof_type ? (
+                        <p className="text-xs text-muted-foreground">
+                          Type de preuve : {submission.proof_type}
+                        </p>
+                      ) : null}
                       {submission.proof_url ? (
                         <a
                           href={submission.proof_url}
