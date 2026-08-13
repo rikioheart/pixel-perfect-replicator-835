@@ -5,6 +5,7 @@ import { Users, Briefcase, FolderKanban, ShieldCheck, Activity } from "lucide-re
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
+import { CharterBanner } from "@/components/CharterBanner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
+import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticated/charter'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
@@ -56,6 +57,11 @@ const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
 const AuthenticatedBlogRoute = AuthenticatedBlogRouteImport.update({
   id: '/blog',
   path: '/blog',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCharterRoute = AuthenticatedCharterRouteImport.update({
+  id: '/charter',
+  path: '/charter',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/blog': typeof AuthenticatedBlogRoute
+  '/charter': typeof AuthenticatedCharterRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/blog': typeof AuthenticatedBlogRoute
+  '/charter': typeof AuthenticatedCharterRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
+  '/_authenticated/charter': typeof AuthenticatedCharterRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activities'
     | '/blog'
+    | '/charter'
     | '/documents'
     | '/finance'
     | '/inventory'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activities'
     | '/blog'
+    | '/charter'
     | '/documents'
     | '/finance'
     | '/inventory'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_authenticated/activities'
     | '/_authenticated/blog'
+    | '/_authenticated/charter'
     | '/_authenticated/documents'
     | '/_authenticated/finance'
     | '/_authenticated/inventory'
@@ -414,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog'
       preLoaderRoute: typeof AuthenticatedBlogRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/charter': {
+      id: '/_authenticated/charter'
+      path: '/charter'
+      fullPath: '/charter'
+      preLoaderRoute: typeof AuthenticatedCharterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/documents': {
@@ -597,6 +616,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
+  AuthenticatedCharterRoute: typeof AuthenticatedCharterRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
@@ -626,6 +646,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
+  AuthenticatedCharterRoute: AuthenticatedCharterRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
