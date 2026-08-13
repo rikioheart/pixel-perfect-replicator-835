@@ -387,7 +387,7 @@ function Block({
   );
 }
 
-function Row({ main, sub, right }: { main: string; sub?: string; right?: string }) {
+function Row({ main, sub, right }: { main: string; sub?: string | undefined; right?: string | undefined }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-border pb-2 last:border-0">
       <div className="min-w-0">
