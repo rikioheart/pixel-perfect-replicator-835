@@ -32,7 +32,7 @@ const statusTone: Record<string, string> = {
   ON_HOLD: "bg-muted text-muted-foreground",
 };
 
-function Tag({ children, tone }: { children: React.ReactNode; tone?: string }) {
+function Tag({ children, tone }: { children: React.ReactNode; tone?: string | undefined }) {
   return (
     <span
       className={cn(

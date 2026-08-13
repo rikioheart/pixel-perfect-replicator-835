@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
+import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
@@ -34,6 +35,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthenticatedMemberRoute = AuthenticatedMemberRouteImport.update({
   id: '/member',
   path: '/member',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMindmapRoute = AuthenticatedMindmapRouteImport.update({
+  id: '/mindmap',
+  path: '/mindmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
@@ -90,6 +96,7 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/member': typeof AuthenticatedMemberRoute
+  '/mindmap': typeof AuthenticatedMindmapRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/member': typeof AuthenticatedMemberRoute
+  '/mindmap': typeof AuthenticatedMindmapRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/member': typeof AuthenticatedMemberRoute
+  '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/member'
+    | '/mindmap'
     | '/tasks'
     | '/admin/validation'
     | '/members/$memberId'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/member'
+    | '/mindmap'
     | '/tasks'
     | '/admin/validation'
     | '/members/$memberId'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/_authenticated/member'
+    | '/_authenticated/mindmap'
     | '/_authenticated/tasks'
     | '/_authenticated/admin/validation'
     | '/_authenticated/members/$memberId'
@@ -198,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/member'
       fullPath: '/member'
       preLoaderRoute: typeof AuthenticatedMemberRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mindmap': {
+      id: '/_authenticated/mindmap'
+      path: '/mindmap'
+      fullPath: '/mindmap'
+      preLoaderRoute: typeof AuthenticatedMindmapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks': {
@@ -268,6 +287,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
+  AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
@@ -280,6 +300,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMemberRoute: AuthenticatedMemberRoute,
+  AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
