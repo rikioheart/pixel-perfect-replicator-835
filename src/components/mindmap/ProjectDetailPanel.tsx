@@ -123,11 +123,7 @@ export function ProjectDetailPanel({
                   <ul className="space-y-2">
                     {tasks.map((task) => (
                       <li key={task.id} className="rounded-md border border-border p-2.5">
-                        <Link
-                          to="/tasks"
-                          search={{ task: task.id }}
-                          className="text-sm font-medium hover:underline"
-                        >
+                        <Link to="/tasks" className="text-sm font-medium hover:underline">
                           {task.title}
                         </Link>
                         <p className="mt-1 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
