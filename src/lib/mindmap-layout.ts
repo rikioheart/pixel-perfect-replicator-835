@@ -46,7 +46,7 @@ export async function saveMindmapLayout(params: {
   nodes: { id: string; type?: string | undefined; position: StoredPosition }[];
   edges: { id: string; source: string; target: string }[];
   userId: string | null;
-}): Promise<{ ok: boolean; id?: string; error?: string }> {
+}): Promise<{ ok: boolean; id?: string | undefined; error?: string | undefined }> {
   const payload = {
     nodes: params.nodes.map((n) => ({
       id: n.id,
