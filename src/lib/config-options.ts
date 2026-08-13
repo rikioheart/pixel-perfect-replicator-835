@@ -51,13 +51,13 @@ export const CONFIG_FAMILY_LABEL: Record<string, string> = Object.fromEntries(
 export async function fetchConfigOptions(family?: string): Promise<ConfigOption[]> {
   let query = supabase
     .from("config_options")
-    .select("id, family, code, label, description, color, sort_order, is_active, is_system")
+    .select("id, family, code, label, description, color, sort_order, is_active, is_system, metadata")
     .order("family", { ascending: true })
     .order("sort_order", { ascending: true });
   if (family) query = query.eq("family", family);
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return (data ?? []) as ConfigOption[];
+  return (data ?? []) as unknown as ConfigOption[];
 }
 
 /** Options actives d'une famille, utilisables dans n'importe quel formulaire. */

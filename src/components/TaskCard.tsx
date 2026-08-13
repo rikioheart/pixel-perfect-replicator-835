@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useConfigOptions } from "@/lib/config-options";
 import { TASK_STATUS_LABEL, PRIORITY_LABEL, formatDate } from "@/lib/domain";
 
 export type TaskRow = {
@@ -43,13 +44,11 @@ export function TaskCard({
 
   // Chaque type de preuve déclare les statuts de tâche auxquels il s'applique.
   const allowedProofs = proofTypes.options.filter((option) => {
-    const statuses = (option as { metadata?: { task_statuses?: string[] } }).metadata?.task_statuses;
+    const statuses = option.metadata?.task_statuses;
     return !statuses || statuses.length === 0 || statuses.includes(task.status);
   });
   const selectedProof = allowedProofs.find((option) => option.code === proofType);
-  const requiresFile = Boolean(
-    (selectedProof as { metadata?: { requires_file?: boolean } } | undefined)?.metadata?.requires_file,
-  );
+  const requiresFile = Boolean(selectedProof?.metadata?.requires_file);
 
   const setStatus = async (status: string, extra: Record<string, unknown> = {}) => {
     const { error } = await supabase.from("tasks").update({ status, ...extra }).eq("id", task.id);
