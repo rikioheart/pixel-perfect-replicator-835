@@ -108,6 +108,8 @@ function AuditPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [page, setPage] = useState(1);
+  const [entity, setEntity] = useState("ALL");
+  const [chronological, setChronological] = useState(false);
 
   const { data: logs } = useQuery({
     queryKey: ["audit-logs"],
@@ -138,6 +140,13 @@ function AuditPage() {
     queryFn: async () => (await supabase.from("projects").select("id, title")).data ?? [],
   });
 
+  const { data: tasks } = useQuery({
+    queryKey: ["audit-tasks"],
+    enabled: isBureau,
+    queryFn: async () =>
+      (await supabase.from("tasks").select("id, title, project_id")).data ?? [],
+  });
+
   const actorName = (id: string | null) => {
     if (!id) return "Système";
     const found = (actors ?? []).find((a) => a.id === id);
@@ -147,10 +156,41 @@ function AuditPage() {
   const projectTitle = (id: string | null) =>
     id ? ((projects ?? []).find((p) => p.id === id)?.title ?? null) : null;
 
+  const taskOf = (id: string | null) =>
+    id ? ((tasks ?? []).find((t) => t.id === id) ?? null) : null;
+
   const actionTypes = useMemo(
     () => Array.from(new Set((logs ?? []).map((l) => l.action))).sort(),
     [logs],
   );
+
+  /** Tous les identifiants d'entités (projet ou tâche) référencés par une entrée. */
+  const relatedIds = (log: LogRow): string[] => {
+    const bags = [log.metadata, log.new_values, log.old_values] as Array<
+      Record<string, unknown> | null
+    >;
+    const ids = new Set<string>();
+    if (log.entity_id) ids.add(log.entity_id);
+    for (const bag of bags) {
+      if (!bag || typeof bag !== "object") continue;
+      for (const key of ["project_id", "parent_project_id", "task_id", "target_id", "source_id"]) {
+        const value = (bag as Record<string, unknown>)[key];
+        if (typeof value === "string") ids.add(value);
+      }
+    }
+    return Array.from(ids);
+  };
+
+  /** Entité principale de l'entrée, pour la navigation directe. */
+  const entityRefOf = (log: LogRow) => {
+    for (const id of relatedIds(log)) {
+      const task = taskOf(id);
+      if (task) return { value: `T:${id}`, label: task.title, kind: "task" as const, id };
+      const title = projectTitle(id);
+      if (title) return { value: `P:${id}`, label: title, kind: "project" as const, id };
+    }
+    return null;
+  };
 
   const contextOf = (log: LogRow) => {
     const meta = (log.metadata ?? {}) as Record<string, unknown>;
@@ -165,6 +205,8 @@ function AuditPage() {
     const parts: string[] = [];
     const linkedProject = projectTitle(log.entity_id);
     if (linkedProject) parts.push(`Projet : ${linkedProject}`);
+    const linkedTask = taskOf(log.entity_id);
+    if (linkedTask) parts.push(`Tâche : ${linkedTask.title}`);
     if (typeof next["status"] === "string")
       parts.push(
         `Statut : ${typeof prev["status"] === "string" ? `${prev["status"]} → ` : ""}${next["status"]}`,
@@ -175,14 +217,24 @@ function AuditPage() {
     return { summary: summary as string | null, context: parts };
   };
 
+  /** Identifiants acceptés pour le filtre entité sélectionné. */
+  const entityScope = useMemo(() => {
+    if (entity === "ALL") return null;
+    const [kind, id] = [entity.slice(0, 1), entity.slice(2)];
+    if (kind === "T") return new Set([id]);
+    const childTaskIds = (tasks ?? []).filter((t) => t.project_id === id).map((t) => t.id);
+    return new Set([id, ...childTaskIds]);
+  }, [entity, tasks]);
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     const fromTime = from ? new Date(`${from}T00:00:00`).getTime() : null;
     const toTime = to ? new Date(`${to}T23:59:59`).getTime() : null;
-    return (logs ?? []).filter((log) => {
+    const rows = (logs ?? []).filter((log) => {
       if (category !== "ALL" && CATEGORY_OF_ACTION(log.action) !== category) return false;
       if (action !== "ALL" && log.action !== action) return false;
       if (actor !== "ALL" && (log.actor_id ?? "SYSTEM") !== actor) return false;
+      if (entityScope && !relatedIds(log).some((id) => entityScope.has(id))) return false;
       const time = new Date(log.created_at).getTime();
       if (fromTime && time < fromTime) return false;
       if (toTime && time > toTime) return false;
@@ -194,11 +246,28 @@ function AuditPage() {
         .toLowerCase()
         .includes(term);
     });
-  }, [logs, search, category, action, actor, from, to, actors, projects]);
+    return rows.sort((a, b) => {
+      const diff = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return chronological ? diff : -diff;
+    });
+  }, [
+    logs,
+    search,
+    category,
+    action,
+    actor,
+    from,
+    to,
+    actors,
+    projects,
+    tasks,
+    entityScope,
+    chronological,
+  ]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, category, action, actor, from, to]);
+  }, [search, category, action, actor, from, to, entity, chronological]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
@@ -211,7 +280,15 @@ function AuditPage() {
     setActor("ALL");
     setFrom("");
     setTo("");
+    setEntity("ALL");
   };
+
+  const entityLabel =
+    entity === "ALL"
+      ? null
+      : entity.startsWith("T:")
+        ? (taskOf(entity.slice(2))?.title ?? "Tâche")
+        : (projectTitle(entity.slice(2)) ?? "Projet");
 
   if (!isBureau) {
     return (
@@ -275,6 +352,24 @@ function AuditPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={entity} onValueChange={setEntity}>
+          <SelectTrigger>
+            <SelectValue placeholder="Projet ou tâche" />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            <SelectItem value="ALL">Tous les projets et tâches</SelectItem>
+            {(projects ?? []).map((p) => (
+              <SelectItem key={p.id} value={`P:${p.id}`}>
+                Projet · {p.title}
+              </SelectItem>
+            ))}
+            {(tasks ?? []).map((t) => (
+              <SelectItem key={t.id} value={`T:${t.id}`}>
+                Tâche · {t.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex gap-2">
           <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
@@ -282,18 +377,33 @@ function AuditPage() {
       </div>
 
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
-        <span>
-          {filtered.length} action{filtered.length > 1 ? "s" : ""} trouvée
-          {filtered.length > 1 ? "s" : ""}
+        <span className="flex flex-wrap items-center gap-2">
+          <span>
+            {filtered.length} action{filtered.length > 1 ? "s" : ""} trouvée
+            {filtered.length > 1 ? "s" : ""}
+          </span>
+          {entityLabel ? (
+            <Badge variant="secondary">Chronologie : {entityLabel}</Badge>
+          ) : null}
         </span>
-        <Button variant="ghost" size="sm" onClick={resetFilters}>
-          Réinitialiser les filtres
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={chronological ? "default" : "outline"}
+            size="sm"
+            onClick={() => setChronological((v) => !v)}
+          >
+            {chronological ? "Du plus ancien au plus récent" : "Du plus récent au plus ancien"}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={resetFilters}>
+            Réinitialiser les filtres
+          </Button>
+        </div>
       </div>
 
       <div className="divide-y divide-border rounded-lg border border-border bg-card">
         {pageRows.map((log) => {
           const { summary, context } = contextOf(log);
+          const ref = entityRefOf(log);
           return (
             <div key={log.id} className="flex flex-wrap items-start justify-between gap-3 p-4">
               <div className="min-w-0">
@@ -307,6 +417,20 @@ function AuditPage() {
                 <p className="text-xs text-muted-foreground">
                   {actorName(log.actor_id)} · {formatDateTime(log.created_at)}
                 </p>
+                {ref ? (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="h-auto px-0 text-xs"
+                    onClick={() => {
+                      setEntity(ref.value);
+                      setChronological(true);
+                    }}
+                  >
+                    Voir la chronologie {ref.kind === "task" ? "de la tâche" : "du projet"} «{" "}
+                    {ref.label} »
+                  </Button>
+                ) : null}
               </div>
               <Badge variant="outline">
                 {CATEGORY_LABEL[CATEGORY_OF_ACTION(log.action)] ?? log.entity_type}
