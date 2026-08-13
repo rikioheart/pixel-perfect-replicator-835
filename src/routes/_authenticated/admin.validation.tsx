@@ -133,17 +133,28 @@ function ValidationPage() {
 
               <Textarea
                 rows={2}
-                placeholder="Commentaire de validation ou motif de renvoi"
+                placeholder="Commentaire obligatoire : ce qui est validé, ou ce qui manque"
                 value={comments[task.id] ?? ""}
                 onChange={(e) => setComments({ ...comments, [task.id]: e.target.value })}
               />
 
-              <div className="flex gap-2">
-                <Button onClick={() => decide(task.id, true)}>Valider</Button>
-                <Button variant="outline" onClick={() => decide(task.id, false)}>
+              <div className="flex items-center gap-2">
+                <Button
+                  disabled={(comments[task.id] ?? "").trim().length < VALIDATION_COMMENT_MIN}
+                  onClick={() => decide(task.id, task.title, true)}
+                >
+                  Valider
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={(comments[task.id] ?? "").trim().length < VALIDATION_COMMENT_MIN}
+                  onClick={() => decide(task.id, task.title, false)}
+                >
                   Renvoyer
                 </Button>
+                <span className="text-xs text-muted-foreground">Commentaire requis</span>
               </div>
+
             </div>
           ))}
         </div>
