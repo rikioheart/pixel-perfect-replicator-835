@@ -74,13 +74,30 @@ function ProjectDetail() {
 
   const { data: members } = useQuery({
     queryKey: ["project-members", projectId],
-    queryFn: async () =>
-      (
-        await supabase
-          .from("project_members")
-          .select("id, project_role, user_id, profiles:user_id(display_name, first_name, last_name)")
-          .eq("project_id", projectId)
-      ).data ?? [],
+    queryFn: async (): Promise<MemberRow[]> => {
+      const rows =
+        (
+          await supabase
+            .from("project_members")
+            .select("id, project_role, user_id")
+            .eq("project_id", projectId)
+        ).data ?? [];
+      if (rows.length === 0) return [];
+      const profiles =
+        (
+          await supabase
+            .from("profiles")
+            .select("id, display_name, first_name, last_name")
+            .in(
+              "id",
+              rows.map((row) => row.user_id),
+            )
+        ).data ?? [];
+      return rows.map((row) => ({
+        ...row,
+        profiles: profiles.find((profile) => profile.id === row.user_id) ?? null,
+      }));
+    },
   });
 
   const { data: tasks } = useQuery({
@@ -105,7 +122,7 @@ function ProjectDetail() {
     );
   }
 
-  const updateProject = async (patch: Record<string, unknown>) => {
+  const updateProject = async (patch: { status?: string; progress_percent?: number }) => {
     const { error } = await supabase.from("projects").update(patch).eq("id", projectId);
     if (error) {
       toast.error(error.message);
@@ -202,7 +219,7 @@ function ProjectDetail() {
               {members?.map((member) => (
                 <li key={member.id} className="flex items-center justify-between gap-2">
                   <span className="truncate">
-                    {member.profiles?.display_name ??
+                    {member.profiles?.display_name ||
                       `${member.profiles?.first_name ?? ""} ${member.profiles?.last_name ?? ""}`.trim() ||
                       "Membre"}
                   </span>
@@ -242,6 +259,8 @@ function ProjectDetail() {
 }
 
 type MemberRow = {
+  id: string;
+  project_role: string;
   user_id: string;
   profiles: { display_name: string | null; first_name: string | null; last_name: string | null } | null;
 };
@@ -359,7 +378,7 @@ function NewTaskDialog({
                 <SelectContent>
                   {members.map((member) => (
                     <SelectItem key={member.user_id} value={member.user_id}>
-                      {member.profiles?.display_name ??
+                      {member.profiles?.display_name ||
                         `${member.profiles?.first_name ?? ""} ${member.profiles?.last_name ?? ""}`.trim() ||
                         "Membre"}
                     </SelectItem>
