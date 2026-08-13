@@ -41,11 +41,15 @@ export const Route = createFileRoute("/_authenticated/documents")({
   component: DocumentsPage,
 });
 
+const EMPTY_DOC = { title: "", category: "", proof_type: "", url: "", visibility: "ASSOCIATION" };
+
 function DocumentsPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: "", category: "", url: "", visibility: "ASSOCIATION" });
+  const [form, setForm] = useState(EMPTY_DOC);
+  const categories = useConfigOptions("DOCUMENT_CATEGORY");
+  const proofTypes = useConfigOptions("PROOF_TYPE");
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["documents"],
@@ -66,6 +70,7 @@ function DocumentsPage() {
       const { error } = await supabase.from("documents").insert({
         title: form.title.trim(),
         category: form.category || null,
+        proof_type: form.proof_type || null,
         url: form.url,
         visibility: form.visibility,
         uploaded_by: user?.id ?? null,
@@ -75,7 +80,7 @@ function DocumentsPage() {
     onSuccess: () => {
       toast.success("Document ajouté.");
       setOpen(false);
-      setForm({ title: "", category: "", url: "", visibility: "ASSOCIATION" });
+      setForm(EMPTY_DOC);
       void queryClient.invalidateQueries({ queryKey: ["documents"] });
     },
     onError: (error: Error) => toast.error(error.message),
