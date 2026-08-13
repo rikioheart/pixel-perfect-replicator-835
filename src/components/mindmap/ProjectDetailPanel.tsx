@@ -174,6 +174,21 @@ export function ProjectDetailPanel({
         newValues: payload,
         metadata: { summary: `Projet « ${payload.title} » modifié` },
       });
+      onAction({
+        type: "project.update",
+        label: `Modification du projet « ${payload.title} »`,
+        projectId: project.id,
+        previous: {
+          title: project.title,
+          description: project.description,
+          status: project.status,
+          priority: project.priority,
+          category_id: project.category_id,
+          deadline: project.deadline,
+          owner_id: project.owner_id,
+          progress_percent: project.progress_percent ?? 0,
+        },
+      });
       toast.success("Projet mis à jour.");
       onChanged();
       void history.refetch();
@@ -187,6 +202,11 @@ export function ProjectDetailPanel({
     if (!project) return;
     setSaving(true);
     try {
+      const { data: fullRow } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("id", project.id)
+        .maybeSingle();
       const { error } = await supabase.from("projects").delete().eq("id", project.id);
       if (error) {
         toast.error(error.message);
@@ -200,9 +220,16 @@ export function ProjectDetailPanel({
         oldValues: { title: project.title },
         metadata: { summary: `Projet « ${project.title} » supprimé` },
       });
+      if (fullRow)
+        onAction({
+          type: "project.delete",
+          label: `Suppression du projet « ${project.title} »`,
+          row: fullRow as unknown as Record<string, unknown>,
+        });
       toast.success("Projet supprimé.");
       setConfirmDelete(false);
       onDeleted();
+
     } finally {
       setSaving(false);
     }
