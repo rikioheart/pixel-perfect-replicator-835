@@ -12,6 +12,8 @@ import {
   Network,
   KeyRound,
   ScrollText,
+  Settings2,
+
   CalendarDays,
   CalendarRange,
   Stamp,
