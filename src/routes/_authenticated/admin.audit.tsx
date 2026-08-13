@@ -280,7 +280,15 @@ function AuditPage() {
     setActor("ALL");
     setFrom("");
     setTo("");
+    setEntity("ALL");
   };
+
+  const entityLabel =
+    entity === "ALL"
+      ? null
+      : entity.startsWith("T:")
+        ? (taskOf(entity.slice(2))?.title ?? "Tâche")
+        : (projectTitle(entity.slice(2)) ?? "Projet");
 
   if (!isBureau) {
     return (
