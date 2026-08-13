@@ -23,35 +23,63 @@ import {
   Newspaper,
   FileText,
   Bell,
+  HeartHandshake,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
 
-const navItems = [
-  { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, bureauOnly: true },
-  { to: "/member", label: "Mon espace", icon: UserRound, bureauOnly: false },
-  { to: "/members", label: "Adhérents", icon: Users, bureauOnly: true },
-  { to: "/projects", label: "Projets", icon: FolderKanban, bureauOnly: false },
-  { to: "/tasks", label: "Tâches", icon: ListChecks, bureauOnly: false },
-  { to: "/mindmap", label: "Mindmap", icon: Network, bureauOnly: false },
-  { to: "/activities", label: "Activités", icon: CalendarDays, bureauOnly: false },
-  { to: "/events", label: "Événements", icon: CalendarRange, bureauOnly: false },
-  { to: "/loyalty", label: "Ma fidélité", icon: Stamp, bureauOnly: false },
-  { to: "/professionals", label: "Professionnels", icon: Briefcase, bureauOnly: false },
-  { to: "/partners", label: "Partenaires", icon: Handshake, bureauOnly: false },
-  { to: "/terrain", label: "Terrain", icon: MapPin, bureauOnly: false },
-  { to: "/finance", label: "Finances", icon: Euro, bureauOnly: false },
-  { to: "/inventory", label: "Inventaire", icon: Package, bureauOnly: true },
-  { to: "/blog", label: "Journal interne", icon: Newspaper, bureauOnly: false },
-  { to: "/documents", label: "Documents", icon: FileText, bureauOnly: false },
-  { to: "/notifications", label: "Notifications", icon: Bell, bureauOnly: false },
-  { to: "/profile", label: "Mon profil", icon: UserRound, bureauOnly: false },
-  { to: "/admin/validation", label: "Validations", icon: ShieldCheck, bureauOnly: true },
-  { to: "/admin/roles", label: "Rôles", icon: KeyRound, bureauOnly: true },
-  { to: "/admin/audit", label: "Journal", icon: ScrollText, bureauOnly: true },
-] as const;
+type Audience = "bureau" | "all" | "pro";
+
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; audience: Audience };
+
+type NavGroup = { title: string; items: NavItem[] };
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    title: "Cockpit Bureau",
+    items: [
+      { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau" },
+      { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau" },
+      { to: "/members", label: "Adhérents", icon: Users, audience: "bureau" },
+      { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
+      { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
+      { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
+    ],
+  },
+  {
+    title: "Avancer ensemble",
+    items: [
+      { to: "/member", label: "Mon espace", icon: UserRound, audience: "all" },
+      { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all" },
+      { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all" },
+      { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all" },
+      { to: "/blog", label: "Journal interne", icon: Newspaper, audience: "all" },
+      { to: "/documents", label: "Documents", icon: FileText, audience: "all" },
+    ],
+  },
+  {
+    title: "Vie de l'association",
+    items: [
+      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all" },
+      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all" },
+      { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
+      { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
+      { to: "/terrain", label: "Terrain", icon: MapPin, audience: "pro" },
+    ],
+  },
+  {
+    title: "Moi",
+    items: [
+      { to: "/loyalty", label: "Ma fidélité", icon: Stamp, audience: "all" },
+      { to: "/finance", label: "Mes finances", icon: Euro, audience: "all" },
+      { to: "/notifications", label: "Notifications", icon: Bell, audience: "all" },
+      { to: "/profile", label: "Mon profil & mes chiens", icon: UserRound, audience: "all" },
+      { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
+    ],
+  },
+];
 
 export function AppShell({
   title,
@@ -68,7 +96,15 @@ export function AppShell({
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const items = navItems.filter((item) => !item.bureauOnly || isBureau);
+  const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const groups = NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => {
+      if (item.audience === "bureau") return isBureau;
+      if (item.audience === "pro") return isBureau || isPro;
+      return true;
+    }),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -78,26 +114,33 @@ export function AppShell({
             <PawPrint className="size-6" />
             <div className="leading-tight">
               <p className="font-display text-sm">La Voix du Chien</p>
-              <p className="text-xs opacity-70">Cockpit associatif</p>
+              <p className="text-xs opacity-70">{isBureau ? "Cockpit Bureau" : "Espace adhérent"}</p>
             </div>
           </div>
-          <nav className="space-y-1">
-            {items.map((item) => {
-              const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                    active ? "surface-wine" : "opacity-80 hover:bg-sidebar-accent hover:opacity-100",
-                  )}
-                >
-                  <item.icon className="size-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="space-y-5">
+            {groups.map((group) => (
+              <div key={group.title} className="space-y-1">
+                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-50">
+                  {group.title}
+                </p>
+                {group.items.map((item) => {
+                  const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className={cn(
+                        "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                        active ? "surface-wine" : "opacity-80 hover:bg-sidebar-accent hover:opacity-100",
+                      )}
+                    >
+                      <item.icon className="size-4" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
         </div>
         <div className="space-y-3 border-t border-sidebar-border pt-4 text-sm">
@@ -144,11 +187,12 @@ export function AppShell({
         </header>
 
         <div className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden">
-          {items.map((item) => (
+          {groups.flatMap((group) => group.items).map((item) => (
             <Button key={item.to} asChild variant="ghost" size="sm">
               <Link to={item.to}>{item.label}</Link>
             </Button>
           ))}
+
         </div>
 
         <main className="flex-1 p-6">{children}</main>
