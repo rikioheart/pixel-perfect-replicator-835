@@ -33,7 +33,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { logAudit } from "@/lib/mindmap-actions";
+import {
+  canUndo,
+  logAudit,
+  undoAction,
+  type UndoableAction,
+} from "@/lib/mindmap-actions";
 
 import {
   Select,
@@ -235,6 +240,10 @@ function MindmapPage() {
     parentId: string | null;
     description: string;
   } | null>(null);
+  const [undoStack, setUndoStack] = useState<UndoableAction[]>([]);
+  const [undoing, setUndoing] = useState(false);
+  const pushAction = (action: UndoableAction) =>
+    setUndoStack((stack) => [...stack, action].slice(-20));
 
 
   const { data, isLoading } = useQuery({
@@ -397,6 +406,8 @@ function MindmapPage() {
     const link = pendingLink;
     setPendingLink(null);
     if (link.kind === "project") {
+      const previousParentId =
+        (data?.projects ?? []).find((p) => p.id === link.childId)?.parent_project_id ?? null;
       const { error } = await supabase
         .from("projects")
         .update({ parent_project_id: link.parentId })
@@ -413,7 +424,15 @@ function MindmapPage() {
         newValues: { parent_project_id: link.parentId },
         metadata: { summary: link.description },
       });
+      pushAction({
+        type: "project.link",
+        label: link.description,
+        projectId: link.childId,
+        previousParentId,
+      });
     } else {
+      const previousProjectId =
+        (data?.tasks ?? []).find((t) => t.id === link.childId)?.project_id ?? null;
       const { error } = await supabase
         .from("tasks")
         .update({ project_id: link.parentId })
@@ -430,9 +449,39 @@ function MindmapPage() {
         newValues: { task_id: link.childId, project_id: link.parentId },
         metadata: { summary: link.description },
       });
+      pushAction({
+        type: "task.link",
+        label: link.description,
+        taskId: link.childId,
+        previousProjectId,
+      });
     }
     toast.success("Lien créé sur la mindmap.");
     refreshGraph();
+  };
+
+  const lastAction = undoStack[undoStack.length - 1] ?? null;
+
+  const handleUndo = async () => {
+    if (!lastAction) return;
+    if (!canUndo(lastAction, isBureau)) {
+      toast.error("Cette annulation est réservée au Bureau.");
+      return;
+    }
+    setUndoing(true);
+    try {
+      const result = await undoAction(lastAction, user?.id ?? null);
+      if (!result.ok) {
+        toast.error(result.error ?? "Annulation impossible.");
+        return;
+      }
+      setUndoStack((stack) => stack.slice(0, -1));
+      toast.success(`Annulé : ${lastAction.label}`);
+      if (lastAction.type === "project.create") setSelectedProjectId(null);
+      refreshGraph();
+    } finally {
+      setUndoing(false);
+    }
   };
 
   const resetFilters = () => {
@@ -452,6 +501,15 @@ function MindmapPage() {
       subtitle="Cartographie interactive des projets, tâches et responsables"
       actions={
         <div className="flex flex-wrap gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void handleUndo()}
+            disabled={!lastAction || undoing}
+            title={lastAction ? `Annuler : ${lastAction.label}` : "Aucune action à annuler"}
+          >
+            Annuler la dernière action
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -610,6 +668,7 @@ function MindmapPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedProjectId(null);
         }}
+        onAction={pushAction}
         onChanged={refreshGraph}
         onDeleted={() => {
           setSelectedProjectId(null);
@@ -653,6 +712,7 @@ function MindmapPage() {
         onOpenChange={(open) => {
           if (!open) setCreateTarget(null);
         }}
+        onAction={pushAction}
         onCreated={() => {
           void queryClient.invalidateQueries({ queryKey: ["mindmap"] });
           void queryClient.invalidateQueries({ queryKey: ["projects"] });
