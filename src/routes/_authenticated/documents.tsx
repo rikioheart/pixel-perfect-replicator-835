@@ -206,7 +206,12 @@ function DocumentsPage() {
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div className="flex flex-wrap gap-2">
-                  {doc.category ? <Badge variant="secondary">{doc.category}</Badge> : null}
+                  {doc.category ? (
+                    <Badge variant="secondary">{categories.labelOf(doc.category)}</Badge>
+                  ) : null}
+                  {doc.proof_type ? (
+                    <Badge>Preuve · {proofTypes.labelOf(doc.proof_type)}</Badge>
+                  ) : null}
                   <Badge variant="outline">
                     {doc.visibility === "BUREAU" ? "Bureau" : "Membres"}
                   </Badge>
