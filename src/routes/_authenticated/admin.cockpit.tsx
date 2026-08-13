@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PROJECT_STATUS_LABEL, TASK_STATUS_LABEL, formatDate } from "@/lib/domain";
+import { QuickValidationRow } from "@/components/QuickValidation";
+
 
 export const Route = createFileRoute("/_authenticated/admin/cockpit")({
   head: () => ({
@@ -233,16 +235,25 @@ function CockpitPage() {
           ))}
         </Block>
 
-        <Block icon={ShieldCheck} title="Quelles actions doivent être validées ?" empty={toValidate.length === 0}>
+        <Block
+          icon={ShieldCheck}
+          title="Quelles actions doivent être validées ?"
+          hint="Validez ou renvoyez directement ici : le commentaire est obligatoire et rejoint l'historique."
+          empty={toValidate.length === 0}
+        >
           {toValidate.map((t) => (
-            <Row
+            <QuickValidationRow
               key={t.id}
-              main={t.title}
-              sub={`${nameOf(t.assigned_user_id)}${t.submitted_at ? ` · soumis le ${formatDate(t.submitted_at)}` : ""}`}
-              right="À valider"
+              task={{
+                id: t.id,
+                title: t.title,
+                submitted_at: t.submitted_at,
+                assignee: nameOf(t.assigned_user_id),
+              }}
             />
           ))}
         </Block>
+
 
         <Block icon={Sparkles} title="Quelles actions sont terminées ?" empty={doneTasks.length === 0}>
           {doneTasks.slice(0, 12).map((t) => (

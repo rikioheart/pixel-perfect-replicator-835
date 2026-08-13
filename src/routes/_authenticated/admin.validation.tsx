@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate, PRIORITY_LABEL } from "@/lib/domain";
+import { VALIDATION_COMMENT_MIN, decideTaskValidation } from "@/lib/validation-actions";
+
 
 export const Route = createFileRoute("/_authenticated/admin/validation")({
   head: () => ({
@@ -49,39 +51,23 @@ function ValidationPage() {
       ).data ?? [],
   });
 
-  const decide = async (taskId: string, approve: boolean) => {
-    const comment = comments[taskId]?.trim() || null;
-    if (!approve && !comment) {
-      toast.error("Un motif est requis pour renvoyer une tâche.");
-      return;
+  const decide = async (taskId: string, taskTitle: string, approve: boolean) => {
+    try {
+      await decideTaskValidation({
+        taskId,
+        taskTitle,
+        decision: approve ? "APPROVED" : "REJECTED",
+        comment: comments[taskId] ?? "",
+        actorId: user?.id ?? null,
+      });
+      setComments({ ...comments, [taskId]: "" });
+      toast.success(approve ? "Tâche validée." : "Tâche renvoyée au membre.");
+      await queryClient.invalidateQueries();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Décision impossible.");
     }
-    const { error: taskError } = await supabase
-      .from("tasks")
-      .update(
-        approve
-          ? {
-              status: "COMPLETED",
-              completed_at: new Date().toISOString(),
-              validated_at: new Date().toISOString(),
-              validated_by: user?.id ?? null,
-              rejection_reason: null,
-            }
-          : { status: "IN_PROGRESS", rejection_reason: comment },
-      )
-      .eq("id", taskId);
-    if (taskError) {
-      toast.error(taskError.message);
-      return;
-    }
-    await supabase.from("task_validation").insert({
-      task_id: taskId,
-      validated_by: user?.id ?? "",
-      status: approve ? "APPROVED" : "REJECTED",
-      comment,
-    });
-    toast.success(approve ? "Tâche validée." : "Tâche renvoyée au membre.");
-    await queryClient.invalidateQueries();
   };
+
 
   if (!isBureau) {
     return (
@@ -149,17 +135,28 @@ function ValidationPage() {
 
               <Textarea
                 rows={2}
-                placeholder="Commentaire de validation ou motif de renvoi"
+                placeholder="Commentaire obligatoire : ce qui est validé, ou ce qui manque"
                 value={comments[task.id] ?? ""}
                 onChange={(e) => setComments({ ...comments, [task.id]: e.target.value })}
               />
 
-              <div className="flex gap-2">
-                <Button onClick={() => decide(task.id, true)}>Valider</Button>
-                <Button variant="outline" onClick={() => decide(task.id, false)}>
+              <div className="flex items-center gap-2">
+                <Button
+                  disabled={(comments[task.id] ?? "").trim().length < VALIDATION_COMMENT_MIN}
+                  onClick={() => decide(task.id, task.title, true)}
+                >
+                  Valider
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={(comments[task.id] ?? "").trim().length < VALIDATION_COMMENT_MIN}
+                  onClick={() => decide(task.id, task.title, false)}
+                >
                   Renvoyer
                 </Button>
+                <span className="text-xs text-muted-foreground">Commentaire requis</span>
               </div>
+
             </div>
           ))}
         </div>
