@@ -92,6 +92,7 @@ export function ProjectDetailPanel({
   onAddSubProject,
   onChanged,
   onDeleted,
+  onAction,
 }: {
   project: PanelProject | null;
   tasks: PanelTask[];
@@ -107,7 +108,9 @@ export function ProjectDetailPanel({
   onAddSubProject: (projectId: string) => void;
   onChanged: () => void;
   onDeleted: () => void;
+  onAction: (action: UndoableAction) => void;
 }) {
+
   const [tab, setTab] = useState("detail");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
