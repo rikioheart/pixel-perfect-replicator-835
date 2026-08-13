@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PROJECT_STATUS_LABEL, TASK_STATUS_LABEL, formatDate } from "@/lib/domain";
+import { QuickValidationRow } from "@/components/QuickValidation";
+
 
 export const Route = createFileRoute("/_authenticated/admin/cockpit")({
   head: () => ({
