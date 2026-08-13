@@ -108,6 +108,8 @@ function AuditPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [page, setPage] = useState(1);
+  const [entity, setEntity] = useState("ALL");
+  const [chronological, setChronological] = useState(false);
 
   const { data: logs } = useQuery({
     queryKey: ["audit-logs"],
@@ -136,6 +138,13 @@ function AuditPage() {
     queryKey: ["audit-projects"],
     enabled: isBureau,
     queryFn: async () => (await supabase.from("projects").select("id, title")).data ?? [],
+  });
+
+  const { data: tasks } = useQuery({
+    queryKey: ["audit-tasks"],
+    enabled: isBureau,
+    queryFn: async () =>
+      (await supabase.from("tasks").select("id, title, project_id")).data ?? [],
   });
 
   const actorName = (id: string | null) => {
