@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const navItems = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, bureauOnly: true },
@@ -97,6 +98,7 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             {actions}
+            <NotificationBell />
             <Button
               variant="outline"
               size="sm"
