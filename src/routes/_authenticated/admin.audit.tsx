@@ -352,6 +352,24 @@ function AuditPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={entity} onValueChange={setEntity}>
+          <SelectTrigger>
+            <SelectValue placeholder="Projet ou tâche" />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            <SelectItem value="ALL">Tous les projets et tâches</SelectItem>
+            {(projects ?? []).map((p) => (
+              <SelectItem key={p.id} value={`P:${p.id}`}>
+                Projet · {p.title}
+              </SelectItem>
+            ))}
+            {(tasks ?? []).map((t) => (
+              <SelectItem key={t.id} value={`T:${t.id}`}>
+                Tâche · {t.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex gap-2">
           <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
@@ -359,18 +377,33 @@ function AuditPage() {
       </div>
 
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
-        <span>
-          {filtered.length} action{filtered.length > 1 ? "s" : ""} trouvée
-          {filtered.length > 1 ? "s" : ""}
+        <span className="flex flex-wrap items-center gap-2">
+          <span>
+            {filtered.length} action{filtered.length > 1 ? "s" : ""} trouvée
+            {filtered.length > 1 ? "s" : ""}
+          </span>
+          {entityLabel ? (
+            <Badge variant="secondary">Chronologie : {entityLabel}</Badge>
+          ) : null}
         </span>
-        <Button variant="ghost" size="sm" onClick={resetFilters}>
-          Réinitialiser les filtres
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={chronological ? "default" : "outline"}
+            size="sm"
+            onClick={() => setChronological((v) => !v)}
+          >
+            {chronological ? "Du plus ancien au plus récent" : "Du plus récent au plus ancien"}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={resetFilters}>
+            Réinitialiser les filtres
+          </Button>
+        </div>
       </div>
 
       <div className="divide-y divide-border rounded-lg border border-border bg-card">
         {pageRows.map((log) => {
           const { summary, context } = contextOf(log);
+          const ref = entityRefOf(log);
           return (
             <div key={log.id} className="flex flex-wrap items-start justify-between gap-3 p-4">
               <div className="min-w-0">
@@ -384,6 +417,20 @@ function AuditPage() {
                 <p className="text-xs text-muted-foreground">
                   {actorName(log.actor_id)} · {formatDateTime(log.created_at)}
                 </p>
+                {ref ? (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="h-auto px-0 text-xs"
+                    onClick={() => {
+                      setEntity(ref.value);
+                      setChronological(true);
+                    }}
+                  >
+                    Voir la chronologie {ref.kind === "task" ? "de la tâche" : "du projet"} «{" "}
+                    {ref.label} »
+                  </Button>
+                ) : null}
               </div>
               <Badge variant="outline">
                 {CATEGORY_LABEL[CATEGORY_OF_ACTION(log.action)] ?? log.entity_type}
