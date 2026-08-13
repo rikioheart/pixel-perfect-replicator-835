@@ -37,9 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [rolesReady, setRolesReady] = useState(false);
 
   const loadContext = async (userId: string | undefined) => {
+    setRolesReady(false);
     if (!userId) {
       setProfile(null);
       setRoles([]);
+      setRolesReady(true);
       return;
     }
     const [profileRes, rolesRes] = await Promise.all([
