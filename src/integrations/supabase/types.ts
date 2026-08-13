@@ -122,6 +122,41 @@ export type Database = {
         }
         Relationships: []
       }
+      mindmap_config: {
+        Row: {
+          created_at: string
+          edges: Json
+          id: string
+          nodes: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          edges?: Json
+          id?: string
+          nodes?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          edges?: Json
+          id?: string
+          nodes?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mindmap_config_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           action: string
@@ -274,6 +309,7 @@ export type Database = {
           deadline: string | null
           description: string | null
           id: string
+          mindmap_node_id: string | null
           owner_id: string | null
           parent_project_id: string | null
           priority: string
@@ -293,6 +329,7 @@ export type Database = {
           deadline?: string | null
           description?: string | null
           id?: string
+          mindmap_node_id?: string | null
           owner_id?: string | null
           parent_project_id?: string | null
           priority?: string
@@ -312,6 +349,7 @@ export type Database = {
           deadline?: string | null
           description?: string | null
           id?: string
+          mindmap_node_id?: string | null
           owner_id?: string | null
           parent_project_id?: string | null
           priority?: string
