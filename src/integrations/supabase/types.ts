@@ -203,6 +203,51 @@ export type Database = {
         }
         Relationships: []
       }
+      config_options: {
+        Row: {
+          code: string
+          color: string | null
+          created_at: string
+          description: string | null
+          family: string
+          id: string
+          is_active: boolean
+          is_system: boolean
+          label: string
+          metadata: Json
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          family: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          label: string
+          metadata?: Json
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          family?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          label?: string
+          metadata?: Json
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contests: {
         Row: {
           created_at: string
@@ -856,6 +901,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          access_level: string
           avatar_path: string | null
           bio: string | null
           city: string | null
@@ -875,6 +921,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          access_level?: string
           avatar_path?: string | null
           bio?: string | null
           city?: string | null
@@ -894,6 +941,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          access_level?: string
           avatar_path?: string | null
           bio?: string | null
           city?: string | null
