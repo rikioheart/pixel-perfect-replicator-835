@@ -415,7 +415,15 @@ function RolesPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <MemberLevels
+                  memberId={member.id}
+                  memberName={name}
+                  accessLevel={member.access_level ?? "STANDARD"}
+                  involvementLevel={member.involvement_level ?? null}
+                />
               </div>
+
             </div>
           );
         })}
