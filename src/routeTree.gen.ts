@@ -19,6 +19,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
+import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events.index'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
 import { Route as AuthenticatedMembersMemberIdRouteImport } from './routes/_authenticated/members.$memberId'
 import { Route as AuthenticatedMembersNewRouteImport } from './routes/_authenticated/members.new'
@@ -76,6 +77,12 @@ const AuthenticatedAdminValidationRoute =
     path: '/admin/validation',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEventsIndexRoute =
+  AuthenticatedEventsIndexRouteImport.update({
+    id: '/events/',
+    path: '/events/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMembersIndexRoute =
   AuthenticatedMembersIndexRouteImport.update({
     id: '/members/',
@@ -125,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/events/': typeof AuthenticatedEventsIndexRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
 }
@@ -142,6 +150,7 @@ export interface FileRoutesByTo {
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/events': typeof AuthenticatedEventsIndexRoute
   '/members': typeof AuthenticatedMembersIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
 }
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
 }
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin/'
+    | '/events/'
     | '/members/'
     | '/projects/'
   fileRoutesByTo: FileRoutesByTo
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin'
+    | '/events'
     | '/members'
     | '/projects'
   id:
@@ -215,6 +227,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projects/$projectId'
     | '/api/public/reset-demo'
     | '/_authenticated/admin/'
+    | '/_authenticated/events/'
     | '/_authenticated/members/'
     | '/_authenticated/projects/'
   fileRoutesById: FileRoutesById
@@ -297,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminValidationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events/': {
+      id: '/_authenticated/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof AuthenticatedEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/members/': {
       id: '/_authenticated/members/'
       path: '/members'
@@ -354,6 +374,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
   AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
 }
@@ -370,6 +391,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
   AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
 }
