@@ -11,6 +11,11 @@ export type ConfigOption = {
   sort_order: number;
   is_active: boolean;
   is_system: boolean;
+  metadata?: {
+    task_statuses?: string[];
+    document_category?: string | null;
+    requires_file?: boolean;
+  } | null;
 };
 
 /**
