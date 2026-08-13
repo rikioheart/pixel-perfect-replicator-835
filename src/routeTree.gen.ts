@@ -20,6 +20,7 @@ import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -90,6 +91,11 @@ const AuthenticatedNotificationsRoute =
 const AuthenticatedPartnersRoute = AuthenticatedPartnersRouteImport.update({
   id: '/partners',
   path: '/partners',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/partners': typeof AuthenticatedPartnersRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/mindmap'
     | '/notifications'
     | '/partners'
+    | '/profile'
     | '/tasks'
     | '/terrain'
     | '/admin/audit'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/mindmap'
     | '/notifications'
     | '/partners'
+    | '/profile'
     | '/tasks'
     | '/terrain'
     | '/admin/audit'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mindmap'
     | '/_authenticated/notifications'
     | '/_authenticated/partners'
+    | '/_authenticated/profile'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
     | '/_authenticated/admin/audit'
@@ -439,6 +451,13 @@ declare module '@tanstack/react-router' {
       path: '/partners'
       fullPath: '/partners'
       preLoaderRoute: typeof AuthenticatedPartnersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks': {
@@ -566,6 +585,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
@@ -593,6 +613,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
