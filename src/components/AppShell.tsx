@@ -49,6 +49,8 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/members", label: "Adhérents", icon: Users, audience: "bureau" },
       { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
       { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
+      { to: "/admin/permissions", label: "Permissions", icon: ShieldCheck, audience: "bureau" },
+      { to: "/admin/loyalty-rules", label: "Règles de fidélité", icon: Stamp, audience: "bureau" },
       { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
       { to: "/admin/settings", label: "Paramétrage", icon: Settings2, audience: "bureau" },
 
