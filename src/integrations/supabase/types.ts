@@ -295,6 +295,7 @@ export type Database = {
           category: string | null
           created_at: string
           id: string
+          proof_type: string | null
           title: string
           updated_at: string
           uploaded_by: string | null
@@ -305,6 +306,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           id?: string
+          proof_type?: string | null
           title: string
           updated_at?: string
           uploaded_by?: string | null
@@ -315,6 +317,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           id?: string
+          proof_type?: string | null
           title?: string
           updated_at?: string
           uploaded_by?: string | null
@@ -518,21 +521,57 @@ export type Database = {
       loyalty_rules: {
         Row: {
           activity_id: string | null
+          code: string | null
           created_at: string
+          description: string | null
+          eligible_membership_types: string[]
+          event_id: string | null
           id: string
+          is_active: boolean
+          label: string | null
+          match_code: string | null
+          priority: number
+          reward_label: string | null
+          scope: string
           stamps_given: number
+          tier_threshold: number | null
+          updated_at: string
         }
         Insert: {
           activity_id?: string | null
+          code?: string | null
           created_at?: string
+          description?: string | null
+          eligible_membership_types?: string[]
+          event_id?: string | null
           id?: string
+          is_active?: boolean
+          label?: string | null
+          match_code?: string | null
+          priority?: number
+          reward_label?: string | null
+          scope?: string
           stamps_given?: number
+          tier_threshold?: number | null
+          updated_at?: string
         }
         Update: {
           activity_id?: string | null
+          code?: string | null
           created_at?: string
+          description?: string | null
+          eligible_membership_types?: string[]
+          event_id?: string | null
           id?: string
+          is_active?: boolean
+          label?: string | null
+          match_code?: string | null
+          priority?: number
+          reward_label?: string | null
+          scope?: string
           stamps_given?: number
+          tier_threshold?: number | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -540,6 +579,13 @@ export type Database = {
             columns: ["activity_id"]
             isOneToOne: false
             referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loyalty_rules_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
@@ -1263,6 +1309,7 @@ export type Database = {
         Row: {
           comment: string | null
           id: string
+          proof_type: string | null
           proof_url: string | null
           submitted_at: string
           submitted_by: string
@@ -1271,6 +1318,7 @@ export type Database = {
         Insert: {
           comment?: string | null
           id?: string
+          proof_type?: string | null
           proof_url?: string | null
           submitted_at?: string
           submitted_by: string
@@ -1279,6 +1327,7 @@ export type Database = {
         Update: {
           comment?: string | null
           id?: string
+          proof_type?: string | null
           proof_url?: string | null
           submitted_at?: string
           submitted_by?: string
@@ -1530,6 +1579,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_loyalty_rules: {
+        Args: { _activity_id: string; _event_id: string; _user_id: string }
+        Returns: number
+      }
       can_view_project: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean

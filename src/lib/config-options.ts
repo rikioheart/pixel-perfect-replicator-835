@@ -11,6 +11,11 @@ export type ConfigOption = {
   sort_order: number;
   is_active: boolean;
   is_system: boolean;
+  metadata?: {
+    task_statuses?: string[];
+    document_category?: string | null;
+    requires_file?: boolean;
+  } | null;
 };
 
 /**
@@ -31,6 +36,7 @@ export const CONFIG_FAMILIES: { family: string; label: string; hint: string }[] 
   { family: "MEMBERSHIP_STATUS", label: "Statuts d'adhésion", hint: "État de l'adhésion d'un membre" },
   { family: "PARTNER_CATEGORY", label: "Catégories de partenaires", hint: "Commerces, collectivités, marques…" },
   { family: "DOCUMENT_CATEGORY", label: "Catégories de documents", hint: "Classement de la bibliothèque partagée" },
+  { family: "PROOF_TYPE", label: "Types de preuves", hint: "Preuves acceptées selon le statut de la tâche (photo, facture, compte-rendu…)" },
   { family: "VISIBILITY", label: "Visibilités", hint: "Qui voit quoi : public, association, projet, bureau, privé" },
   { family: "MEMBER_FUNCTION", label: "Fonctions associatives", hint: "Badges qui complètent le rôle principal sans l'écraser" },
   { family: "PRO_LEVEL", label: "Niveaux professionnels", hint: "Standard, avancé, coordinateur" },
@@ -45,13 +51,13 @@ export const CONFIG_FAMILY_LABEL: Record<string, string> = Object.fromEntries(
 export async function fetchConfigOptions(family?: string): Promise<ConfigOption[]> {
   let query = supabase
     .from("config_options")
-    .select("id, family, code, label, description, color, sort_order, is_active, is_system")
+    .select("id, family, code, label, description, color, sort_order, is_active, is_system, metadata")
     .order("family", { ascending: true })
     .order("sort_order", { ascending: true });
   if (family) query = query.eq("family", family);
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return (data ?? []) as ConfigOption[];
+  return (data ?? []) as unknown as ConfigOption[];
 }
 
 /** Options actives d'une famille, utilisables dans n'importe quel formulaire. */

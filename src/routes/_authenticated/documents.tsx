@@ -6,6 +6,7 @@ import { FileText, Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useConfigOptions } from "@/lib/config-options";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,11 +42,15 @@ export const Route = createFileRoute("/_authenticated/documents")({
   component: DocumentsPage,
 });
 
+const EMPTY_DOC = { title: "", category: "", proof_type: "", url: "", visibility: "ASSOCIATION" };
+
 function DocumentsPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: "", category: "", url: "", visibility: "ASSOCIATION" });
+  const [form, setForm] = useState(EMPTY_DOC);
+  const categories = useConfigOptions("DOCUMENT_CATEGORY");
+  const proofTypes = useConfigOptions("PROOF_TYPE");
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["documents"],
@@ -66,6 +71,7 @@ function DocumentsPage() {
       const { error } = await supabase.from("documents").insert({
         title: form.title.trim(),
         category: form.category || null,
+        proof_type: form.proof_type || null,
         url: form.url,
         visibility: form.visibility,
         uploaded_by: user?.id ?? null,
@@ -75,7 +81,7 @@ function DocumentsPage() {
     onSuccess: () => {
       toast.success("Document ajouté.");
       setOpen(false);
-      setForm({ title: "", category: "", url: "", visibility: "ASSOCIATION" });
+      setForm(EMPTY_DOC);
       void queryClient.invalidateQueries({ queryKey: ["documents"] });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -130,13 +136,37 @@ function DocumentsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="doc-cat">Catégorie</Label>
-                    <Input
+                    <select
                       id="doc-cat"
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                       value={form.category}
                       onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    />
+                    >
+                      <option value="">Non classé</option>
+                      {categories.options.map((option) => (
+                        <option key={option.code} value={option.code}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
+                    <Label htmlFor="doc-proof">Type de preuve</Label>
+                    <select
+                      id="doc-proof"
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      value={form.proof_type}
+                      onChange={(e) => setForm({ ...form, proof_type: e.target.value })}
+                    >
+                      <option value="">Aucun (document simple)</option>
+                      {proofTypes.options.map((option) => (
+                        <option key={option.code} value={option.code}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-2">
                     <Label htmlFor="doc-vis">Visibilité</Label>
                     <select
                       id="doc-vis"
@@ -149,6 +179,7 @@ function DocumentsPage() {
                     </select>
                   </div>
                 </div>
+
               </div>
               <DialogFooter>
                 <Button onClick={() => create.mutate()} disabled={create.isPending}>
@@ -175,7 +206,12 @@ function DocumentsPage() {
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div className="flex flex-wrap gap-2">
-                  {doc.category ? <Badge variant="secondary">{doc.category}</Badge> : null}
+                  {doc.category ? (
+                    <Badge variant="secondary">{categories.labelOf(doc.category)}</Badge>
+                  ) : null}
+                  {doc.proof_type ? (
+                    <Badge>Preuve · {proofTypes.labelOf(doc.proof_type)}</Badge>
+                  ) : null}
                   <Badge variant="outline">
                     {doc.visibility === "BUREAU" ? "Bureau" : "Membres"}
                   </Badge>

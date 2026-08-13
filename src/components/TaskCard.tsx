@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useConfigOptions } from "@/lib/config-options";
 import { TASK_STATUS_LABEL, PRIORITY_LABEL, formatDate } from "@/lib/domain";
 
 export type TaskRow = {
@@ -35,9 +36,19 @@ export function TaskCard({
   const [submitting, setSubmitting] = useState(false);
   const [comment, setComment] = useState("");
   const [proofUrl, setProofUrl] = useState("");
+  const [proofType, setProofType] = useState("");
+  const proofTypes = useConfigOptions("PROOF_TYPE");
 
   const isMine = task.assigned_user_id === currentUserId;
   const canAct = isMine || isBureau;
+
+  // Chaque type de preuve déclare les statuts de tâche auxquels il s'applique.
+  const allowedProofs = proofTypes.options.filter((option) => {
+    const statuses = option.metadata?.task_statuses;
+    return !statuses || statuses.length === 0 || statuses.includes(task.status);
+  });
+  const selectedProof = allowedProofs.find((option) => option.code === proofType);
+  const requiresFile = Boolean(selectedProof?.metadata?.requires_file);
 
   const setStatus = async (status: string, extra: Record<string, unknown> = {}) => {
     const { error } = await supabase.from("tasks").update({ status, ...extra }).eq("id", task.id);
@@ -53,11 +64,16 @@ export function TaskCard({
       toast.error("Ajoutez un commentaire ou un lien de preuve.");
       return;
     }
+    if (requiresFile && !/^https?:\/\//.test(proofUrl.trim())) {
+      toast.error(`Le type « ${selectedProof?.label} » demande un lien vers la pièce jointe.`);
+      return;
+    }
     const { error } = await supabase.from("task_submissions").insert({
       task_id: task.id,
       submitted_by: currentUserId,
       comment: comment.trim() || null,
       proof_url: proofUrl.trim() || null,
+      proof_type: proofType || null,
     });
     if (error) {
       toast.error(error.message);
@@ -68,6 +84,7 @@ export function TaskCard({
     setSubmitting(false);
     setComment("");
     setProofUrl("");
+    setProofType("");
   };
 
   return (
@@ -127,11 +144,33 @@ export function TaskCard({
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
+          {allowedProofs.length > 0 ? (
+            <select
+              aria-label="Type de preuve"
+              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+              value={proofType}
+              onChange={(e) => setProofType(e.target.value)}
+            >
+              <option value="">Type de preuve (facultatif)</option>
+              {allowedProofs.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : null}
           <Input
-            placeholder="Lien vers la preuve (document, photo, page…)"
+            placeholder={
+              requiresFile
+                ? "Lien vers la pièce jointe (obligatoire)"
+                : "Lien vers la preuve (document, photo, page…)"
+            }
             value={proofUrl}
             onChange={(e) => setProofUrl(e.target.value)}
           />
+          {selectedProof?.description ? (
+            <p className="text-xs text-muted-foreground">{selectedProof.description}</p>
+          ) : null}
           <Button size="sm" onClick={submitProof}>
             Envoyer au Bureau
           </Button>
