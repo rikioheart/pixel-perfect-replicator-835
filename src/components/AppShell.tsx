@@ -97,6 +97,7 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             {actions}
+            <NotificationBell />
             <Button
               variant="outline"
               size="sm"
