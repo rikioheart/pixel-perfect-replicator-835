@@ -49,39 +49,23 @@ function ValidationPage() {
       ).data ?? [],
   });
 
-  const decide = async (taskId: string, approve: boolean) => {
-    const comment = comments[taskId]?.trim() || null;
-    if (!approve && !comment) {
-      toast.error("Un motif est requis pour renvoyer une tâche.");
-      return;
+  const decide = async (taskId: string, taskTitle: string, approve: boolean) => {
+    try {
+      await decideTaskValidation({
+        taskId,
+        taskTitle,
+        decision: approve ? "APPROVED" : "REJECTED",
+        comment: comments[taskId] ?? "",
+        actorId: user?.id ?? null,
+      });
+      setComments({ ...comments, [taskId]: "" });
+      toast.success(approve ? "Tâche validée." : "Tâche renvoyée au membre.");
+      await queryClient.invalidateQueries();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Décision impossible.");
     }
-    const { error: taskError } = await supabase
-      .from("tasks")
-      .update(
-        approve
-          ? {
-              status: "COMPLETED",
-              completed_at: new Date().toISOString(),
-              validated_at: new Date().toISOString(),
-              validated_by: user?.id ?? null,
-              rejection_reason: null,
-            }
-          : { status: "IN_PROGRESS", rejection_reason: comment },
-      )
-      .eq("id", taskId);
-    if (taskError) {
-      toast.error(taskError.message);
-      return;
-    }
-    await supabase.from("task_validation").insert({
-      task_id: taskId,
-      validated_by: user?.id ?? "",
-      status: approve ? "APPROVED" : "REJECTED",
-      comment,
-    });
-    toast.success(approve ? "Tâche validée." : "Tâche renvoyée au membre.");
-    await queryClient.invalidateQueries();
   };
+
 
   if (!isBureau) {
     return (
