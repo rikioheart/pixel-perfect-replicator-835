@@ -584,9 +584,12 @@ function MindmapPage() {
         )}
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Astuce : double-cliquez sur un projet pour ouvrir son panneau détaillé, ou sur le nœud de
-        l'association pour créer un projet rattaché.
-        {isBureau ? "" : " Certaines créations peuvent être réservées au Bureau."}
+        Astuce : double-cliquez sur un projet pour ouvrir son panneau (détail, modification,
+        historique), ou sur le nœud de l'association pour créer un projet rattaché. Glissez la
+        poignée droite d'un nœud vers un autre pour créer un rattachement — une confirmation est
+        demandée avant enregistrement.
+        {isBureau ? "" : " Certaines actions peuvent être réservées au Bureau."}
+
       </p>
 
       <ProjectDetailPanel
