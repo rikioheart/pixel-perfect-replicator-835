@@ -26,6 +26,7 @@ import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedMembersMemberIdRouteImport } from './routes/_authenticated/members.$memberId'
 import { Route as AuthenticatedMembersNewRouteImport } from './routes/_authenticated/members.new'
 import { Route as AuthenticatedProfessionalsIndexRouteImport } from './routes/_authenticated/professionals.index'
+import { Route as AuthenticatedProfessionalsProIdRouteImport } from './routes/_authenticated/professionals.$proId'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects.index'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
 import { Route as ApiPublicResetDemoRouteImport } from './routes/api/public/reset-demo'
@@ -120,6 +121,12 @@ const AuthenticatedProfessionalsIndexRoute =
     path: '/professionals/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfessionalsProIdRoute =
+  AuthenticatedProfessionalsProIdRouteImport.update({
+    id: '/professionals/$proId',
+    path: '/professionals/$proId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProjectsIndexRoute =
   AuthenticatedProjectsIndexRouteImport.update({
     id: '/projects/',
@@ -151,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
+  '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -172,6 +180,7 @@ export interface FileRoutesByTo {
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
+  '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -195,6 +204,7 @@ export interface FileRoutesById {
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
+  '/_authenticated/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
+    | '/professionals/$proId'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin/'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
+    | '/professionals/$proId'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin'
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated/events/$eventId'
     | '/_authenticated/members/$memberId'
     | '/_authenticated/members/new'
+    | '/_authenticated/professionals/$proId'
     | '/_authenticated/projects/$projectId'
     | '/api/public/reset-demo'
     | '/_authenticated/admin/'
@@ -397,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessionalsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/professionals/$proId': {
+      id: '/_authenticated/professionals/$proId'
+      path: '/professionals/$proId'
+      fullPath: '/professionals/$proId'
+      preLoaderRoute: typeof AuthenticatedProfessionalsProIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/projects/': {
       id: '/_authenticated/projects/'
       path: '/projects'
@@ -433,6 +453,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
+  AuthenticatedProfessionalsProIdRoute: typeof AuthenticatedProfessionalsProIdRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
@@ -453,6 +474,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
+  AuthenticatedProfessionalsProIdRoute: AuthenticatedProfessionalsProIdRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
