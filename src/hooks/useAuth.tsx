@@ -45,7 +45,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("roles(code)").eq("user_id", userId),
     ]);
-    setProfile((profileRes.data as Profile | null) ?? null);
+    let profile = (profileRes.data as Profile | null) ?? null;
+
+    // First-time OAuth (e.g. Google) sign-in has no profile yet — create a
+    // pending one so the member area works while the Bureau validates it.
+    if (!profile) {
+      const { data: inserted } = await supabase
+        .from("profiles")
+        .insert({
+          id: userId,
+          email: null,
+          display_name: null,
+          membership_type: "PARTICULIER",
+          membership_status: "PENDING",
+        })
+        .select("*")
+        .maybeSingle();
+      profile = (inserted as Profile | null) ?? null;
+    }
+
+    setProfile(profile);
     const codes = (rolesRes.data ?? [])
       .map((row) => (row as { roles: { code: string } | null }).roles?.code)
       .filter((code): code is string => Boolean(code));
