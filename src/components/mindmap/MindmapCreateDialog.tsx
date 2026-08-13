@@ -27,6 +27,8 @@ import {
   PROJECT_STATUS_LABEL,
   slugify,
 } from "@/lib/domain";
+import { logAudit } from "@/lib/mindmap-actions";
+
 
 export const ROOT_ID = "root";
 
