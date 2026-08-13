@@ -470,6 +470,9 @@ function MindmapPage() {
         tasks={selectedTasks}
         categories={categories}
         people={people}
+        categoryList={data?.categoryList ?? []}
+        peopleList={(data?.peopleList ?? []).map((p) => ({ id: p.id, name: p.name || "Membre" }))}
+        userId={user?.id ?? ""}
         parentTitle={
           selectedProject?.parent_project_id
             ? ((data?.projects ?? []).find((p) => p.id === selectedProject.parent_project_id)
@@ -480,6 +483,11 @@ function MindmapPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedProjectId(null);
         }}
+        onChanged={refreshGraph}
+        onDeleted={() => {
+          setSelectedProjectId(null);
+          refreshGraph();
+        }}
         onAddTask={(projectId) => {
           setSelectedProjectId(null);
           setCreateTarget({ kind: "task", parentId: projectId });
@@ -489,6 +497,25 @@ function MindmapPage() {
           setCreateTarget({ kind: "project", parentId: projectId });
         }}
       />
+
+      <AlertDialog
+        open={Boolean(pendingLink)}
+        onOpenChange={(open) => {
+          if (!open) setPendingLink(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer le rattachement</AlertDialogTitle>
+            <AlertDialogDescription>{pendingLink?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void applyLink()}>Créer le lien</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
       <MindmapCreateDialog
         target={createTarget}
