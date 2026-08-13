@@ -10,6 +10,8 @@ import {
   PawPrint,
   Users,
   Network,
+  KeyRound,
+  ScrollText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -24,6 +26,8 @@ const navItems = [
   { to: "/tasks", label: "Tâches", icon: ListChecks, bureauOnly: false },
   { to: "/mindmap", label: "Mindmap", icon: Network, bureauOnly: false },
   { to: "/admin/validation", label: "Validations", icon: ShieldCheck, bureauOnly: true },
+  { to: "/admin/roles", label: "Rôles", icon: KeyRound, bureauOnly: true },
+  { to: "/admin/audit", label: "Journal", icon: ScrollText, bureauOnly: true },
 ] as const;
 
 export function AppShell({
