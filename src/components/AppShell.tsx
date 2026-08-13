@@ -10,6 +10,8 @@ import {
   PawPrint,
   Users,
   Network,
+  KeyRound,
+  ScrollText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
