@@ -35,9 +35,21 @@ export function TaskCard({
   const [submitting, setSubmitting] = useState(false);
   const [comment, setComment] = useState("");
   const [proofUrl, setProofUrl] = useState("");
+  const [proofType, setProofType] = useState("");
+  const proofTypes = useConfigOptions("PROOF_TYPE");
 
   const isMine = task.assigned_user_id === currentUserId;
   const canAct = isMine || isBureau;
+
+  // Chaque type de preuve déclare les statuts de tâche auxquels il s'applique.
+  const allowedProofs = proofTypes.options.filter((option) => {
+    const statuses = (option as { metadata?: { task_statuses?: string[] } }).metadata?.task_statuses;
+    return !statuses || statuses.length === 0 || statuses.includes(task.status);
+  });
+  const selectedProof = allowedProofs.find((option) => option.code === proofType);
+  const requiresFile = Boolean(
+    (selectedProof as { metadata?: { requires_file?: boolean } } | undefined)?.metadata?.requires_file,
+  );
 
   const setStatus = async (status: string, extra: Record<string, unknown> = {}) => {
     const { error } = await supabase.from("tasks").update({ status, ...extra }).eq("id", task.id);
@@ -53,11 +65,16 @@ export function TaskCard({
       toast.error("Ajoutez un commentaire ou un lien de preuve.");
       return;
     }
+    if (requiresFile && !/^https?:\/\//.test(proofUrl.trim())) {
+      toast.error(`Le type « ${selectedProof?.label} » demande un lien vers la pièce jointe.`);
+      return;
+    }
     const { error } = await supabase.from("task_submissions").insert({
       task_id: task.id,
       submitted_by: currentUserId,
       comment: comment.trim() || null,
       proof_url: proofUrl.trim() || null,
+      proof_type: proofType || null,
     });
     if (error) {
       toast.error(error.message);
@@ -68,6 +85,7 @@ export function TaskCard({
     setSubmitting(false);
     setComment("");
     setProofUrl("");
+    setProofType("");
   };
 
   return (
