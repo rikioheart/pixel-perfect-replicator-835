@@ -23,6 +23,7 @@ type AuthState = {
   roles: string[];
   isBureau: boolean;
   loading: boolean;
+  rolesReady: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 };
