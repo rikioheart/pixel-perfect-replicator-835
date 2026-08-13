@@ -145,7 +145,16 @@ export function MindmapCreateDialog({
           toast.error(error.message);
           return;
         }
+        await logAudit({
+          actorId: userId || null,
+          action: "task.create",
+          entityType: "project",
+          entityId: parentId,
+          newValues: { title: task.title.trim() },
+          metadata: { summary: `Tâche « ${task.title.trim()} » créée dans ce projet` },
+        });
         toast.success("Tâche créée et reliée au projet.");
+
       }
       setProject({
         title: "",
