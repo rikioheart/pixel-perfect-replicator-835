@@ -136,13 +136,37 @@ function DocumentsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="doc-cat">Catégorie</Label>
-                    <Input
+                    <select
                       id="doc-cat"
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                       value={form.category}
                       onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    />
+                    >
+                      <option value="">Non classé</option>
+                      {categories.options.map((option) => (
+                        <option key={option.code} value={option.code}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
+                    <Label htmlFor="doc-proof">Type de preuve</Label>
+                    <select
+                      id="doc-proof"
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      value={form.proof_type}
+                      onChange={(e) => setForm({ ...form, proof_type: e.target.value })}
+                    >
+                      <option value="">Aucun (document simple)</option>
+                      {proofTypes.options.map((option) => (
+                        <option key={option.code} value={option.code}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-2">
                     <Label htmlFor="doc-vis">Visibilité</Label>
                     <select
                       id="doc-vis"
@@ -155,6 +179,7 @@ function DocumentsPage() {
                     </select>
                   </div>
                 </div>
+
               </div>
               <DialogFooter>
                 <Button onClick={() => create.mutate()} disabled={create.isPending}>
