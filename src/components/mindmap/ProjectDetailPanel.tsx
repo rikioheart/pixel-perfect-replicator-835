@@ -43,12 +43,13 @@ import {
   formatDate,
 } from "@/lib/domain";
 import {
-  AUDIT_ACTION_LABEL,
-  fetchProjectAudit,
+  fetchProjectHistory,
   logAudit,
   validateProjectEdit,
   type ProjectEditValues,
+  type UndoableAction,
 } from "@/lib/mindmap-actions";
+
 
 export type PanelProject = {
   id: string;
@@ -91,6 +92,7 @@ export function ProjectDetailPanel({
   onAddSubProject,
   onChanged,
   onDeleted,
+  onAction,
 }: {
   project: PanelProject | null;
   tasks: PanelTask[];
@@ -106,7 +108,9 @@ export function ProjectDetailPanel({
   onAddSubProject: (projectId: string) => void;
   onChanged: () => void;
   onDeleted: () => void;
+  onAction: (action: UndoableAction) => void;
 }) {
+
   const [tab, setTab] = useState("detail");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -131,9 +135,10 @@ export function ProjectDetailPanel({
 
   const history = useQuery({
     queryKey: ["project-audit", project?.id],
-    queryFn: () => fetchProjectAudit(project!.id),
+    queryFn: () => fetchProjectHistory(project!.id),
     enabled: Boolean(project) && tab === "history",
   });
+
 
   const save = async () => {
     if (!project || !form) return;
@@ -169,6 +174,21 @@ export function ProjectDetailPanel({
         newValues: payload,
         metadata: { summary: `Projet « ${payload.title} » modifié` },
       });
+      onAction({
+        type: "project.update",
+        label: `Modification du projet « ${payload.title} »`,
+        projectId: project.id,
+        previous: {
+          title: project.title,
+          description: project.description,
+          status: project.status,
+          priority: project.priority,
+          category_id: project.category_id,
+          deadline: project.deadline,
+          owner_id: project.owner_id,
+          progress_percent: project.progress_percent ?? 0,
+        },
+      });
       toast.success("Projet mis à jour.");
       onChanged();
       void history.refetch();
@@ -182,6 +202,11 @@ export function ProjectDetailPanel({
     if (!project) return;
     setSaving(true);
     try {
+      const { data: fullRow } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("id", project.id)
+        .maybeSingle();
       const { error } = await supabase.from("projects").delete().eq("id", project.id);
       if (error) {
         toast.error(error.message);
@@ -195,9 +220,16 @@ export function ProjectDetailPanel({
         oldValues: { title: project.title },
         metadata: { summary: `Projet « ${project.title} » supprimé` },
       });
+      if (fullRow)
+        onAction({
+          type: "project.delete",
+          label: `Suppression du projet « ${project.title} »`,
+          row: fullRow as unknown as Record<string, unknown>,
+        });
       toast.success("Projet supprimé.");
       setConfirmDelete(false);
       onDeleted();
+
     } finally {
       setSaving(false);
     }
@@ -496,27 +528,25 @@ export function ProjectDetailPanel({
                   </p>
                 ) : (
                   <ul className="space-y-2">
-                    {(history.data ?? []).map((entry) => {
-                      const summary =
-                        typeof entry.metadata?.['summary'] === "string"
-                          ? (entry.metadata['summary'] as string)
-                          : null;
-                      return (
-                        <li key={entry.id} className="rounded-md border border-border p-2.5">
-                          <p className="text-sm font-medium">
-                            {AUDIT_ACTION_LABEL[entry.action] ?? entry.action}
-                          </p>
-                          {summary ? (
-                            <p className="mt-0.5 text-xs text-muted-foreground">{summary}</p>
-                          ) : null}
-                          <p className="mt-1 text-[11px] text-muted-foreground">
-                            {new Date(entry.created_at).toLocaleString("fr-FR")} ·{" "}
-                            {entry.actor_id ? (people[entry.actor_id] ?? "Membre") : "Système"}
-                          </p>
-                        </li>
-                      );
-                    })}
+                    {(history.data ?? []).map((entry) => (
+                      <li key={entry.id} className="rounded-md border border-border p-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-medium">{entry.label}</p>
+                          <Badge variant="outline" className="shrink-0 text-[10px]">
+                            {entry.scope === "task" ? "Tâche" : "Projet"}
+                          </Badge>
+                        </div>
+                        {entry.summary ? (
+                          <p className="mt-0.5 text-xs text-muted-foreground">{entry.summary}</p>
+                        ) : null}
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {new Date(entry.at).toLocaleString("fr-FR")} ·{" "}
+                          {entry.actorId ? (people[entry.actorId] ?? "Membre") : "Système"}
+                        </p>
+                      </li>
+                    ))}
                   </ul>
+
                 )}
               </TabsContent>
             </Tabs>

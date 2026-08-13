@@ -27,7 +27,7 @@ import {
   PROJECT_STATUS_LABEL,
   slugify,
 } from "@/lib/domain";
-import { logAudit } from "@/lib/mindmap-actions";
+import { logAudit, type UndoableAction } from "@/lib/mindmap-actions";
 
 
 export const ROOT_ID = "root";
@@ -46,6 +46,7 @@ export function MindmapCreateDialog({
   userId,
   onOpenChange,
   onCreated,
+  onAction,
 }: {
   target: CreateTarget | null;
   projects: { id: string; title: string }[];
@@ -54,6 +55,7 @@ export function MindmapCreateDialog({
   userId: string;
   onOpenChange: (open: boolean) => void;
   onCreated: () => void;
+  onAction: (action: UndoableAction) => void;
 }) {
   const [kind, setKind] = useState<"project" | "task">("project");
   const [parentId, setParentId] = useState<string>(ROOT_ID);
@@ -119,6 +121,11 @@ export function MindmapCreateDialog({
             newValues: { title: project.title.trim(), status: project.status },
             metadata: { summary: `Projet « ${project.title.trim()} » créé` },
           });
+          onAction({
+            type: "project.create",
+            label: `Création du projet « ${project.title.trim()} »`,
+            projectId: created.id,
+          });
         }
         toast.success("Projet créé et relié à la carte.");
 
@@ -131,7 +138,7 @@ export function MindmapCreateDialog({
           toast.error("Choisissez le projet auquel rattacher la tâche.");
           return;
         }
-        const { error } = await supabase.from("tasks").insert({
+        const { data: createdTask, error } = await supabase.from("tasks").insert({
           title: task.title.trim(),
           description: task.description || null,
           project_id: parentId,
@@ -140,7 +147,7 @@ export function MindmapCreateDialog({
           assigned_user_id: task.assigned_user_id || null,
           created_by: userId || null,
           status: "TODO",
-        });
+        }).select("id").single();
         if (error) {
           toast.error(error.message);
           return;
@@ -153,6 +160,12 @@ export function MindmapCreateDialog({
           newValues: { title: task.title.trim() },
           metadata: { summary: `Tâche « ${task.title.trim()} » créée dans ce projet` },
         });
+        if (createdTask)
+          onAction({
+            type: "task.create",
+            label: `Création de la tâche « ${task.title.trim()} »`,
+            taskId: createdTask.id,
+          });
         toast.success("Tâche créée et reliée au projet.");
 
       }
