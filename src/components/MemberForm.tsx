@@ -217,8 +217,8 @@ function Field({
   children,
 }: {
   label: string;
-  error?: string;
-  htmlFor?: string;
+  error?: string | undefined;
+  htmlFor?: string | undefined;
   children: React.ReactNode;
 }) {
   return (
