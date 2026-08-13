@@ -8,6 +8,7 @@ import {
   UserRound,
   LogOut,
   PawPrint,
+  Users,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, bureauOnly: true },
   { to: "/member", label: "Mon espace", icon: UserRound, bureauOnly: false },
+  { to: "/members", label: "Adhérents", icon: Users, bureauOnly: true },
   { to: "/projects", label: "Projets", icon: FolderKanban, bureauOnly: false },
   { to: "/tasks", label: "Tâches", icon: ListChecks, bureauOnly: false },
   { to: "/admin/validation", label: "Validations", icon: ShieldCheck, bureauOnly: true },
