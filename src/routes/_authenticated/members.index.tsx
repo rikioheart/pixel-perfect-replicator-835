@@ -78,6 +78,11 @@ function MembersPage() {
     <AppShell
       title="Adhérents"
       subtitle="Le CRM des membres, professionnels et bénévoles de l'association"
+      actions={
+        <Button asChild size="sm">
+          <Link to="/members/new">Nouvel adhérent</Link>
+        </Button>
+      }
     >
       <div className="space-y-5">
         <div className="flex flex-wrap items-center gap-3">
