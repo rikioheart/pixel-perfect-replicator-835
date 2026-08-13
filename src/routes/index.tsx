@@ -73,6 +73,7 @@ function AuthPage() {
 
       <section className="flex items-center justify-center bg-background p-6">
         <div className="panel w-full max-w-md p-7">
+          <GoogleSignInButton />
           <Tabs defaultValue="signin">
             <TabsList className="mb-6 grid w-full grid-cols-2">
               <TabsTrigger value="signin">Connexion</TabsTrigger>
