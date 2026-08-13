@@ -564,6 +564,8 @@ function MindmapPage() {
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+
               nodeTypes={mindmapNodeTypes}
               fitView
               minZoom={0.2}
