@@ -72,7 +72,10 @@ function RolesPage() {
       (
         await supabase
           .from("profiles")
-          .select("id, first_name, last_name, display_name, email, membership_status")
+          .select(
+            "id, first_name, last_name, display_name, email, membership_status, membership_type, access_level, involvement_level",
+          )
+
           .order("created_at", { ascending: true })
       ).data ?? [],
   });
