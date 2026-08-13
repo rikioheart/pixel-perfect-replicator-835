@@ -93,7 +93,21 @@ export function AppShell({
             <h1 className="text-2xl">{title}</h1>
             {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
           </div>
-          <div className="flex items-center gap-2">{actions}</div>
+          <div className="flex items-center gap-2">
+            {actions}
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={async () => {
+                await signOut();
+                void navigate({ to: "/" });
+              }}
+            >
+              <LogOut className="size-4" />
+              Se déconnecter
+            </Button>
+          </div>
         </header>
 
         <div className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden">
