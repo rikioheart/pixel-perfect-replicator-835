@@ -132,9 +132,10 @@ export function ProjectDetailPanel({
 
   const history = useQuery({
     queryKey: ["project-audit", project?.id],
-    queryFn: () => fetchProjectAudit(project!.id),
+    queryFn: () => fetchProjectHistory(project!.id),
     enabled: Boolean(project) && tab === "history",
   });
+
 
   const save = async () => {
     if (!project || !form) return;
