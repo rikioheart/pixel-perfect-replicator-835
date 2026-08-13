@@ -24,6 +24,7 @@ import {
   FileText,
   Bell,
   HeartHandshake,
+  Gauge,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: "Cockpit Bureau",
     items: [
       { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau" },
+      { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau" },
       { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau" },
       { to: "/members", label: "Adhérents", icon: Users, audience: "bureau" },
       { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
