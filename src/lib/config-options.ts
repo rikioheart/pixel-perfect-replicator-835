@@ -31,6 +31,7 @@ export const CONFIG_FAMILIES: { family: string; label: string; hint: string }[] 
   { family: "MEMBERSHIP_STATUS", label: "Statuts d'adhésion", hint: "État de l'adhésion d'un membre" },
   { family: "PARTNER_CATEGORY", label: "Catégories de partenaires", hint: "Commerces, collectivités, marques…" },
   { family: "DOCUMENT_CATEGORY", label: "Catégories de documents", hint: "Classement de la bibliothèque partagée" },
+  { family: "PROOF_TYPE", label: "Types de preuves", hint: "Preuves acceptées selon le statut de la tâche (photo, facture, compte-rendu…)" },
   { family: "VISIBILITY", label: "Visibilités", hint: "Qui voit quoi : public, association, projet, bureau, privé" },
   { family: "MEMBER_FUNCTION", label: "Fonctions associatives", hint: "Badges qui complètent le rôle principal sans l'écraser" },
   { family: "PRO_LEVEL", label: "Niveaux professionnels", hint: "Standard, avancé, coordinateur" },

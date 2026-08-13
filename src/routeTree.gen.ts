@@ -28,6 +28,7 @@ import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
+import { Route as AuthenticatedAdminLoyaltyRulesRouteImport } from './routes/_authenticated/admin.loyalty-rules'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
@@ -139,6 +140,12 @@ const AuthenticatedAdminCockpitRoute =
     path: '/admin/cockpit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminLoyaltyRulesRoute =
+  AuthenticatedAdminLoyaltyRulesRouteImport.update({
+    id: '/admin/loyalty-rules',
+    path: '/admin/loyalty-rules',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPermissionsRoute =
   AuthenticatedAdminPermissionsRouteImport.update({
     id: '/admin/permissions',
@@ -239,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -273,6 +281,7 @@ export interface FileRoutesByTo {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -309,6 +318,7 @@ export interface FileRoutesById {
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/_authenticated/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/loyalty-rules'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/settings'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/loyalty-rules'
     | '/admin/permissions'
     | '/admin/roles'
     | '/admin/settings'
@@ -414,6 +426,7 @@ export interface FileRouteTypes {
     | '/_authenticated/terrain'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
+    | '/_authenticated/admin/loyalty-rules'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/roles'
     | '/_authenticated/admin/settings'
@@ -572,6 +585,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCockpitRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/loyalty-rules': {
+      id: '/_authenticated/admin/loyalty-rules'
+      path: '/admin/loyalty-rules'
+      fullPath: '/admin/loyalty-rules'
+      preLoaderRoute: typeof AuthenticatedAdminLoyaltyRulesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/permissions': {
       id: '/_authenticated/admin/permissions'
       path: '/admin/permissions'
@@ -690,6 +710,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
+  AuthenticatedAdminLoyaltyRulesRoute: typeof AuthenticatedAdminLoyaltyRulesRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -723,6 +744,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
+  AuthenticatedAdminLoyaltyRulesRoute: AuthenticatedAdminLoyaltyRulesRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
