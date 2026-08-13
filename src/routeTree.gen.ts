@@ -29,6 +29,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
 import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events.index'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events.$eventId'
@@ -142,6 +143,12 @@ const AuthenticatedAdminRolesRoute = AuthenticatedAdminRolesRouteImport.update({
   path: '/admin/roles',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/admin/settings',
+    path: '/admin/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminValidationRoute =
   AuthenticatedAdminValidationRouteImport.update({
     id: '/admin/validation',
@@ -226,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
@@ -258,6 +266,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
@@ -292,6 +301,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
@@ -326,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/roles'
+    | '/admin/settings'
     | '/admin/validation'
     | '/events/$eventId'
     | '/members/$memberId'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/roles'
+    | '/admin/settings'
     | '/admin/validation'
     | '/events/$eventId'
     | '/members/$memberId'
@@ -391,6 +403,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
     | '/_authenticated/admin/roles'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/validation'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/members/$memberId'
@@ -553,6 +566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRolesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/validation': {
       id: '/_authenticated/admin/validation'
       path: '/admin/validation'
@@ -651,6 +671,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
   AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
@@ -682,6 +703,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
   AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
