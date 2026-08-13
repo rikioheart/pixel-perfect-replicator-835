@@ -64,6 +64,7 @@ function MemberDashboard() {
         </Button>
       }
     >
+      <CharterBanner />
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="panel p-4">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Tâches en cours</p>
