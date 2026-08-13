@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
 import { Route as AuthenticatedMembersMemberIdRouteImport } from './routes/_authenticated/members.$memberId'
+import { Route as AuthenticatedMembersNewRouteImport } from './routes/_authenticated/members.new'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects.index'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
 import { Route as ApiPublicResetDemoRouteImport } from './routes/api/public/reset-demo'
@@ -63,6 +64,11 @@ const AuthenticatedMembersMemberIdRoute =
     path: '/members/$memberId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMembersNewRoute = AuthenticatedMembersNewRouteImport.update({
+  id: '/members/new',
+  path: '/members/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProjectsIndexRoute =
   AuthenticatedProjectsIndexRouteImport.update({
     id: '/projects/',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
+  '/members/new': typeof AuthenticatedMembersNewRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
+  '/members/new': typeof AuthenticatedMembersNewRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
+  '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/admin/validation'
     | '/members/$memberId'
+    | '/members/new'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin/'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/admin/validation'
     | '/members/$memberId'
+    | '/members/new'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks'
     | '/_authenticated/admin/validation'
     | '/_authenticated/members/$memberId'
+    | '/_authenticated/members/new'
     | '/_authenticated/projects/$projectId'
     | '/api/public/reset-demo'
     | '/_authenticated/admin/'
@@ -223,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMembersMemberIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/members/new': {
+      id: '/_authenticated/members/new'
+      path: '/members/new'
+      fullPath: '/members/new'
+      preLoaderRoute: typeof AuthenticatedMembersNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/projects/': {
       id: '/_authenticated/projects/'
       path: '/projects'
@@ -252,6 +271,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
+  AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
@@ -263,6 +283,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
+  AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
