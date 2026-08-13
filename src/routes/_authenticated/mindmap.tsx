@@ -229,6 +229,13 @@ function MindmapPage() {
   const [onlyLate, setOnlyLate] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [createTarget, setCreateTarget] = useState<CreateTarget | null>(null);
+  const [pendingLink, setPendingLink] = useState<{
+    kind: "project" | "task";
+    childId: string;
+    parentId: string | null;
+    description: string;
+  } | null>(null);
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["mindmap"],
