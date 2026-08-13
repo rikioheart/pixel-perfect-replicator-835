@@ -18,6 +18,7 @@ import { Route as AuthenticatedInventoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedLoyaltyRouteImport } from './routes/_authenticated/loyalty'
 import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
@@ -80,6 +81,12 @@ const AuthenticatedMindmapRoute = AuthenticatedMindmapRouteImport.update({
   path: '/mindmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPartnersRoute = AuthenticatedPartnersRouteImport.update({
   id: '/partners',
   path: '/partners',
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
@@ -211,6 +219,7 @@ export interface FileRoutesByTo {
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
@@ -240,6 +249,7 @@ export interface FileRoutesById {
   '/_authenticated/loyalty': typeof AuthenticatedLoyaltyRoute
   '/_authenticated/member': typeof AuthenticatedMemberRoute
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/partners': typeof AuthenticatedPartnersRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/notifications'
     | '/partners'
     | '/tasks'
     | '/terrain'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/notifications'
     | '/partners'
     | '/tasks'
     | '/terrain'
@@ -324,6 +336,7 @@ export interface FileRouteTypes {
     | '/_authenticated/loyalty'
     | '/_authenticated/member'
     | '/_authenticated/mindmap'
+    | '/_authenticated/notifications'
     | '/_authenticated/partners'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
@@ -412,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/mindmap'
       fullPath: '/mindmap'
       preLoaderRoute: typeof AuthenticatedMindmapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/partners': {
@@ -544,6 +564,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLoyaltyRoute: typeof AuthenticatedLoyaltyRoute
   AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
@@ -570,6 +591,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLoyaltyRoute: AuthenticatedLoyaltyRoute,
   AuthenticatedMemberRoute: AuthenticatedMemberRoute,
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
