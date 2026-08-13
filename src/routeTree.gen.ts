@@ -17,6 +17,7 @@ import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
 import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
@@ -69,6 +70,11 @@ const AuthenticatedPartnersRoute = AuthenticatedPartnersRouteImport.update({
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTerrainRoute = AuthenticatedTerrainRouteImport.update({
+  id: '/terrain',
+  path: '/terrain',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
   '/_authenticated/partners': typeof AuthenticatedPartnersRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
+  '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/mindmap'
     | '/partners'
     | '/tasks'
+    | '/terrain'
     | '/admin/audit'
     | '/admin/roles'
     | '/admin/validation'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/mindmap'
     | '/partners'
     | '/tasks'
+    | '/terrain'
     | '/admin/audit'
     | '/admin/roles'
     | '/admin/validation'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mindmap'
     | '/_authenticated/partners'
     | '/_authenticated/tasks'
+    | '/_authenticated/terrain'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/roles'
     | '/_authenticated/admin/validation'
@@ -357,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof AuthenticatedTasksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/terrain': {
+      id: '/_authenticated/terrain'
+      path: '/terrain'
+      fullPath: '/terrain'
+      preLoaderRoute: typeof AuthenticatedTerrainRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
@@ -467,6 +486,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
   AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
+  AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
@@ -489,6 +509,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
   AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
+  AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
