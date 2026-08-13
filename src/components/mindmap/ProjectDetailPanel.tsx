@@ -43,12 +43,13 @@ import {
   formatDate,
 } from "@/lib/domain";
 import {
-  AUDIT_ACTION_LABEL,
-  fetchProjectAudit,
+  fetchProjectHistory,
   logAudit,
   validateProjectEdit,
   type ProjectEditValues,
+  type UndoableAction,
 } from "@/lib/mindmap-actions";
+
 
 export type PanelProject = {
   id: string;
