@@ -10,9 +10,12 @@ import {
   useEdgesState,
   useNodesState,
   type Edge,
+  type Connection,
 } from "@xyflow/react";
+
 import "@xyflow/react/dist/style.css";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
@@ -20,6 +23,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { logAudit } from "@/lib/mindmap-actions";
+
 import {
   Select,
   SelectContent,
@@ -214,6 +229,13 @@ function MindmapPage() {
   const [onlyLate, setOnlyLate] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [createTarget, setCreateTarget] = useState<CreateTarget | null>(null);
+  const [pendingLink, setPendingLink] = useState<{
+    kind: "project" | "task";
+    childId: string;
+    parentId: string | null;
+    description: string;
+  } | null>(null);
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["mindmap"],
@@ -312,6 +334,106 @@ function MindmapPage() {
   const childProjects = (data?.projects ?? [])
     .filter((p) => p.parent_project_id === selectedProjectId)
     .map((p) => ({ id: p.id, title: p.title }));
+
+  const refreshGraph = () => {
+    void queryClient.invalidateQueries({ queryKey: ["mindmap"] });
+    void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    void queryClient.invalidateQueries({ queryKey: ["project-audit"] });
+  };
+
+  const onConnect = (connection: Connection) => {
+    const { source, target } = connection;
+    if (!source || !target || source === target) return;
+    const projectsById = new Map((data?.projects ?? []).map((p) => [p.id, p]));
+    const tasksById = new Map((data?.tasks ?? []).map((t) => [t.id, t]));
+    const sourceLabel =
+      source === ROOT_ID ? "L'association" : (projectsById.get(source)?.title ?? "");
+    if (source !== ROOT_ID && !projectsById.has(source)) {
+      toast.error("Seuls l'association ou un projet peuvent être parents.");
+      return;
+    }
+
+    if (tasksById.has(target)) {
+      const task = tasksById.get(target)!;
+      if (source === ROOT_ID) {
+        toast.error("Une tâche doit être rattachée à un projet.");
+        return;
+      }
+      if (task.project_id === source) return;
+      setPendingLink({
+        kind: "task",
+        childId: target,
+        parentId: source,
+        description: `Rattacher la tâche « ${task.title} » au projet « ${sourceLabel} » ?`,
+      });
+      return;
+    }
+
+    const child = projectsById.get(target);
+    if (!child) return;
+    const parentId = source === ROOT_ID ? null : source;
+    if ((child.parent_project_id ?? null) === parentId) return;
+    // Empêche les cycles : le parent ne peut pas être un descendant de l'enfant.
+    let cursorId: string | null = parentId;
+    while (cursorId) {
+      if (cursorId === child.id) {
+        toast.error("Ce rattachement créerait une boucle dans la hiérarchie.");
+        return;
+      }
+      cursorId = projectsById.get(cursorId)?.parent_project_id ?? null;
+    }
+    setPendingLink({
+      kind: "project",
+      childId: child.id,
+      parentId,
+      description: `Rattacher le projet « ${child.title} » à ${
+        parentId ? `« ${sourceLabel} »` : "l'association"
+      } ?`,
+    });
+  };
+
+  const applyLink = async () => {
+    if (!pendingLink) return;
+    const link = pendingLink;
+    setPendingLink(null);
+    if (link.kind === "project") {
+      const { error } = await supabase
+        .from("projects")
+        .update({ parent_project_id: link.parentId })
+        .eq("id", link.childId);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      await logAudit({
+        actorId: user?.id ?? null,
+        action: "project.link",
+        entityType: "project",
+        entityId: link.childId,
+        newValues: { parent_project_id: link.parentId },
+        metadata: { summary: link.description },
+      });
+    } else {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ project_id: link.parentId })
+        .eq("id", link.childId);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      await logAudit({
+        actorId: user?.id ?? null,
+        action: "task.link",
+        entityType: "project",
+        entityId: link.parentId ?? link.childId,
+        newValues: { task_id: link.childId, project_id: link.parentId },
+        metadata: { summary: link.description },
+      });
+    }
+    toast.success("Lien créé sur la mindmap.");
+    refreshGraph();
+  };
 
   const resetFilters = () => {
     setSearch("");
@@ -442,6 +564,8 @@ function MindmapPage() {
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+
               nodeTypes={mindmapNodeTypes}
               fitView
               minZoom={0.2}
@@ -460,9 +584,12 @@ function MindmapPage() {
         )}
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Astuce : double-cliquez sur un projet pour ouvrir son panneau détaillé, ou sur le nœud de
-        l'association pour créer un projet rattaché.
-        {isBureau ? "" : " Certaines créations peuvent être réservées au Bureau."}
+        Astuce : double-cliquez sur un projet pour ouvrir son panneau (détail, modification,
+        historique), ou sur le nœud de l'association pour créer un projet rattaché. Glissez la
+        poignée droite d'un nœud vers un autre pour créer un rattachement — une confirmation est
+        demandée avant enregistrement.
+        {isBureau ? "" : " Certaines actions peuvent être réservées au Bureau."}
+
       </p>
 
       <ProjectDetailPanel
@@ -470,6 +597,9 @@ function MindmapPage() {
         tasks={selectedTasks}
         categories={categories}
         people={people}
+        categoryList={data?.categoryList ?? []}
+        peopleList={(data?.peopleList ?? []).map((p) => ({ id: p.id, name: p.name || "Membre" }))}
+        userId={user?.id ?? ""}
         parentTitle={
           selectedProject?.parent_project_id
             ? ((data?.projects ?? []).find((p) => p.id === selectedProject.parent_project_id)
@@ -480,6 +610,11 @@ function MindmapPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedProjectId(null);
         }}
+        onChanged={refreshGraph}
+        onDeleted={() => {
+          setSelectedProjectId(null);
+          refreshGraph();
+        }}
         onAddTask={(projectId) => {
           setSelectedProjectId(null);
           setCreateTarget({ kind: "task", parentId: projectId });
@@ -489,6 +624,25 @@ function MindmapPage() {
           setCreateTarget({ kind: "project", parentId: projectId });
         }}
       />
+
+      <AlertDialog
+        open={Boolean(pendingLink)}
+        onOpenChange={(open) => {
+          if (!open) setPendingLink(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer le rattachement</AlertDialogTitle>
+            <AlertDialogDescription>{pendingLink?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void applyLink()}>Créer le lien</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
       <MindmapCreateDialog
         target={createTarget}
