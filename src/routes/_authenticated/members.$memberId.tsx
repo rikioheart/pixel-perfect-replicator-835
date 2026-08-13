@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,16 +8,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { formatDate, PROJECT_ROLE_LABEL, TASK_STATUS_LABEL } from "@/lib/domain";
 import {
   MEMBERSHIP_STATUS_LABEL,
@@ -25,6 +15,9 @@ import {
   MEMBER_FUNCTION_LABEL,
   memberFullName,
 } from "@/lib/members";
+import { MemberForm } from "@/components/MemberForm";
+import { memberFormSchema, type MemberFormValues } from "@/lib/member-schema";
+import { updateMember } from "@/lib/members.functions";
 
 export const Route = createFileRoute("/_authenticated/members/$memberId")({
   head: () => ({
@@ -246,162 +239,65 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-type MemberRow = {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  display_name: string | null;
-  phone: string | null;
-  city: string | null;
-  department: string | null;
-  bio: string | null;
-  membership_type: string;
-  membership_status: string;
-};
-
-function BureauEditor({ member, onSaved }: { member: MemberRow; onSaved: () => void }) {
-  const [form, setForm] = useState({
-    first_name: member.first_name ?? "",
-    last_name: member.last_name ?? "",
-    phone: member.phone ?? "",
-    city: member.city ?? "",
-    department: member.department ?? "",
-    bio: member.bio ?? "",
-    membership_type: member.membership_type,
-    membership_status: member.membership_status,
+function toFormValues(member: Record<string, unknown>): MemberFormValues {
+  const parsed = memberFormSchema.safeParse({
+    first_name: member['first_name'] ?? "",
+    last_name: member['last_name'] ?? "",
+    email: member['email'] ?? "",
+    phone: member['phone'] ?? "",
+    city: member['city'] ?? "",
+    department: member['department'] ?? "",
+    bio: member['bio'] ?? "",
+    membership_type: member['membership_type'],
+    membership_status: member['membership_status'],
+    involvement_level: member['involvement_level'] ?? "",
+    membership_date: member['membership_date'] ?? "",
+    public_visibility: Boolean(member['public_visibility']),
   });
-  const [busy, setBusy] = useState(false);
+  return parsed.success
+    ? parsed.data
+    : {
+        first_name: String(member['first_name'] ?? ""),
+        last_name: String(member['last_name'] ?? ""),
+        email: String(member['email'] ?? ""),
+        phone: String(member['phone'] ?? ""),
+        city: String(member['city'] ?? ""),
+        department: String(member['department'] ?? ""),
+        bio: String(member['bio'] ?? ""),
+        membership_type: "PARTICULIER",
+        membership_status: "PENDING",
+        involvement_level: "",
+        membership_date: "",
+        public_visibility: Boolean(member['public_visibility']),
+      };
+}
 
-  useEffect(() => {
-    setForm({
-      first_name: member.first_name ?? "",
-      last_name: member.last_name ?? "",
-      phone: member.phone ?? "",
-      city: member.city ?? "",
-      department: member.department ?? "",
-      bio: member.bio ?? "",
-      membership_type: member.membership_type,
-      membership_status: member.membership_status,
-    });
-  }, [member]);
-
-  const save = async () => {
-    setBusy(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        first_name: form.first_name || null,
-        last_name: form.last_name || null,
-        display_name: `${form.first_name} ${form.last_name}`.trim() || null,
-        phone: form.phone || null,
-        city: form.city || null,
-        department: form.department || null,
-        bio: form.bio || null,
-        membership_type: form.membership_type,
-        membership_status: form.membership_status,
-      })
-      .eq("id", member.id);
-    setBusy(false);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Fiche adhérent mise à jour.");
-      onSaved();
-    }
-  };
+function BureauEditor({
+  member,
+  onSaved,
+}: {
+  member: Record<string, unknown> & { id: string };
+  onSaved: () => void;
+}) {
+  const save = useServerFn(updateMember);
 
   return (
     <section className="panel space-y-4 p-5">
-      <h2 className="text-lg">Édition Bureau</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="first_name">Prénom</Label>
-          <Input
-            id="first_name"
-            value={form.first_name}
-            onChange={(e) => setForm({ ...form, first_name: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="last_name">Nom</Label>
-          <Input
-            id="last_name"
-            value={form.last_name}
-            onChange={(e) => setForm({ ...form, last_name: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone">Téléphone</Label>
-          <Input
-            id="phone"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="city">Ville</Label>
-          <Input
-            id="city"
-            value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="department">Département</Label>
-          <Input
-            id="department"
-            value={form.department}
-            onChange={(e) => setForm({ ...form, department: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>Type d'adhésion</Label>
-          <Select
-            value={form.membership_type}
-            onValueChange={(value) => setForm({ ...form, membership_type: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(MEMBERSHIP_TYPE_LABEL).map(([code, label]) => (
-                <SelectItem key={code} value={code}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>Statut</Label>
-          <Select
-            value={form.membership_status}
-            onValueChange={(value) => setForm({ ...form, membership_status: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(MEMBERSHIP_STATUS_LABEL).map(([code, label]) => (
-                <SelectItem key={code} value={code}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="bio">Présentation</Label>
-        <Textarea
-          id="bio"
-          rows={3}
-          value={form.bio}
-          onChange={(e) => setForm({ ...form, bio: e.target.value })}
-        />
-      </div>
-      <Button onClick={save} disabled={busy}>
-        {busy ? "Enregistrement…" : "Enregistrer"}
-      </Button>
+      <h2 className="text-lg">Modifier la fiche adhérent</h2>
+      <MemberForm
+        key={member.id}
+        initialValues={toFormValues(member)}
+        submitLabel="Enregistrer"
+        onSubmit={async (values) => {
+          try {
+            await save({ data: { ...values, id: member.id } });
+            toast.success("Fiche adhérent mise à jour.");
+            onSaved();
+          } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Enregistrement impossible.");
+          }
+        }}
+      />
     </section>
   );
 }
