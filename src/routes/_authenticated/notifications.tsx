@@ -76,7 +76,7 @@ function NotificationsPage() {
     mutationFn: async () => {
       const { error } = await supabase
         .from("in_app_notifications")
-        .update({ is_read: true })
+        .update({ is_read: true, read_at: new Date().toISOString() })
         .eq("recipient_id", user!.id)
         .eq("is_read", false);
       if (error) throw error;
@@ -92,7 +92,7 @@ function NotificationsPage() {
     mutationFn: async ({ id, isRead }: { id: string; isRead: boolean }) => {
       const { error } = await supabase
         .from("in_app_notifications")
-        .update({ is_read: isRead })
+        .update({ is_read: isRead, read_at: isRead ? new Date().toISOString() : null })
         .eq("id", id);
       if (error) throw error;
     },
@@ -111,6 +111,35 @@ function NotificationsPage() {
 
   const unread = notifications.filter((n) => !n.is_read).length;
 
+  const availableTypes = useMemo(() => {
+    const set = new Set<string>(NOTIFICATION_TYPES as readonly string[]);
+    notifications.forEach((n) => set.add(n.kind));
+    return Array.from(set).sort();
+  }, [notifications]);
+
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return notifications.filter((n) => {
+      if (statusFilter === "UNREAD" && n.is_read) return false;
+      if (statusFilter === "READ" && !n.is_read) return false;
+      if (typeFilter !== "ALL" && n.kind !== typeFilter) return false;
+      if (term) {
+        const haystack = `${n.title} ${n.message ?? ""}`.toLowerCase();
+        if (!haystack.includes(term)) return false;
+      }
+      return true;
+    });
+  }, [notifications, statusFilter, typeFilter, search]);
+
+  const open = (notification: (typeof notifications)[number]) => {
+    if (!notification.is_read) {
+      toggleRead.mutate({ id: notification.id, isRead: true });
+    }
+    if (notification.link_url) {
+      void navigate({ to: notification.link_url });
+    }
+  };
+
   return (
     <AppShell
       title="Notifications"
@@ -121,13 +150,45 @@ function NotificationsPage() {
         </Button>
       }
     >
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Input
+          placeholder="Rechercher…"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="w-56"
+        />
+        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Toutes</SelectItem>
+            <SelectItem value="UNREAD">Non lues</SelectItem>
+            <SelectItem value="READ">Lues</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-60">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Tous les types</SelectItem>
+            {availableTypes.map((type) => (
+              <SelectItem key={type} value={type}>
+                {notificationLabel(type)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement…</p>
-      ) : notifications.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucune notification.</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Aucune notification pour ces critères.</p>
       ) : (
         <div className="space-y-2">
-          {notifications.map((notification) => (
+          {filtered.map((notification) => (
             <Card key={notification.id} className={cn(!notification.is_read && "border-primary/50")}>
               <CardContent className="flex items-start gap-3 p-4 text-sm">
                 <BellRing
@@ -136,7 +197,7 @@ function NotificationsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium">{notification.title}</p>
-                    <Badge variant="outline">{notification.kind}</Badge>
+                    <Badge variant="outline">{notificationLabel(notification.kind)}</Badge>
                   </div>
                   {notification.message ? (
                     <p className="text-muted-foreground">{notification.message}</p>
@@ -149,6 +210,11 @@ function NotificationsPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
+                  {notification.link_url ? (
+                    <Button variant="ghost" size="sm" className="gap-1" onClick={() => open(notification)}>
+                      <ExternalLink className="size-4" /> Ouvrir
+                    </Button>
+                  ) : null}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -156,7 +222,7 @@ function NotificationsPage() {
                       toggleRead.mutate({ id: notification.id, isRead: !notification.is_read })
                     }
                   >
-                    {notification.is_read ? "Non lu" : "Lu"}
+                    {notification.is_read ? "Marquer non lu" : "Marquer lu"}
                   </Button>
                   <Button variant="ghost" size="icon" className="size-8" onClick={() => remove.mutate(notification.id)}>
                     <Trash2 className="size-4" />
@@ -170,3 +236,4 @@ function NotificationsPage() {
     </AppShell>
   );
 }
+
