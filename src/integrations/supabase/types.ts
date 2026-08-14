@@ -337,7 +337,10 @@ export type Database = {
           needs: string | null
           owner_id: string
           photo_url: string | null
+          sex: string | null
           updated_at: string
+          useful_information: string | null
+          visibility: string
         }
         Insert: {
           birth_date?: string | null
@@ -349,7 +352,10 @@ export type Database = {
           needs?: string | null
           owner_id: string
           photo_url?: string | null
+          sex?: string | null
           updated_at?: string
+          useful_information?: string | null
+          visibility?: string
         }
         Update: {
           birth_date?: string | null
@@ -361,7 +367,10 @@ export type Database = {
           needs?: string | null
           owner_id?: string
           photo_url?: string | null
+          sex?: string | null
           updated_at?: string
+          useful_information?: string | null
+          visibility?: string
         }
         Relationships: []
       }
@@ -426,6 +435,7 @@ export type Database = {
           kind: string
           link_url: string | null
           message: string | null
+          read_at: string | null
           recipient_id: string
           sender_id: string | null
           title: string
@@ -439,6 +449,7 @@ export type Database = {
           kind?: string
           link_url?: string | null
           message?: string | null
+          read_at?: string | null
           recipient_id: string
           sender_id?: string | null
           title: string
@@ -452,6 +463,7 @@ export type Database = {
           kind?: string
           link_url?: string | null
           message?: string | null
+          read_at?: string | null
           recipient_id?: string
           sender_id?: string | null
           title?: string
@@ -704,6 +716,48 @@ export type Database = {
         }
         Relationships: []
       }
+      memberships: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          membership_type: string
+          notes: string | null
+          start_date: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          membership_type?: string
+          notes?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          membership_type?: string
+          notes?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: []
+      }
       mindmap_config: {
         Row: {
           created_at: string
@@ -906,6 +960,39 @@ export type Database = {
           },
         ]
       }
+      professional_categories: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       professional_proposals: {
         Row: {
           created_at: string
@@ -944,6 +1031,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      professional_services: {
+        Row: {
+          active: boolean
+          category: string | null
+          category_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          professional_id: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          professional_id: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          professional_id?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "professional_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1267,6 +1401,101 @@ export type Database = {
         }
         Relationships: []
       }
+      social_links: {
+        Row: {
+          created_at: string
+          id: string
+          is_visible: boolean
+          platform: string
+          professional_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          platform: string
+          professional_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          platform?: string
+          professional_id?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      task_assignees: {
+        Row: {
+          created_at: string
+          id: string
+          role_in_task: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role_in_task?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role_in_task?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_assignees_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_dependencies: {
+        Row: {
+          created_at: string
+          depends_on_task_id: string
+          id: string
+          task_id: string
+        }
+        Insert: {
+          created_at?: string
+          depends_on_task_id: string
+          id?: string
+          task_id: string
+        }
+        Update: {
+          created_at?: string
+          depends_on_task_id?: string
+          id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_dependencies_depends_on_task_id_fkey"
+            columns: ["depends_on_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_dependencies_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_history: {
         Row: {
           action: string
@@ -1541,6 +1770,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      user_permission_overrides: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          effect: string
+          id: string
+          permission_id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          effect?: string
+          id?: string
+          permission_id: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          effect?: string
+          id?: string
+          permission_id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_permission_overrides_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
