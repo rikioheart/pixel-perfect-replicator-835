@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Stamp, Trash2 } from "lucide-react";
+import { Plus, RefreshCw, Stamp, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +20,7 @@ import {
   LOYALTY_SCOPE_LABEL,
   MEMBERSHIP_TYPES,
   fetchLoyaltyRules,
+  recomputeLoyaltyAll,
   type LoyaltyRule,
 } from "@/lib/loyalty-rules";
 
@@ -130,6 +131,19 @@ function LoyaltyRulesPage() {
       });
     },
     onSuccess: invalidate,
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const recompute = useMutation({
+    mutationFn: recomputeLoyaltyAll,
+    onSuccess: async (granted) => {
+      toast.success(
+        granted > 0
+          ? `Recalcul global terminé : ${granted} tampon(s) attribué(s).`
+          : "Recalcul global terminé : toutes les cartes étaient à jour.",
+      );
+      await queryClient.invalidateQueries();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -294,9 +308,22 @@ function LoyaltyRulesPage() {
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
             placeholder="À quoi sert cette règle ? (facultatif)"
           />
-          <Button onClick={() => create.mutate()} disabled={create.isPending}>
-            <Plus className="mr-2 size-4" /> Ajouter la règle
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={() => create.mutate()} disabled={create.isPending}>
+              <Plus className="mr-2 size-4" /> Ajouter la règle
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => recompute.mutate()}
+              disabled={recompute.isPending}
+            >
+              <RefreshCw className="mr-2 size-4" />
+              {recompute.isPending ? "Recalcul en cours…" : "Recalculer toutes les cartes"}
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Rejoue les barèmes sur toutes les participations validées, sans doublon.
+            </span>
+          </div>
         </div>
 
         <RuleList
