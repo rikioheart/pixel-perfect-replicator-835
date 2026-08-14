@@ -44,7 +44,13 @@ export const Route = createFileRoute("/_authenticated/notifications")({
 
 function NotificationsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "UNREAD" | "READ">("ALL");
+  const [typeFilter, setTypeFilter] = useState<string>("ALL");
+  const [search, setSearch] = useState("");
+
+
 
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["notifications-page", user?.id],
