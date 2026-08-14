@@ -1602,6 +1602,11 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      recompute_loyalty_all: { Args: never; Returns: number }
+      recompute_loyalty_for_member: {
+        Args: { _user_id: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

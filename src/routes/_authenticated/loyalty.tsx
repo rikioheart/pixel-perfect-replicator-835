@@ -1,7 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Stamp, QrCode } from "lucide-react";
+import { Stamp, QrCode, RefreshCw, Trophy } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  fetchLoyaltyRules,
+  eligibleGrants,
+  tierProgress,
+  recomputeLoyaltyForMember,
+  LOYALTY_SCOPE_LABEL,
+} from "@/lib/loyalty-rules";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,8 +43,9 @@ export const Route = createFileRoute("/_authenticated/loyalty")({
 const CARD_SIZE = 10;
 
 function LoyaltyPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const queryClient = useQueryClient();
+  const [recomputing, setRecomputing] = useState(false);
 
   const { data: card, isLoading } = useQuery({
     queryKey: ["loyalty-card", user?.id],
@@ -73,9 +84,34 @@ function LoyaltyPage() {
     },
   });
 
+  const { data: rules = [] } = useQuery({
+    queryKey: ["loyalty-rules"],
+    queryFn: fetchLoyaltyRules,
+  });
+
   const total = card?.total_stamps ?? 0;
   const filled = total % CARD_SIZE;
   const completed = Math.floor(total / CARD_SIZE);
+  const grants = eligibleGrants(rules, profile?.membership_type ?? null);
+  const tiers = tierProgress(rules, total);
+
+  const recompute = async () => {
+    if (!user?.id) return;
+    setRecomputing(true);
+    try {
+      const granted = await recomputeLoyaltyForMember(user.id);
+      await queryClient.invalidateQueries();
+      toast.success(
+        granted > 0
+          ? `Recalcul terminé : ${granted} tampon(s) ajouté(s).`
+          : "Recalcul terminé : votre carte était déjà à jour.",
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Recalcul impossible.");
+    } finally {
+      setRecomputing(false);
+    }
+  };
 
   return (
     <AppShell title="Ma carte de fidélité" subtitle="Vos tampons et votre historique d'activités">
@@ -133,6 +169,85 @@ function LoyaltyPage() {
             ) : (
               <p className="text-muted-foreground">Création de votre carte en cours…</p>
             )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Stamp className="size-4" /> Mon éligibilité (barèmes actifs)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {grants.length === 0 ? (
+              <p className="text-muted-foreground">
+                Aucun barème actif ne s'applique à votre profil pour le moment.
+              </p>
+            ) : (
+              grants.map((rule) => (
+                <div
+                  key={rule.id}
+                  className="flex items-start justify-between gap-3 border-b border-border pb-2 last:border-0"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{rule.label ?? rule.code}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {LOYALTY_SCOPE_LABEL[rule.scope] ?? rule.scope}
+                      {rule.match_code ? ` · ${rule.match_code}` : ""}
+                      {rule.eligible_membership_types.length > 0
+                        ? ` · ${rule.eligible_membership_types.join(", ")}`
+                        : " · tous les adhérents"}
+                    </p>
+                  </div>
+                  <Badge variant="secondary">+{rule.stamps_given}</Badge>
+                </div>
+              ))
+            )}
+            <p className="pt-1 text-xs text-muted-foreground">
+              Les tampons sont attribués automatiquement dès qu'une participation ou un événement
+              est validé.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Trophy className="size-4" /> Paliers et récompenses
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {tiers.length === 0 ? (
+              <p className="text-muted-foreground">Aucun palier configuré.</p>
+            ) : (
+              tiers.map((tier) => (
+                <div key={tier.rule.id} className="space-y-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="truncate font-medium">
+                      {tier.rule.reward_label ?? tier.rule.label ?? "Récompense"}
+                    </p>
+                    <Badge variant={tier.reached ? "default" : "outline"}>
+                      {tier.reached ? "Atteint" : `${tier.remaining} restant(s)`}
+                    </Badge>
+                  </div>
+                  <Progress value={tier.percent} />
+                  <p className="text-xs text-muted-foreground">
+                    {total} / {tier.threshold} tampons
+                  </p>
+                </div>
+              ))
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={recompute}
+              disabled={recomputing || !user?.id}
+            >
+              <RefreshCw className="mr-2 size-4" />
+              {recomputing ? "Recalcul en cours…" : "Recalculer mes tampons"}
+            </Button>
           </CardContent>
         </Card>
       </div>

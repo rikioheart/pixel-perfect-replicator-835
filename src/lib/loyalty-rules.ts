@@ -68,3 +68,47 @@ export function nextTier(rules: LoyaltyRule[], totalStamps: number) {
     .filter((rule) => rule.is_active && rule.scope === "TIER" && (rule.tier_threshold ?? 0) > totalStamps)
     .sort((a, b) => (a.tier_threshold ?? 0) - (b.tier_threshold ?? 0))[0];
 }
+
+/** Paliers actifs triés, avec l'état d'obtention pour un total de tampons donné. */
+export function tierProgress(rules: LoyaltyRule[], totalStamps: number) {
+  return rules
+    .filter((rule) => rule.is_active && rule.scope === "TIER")
+    .sort((a, b) => (a.tier_threshold ?? 0) - (b.tier_threshold ?? 0))
+    .map((rule) => {
+      const threshold = rule.tier_threshold ?? 0;
+      return {
+        rule,
+        threshold,
+        reached: totalStamps >= threshold,
+        remaining: Math.max(0, threshold - totalStamps),
+        percent: threshold > 0 ? Math.min(100, Math.round((totalStamps / threshold) * 100)) : 100,
+      };
+    });
+}
+
+/** Barèmes d'attribution auxquels un type d'adhésion est éligible. */
+export function eligibleGrants(rules: LoyaltyRule[], membershipType?: string | null) {
+  return rules
+    .filter((rule) => rule.is_active && rule.scope !== "TIER" && rule.stamps_given > 0)
+    .filter(
+      (rule) =>
+        rule.eligible_membership_types.length === 0 ||
+        (membershipType ? rule.eligible_membership_types.includes(membershipType) : false),
+    )
+    .sort((a, b) => a.priority - b.priority);
+}
+
+/** Recalcule les tampons d'un adhérent à partir de toutes ses participations validées. */
+export async function recomputeLoyaltyForMember(userId: string): Promise<number> {
+  const { data, error } = await supabase.rpc("recompute_loyalty_for_member", { _user_id: userId });
+  if (error) throw new Error(error.message);
+  return data ?? 0;
+}
+
+/** Recalcul global, réservé au Bureau. */
+export async function recomputeLoyaltyAll(): Promise<number> {
+  const { data, error } = await supabase.rpc("recompute_loyalty_all");
+  if (error) throw new Error(error.message);
+  return data ?? 0;
+}
+
