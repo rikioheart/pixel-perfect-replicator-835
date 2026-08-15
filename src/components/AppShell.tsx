@@ -35,7 +35,14 @@ import { NotificationBell } from "@/components/NotificationBell";
 
 type Audience = "bureau" | "all" | "pro";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; audience: Audience };
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  audience: Audience;
+  /** Entrées principales : 5 maximum par rôle, le reste est replié. */
+  primary?: boolean;
+};
 
 type NavGroup = { title: string; items: NavItem[] };
 
@@ -43,25 +50,24 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Cockpit Bureau",
     items: [
-      { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau" },
-      { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau" },
-      { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau" },
-      { to: "/members", label: "Adhérents", icon: Users, audience: "bureau" },
+      { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
+      { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau", primary: true },
+      { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau", primary: true },
+      { to: "/members", label: "Adhérents", icon: Users, audience: "bureau", primary: true },
       { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
       { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
       { to: "/admin/permissions", label: "Permissions", icon: ShieldCheck, audience: "bureau" },
       { to: "/admin/loyalty-rules", label: "Règles de fidélité", icon: Stamp, audience: "bureau" },
       { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
       { to: "/admin/settings", label: "Paramétrage", icon: Settings2, audience: "bureau" },
-
     ],
   },
   {
     title: "Avancer ensemble",
     items: [
-      { to: "/member", label: "Mon espace", icon: UserRound, audience: "all" },
-      { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all" },
-      { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all" },
+      { to: "/member", label: "Mon espace", icon: UserRound, audience: "all", primary: true },
+      { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all", primary: true },
+      { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all", primary: true },
       { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all" },
       { to: "/blog", label: "Journal interne", icon: Newspaper, audience: "all" },
       { to: "/documents", label: "Documents", icon: FileText, audience: "all" },
@@ -70,8 +76,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Vie de l'association",
     items: [
-      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all" },
-      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all" },
+      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true },
+      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true },
       { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: MapPin, audience: "pro" },
