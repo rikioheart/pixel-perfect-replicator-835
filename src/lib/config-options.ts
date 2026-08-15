@@ -42,6 +42,16 @@ export const CONFIG_FAMILIES: { family: string; label: string; hint: string }[] 
   { family: "PRO_LEVEL", label: "Niveaux professionnels", hint: "Standard, avancé, coordinateur" },
   { family: "PARTICULIER_LEVEL", label: "Niveaux particuliers", hint: "Standard, impliqué, bénévole validé, référent" },
   { family: "PRIORITY", label: "Priorités", hint: "Échelle de priorité des actions" },
+  {
+    family: "HOME_MEDIA",
+    label: "Accueil : image et à la une",
+    hint: "Code COVER = photo de couverture (URL dans la description), code HIGHLIGHT = mise en avant de la semaine",
+  },
+  {
+    family: "EXTERNAL_LINK",
+    label: "Liens externes (Drive, Formulaires)",
+    hint: "Outils Google Drive / Google Form accessibles en un clic — mettez l'URL complète dans la description",
+  },
 ];
 
 export const CONFIG_FAMILY_LABEL: Record<string, string> = Object.fromEntries(
