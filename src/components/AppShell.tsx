@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   UserRound,
   LogOut,
-  PawPrint,
+  
   Users,
   Network,
   KeyRound,
