@@ -111,50 +111,93 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const externalLinks = useExternalLinks();
+  const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => {
+    if (item.audience === "bureau") return isBureau;
+    if (item.audience === "pro") return isBureau || isPro;
+    return true;
+  });
+
+  const primary = visible.filter((item) => item.primary).slice(0, 5);
+  const primaryPaths = new Set(primary.map((item) => item.to));
+  const secondary = visible.filter((item) => !primaryPaths.has(item.to));
   const groups = NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) => {
-      if (item.audience === "bureau") return isBureau;
-      if (item.audience === "pro") return isBureau || isPro;
-      return true;
-    }),
+    items: group.items.filter((item) => secondary.includes(item)),
   })).filter((group) => group.items.length > 0);
+
+  const renderLink = (item: NavItem) => {
+    const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+    return (
+      <Link
+        key={item.to}
+        to={item.to}
+        className={cn(
+          "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
+          active ? "surface-wine" : "opacity-80 hover:bg-sidebar-accent hover:opacity-100",
+        )}
+      >
+        <item.icon className="size-4" />
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="surface-night hidden w-64 shrink-0 flex-col justify-between p-5 md:flex">
+      <aside className="surface-night hidden w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex">
         <div>
-          <div className="flex items-center gap-2 pb-8">
-            <PawPrint className="size-6" />
+          <div className="flex items-center gap-3 pb-8">
+            <img
+              src={logoAsset.url}
+              alt="Logo La Voix du Chien"
+              className="size-10 rounded-full bg-navy-foreground/10 object-contain p-0.5"
+            />
             <div className="leading-tight">
               <p className="font-display text-sm">La Voix du Chien</p>
               <p className="text-xs opacity-70">{isBureau ? "Cockpit Bureau" : "Espace adhérent"}</p>
             </div>
           </div>
           <nav className="space-y-5">
-            {groups.map((group) => (
-              <div key={group.title} className="space-y-1">
-                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-50">
-                  {group.title}
+            <div className="space-y-1">{primary.map(renderLink)}</div>
+
+            {groups.length ? (
+              <details className="group">
+                <summary className="cursor-pointer list-none px-3 py-2 text-[11px] font-semibold uppercase tracking-wide opacity-50 hover:opacity-80">
+                  Tout le reste
+                </summary>
+                <div className="mt-2 space-y-4">
+                  {groups.map((group) => (
+                    <div key={group.title} className="space-y-1">
+                      <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-40">
+                        {group.title}
+                      </p>
+                      {group.items.map(renderLink)}
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+
+            {externalLinks.length ? (
+              <div className="space-y-1 border-t border-sidebar-border pt-4">
+                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-40">
+                  Outils partagés
                 </p>
-                {group.items.map((item) => {
-                  const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      className={cn(
-                        "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                        active ? "surface-wine" : "opacity-80 hover:bg-sidebar-accent hover:opacity-100",
-                      )}
-                    >
-                      <item.icon className="size-4" />
-                      {item.label}
-                    </Link>
-                  );
-                })}
+                {externalLinks.map((link) => (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm opacity-80 transition-colors hover:bg-sidebar-accent hover:opacity-100"
+                  >
+                    <ExternalLink className="size-4" />
+                    {link.label}
+                  </a>
+                ))}
               </div>
-            ))}
+            ) : null}
           </nav>
         </div>
         <div className="space-y-3 border-t border-sidebar-border pt-4 text-sm">
