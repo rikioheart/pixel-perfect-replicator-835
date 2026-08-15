@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { PawPrint } from "lucide-react";
+import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -49,8 +49,12 @@ function AuthPage() {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <section className="surface-night flex flex-col justify-between p-10">
-        <div className="flex items-center gap-2">
-          <PawPrint className="size-6" />
+        <div className="flex items-center gap-3">
+          <img
+            src={logoAsset.url}
+            alt="Logo de l'association La Voix du Chien"
+            className="size-12 rounded-full bg-navy-foreground/10 object-contain p-1"
+          />
           <span className="font-display">La Voix du Chien</span>
         </div>
         <div className="max-w-md space-y-5 py-16">
