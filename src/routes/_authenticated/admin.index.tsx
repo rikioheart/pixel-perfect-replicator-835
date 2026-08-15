@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { TASK_STATUS_LABEL, PROJECT_STATUS_LABEL, formatDate } from "@/lib/domain";
+import { HomeHero } from "@/components/HomeHero";
+import { NewsFeed } from "@/components/NewsFeed";
+import { EmptyState } from "@/components/EmptyState";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -31,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 function AdminDashboard() {
-  const { isBureau, refresh, roles, loading } = useAuth();
+  const { isBureau, refresh, roles, loading, profile } = useAuth();
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
@@ -130,7 +133,14 @@ function AdminDashboard() {
         </Button>
       }
     >
-      <CharterBanner />
+      <HomeHero
+        firstName={profile?.first_name ?? profile?.display_name ?? ""}
+        roleLabel="Bureau"
+        message="Validations en attente, alertes prioritaires et indicateurs clés du réseau."
+      />
+      <div className="mt-6">
+        <CharterBanner />
+      </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <div key={stat.label} className="panel p-4">
@@ -181,7 +191,10 @@ function AdminDashboard() {
           </div>
           <ul className="space-y-3">
             {(data?.tasks ?? []).length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucune tâche enregistrée.</p>
+              <EmptyState
+                title="Tout est calme"
+                message="Aucune tâche enregistrée pour l'instant : le premier petit progrès s'affichera ici."
+              />
             ) : (
               data?.tasks.map((task) => (
                 <li key={task.id} className="flex items-start justify-between gap-3 text-sm">
@@ -192,6 +205,10 @@ function AdminDashboard() {
             )}
           </ul>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <NewsFeed />
       </div>
 
       <div className="panel mt-6 p-5">

@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   UserRound,
   LogOut,
-  PawPrint,
+  
   Users,
   Network,
   KeyRound,
@@ -28,14 +28,24 @@ import {
   HeartHandshake,
   Gauge,
 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useExternalLinks } from "@/lib/home-config";
+import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 
 type Audience = "bureau" | "all" | "pro";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; audience: Audience };
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  audience: Audience;
+  /** Entrées principales : 5 maximum par rôle, le reste est replié. */
+  primary?: boolean;
+};
 
 type NavGroup = { title: string; items: NavItem[] };
 
@@ -43,25 +53,24 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Cockpit Bureau",
     items: [
-      { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau" },
-      { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau" },
-      { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau" },
-      { to: "/members", label: "Adhérents", icon: Users, audience: "bureau" },
+      { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
+      { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau", primary: true },
+      { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau", primary: true },
+      { to: "/members", label: "Adhérents", icon: Users, audience: "bureau", primary: true },
       { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
       { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
       { to: "/admin/permissions", label: "Permissions", icon: ShieldCheck, audience: "bureau" },
       { to: "/admin/loyalty-rules", label: "Règles de fidélité", icon: Stamp, audience: "bureau" },
       { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
       { to: "/admin/settings", label: "Paramétrage", icon: Settings2, audience: "bureau" },
-
     ],
   },
   {
     title: "Avancer ensemble",
     items: [
-      { to: "/member", label: "Mon espace", icon: UserRound, audience: "all" },
-      { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all" },
-      { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all" },
+      { to: "/member", label: "Mon espace", icon: UserRound, audience: "all", primary: true },
+      { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all", primary: true },
+      { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all", primary: true },
       { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all" },
       { to: "/blog", label: "Journal interne", icon: Newspaper, audience: "all" },
       { to: "/documents", label: "Documents", icon: FileText, audience: "all" },
@@ -70,8 +79,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Vie de l'association",
     items: [
-      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all" },
-      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all" },
+      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true },
+      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true },
       { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: MapPin, audience: "pro" },
@@ -105,50 +114,93 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const externalLinks = useExternalLinks();
+  const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => {
+    if (item.audience === "bureau") return isBureau;
+    if (item.audience === "pro") return isBureau || isPro;
+    return true;
+  });
+
+  const primary = visible.filter((item) => item.primary).slice(0, 5);
+  const primaryPaths = new Set(primary.map((item) => item.to));
+  const secondary = visible.filter((item) => !primaryPaths.has(item.to));
   const groups = NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) => {
-      if (item.audience === "bureau") return isBureau;
-      if (item.audience === "pro") return isBureau || isPro;
-      return true;
-    }),
+    items: group.items.filter((item) => secondary.includes(item)),
   })).filter((group) => group.items.length > 0);
+
+  const renderLink = (item: NavItem) => {
+    const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+    return (
+      <Link
+        key={item.to}
+        to={item.to}
+        className={cn(
+          "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
+          active ? "surface-wine" : "opacity-80 hover:bg-sidebar-accent hover:opacity-100",
+        )}
+      >
+        <item.icon className="size-4" />
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="surface-night hidden w-64 shrink-0 flex-col justify-between p-5 md:flex">
+      <aside className="surface-night hidden w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex">
         <div>
-          <div className="flex items-center gap-2 pb-8">
-            <PawPrint className="size-6" />
+          <div className="flex items-center gap-3 pb-8">
+            <img
+              src={logoAsset.url}
+              alt="Logo La Voix du Chien"
+              className="size-10 rounded-full bg-navy-foreground/10 object-contain p-0.5"
+            />
             <div className="leading-tight">
               <p className="font-display text-sm">La Voix du Chien</p>
               <p className="text-xs opacity-70">{isBureau ? "Cockpit Bureau" : "Espace adhérent"}</p>
             </div>
           </div>
           <nav className="space-y-5">
-            {groups.map((group) => (
-              <div key={group.title} className="space-y-1">
-                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-50">
-                  {group.title}
+            <div className="space-y-1">{primary.map(renderLink)}</div>
+
+            {groups.length ? (
+              <details className="group">
+                <summary className="cursor-pointer list-none px-3 py-2 text-[11px] font-semibold uppercase tracking-wide opacity-50 hover:opacity-80">
+                  Tout le reste
+                </summary>
+                <div className="mt-2 space-y-4">
+                  {groups.map((group) => (
+                    <div key={group.title} className="space-y-1">
+                      <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-40">
+                        {group.title}
+                      </p>
+                      {group.items.map(renderLink)}
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+
+            {externalLinks.length ? (
+              <div className="space-y-1 border-t border-sidebar-border pt-4">
+                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-40">
+                  Outils partagés
                 </p>
-                {group.items.map((item) => {
-                  const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      className={cn(
-                        "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                        active ? "surface-wine" : "opacity-80 hover:bg-sidebar-accent hover:opacity-100",
-                      )}
-                    >
-                      <item.icon className="size-4" />
-                      {item.label}
-                    </Link>
-                  );
-                })}
+                {externalLinks.map((link) => (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm opacity-80 transition-colors hover:bg-sidebar-accent hover:opacity-100"
+                  >
+                    <ExternalLink className="size-4" />
+                    {link.label}
+                  </a>
+                ))}
               </div>
-            ))}
+            ) : null}
           </nav>
         </div>
         <div className="space-y-3 border-t border-sidebar-border pt-4 text-sm">
