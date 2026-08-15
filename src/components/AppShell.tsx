@@ -28,10 +28,13 @@ import {
   HeartHandshake,
   Gauge,
 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useExternalLinks } from "@/lib/home-config";
+import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 
 type Audience = "bureau" | "all" | "pro";
 
