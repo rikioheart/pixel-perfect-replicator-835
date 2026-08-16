@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarRange, MapPin, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { EmptyState } from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,7 @@ function EventsPage() {
     start_date: "",
     end_date: "",
     location: "",
+    image_url: "",
     visibility: "ASSOCIATION",
   });
 
@@ -87,6 +89,7 @@ function EventsPage() {
         start_date: form.start_date ? new Date(form.start_date).toISOString() : null,
         end_date: form.end_date ? new Date(form.end_date).toISOString() : null,
         location: form.location || null,
+        image_url: form.image_url.trim() || null,
         visibility: form.visibility,
         created_by: user?.id ?? null,
       });
@@ -190,6 +193,15 @@ function EventsPage() {
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
                   />
                 </div>
+                <div>
+                  <Label htmlFor="ev-img">Image (URL)</Label>
+                  <Input
+                    id="ev-img"
+                    placeholder="https://…"
+                    value={form.image_url}
+                    onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  />
+                </div>
               </div>
               <DialogFooter>
                 <Button onClick={() => create.mutate()} disabled={create.isPending}>
@@ -204,11 +216,22 @@ function EventsPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement du calendrier…</p>
       ) : events.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucun événement programmé.</p>
+        <EmptyState
+          title="Pas encore d'événement"
+          message="Les prochains temps forts de l'association apparaîtront ici."
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {events.map((event) => (
-            <Card key={event.id}>
+            <Card key={event.id} className="overflow-hidden">
+              {event.image_url ? (
+                <img
+                  src={event.image_url}
+                  alt={`Illustration de l'événement ${event.title}`}
+                  loading="lazy"
+                  className="h-36 w-full object-cover"
+                />
+              ) : null}
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle className="text-base">{event.title}</CardTitle>

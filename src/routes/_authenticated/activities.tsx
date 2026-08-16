@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarDays, MapPin, Plus, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { EmptyState } from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,7 @@ function ActivitiesPage() {
     location: "",
     price_public: "0",
     price_member: "0",
+    image_url: "",
     eligible_for_loyalty: true,
   });
 
@@ -133,6 +135,7 @@ function ActivitiesPage() {
         location: form.location || null,
         price_public: Number(form.price_public) || 0,
         price_member: Number(form.price_member) || 0,
+        image_url: form.image_url.trim() || null,
         eligible_for_loyalty: form.eligible_for_loyalty,
         created_by: user?.id ?? null,
       });
@@ -149,6 +152,7 @@ function ActivitiesPage() {
         location: "",
         price_public: "0",
         price_member: "0",
+        image_url: "",
         eligible_for_loyalty: true,
       });
       void queryClient.invalidateQueries({ queryKey: ["activities"] });
@@ -223,6 +227,15 @@ function ActivitiesPage() {
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
                   />
                 </div>
+                <div>
+                  <Label htmlFor="act-img">Image (URL)</Label>
+                  <Input
+                    id="act-img"
+                    placeholder="https://…"
+                    value={form.image_url}
+                    onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="act-pm">Tarif adhérent (€)</Label>
@@ -272,13 +285,24 @@ function ActivitiesPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement des activités…</p>
       ) : activities.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucune activité programmée pour le moment.</p>
+        <EmptyState
+          title="Aucune activité pour l'instant"
+          message="Les prochains ateliers et sorties s'afficheront ici dès que le Bureau les aura programmés."
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {activities.map((activity) => {
             const participation = myParticipations.find((p) => p.activity_id === activity.id);
             return (
-              <Card key={activity.id}>
+              <Card key={activity.id} className="overflow-hidden">
+                {activity.image_url ? (
+                  <img
+                    src={activity.image_url}
+                    alt={`Illustration de l'activité ${activity.title}`}
+                    loading="lazy"
+                    className="h-36 w-full object-cover"
+                  />
+                ) : null}
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-base">{activity.title}</CardTitle>

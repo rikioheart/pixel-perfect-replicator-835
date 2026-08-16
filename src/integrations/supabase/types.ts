@@ -80,6 +80,7 @@ export type Database = {
           description: string | null
           eligible_for_loyalty: boolean
           id: string
+          image_url: string | null
           location: string | null
           price_member: number
           price_public: number
@@ -97,6 +98,7 @@ export type Database = {
           description?: string | null
           eligible_for_loyalty?: boolean
           id?: string
+          image_url?: string | null
           location?: string | null
           price_member?: number
           price_public?: number
@@ -114,6 +116,7 @@ export type Database = {
           description?: string | null
           eligible_for_loyalty?: boolean
           id?: string
+          image_url?: string | null
           location?: string | null
           price_member?: number
           price_public?: number
@@ -383,6 +386,7 @@ export type Database = {
           event_type: string
           financial_summary: Json
           id: string
+          image_url: string | null
           location: string | null
           professional_ids: string[]
           start_date: string | null
@@ -399,6 +403,7 @@ export type Database = {
           event_type?: string
           financial_summary?: Json
           id?: string
+          image_url?: string | null
           location?: string | null
           professional_ids?: string[]
           start_date?: string | null
@@ -415,6 +420,7 @@ export type Database = {
           event_type?: string
           financial_summary?: Json
           id?: string
+          image_url?: string | null
           location?: string | null
           professional_ids?: string[]
           start_date?: string | null
@@ -1869,11 +1875,25 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      notify_once: {
+        Args: {
+          _entity_id: string
+          _entity_type: string
+          _kind: string
+          _link: string
+          _message: string
+          _recipient: string
+          _title: string
+        }
+        Returns: undefined
+      }
       recompute_loyalty_all: { Args: never; Returns: number }
       recompute_loyalty_for_member: {
         Args: { _user_id: string }
         Returns: number
       }
+      run_daily_reminders: { Args: never; Returns: undefined }
+      run_weekly_bureau_digest: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

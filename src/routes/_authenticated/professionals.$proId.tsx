@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Briefcase, Globe, MapPin } from "lucide-react";
+import { ArrowLeft, Briefcase, Globe, MapPin, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { avatarUrl, useActiveProsOfMonth } from "@/lib/pros";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,7 +51,7 @@ function ProfessionalDetailPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pro_details")
-        .select("*, profiles(display_name, first_name, last_name, city, email, phone)")
+        .select("*, profiles(display_name, first_name, last_name, city, email, phone, avatar_path)")
         .eq("profile_id", proId)
         .maybeSingle();
       if (error) throw error;
@@ -71,6 +72,8 @@ function ProfessionalDetailPage() {
       return data;
     },
   });
+
+  const { data: topPros } = useActiveProsOfMonth();
 
   if (isLoading) {
     return (
@@ -95,7 +98,10 @@ function ProfessionalDetailPage() {
     city: string | null;
     email: string | null;
     phone: string | null;
+    avatar_path: string | null;
   } | null;
+  const photo = avatarUrl(profile?.avatar_path);
+  const isActiveThisMonth = Boolean(topPros?.get(pro.profile_id));
   const socials = (pro.social_links ?? {}) as Record<string, string>;
 
   return (
@@ -110,6 +116,33 @@ function ProfessionalDetailPage() {
         </Button>
       }
     >
+      <div className="mb-4 flex flex-wrap items-center gap-4">
+        {photo ? (
+          <img
+            src={photo}
+            alt={`Photo de ${pro.company_name}`}
+            className="size-24 rounded-full object-cover ring-1 ring-border"
+          />
+        ) : (
+          <span className="flex size-24 items-center justify-center rounded-full bg-accent text-accent-foreground">
+            <Briefcase className="size-8" />
+          </span>
+        )}
+        <div>
+          <p className="font-display text-xl">{pro.company_name}</p>
+          {profile?.city ? (
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="size-4" /> {profile.city}
+            </p>
+          ) : null}
+          {isActiveThisMonth ? (
+            <Badge className="mt-2 gap-1">
+              <Sparkles className="size-3" /> Professionnel le plus actif ce mois-ci
+            </Badge>
+          ) : null}
+        </div>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
