@@ -226,6 +226,15 @@ function ActivitiesPage() {
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
                   />
                 </div>
+                <div>
+                  <Label htmlFor="act-img">Image (URL)</Label>
+                  <Input
+                    id="act-img"
+                    placeholder="https://…"
+                    value={form.image_url}
+                    onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="act-pm">Tarif adhérent (€)</Label>
