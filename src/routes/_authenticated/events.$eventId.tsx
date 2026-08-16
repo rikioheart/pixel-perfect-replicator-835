@@ -126,6 +126,14 @@ function EventDetailPage() {
         </Button>
       }
     >
+      {event.image_url ? (
+        <img
+          src={event.image_url}
+          alt={`Illustration de l'événement ${event.title}`}
+          className="mb-4 h-48 w-full rounded-lg object-cover sm:h-64"
+        />
+      ) : null}
+
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
