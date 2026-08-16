@@ -64,6 +64,7 @@ function ActivitiesPage() {
     location: "",
     price_public: "0",
     price_member: "0",
+    image_url: "",
     eligible_for_loyalty: true,
   });
 
