@@ -134,6 +134,7 @@ function ActivitiesPage() {
         location: form.location || null,
         price_public: Number(form.price_public) || 0,
         price_member: Number(form.price_member) || 0,
+        image_url: form.image_url.trim() || null,
         eligible_for_loyalty: form.eligible_for_loyalty,
         created_by: user?.id ?? null,
       });
