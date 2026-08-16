@@ -284,13 +284,24 @@ function ActivitiesPage() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement des activités…</p>
       ) : activities.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucune activité programmée pour le moment.</p>
+        <EmptyState
+          title="Aucune activité pour l'instant"
+          message="Les prochains ateliers et sorties s'afficheront ici dès que le Bureau les aura programmés."
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {activities.map((activity) => {
             const participation = myParticipations.find((p) => p.activity_id === activity.id);
             return (
-              <Card key={activity.id}>
+              <Card key={activity.id} className="overflow-hidden">
+                {activity.image_url ? (
+                  <img
+                    src={activity.image_url}
+                    alt={`Illustration de l'activité ${activity.title}`}
+                    loading="lazy"
+                    className="h-36 w-full object-cover"
+                  />
+                ) : null}
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-base">{activity.title}</CardTitle>
