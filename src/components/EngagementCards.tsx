@@ -52,8 +52,11 @@ export function ProfileCompletionCard() {
           : `Il reste à renseigner : ${missing.slice(0, 3).join(", ")}`}
       </p>
       <Button asChild size="sm" variant="ghost" className="mt-2 px-0">
-        <Link to="/profile">Compléter ma fiche</Link>
+        <Link to="/onboarding">
+          {percent === 100 ? "Revoir ma fiche" : "Compléter en 3 étapes"}
+        </Link>
       </Button>
+
     </div>
   );
 }
