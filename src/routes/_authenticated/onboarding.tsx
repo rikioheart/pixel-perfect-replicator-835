@@ -91,8 +91,8 @@ function OnboardingPage() {
 
   const liveMissing = useMemo(
     () =>
-      (Object.keys(STEP_FIELDS) as unknown as number[])
-        .flatMap((key) => STEP_FIELDS[Number(key)])
+      ([0, 1, 2] as const)
+        .flatMap((key) => STEP_FIELDS[key] ?? [])
         .filter((field) => String(form[field] ?? "").trim() === ""),
     [form],
   );
@@ -124,6 +124,7 @@ function OnboardingPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const current = STEPS[step] ?? STEPS[0];
   const stepPercent = Math.round(((step + 1) / STEPS.length) * 100);
 
   const goNext = async () => {
@@ -141,9 +142,9 @@ function OnboardingPage() {
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="size-4" /> Étape {step + 1} / {STEPS.length} — {STEPS[step].title}
+              <Sparkles className="size-4" /> Étape {step + 1} / {STEPS.length} — {current.title}
             </CardTitle>
-            <p className="text-xs text-muted-foreground">{STEPS[step].hint}</p>
+            <p className="text-xs text-muted-foreground">{current.hint}</p>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <Progress value={stepPercent} />
