@@ -148,7 +148,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="surface-night hidden w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex">
+      <aside className="surface-night sticky top-0 hidden h-screen w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex">
         <div>
           <div className="flex items-center gap-3 pb-8">
             <img
