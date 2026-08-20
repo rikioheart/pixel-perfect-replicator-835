@@ -715,7 +715,8 @@ function MindmapPage() {
         )}
       </div>
         {selectedProject ? (
-          <div className="h-[70vh] w-[400px] shrink-0">
+          <div className="order-first h-[70vh] w-[400px] shrink-0">
+
             <ProjectDetailPanel
               project={selectedProject}
               tasks={selectedTasks}
