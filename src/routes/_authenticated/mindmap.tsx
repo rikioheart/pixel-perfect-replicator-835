@@ -680,7 +680,9 @@ function MindmapPage() {
         </div>
       </div>
 
-      <div className="h-[70vh] w-full overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex gap-4">
+        <div className="h-[70vh] min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-card">
+
         {isLoading ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
             Chargement de la cartographie…
@@ -712,48 +714,54 @@ function MindmapPage() {
           </ReactFlowProvider>
         )}
       </div>
+        {selectedProject ? (
+          <div className="h-[70vh] w-[400px] shrink-0">
+            <ProjectDetailPanel
+              project={selectedProject}
+              tasks={selectedTasks}
+              categories={categories}
+              people={people}
+              categoryList={data?.categoryList ?? []}
+              peopleList={(data?.peopleList ?? []).map((p) => ({
+                id: p.id,
+                name: p.name || "Membre",
+              }))}
+              userId={user?.id ?? ""}
+              parentTitle={
+                selectedProject.parent_project_id
+                  ? ((data?.projects ?? []).find(
+                      (p) => p.id === selectedProject.parent_project_id,
+                    )?.title ?? null)
+                  : null
+              }
+              childProjects={childProjects}
+              onOpenChange={(open) => {
+                if (!open) setSelectedProjectId(null);
+              }}
+              onAction={pushAction}
+              onChanged={refreshGraph}
+              onDeleted={() => {
+                setSelectedProjectId(null);
+                refreshGraph();
+              }}
+              onAddTask={(projectId) => {
+                setCreateTarget({ kind: "task", parentId: projectId });
+              }}
+              onAddSubProject={(projectId) => {
+                setCreateTarget({ kind: "project", parentId: projectId });
+              }}
+            />
+          </div>
+        ) : null}
+      </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Astuce : double-cliquez sur un projet pour ouvrir son panneau (détail, modification,
         historique), ou sur le nœud de l'association pour créer un projet rattaché. Glissez la
         poignée droite d'un nœud vers un autre pour créer un rattachement — une confirmation est
         demandée avant enregistrement.
         {isBureau ? "" : " Certaines actions peuvent être réservées au Bureau."}
-
       </p>
 
-      <ProjectDetailPanel
-        project={selectedProject}
-        tasks={selectedTasks}
-        categories={categories}
-        people={people}
-        categoryList={data?.categoryList ?? []}
-        peopleList={(data?.peopleList ?? []).map((p) => ({ id: p.id, name: p.name || "Membre" }))}
-        userId={user?.id ?? ""}
-        parentTitle={
-          selectedProject?.parent_project_id
-            ? ((data?.projects ?? []).find((p) => p.id === selectedProject.parent_project_id)
-                ?.title ?? null)
-            : null
-        }
-        childProjects={childProjects}
-        onOpenChange={(open) => {
-          if (!open) setSelectedProjectId(null);
-        }}
-        onAction={pushAction}
-        onChanged={refreshGraph}
-        onDeleted={() => {
-          setSelectedProjectId(null);
-          refreshGraph();
-        }}
-        onAddTask={(projectId) => {
-          setSelectedProjectId(null);
-          setCreateTarget({ kind: "task", parentId: projectId });
-        }}
-        onAddSubProject={(projectId) => {
-          setSelectedProjectId(null);
-          setCreateTarget({ kind: "project", parentId: projectId });
-        }}
-      />
 
       <AlertDialog
         open={Boolean(pendingLink)}

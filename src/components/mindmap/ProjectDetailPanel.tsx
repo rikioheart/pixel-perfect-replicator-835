@@ -2,14 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -235,17 +230,28 @@ export function ProjectDetailPanel({
     }
   };
 
+  if (!project) return null;
   return (
-    <Sheet open={Boolean(project)} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
-        {project ? (
-          <>
-            <SheetHeader>
-              <SheetTitle className="pr-6 text-left">{project.title}</SheetTitle>
-              <SheetDescription className="text-left">
-                {project.description || "Aucun objectif renseigné."}
-              </SheetDescription>
-            </SheetHeader>
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex items-start justify-between gap-2 border-b border-border p-4">
+        <div className="min-w-0">
+          <h3 className="truncate font-display text-base">{project.title}</h3>
+          <p className="mt-0.5 text-left text-xs text-muted-foreground">
+            {project.description || "Aucun objectif renseigné."}
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 shrink-0"
+          onClick={() => onOpenChange(false)}
+          aria-label="Fermer le panneau"
+        >
+          <X className="size-4" />
+        </Button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4">
+
 
             <Tabs value={tab} onValueChange={setTab} className="mt-4">
               <TabsList className="w-full">
@@ -565,10 +571,8 @@ export function ProjectDetailPanel({
                   <AlertDialogAction onClick={() => void remove()}>Supprimer</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
-            </AlertDialog>
-          </>
-        ) : null}
-      </SheetContent>
-    </Sheet>
+        </AlertDialog>
+      </div>
+    </div>
   );
 }
