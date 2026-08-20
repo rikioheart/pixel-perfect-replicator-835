@@ -680,7 +680,9 @@ function MindmapPage() {
         </div>
       </div>
 
-      <div className="h-[70vh] w-full overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex gap-4">
+        <div className="h-[70vh] min-w-0 flex-1 overflow-hidden rounded-xl border border-border bg-card">
+
         {isLoading ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
             Chargement de la cartographie…
