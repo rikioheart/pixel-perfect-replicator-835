@@ -45,6 +45,10 @@ type NavItem = {
   audience: Audience;
   /** Entrées principales : 5 maximum par rôle, le reste est replié. */
   primary?: boolean;
+  /** Masqué pour les adhérents particuliers (ni bureau, ni professionnel). */
+  hideForParticulier?: boolean;
+  /** Libellé alternatif pour les membres du bureau. */
+  bureauLabel?: string;
 };
 
 type NavGroup = { title: string; items: NavItem[] };
@@ -55,14 +59,12 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
       { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau", primary: true },
+      { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all", hideForParticulier: true },
+      { to: "/notifications", label: "Notifications", icon: Bell, audience: "bureau", primary: true },
       { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau", primary: true },
       { to: "/members", label: "Adhérents", icon: Users, audience: "bureau", primary: true },
       { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
-      { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
-      { to: "/admin/permissions", label: "Permissions", icon: ShieldCheck, audience: "bureau" },
-      { to: "/admin/loyalty-rules", label: "Règles de fidélité", icon: Stamp, audience: "bureau" },
       { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
-      { to: "/admin/settings", label: "Paramétrage", icon: Settings2, audience: "bureau" },
     ],
   },
   {
@@ -71,9 +73,8 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/member", label: "Mon espace", icon: UserRound, audience: "all", primary: true },
       { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all", primary: true },
       { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all", primary: true },
-      { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all" },
       { to: "/blog", label: "Journal interne", icon: Newspaper, audience: "all" },
-      { to: "/documents", label: "Documents", icon: FileText, audience: "all" },
+      { to: "/documents", label: "Documents", icon: FileText, audience: "all", hideForParticulier: true },
     ],
   },
   {
@@ -89,14 +90,30 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Moi",
     items: [
-      { to: "/loyalty", label: "Ma fidélité", icon: Stamp, audience: "all" },
-      { to: "/finance", label: "Mes finances", icon: Euro, audience: "all" },
+      {
+        to: "/loyalty",
+        label: "Ma fidélité",
+        bureauLabel: "Engagement",
+        icon: Stamp,
+        audience: "all",
+      },
+      { to: "/finance", label: "Mes finances", icon: Euro, audience: "all", hideForParticulier: true },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "all" },
       { to: "/profile", label: "Mon profil & mes chiens", icon: UserRound, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
     ],
   },
+  {
+    title: "Configuration",
+    items: [
+      { to: "/admin/loyalty-rules", label: "Règles de fidélité", icon: Stamp, audience: "bureau" },
+      { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
+      { to: "/admin/permissions", label: "Permissions", icon: ShieldCheck, audience: "bureau" },
+      { to: "/admin/settings", label: "Paramétrage", icon: Settings2, audience: "bureau" },
+    ],
+  },
 ];
+
 
 export function AppShell({
   title,
@@ -114,8 +131,10 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const isParticulier = !isBureau && !isPro;
   const externalLinks = useExternalLinks();
   const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => {
+    if (item.hideForParticulier && isParticulier) return false;
     if (item.audience === "bureau") return isBureau;
     if (item.audience === "pro") return isBureau || isPro;
     return true;
@@ -123,7 +142,12 @@ export function AppShell({
 
   const primary = visible.filter((item) => item.primary).slice(0, 5);
   const primaryPaths = new Set(primary.map((item) => item.to));
-  const secondary = visible.filter((item) => !primaryPaths.has(item.to));
+  const seen = new Set(primaryPaths);
+  const secondary = visible.filter((item) => {
+    if (seen.has(item.to)) return false;
+    seen.add(item.to);
+    return true;
+  });
   const groups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter((item) => secondary.includes(item)),
@@ -133,7 +157,7 @@ export function AppShell({
     const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
     return (
       <Link
-        key={item.to}
+        key={`${item.to}-${item.label}`}
         to={item.to}
         className={cn(
           "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
@@ -141,10 +165,11 @@ export function AppShell({
         )}
       >
         <item.icon className="size-4" />
-        {item.label}
+        {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
       </Link>
     );
   };
+
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -248,7 +273,7 @@ export function AppShell({
 
         <div className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden">
           {groups.flatMap((group) => group.items).map((item) => (
-            <Button key={item.to} asChild variant="ghost" size="sm">
+            <Button key={`${item.to}-${item.label}`} asChild variant="ghost" size="sm">
               <Link to={item.to}>{item.label}</Link>
             </Button>
           ))}
