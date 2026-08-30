@@ -131,8 +131,10 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const isParticulier = !isBureau && !isPro;
   const externalLinks = useExternalLinks();
   const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => {
+    if (item.hideForParticulier && isParticulier) return false;
     if (item.audience === "bureau") return isBureau;
     if (item.audience === "pro") return isBureau || isPro;
     return true;
@@ -140,7 +142,12 @@ export function AppShell({
 
   const primary = visible.filter((item) => item.primary).slice(0, 5);
   const primaryPaths = new Set(primary.map((item) => item.to));
-  const secondary = visible.filter((item) => !primaryPaths.has(item.to));
+  const seen = new Set(primaryPaths);
+  const secondary = visible.filter((item) => {
+    if (seen.has(item.to)) return false;
+    seen.add(item.to);
+    return true;
+  });
   const groups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter((item) => secondary.includes(item)),
@@ -150,7 +157,7 @@ export function AppShell({
     const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
     return (
       <Link
-        key={item.to}
+        key={`${item.to}-${item.label}`}
         to={item.to}
         className={cn(
           "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
@@ -158,10 +165,11 @@ export function AppShell({
         )}
       >
         <item.icon className="size-4" />
-        {item.label}
+        {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
       </Link>
     );
   };
+
 
   return (
     <div className="flex min-h-screen bg-background">
