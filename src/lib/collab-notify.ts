@@ -12,7 +12,7 @@ export async function notifyMembers({
   entityId,
 }: {
   recipients: (string | null | undefined)[];
-  senderId?: string | null;
+  senderId?: string | null | undefined;
   kind: string;
   title: string;
   message?: string | null;
@@ -40,7 +40,7 @@ export async function notifyMembers({
 
 /** Notifie tous les membres du bureau (ajout/modification à surveiller). */
 export async function notifyBureau(params: {
-  senderId?: string | null;
+  senderId?: string | null | undefined;
   kind: string;
   title: string;
   message?: string | null;
