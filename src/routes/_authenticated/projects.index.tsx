@@ -44,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/projects/")({
 });
 
 function ProjectsPage() {
-  const { isBureau, user } = useAuth();
+  const { isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [panelOpen, setPanelOpen] = useState(false);
@@ -192,6 +192,7 @@ type ProjectRow = {
   status: string;
   priority: string;
   deadline: string | null;
+  category_id: string | null;
   progress_percent: number;
   project_categories: { name: string } | null;
 };
