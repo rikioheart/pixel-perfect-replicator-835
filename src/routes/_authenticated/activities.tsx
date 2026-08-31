@@ -13,14 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { SidePanel } from "@/components/SidePanel";
 
 export const Route = createFileRoute("/_authenticated/activities")({
   head: () => ({
@@ -166,16 +159,16 @@ function ActivitiesPage() {
       subtitle="Ateliers, balades et rencontres proposés aux adhérents"
       actions={
         isBureau ? (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
+          <>
+              <Button size="sm" className="gap-2" onClick={() => setOpen(true)}>
                 <Plus className="size-4" /> Nouvelle activité
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nouvelle activité</DialogTitle>
-              </DialogHeader>
+            <SidePanel
+              open={open}
+              onOpenChange={setOpen}
+              title="Nouvelle activité"
+              description="Créez une activité : elle apparaît immédiatement dans l'agenda des adhérents."
+            >
               <div className="space-y-3">
                 <div>
                   <Label htmlFor="act-title">Titre</Label>
@@ -269,16 +262,16 @@ function ActivitiesPage() {
                   Éligible à la carte de fidélité
                 </label>
               </div>
-              <DialogFooter>
+              <div className="flex justify-end gap-2">
                 <Button
                   onClick={() => create.mutate()}
                   disabled={create.isPending}
                 >
                   {create.isPending ? "Création…" : "Créer l'activité"}
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </div>
+            </SidePanel>
+          </>
         ) : null
       }
     >

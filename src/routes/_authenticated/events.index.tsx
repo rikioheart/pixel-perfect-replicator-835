@@ -13,14 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { SidePanel } from "@/components/SidePanel";
 
 export const Route = createFileRoute("/_authenticated/events/")({
   head: () => ({
@@ -109,16 +102,16 @@ function EventsPage() {
       subtitle="Calendrier des temps forts de l'association"
       actions={
         isBureau ? (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
+          <>
+              <Button size="sm" className="gap-2" onClick={() => setOpen(true)}>
                 <Plus className="size-4" /> Nouvel événement
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nouvel événement</DialogTitle>
-              </DialogHeader>
+            <SidePanel
+              open={open}
+              onOpenChange={setOpen}
+              title="Nouvel événement"
+              description="Renseignez l'événement : les adhérents concernés seront informés."
+            >
               <div className="space-y-3">
                 <div>
                   <Label htmlFor="ev-title">Titre</Label>
@@ -203,13 +196,13 @@ function EventsPage() {
                   />
                 </div>
               </div>
-              <DialogFooter>
+              <div className="flex justify-end gap-2">
                 <Button onClick={() => create.mutate()} disabled={create.isPending}>
                   {create.isPending ? "Création…" : "Créer l'événement"}
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </div>
+            </SidePanel>
+          </>
         ) : null
       }
     >

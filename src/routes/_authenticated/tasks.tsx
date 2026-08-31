@@ -13,6 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TASK_STATUSES, TASK_STATUS_LABEL } from "@/lib/domain";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
+import { TaskPanel, type TaskPanelValue } from "@/components/panels/TaskPanel";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
@@ -38,6 +41,8 @@ function TasksPage() {
   const queryClient = useQueryClient();
   const [scope, setScope] = useState<"MINE" | "ALL">("MINE");
   const [status, setStatus] = useState("ALL");
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskPanelValue | null>(null);
 
   const { data: tasks } = useQuery({
     queryKey: ["tasks", scope, user?.id],
@@ -46,7 +51,7 @@ function TasksPage() {
       let query = supabase
         .from("tasks")
         .select(
-          "id, title, description, status, priority, deadline, assigned_user_id, rejection_reason, projects(title)",
+          "id, title, description, status, priority, deadline, assigned_user_id, project_id, rejection_reason, projects(title)",
         )
         .order("deadline", { ascending: true });
       if (scope === "MINE") query = query.eq("assigned_user_id", user!.id);
@@ -57,7 +62,20 @@ function TasksPage() {
   const filtered = (tasks ?? []).filter((task) => status === "ALL" || task.status === status);
 
   return (
-    <AppShell title="Tâches" subtitle="Une tâche terminée est une tâche prouvée et validée">
+    <AppShell
+      title="Tâches"
+      subtitle="Une tâche terminée est une tâche prouvée et validée"
+      actions={
+        <Button
+          onClick={() => {
+            setEditingTask(null);
+            setPanelOpen(true);
+          }}
+        >
+          Nouvelle tâche
+        </Button>
+      }
+    >
       <div className="mb-5 flex flex-wrap gap-3">
         <Select value={scope} onValueChange={(value) => setScope(value as "MINE" | "ALL")}>
           <SelectTrigger className="w-52">
@@ -88,16 +106,38 @@ function TasksPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {filtered.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              currentUserId={user?.id ?? ""}
-              isBureau={isBureau}
-              onChanged={() => queryClient.invalidateQueries({ queryKey: ["tasks"] })}
-            />
+            <div key={task.id} className="relative">
+              {isBureau || task.assigned_user_id === user?.id ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Modifier la tâche"
+                  className="absolute right-2 top-2 z-10 min-h-9 min-w-9"
+                  onClick={() => {
+                    setEditingTask(task as TaskPanelValue);
+                    setPanelOpen(true);
+                  }}
+                >
+                  <Pencil className="size-4" />
+                </Button>
+              ) : null}
+              <TaskCard
+                task={task}
+                currentUserId={user?.id ?? ""}
+                isBureau={isBureau}
+                onChanged={() => queryClient.invalidateQueries({ queryKey: ["tasks"] })}
+              />
+            </div>
           ))}
         </div>
       )}
+
+      <TaskPanel
+        open={panelOpen}
+        onOpenChange={setPanelOpen}
+        task={editingTask}
+        onSaved={() => queryClient.invalidateQueries({ queryKey: ["tasks"] })}
+      />
     </AppShell>
   );
 }

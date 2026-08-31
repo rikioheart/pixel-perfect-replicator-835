@@ -1,25 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ProjectPanel } from "@/components/panels/ProjectPanel";
+import { Pencil } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -28,12 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  PRIORITIES,
   PRIORITY_LABEL,
   PROJECT_STATUSES,
   PROJECT_STATUS_LABEL,
   formatDate,
-  slugify,
 } from "@/lib/domain";
 
 export const Route = createFileRoute("/_authenticated/projects/")({
@@ -56,9 +44,11 @@ export const Route = createFileRoute("/_authenticated/projects/")({
 });
 
 function ProjectsPage() {
-  const { isBureau, user } = useAuth();
+  const { isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [editing, setEditing] = useState<ProjectRow | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
 
   const { data: categories } = useQuery({
@@ -89,11 +79,14 @@ function ProjectsPage() {
       subtitle="Chaque projet avance par petits progrès mesurables"
       actions={
         isBureau ? (
-          <NewProjectDialog
-            categories={categories ?? []}
-            userId={user?.id ?? ""}
-            onCreated={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
-          />
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setPanelOpen(true);
+            }}
+          >
+            Nouveau projet
+          </Button>
         ) : null
       }
     >
@@ -138,7 +131,15 @@ function ProjectsPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  canEdit={isBureau}
+                  onEdit={() => {
+                    setEditing(project);
+                    setPanelOpen(true);
+                  }}
+                />
               ))}
             </div>
           )}
@@ -173,6 +174,13 @@ function ProjectsPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <ProjectPanel
+        open={panelOpen}
+        onOpenChange={setPanelOpen}
+        project={editing}
+        onSaved={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
+      />
     </AppShell>
   );
 }
@@ -184,18 +192,39 @@ type ProjectRow = {
   status: string;
   priority: string;
   deadline: string | null;
+  category_id: string | null;
   progress_percent: number;
   project_categories: { name: string } | null;
 };
 
-function ProjectCard({ project }: { project: ProjectRow }) {
+function ProjectCard({
+  project,
+  canEdit,
+  onEdit,
+}: {
+  project: ProjectRow;
+  canEdit?: boolean;
+  onEdit?: () => void;
+}) {
   return (
-    <Link
+    <div className="relative">
+      {canEdit ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Modifier le projet"
+          className="absolute right-2 top-2 z-10 min-h-9 min-w-9"
+          onClick={onEdit}
+        >
+          <Pencil className="size-4" />
+        </Button>
+      ) : null}
+      <Link
       to="/projects/$projectId"
       params={{ projectId: project.id }}
       className="panel block space-y-3 p-4 transition-shadow hover:shadow-lg"
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2 pr-10">
         <h2 className="text-base font-medium">{project.title}</h2>
         <Badge variant="outline">{PROJECT_STATUS_LABEL[project.status] ?? project.status}</Badge>
       </div>
@@ -209,159 +238,8 @@ function ProjectCard({ project }: { project: ProjectRow }) {
           {PRIORITY_LABEL[project.priority] ?? project.priority} · {formatDate(project.deadline)}
         </span>
       </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
 
-function NewProjectDialog({
-  categories,
-  userId,
-  onCreated,
-}: {
-  categories: { id: string; name: string }[];
-  userId: string;
-  onCreated: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    category_id: "",
-    status: "PLANNED",
-    priority: "NORMAL",
-    deadline: "",
-  });
-
-  const submit = async () => {
-    if (!form.title.trim()) {
-      toast.error("Le titre est obligatoire.");
-      return;
-    }
-    const { error } = await supabase.from("projects").insert({
-      title: form.title,
-      slug: `${slugify(form.title)}-${Date.now().toString(36)}`,
-      description: form.description || null,
-      category_id: form.category_id || null,
-      status: form.status,
-      priority: form.priority,
-      deadline: form.deadline || null,
-      owner_id: userId,
-      created_by: userId,
-    });
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Projet créé.");
-    setOpen(false);
-    setForm({
-      title: "",
-      description: "",
-      category_id: "",
-      status: "PLANNED",
-      priority: "NORMAL",
-      deadline: "",
-    });
-    onCreated();
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Nouveau projet</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Nouveau projet</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Titre</Label>
-            <Input
-              id="title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Objectif</Label>
-            <Textarea
-              id="description"
-              rows={3}
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Catégorie</Label>
-              <Select
-                value={form.category_id}
-                onValueChange={(value) => setForm({ ...form, category_id: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="deadline">Échéance</Label>
-              <Input
-                id="deadline"
-                type="date"
-                value={form.deadline}
-                onChange={(e) => setForm({ ...form, deadline: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Statut</Label>
-              <Select
-                value={form.status}
-                onValueChange={(value) => setForm({ ...form, status: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROJECT_STATUSES.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {PROJECT_STATUS_LABEL[status]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Priorité</Label>
-              <Select
-                value={form.priority}
-                onValueChange={(value) => setForm({ ...form, priority: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PRIORITIES.map((priority) => (
-                    <SelectItem key={priority} value={priority}>
-                      {PRIORITY_LABEL[priority]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button onClick={submit}>Créer le projet</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}

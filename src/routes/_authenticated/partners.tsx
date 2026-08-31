@@ -12,14 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { SidePanel } from "@/components/SidePanel";
 
 export const Route = createFileRoute("/_authenticated/partners")({
   head: () => ({
@@ -96,16 +89,16 @@ function PartnersPage() {
       subtitle="Avantages et codes promo réservés aux adhérents"
       actions={
         isBureau ? (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
+          <>
+              <Button size="sm" className="gap-2" onClick={() => setOpen(true)}>
                 <Plus className="size-4" /> Nouveau partenaire
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nouveau partenaire</DialogTitle>
-              </DialogHeader>
+            <SidePanel
+              open={open}
+              onOpenChange={setOpen}
+              title="Nouveau partenaire"
+              description="Ajoutez un partenaire et ses avantages pour les adhérents."
+            >
               <div className="space-y-3">
                 <div>
                   <Label htmlFor="pa-name">Nom</Label>
@@ -163,13 +156,13 @@ function PartnersPage() {
                   />
                 </div>
               </div>
-              <DialogFooter>
+              <div className="flex justify-end gap-2">
                 <Button onClick={() => create.mutate()} disabled={create.isPending}>
                   {create.isPending ? "Ajout…" : "Ajouter"}
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </div>
+            </SidePanel>
+          </>
         ) : null
       }
     >
