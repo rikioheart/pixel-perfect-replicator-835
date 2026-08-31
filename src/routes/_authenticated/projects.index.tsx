@@ -1,25 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ProjectPanel } from "@/components/panels/ProjectPanel";
+import { Pencil } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -28,12 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  PRIORITIES,
   PRIORITY_LABEL,
   PROJECT_STATUSES,
   PROJECT_STATUS_LABEL,
   formatDate,
-  slugify,
 } from "@/lib/domain";
 
 export const Route = createFileRoute("/_authenticated/projects/")({
@@ -59,6 +47,8 @@ function ProjectsPage() {
   const { isBureau, user } = useAuth();
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [editing, setEditing] = useState<ProjectRow | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
 
   const { data: categories } = useQuery({
@@ -89,11 +79,14 @@ function ProjectsPage() {
       subtitle="Chaque projet avance par petits progrès mesurables"
       actions={
         isBureau ? (
-          <NewProjectDialog
-            categories={categories ?? []}
-            userId={user?.id ?? ""}
-            onCreated={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
-          />
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setPanelOpen(true);
+            }}
+          >
+            Nouveau projet
+          </Button>
         ) : null
       }
     >
@@ -138,7 +131,15 @@ function ProjectsPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  canEdit={isBureau}
+                  onEdit={() => {
+                    setEditing(project);
+                    setPanelOpen(true);
+                  }}
+                />
               ))}
             </div>
           )}
@@ -173,6 +174,13 @@ function ProjectsPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <ProjectPanel
+        open={panelOpen}
+        onOpenChange={setPanelOpen}
+        project={editing}
+        onSaved={() => queryClient.invalidateQueries({ queryKey: ["projects"] })}
+      />
     </AppShell>
   );
 }
@@ -188,14 +196,34 @@ type ProjectRow = {
   project_categories: { name: string } | null;
 };
 
-function ProjectCard({ project }: { project: ProjectRow }) {
+function ProjectCard({
+  project,
+  canEdit,
+  onEdit,
+}: {
+  project: ProjectRow;
+  canEdit?: boolean;
+  onEdit?: () => void;
+}) {
   return (
-    <Link
+    <div className="relative">
+      {canEdit ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Modifier le projet"
+          className="absolute right-2 top-2 z-10 min-h-9 min-w-9"
+          onClick={onEdit}
+        >
+          <Pencil className="size-4" />
+        </Button>
+      ) : null}
+      <Link
       to="/projects/$projectId"
       params={{ projectId: project.id }}
       className="panel block space-y-3 p-4 transition-shadow hover:shadow-lg"
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2 pr-10">
         <h2 className="text-base font-medium">{project.title}</h2>
         <Badge variant="outline">{PROJECT_STATUS_LABEL[project.status] ?? project.status}</Badge>
       </div>
@@ -209,7 +237,8 @@ function ProjectCard({ project }: { project: ProjectRow }) {
           {PRIORITY_LABEL[project.priority] ?? project.priority} · {formatDate(project.deadline)}
         </span>
       </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
 
