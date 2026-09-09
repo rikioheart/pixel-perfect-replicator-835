@@ -22,8 +22,10 @@ import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedParticipationsRouteImport } from './routes/_authenticated/participations'
 import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated/statistics'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -110,6 +112,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedParticipationsRoute =
+  AuthenticatedParticipationsRouteImport.update({
+    id: '/participations',
+    path: '/participations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPartnersRoute = AuthenticatedPartnersRouteImport.update({
   id: '/partners',
   path: '/partners',
@@ -118,6 +126,11 @@ const AuthenticatedPartnersRoute = AuthenticatedPartnersRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStatisticsRoute = AuthenticatedStatisticsRouteImport.update({
+  id: '/statistics',
+  path: '/statistics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
@@ -247,8 +260,10 @@ export interface FileRoutesByFullPath {
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -283,8 +298,10 @@ export interface FileRoutesByTo {
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -321,8 +338,10 @@ export interface FileRoutesById {
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/participations': typeof AuthenticatedParticipationsRoute
   '/_authenticated/partners': typeof AuthenticatedPartnersRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/statistics': typeof AuthenticatedStatisticsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -359,8 +378,10 @@ export interface FileRouteTypes {
     | '/mindmap'
     | '/notifications'
     | '/onboarding'
+    | '/participations'
     | '/partners'
     | '/profile'
+    | '/statistics'
     | '/tasks'
     | '/terrain'
     | '/admin/audit'
@@ -395,8 +416,10 @@ export interface FileRouteTypes {
     | '/mindmap'
     | '/notifications'
     | '/onboarding'
+    | '/participations'
     | '/partners'
     | '/profile'
+    | '/statistics'
     | '/tasks'
     | '/terrain'
     | '/admin/audit'
@@ -432,8 +455,10 @@ export interface FileRouteTypes {
     | '/_authenticated/mindmap'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
+    | '/_authenticated/participations'
     | '/_authenticated/partners'
     | '/_authenticated/profile'
+    | '/_authenticated/statistics'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
     | '/_authenticated/admin/audit'
@@ -555,6 +580,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/participations': {
+      id: '/_authenticated/participations'
+      path: '/participations'
+      fullPath: '/participations'
+      preLoaderRoute: typeof AuthenticatedParticipationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/partners': {
       id: '/_authenticated/partners'
       path: '/partners'
@@ -567,6 +599,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/statistics': {
+      id: '/_authenticated/statistics'
+      path: '/statistics'
+      fullPath: '/statistics'
+      preLoaderRoute: typeof AuthenticatedStatisticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks': {
@@ -724,8 +763,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedParticipationsRoute: typeof AuthenticatedParticipationsRoute
   AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedStatisticsRoute: typeof AuthenticatedStatisticsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
@@ -759,8 +800,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedParticipationsRoute: AuthenticatedParticipationsRoute,
   AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedStatisticsRoute: AuthenticatedStatisticsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
