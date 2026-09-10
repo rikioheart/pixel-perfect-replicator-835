@@ -431,6 +431,99 @@ export type Database = {
         }
         Relationships: []
       }
+      help_guides: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string
+          id: string
+          module: string
+          review_comment: string | null
+          reviewed_by: string | null
+          role_scopes: string[]
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          author_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          module?: string
+          review_comment?: string | null
+          reviewed_by?: string | null
+          role_scopes?: string[]
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          module?: string
+          review_comment?: string | null
+          reviewed_by?: string | null
+          role_scopes?: string[]
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
+      help_requests: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          handled_by: string | null
+          id: string
+          message: string
+          response: string | null
+          skills: string[]
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          handled_by?: string | null
+          id?: string
+          message: string
+          response?: string | null
+          skills?: string[]
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          handled_by?: string | null
+          id?: string
+          message?: string
+          response?: string | null
+          skills?: string[]
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       in_app_notifications: {
         Row: {
           created_at: string
@@ -506,6 +599,45 @@ export type Database = {
           name?: string
           quantity?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      job_sheets: {
+        Row: {
+          created_at: string
+          daily_actions: string | null
+          id: string
+          member_id: string
+          modules: string[]
+          notes: string | null
+          responsibilities: string | null
+          role_title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          daily_actions?: string | null
+          id?: string
+          member_id: string
+          modules?: string[]
+          notes?: string | null
+          responsibilities?: string | null
+          role_title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          daily_actions?: string | null
+          id?: string
+          member_id?: string
+          modules?: string[]
+          notes?: string | null
+          responsibilities?: string | null
+          role_title?: string
+          updated_at?: string
+          visibility?: string
         }
         Relationships: []
       }
@@ -719,6 +851,39 @@ export type Database = {
           id?: string
           start_date?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      member_imports: {
+        Row: {
+          created_at: string
+          created_count: number
+          errors: Json
+          file_name: string
+          id: string
+          imported_by: string | null
+          skipped_count: number
+          updated_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_count?: number
+          errors?: Json
+          file_name: string
+          id?: string
+          imported_by?: string | null
+          skipped_count?: number
+          updated_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_count?: number
+          errors?: Json
+          file_name?: string
+          id?: string
+          imported_by?: string | null
+          skipped_count?: number
+          updated_count?: number
         }
         Relationships: []
       }
@@ -1814,6 +1979,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          default_view: string
+          high_contrast: boolean
+          notify_email: boolean
+          notify_in_app: boolean
+          notify_reminders: boolean
+          reduced_motion: boolean
+          text_size: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_view?: string
+          high_contrast?: boolean
+          notify_email?: boolean
+          notify_in_app?: boolean
+          notify_reminders?: boolean
+          reduced_motion?: boolean
+          text_size?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          default_view?: string
+          high_contrast?: boolean
+          notify_email?: boolean
+          notify_in_app?: boolean
+          notify_reminders?: boolean
+          reduced_motion?: boolean
+          text_size?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
