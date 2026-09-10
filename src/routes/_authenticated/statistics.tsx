@@ -98,7 +98,7 @@ function StatisticsPage() {
           supabase.from("loyalty_cards").select("id"),
           supabase.from("loyalty_stamps").select("id, created_at, stamps"),
           supabase.from("audit_logs").select("id"),
-          supabase.from("project_categories").select("id, label"),
+          supabase.from("project_categories").select("id, name"),
         ]);
       return {
         profiles: profiles.data ?? [],
@@ -175,7 +175,7 @@ function StatisticsPage() {
     tampons: tampons.get(label) ?? 0,
   }));
 
-  const categoryLabels = new Map(data.categories.map((c) => [c.id, c.label]));
+  const categoryLabels = new Map(data.categories.map((c) => [c.id, c.name]));
   const byCategory = new Map<string, number>();
   for (const project of data.projects) {
     const label = (project.category_id && categoryLabels.get(project.category_id)) || "Sans catégorie";

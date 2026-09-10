@@ -27,6 +27,8 @@ import {
   Bell,
   HeartHandshake,
   Gauge,
+  BarChart3,
+  CalendarCheck,
 } from "lucide-react";
 import { ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,6 +67,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/members", label: "Adhérents", icon: Users, audience: "bureau", primary: true },
       { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
       { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
+      { to: "/statistics", label: "Statistiques", icon: BarChart3, audience: "bureau" },
     ],
   },
   {
@@ -98,6 +101,7 @@ const NAV_GROUPS: NavGroup[] = [
         audience: "all",
       },
       { to: "/finance", label: "Mes finances", icon: Euro, audience: "all", hideForParticulier: true },
+      { to: "/participations", label: "Mes participations", icon: CalendarCheck, audience: "all" },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "all" },
       { to: "/profile", label: "Mon profil & mes chiens", icon: UserRound, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },

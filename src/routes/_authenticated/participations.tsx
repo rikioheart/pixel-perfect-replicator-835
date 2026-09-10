@@ -74,9 +74,12 @@ function ParticipationsPage() {
       ) : items.length === 0 ? (
         <EmptyState
           title="Aucune inscription pour l'instant"
-          description="Inscrivez-vous à une balade, un atelier ou un événement pour les retrouver ici."
-          actionLabel="Voir les activités"
-          actionTo="/activities"
+          message="Inscrivez-vous à une balade, un atelier ou un événement pour les retrouver ici."
+          action={
+            <Link to="/activities" className="text-sm font-semibold text-primary hover:underline">
+              Voir les activités
+            </Link>
+          }
         />
       ) : (
         <div className="space-y-2">
