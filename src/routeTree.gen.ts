@@ -16,6 +16,7 @@ import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/b
 import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticated/charter'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedHelpRequestsRouteImport } from './routes/_authenticated/help-requests'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedLoyaltyRouteImport } from './routes/_authenticated/loyalty'
@@ -81,6 +82,11 @@ const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHelpRequestsRoute =
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/charter': typeof AuthenticatedCharterRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/charter': typeof AuthenticatedCharterRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
@@ -349,6 +357,7 @@ export interface FileRoutesById {
   '/_authenticated/charter': typeof AuthenticatedCharterRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/loyalty': typeof AuthenticatedLoyaltyRoute
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
     | '/charter'
     | '/documents'
     | '/finance'
+    | '/help'
     | '/help-requests'
     | '/inventory'
     | '/loyalty'
@@ -431,6 +441,7 @@ export interface FileRouteTypes {
     | '/charter'
     | '/documents'
     | '/finance'
+    | '/help'
     | '/help-requests'
     | '/inventory'
     | '/loyalty'
@@ -472,6 +483,7 @@ export interface FileRouteTypes {
     | '/_authenticated/charter'
     | '/_authenticated/documents'
     | '/_authenticated/finance'
+    | '/_authenticated/help'
     | '/_authenticated/help-requests'
     | '/_authenticated/inventory'
     | '/_authenticated/loyalty'
@@ -561,6 +573,13 @@ declare module '@tanstack/react-router' {
       path: '/finance'
       fullPath: '/finance'
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/help': {
+      id: '/_authenticated/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof AuthenticatedHelpRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/help-requests': {
@@ -796,6 +815,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCharterRoute: typeof AuthenticatedCharterRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHelpRequestsRoute: typeof AuthenticatedHelpRequestsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedLoyaltyRoute: typeof AuthenticatedLoyaltyRoute
@@ -835,6 +855,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCharterRoute: AuthenticatedCharterRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHelpRequestsRoute: AuthenticatedHelpRequestsRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedLoyaltyRoute: AuthenticatedLoyaltyRoute,
