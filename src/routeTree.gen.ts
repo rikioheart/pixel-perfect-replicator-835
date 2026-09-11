@@ -16,10 +16,12 @@ import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/b
 import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticated/charter'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedHelpRequestsRouteImport } from './routes/_authenticated/help-requests'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedLoyaltyRouteImport } from './routes/_authenticated/loyalty'
 import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
+import { Route as AuthenticatedMySpaceRouteImport } from './routes/_authenticated/my-space'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedParticipationsRouteImport } from './routes/_authenticated/participations'
@@ -81,6 +83,12 @@ const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHelpRequestsRoute =
+  AuthenticatedHelpRequestsRouteImport.update({
+    id: '/help-requests',
+    path: '/help-requests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
@@ -99,6 +107,11 @@ const AuthenticatedMemberRoute = AuthenticatedMemberRouteImport.update({
 const AuthenticatedMindmapRoute = AuthenticatedMindmapRouteImport.update({
   id: '/mindmap',
   path: '/mindmap',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMySpaceRoute = AuthenticatedMySpaceRouteImport.update({
+  id: '/my-space',
+  path: '/my-space',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
@@ -254,10 +267,12 @@ export interface FileRoutesByFullPath {
   '/charter': typeof AuthenticatedCharterRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/my-space': typeof AuthenticatedMySpaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/participations': typeof AuthenticatedParticipationsRoute
@@ -292,10 +307,12 @@ export interface FileRoutesByTo {
   '/charter': typeof AuthenticatedCharterRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/my-space': typeof AuthenticatedMySpaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/participations': typeof AuthenticatedParticipationsRoute
@@ -332,10 +349,12 @@ export interface FileRoutesById {
   '/_authenticated/charter': typeof AuthenticatedCharterRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/loyalty': typeof AuthenticatedLoyaltyRoute
   '/_authenticated/member': typeof AuthenticatedMemberRoute
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
+  '/_authenticated/my-space': typeof AuthenticatedMySpaceRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/participations': typeof AuthenticatedParticipationsRoute
@@ -372,10 +391,12 @@ export interface FileRouteTypes {
     | '/charter'
     | '/documents'
     | '/finance'
+    | '/help-requests'
     | '/inventory'
     | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/my-space'
     | '/notifications'
     | '/onboarding'
     | '/participations'
@@ -410,10 +431,12 @@ export interface FileRouteTypes {
     | '/charter'
     | '/documents'
     | '/finance'
+    | '/help-requests'
     | '/inventory'
     | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/my-space'
     | '/notifications'
     | '/onboarding'
     | '/participations'
@@ -449,10 +472,12 @@ export interface FileRouteTypes {
     | '/_authenticated/charter'
     | '/_authenticated/documents'
     | '/_authenticated/finance'
+    | '/_authenticated/help-requests'
     | '/_authenticated/inventory'
     | '/_authenticated/loyalty'
     | '/_authenticated/member'
     | '/_authenticated/mindmap'
+    | '/_authenticated/my-space'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
     | '/_authenticated/participations'
@@ -538,6 +563,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/help-requests': {
+      id: '/_authenticated/help-requests'
+      path: '/help-requests'
+      fullPath: '/help-requests'
+      preLoaderRoute: typeof AuthenticatedHelpRequestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inventory': {
       id: '/_authenticated/inventory'
       path: '/inventory'
@@ -564,6 +596,13 @@ declare module '@tanstack/react-router' {
       path: '/mindmap'
       fullPath: '/mindmap'
       preLoaderRoute: typeof AuthenticatedMindmapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-space': {
+      id: '/_authenticated/my-space'
+      path: '/my-space'
+      fullPath: '/my-space'
+      preLoaderRoute: typeof AuthenticatedMySpaceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notifications': {
@@ -757,10 +796,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCharterRoute: typeof AuthenticatedCharterRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedHelpRequestsRoute: typeof AuthenticatedHelpRequestsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedLoyaltyRoute: typeof AuthenticatedLoyaltyRoute
   AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
+  AuthenticatedMySpaceRoute: typeof AuthenticatedMySpaceRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedParticipationsRoute: typeof AuthenticatedParticipationsRoute
@@ -794,10 +835,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCharterRoute: AuthenticatedCharterRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedHelpRequestsRoute: AuthenticatedHelpRequestsRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedLoyaltyRoute: AuthenticatedLoyaltyRoute,
   AuthenticatedMemberRoute: AuthenticatedMemberRoute,
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
+  AuthenticatedMySpaceRoute: AuthenticatedMySpaceRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedParticipationsRoute: AuthenticatedParticipationsRoute,
