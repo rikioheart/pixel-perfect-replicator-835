@@ -509,11 +509,11 @@ function HelpCenterPage() {
         }
       >
         <div className="space-y-2">
-          <Label>Membre concerné</Label>
           <MemberPicker
-            value={sheet.member_id ? [sheet.member_id] : []}
+            label="Membre concerné"
+            selected={sheet.member_id ? [sheet.member_id] : []}
             onChange={(ids) => setSheet({ ...sheet, member_id: ids[0] ?? "" })}
-            multiple={false}
+            single
           />
         </div>
         <div className="space-y-2">
