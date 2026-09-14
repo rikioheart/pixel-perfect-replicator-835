@@ -29,7 +29,12 @@ import {
   Gauge,
   BarChart3,
   CalendarCheck,
+  UploadCloud,
+  BookUser,
+  LifeBuoy,
+  HandHeart as HandHeartIcon,
 } from "lucide-react";
+const HandHeart = HandHeartIcon;
 import { ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -68,6 +73,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
       { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
       { to: "/statistics", label: "Statistiques", icon: BarChart3, audience: "bureau" },
+      { to: "/admin/import", label: "Import d'adhérents", icon: UploadCloud, audience: "bureau" },
     ],
   },
   {
@@ -86,6 +92,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true },
       { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true },
       { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
+      { to: "/directory", label: "Annuaire du réseau", icon: BookUser, audience: "all" },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: MapPin, audience: "pro" },
     ],
@@ -103,7 +110,10 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/finance", label: "Mes finances", icon: Euro, audience: "all", hideForParticulier: true },
       { to: "/participations", label: "Mes participations", icon: CalendarCheck, audience: "all" },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "all" },
+      { to: "/my-space", label: "Mon espace personnel", icon: Settings2, audience: "all" },
       { to: "/profile", label: "Mon profil & mes chiens", icon: UserRound, audience: "all" },
+      { to: "/help", label: "Centre d'aide", icon: LifeBuoy, audience: "all" },
+      { to: "/help-requests", label: "Demandes d'aide", icon: HandHeart, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
     ],
   },
