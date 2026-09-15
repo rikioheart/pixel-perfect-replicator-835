@@ -167,7 +167,8 @@ function DirectoryPage() {
           {filtered.map((person) => (
             <article key={person.id} className="rounded-xl border border-border bg-card p-5">
               <h2 className="font-display text-base font-bold">
-                {person.display_name ?? `${person.first_name ?? ""} ${person.last_name ?? ""}`.trim() ||
+                {person.display_name ||
+                  `${person.first_name ?? ""} ${person.last_name ?? ""}`.trim() ||
                   "Adhérent"}
               </h2>
               {person.pro?.company_name ? (
