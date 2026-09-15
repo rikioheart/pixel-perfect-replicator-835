@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
 import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticated/charter'
+import { Route as AuthenticatedDirectoryRouteImport } from './routes/_authenticated/directory'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
@@ -34,6 +35,7 @@ import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
+import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as AuthenticatedAdminLoyaltyRulesRouteImport } from './routes/_authenticated/admin.loyalty-rules'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
@@ -72,6 +74,11 @@ const AuthenticatedBlogRoute = AuthenticatedBlogRouteImport.update({
 const AuthenticatedCharterRoute = AuthenticatedCharterRouteImport.update({
   id: '/charter',
   path: '/charter',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDirectoryRoute = AuthenticatedDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
@@ -178,6 +185,12 @@ const AuthenticatedAdminCockpitRoute =
     path: '/admin/cockpit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminImportRoute =
+  AuthenticatedAdminImportRouteImport.update({
+    id: '/admin/import',
+    path: '/admin/import',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminLoyaltyRulesRoute =
   AuthenticatedAdminLoyaltyRulesRouteImport.update({
     id: '/admin/loyalty-rules',
@@ -271,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/activities': typeof AuthenticatedActivitiesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/charter': typeof AuthenticatedCharterRoute
+  '/directory': typeof AuthenticatedDirectoryRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/help': typeof AuthenticatedHelpRoute
@@ -290,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
@@ -312,6 +327,7 @@ export interface FileRoutesByTo {
   '/activities': typeof AuthenticatedActivitiesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/charter': typeof AuthenticatedCharterRoute
+  '/directory': typeof AuthenticatedDirectoryRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/help': typeof AuthenticatedHelpRoute
@@ -331,6 +347,7 @@ export interface FileRoutesByTo {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
@@ -355,6 +372,7 @@ export interface FileRoutesById {
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
   '/_authenticated/charter': typeof AuthenticatedCharterRoute
+  '/_authenticated/directory': typeof AuthenticatedDirectoryRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/help': typeof AuthenticatedHelpRoute
@@ -374,6 +392,7 @@ export interface FileRoutesById {
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
@@ -398,6 +417,7 @@ export interface FileRouteTypes {
     | '/activities'
     | '/blog'
     | '/charter'
+    | '/directory'
     | '/documents'
     | '/finance'
     | '/help'
@@ -417,6 +437,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
     | '/admin/roles'
@@ -439,6 +460,7 @@ export interface FileRouteTypes {
     | '/activities'
     | '/blog'
     | '/charter'
+    | '/directory'
     | '/documents'
     | '/finance'
     | '/help'
@@ -458,6 +480,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
     | '/admin/roles'
@@ -481,6 +504,7 @@ export interface FileRouteTypes {
     | '/_authenticated/activities'
     | '/_authenticated/blog'
     | '/_authenticated/charter'
+    | '/_authenticated/directory'
     | '/_authenticated/documents'
     | '/_authenticated/finance'
     | '/_authenticated/help'
@@ -500,6 +524,7 @@ export interface FileRouteTypes {
     | '/_authenticated/terrain'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
+    | '/_authenticated/admin/import'
     | '/_authenticated/admin/loyalty-rules'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/roles'
@@ -559,6 +584,13 @@ declare module '@tanstack/react-router' {
       path: '/charter'
       fullPath: '/charter'
       preLoaderRoute: typeof AuthenticatedCharterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/directory': {
+      id: '/_authenticated/directory'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof AuthenticatedDirectoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/documents': {
@@ -701,6 +733,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCockpitRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/import': {
+      id: '/_authenticated/admin/import'
+      path: '/admin/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/loyalty-rules': {
       id: '/_authenticated/admin/loyalty-rules'
       path: '/admin/loyalty-rules'
@@ -813,6 +852,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
   AuthenticatedCharterRoute: typeof AuthenticatedCharterRoute
+  AuthenticatedDirectoryRoute: typeof AuthenticatedDirectoryRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
@@ -832,6 +872,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
+  AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminLoyaltyRulesRoute: typeof AuthenticatedAdminLoyaltyRulesRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
@@ -853,6 +894,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
   AuthenticatedCharterRoute: AuthenticatedCharterRoute,
+  AuthenticatedDirectoryRoute: AuthenticatedDirectoryRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
@@ -872,6 +914,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
+  AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminLoyaltyRulesRoute: AuthenticatedAdminLoyaltyRulesRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
