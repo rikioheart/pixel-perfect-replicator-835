@@ -177,7 +177,7 @@ function HelpRequestsPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {items.map((item) => {
-            const author = item.profiles as { display_name: string | null } | null;
+            const author = item.profiles as unknown as { display_name: string | null } | null;
             return (
               <div key={item.id} className="rounded-xl border border-border bg-card p-5">
                 <div className="flex items-start justify-between gap-3">

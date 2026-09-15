@@ -128,6 +128,86 @@ export type Database = {
         }
         Relationships: []
       }
+      advantage_claims: {
+        Row: {
+          advantage_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          advantage_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          advantage_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advantage_claims_advantage_id_fkey"
+            columns: ["advantage_id"]
+            isOneToOne: false
+            referencedRelation: "advantages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advantages: {
+        Row: {
+          conditions: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          kind: string
+          partner_name: string | null
+          promo_code: string | null
+          quantity: number | null
+          status: string
+          title: string
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          conditions?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          kind?: string
+          partner_name?: string | null
+          promo_code?: string | null
+          quantity?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          conditions?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          kind?: string
+          partner_name?: string | null
+          promo_code?: string | null
+          quantity?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -428,6 +508,89 @@ export type Database = {
           title?: string
           updated_at?: string
           visibility?: string
+        }
+        Relationships: []
+      }
+      formation_registrations: {
+        Row: {
+          created_at: string
+          formation_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          formation_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          formation_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "formation_registrations_formation_id_fkey"
+            columns: ["formation_id"]
+            isOneToOne: false
+            referencedRelation: "formations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      formations: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          created_by: string | null
+          date: string | null
+          description: string | null
+          duration_minutes: number | null
+          format: string
+          id: string
+          live_link: string | null
+          location: string | null
+          speaker_name: string | null
+          start_time: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          date?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          format?: string
+          id?: string
+          live_link?: string | null
+          location?: string | null
+          speaker_name?: string | null
+          start_time?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          date?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          format?: string
+          id?: string
+          live_link?: string | null
+          location?: string | null
+          speaker_name?: string | null
+          start_time?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

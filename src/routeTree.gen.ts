@@ -12,16 +12,21 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
+import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authenticated/advantages'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticated/charter'
+import { Route as AuthenticatedDirectoryRouteImport } from './routes/_authenticated/directory'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedFormationsRouteImport } from './routes/_authenticated/formations'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedHelpRequestsRouteImport } from './routes/_authenticated/help-requests'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedLoyaltyRouteImport } from './routes/_authenticated/loyalty'
 import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
+import { Route as AuthenticatedMyHistoryRouteImport } from './routes/_authenticated/my-history'
 import { Route as AuthenticatedMySpaceRouteImport } from './routes/_authenticated/my-space'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -34,6 +39,7 @@ import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
+import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as AuthenticatedAdminLoyaltyRulesRouteImport } from './routes/_authenticated/admin.loyalty-rules'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
@@ -64,14 +70,29 @@ const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
   path: '/activities',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdvantagesRoute = AuthenticatedAdvantagesRouteImport.update({
+  id: '/advantages',
+  path: '/advantages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBlogRoute = AuthenticatedBlogRouteImport.update({
   id: '/blog',
   path: '/blog',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCharterRoute = AuthenticatedCharterRouteImport.update({
   id: '/charter',
   path: '/charter',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDirectoryRoute = AuthenticatedDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
@@ -82,6 +103,11 @@ const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFormationsRoute = AuthenticatedFormationsRouteImport.update({
+  id: '/formations',
+  path: '/formations',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
@@ -113,6 +139,11 @@ const AuthenticatedMemberRoute = AuthenticatedMemberRouteImport.update({
 const AuthenticatedMindmapRoute = AuthenticatedMindmapRouteImport.update({
   id: '/mindmap',
   path: '/mindmap',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyHistoryRoute = AuthenticatedMyHistoryRouteImport.update({
+  id: '/my-history',
+  path: '/my-history',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMySpaceRoute = AuthenticatedMySpaceRouteImport.update({
@@ -176,6 +207,12 @@ const AuthenticatedAdminCockpitRoute =
   AuthenticatedAdminCockpitRouteImport.update({
     id: '/admin/cockpit',
     path: '/admin/cockpit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminImportRoute =
+  AuthenticatedAdminImportRouteImport.update({
+    id: '/admin/import',
+    path: '/admin/import',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminLoyaltyRulesRoute =
@@ -269,16 +306,21 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof AuthenticatedActivitiesRoute
+  '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/charter': typeof AuthenticatedCharterRoute
+  '/directory': typeof AuthenticatedDirectoryRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/formations': typeof AuthenticatedFormationsRoute
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/my-history': typeof AuthenticatedMyHistoryRoute
   '/my-space': typeof AuthenticatedMySpaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -290,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
@@ -310,16 +353,21 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof AuthenticatedActivitiesRoute
+  '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/charter': typeof AuthenticatedCharterRoute
+  '/directory': typeof AuthenticatedDirectoryRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/formations': typeof AuthenticatedFormationsRoute
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
+  '/my-history': typeof AuthenticatedMyHistoryRoute
   '/my-space': typeof AuthenticatedMySpaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -331,6 +379,7 @@ export interface FileRoutesByTo {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
@@ -353,16 +402,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
+  '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
+  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/charter': typeof AuthenticatedCharterRoute
+  '/_authenticated/directory': typeof AuthenticatedDirectoryRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/formations': typeof AuthenticatedFormationsRoute
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/loyalty': typeof AuthenticatedLoyaltyRoute
   '/_authenticated/member': typeof AuthenticatedMemberRoute
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
+  '/_authenticated/my-history': typeof AuthenticatedMyHistoryRoute
   '/_authenticated/my-space': typeof AuthenticatedMySpaceRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -374,6 +428,7 @@ export interface FileRoutesById {
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
@@ -396,16 +451,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/activities'
+    | '/advantages'
     | '/blog'
+    | '/calendar'
     | '/charter'
+    | '/directory'
     | '/documents'
     | '/finance'
+    | '/formations'
     | '/help'
     | '/help-requests'
     | '/inventory'
     | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/my-history'
     | '/my-space'
     | '/notifications'
     | '/onboarding'
@@ -417,6 +477,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
     | '/admin/roles'
@@ -437,16 +498,21 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/activities'
+    | '/advantages'
     | '/blog'
+    | '/calendar'
     | '/charter'
+    | '/directory'
     | '/documents'
     | '/finance'
+    | '/formations'
     | '/help'
     | '/help-requests'
     | '/inventory'
     | '/loyalty'
     | '/member'
     | '/mindmap'
+    | '/my-history'
     | '/my-space'
     | '/notifications'
     | '/onboarding'
@@ -458,6 +524,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
     | '/admin/roles'
@@ -479,16 +546,21 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/_authenticated/activities'
+    | '/_authenticated/advantages'
     | '/_authenticated/blog'
+    | '/_authenticated/calendar'
     | '/_authenticated/charter'
+    | '/_authenticated/directory'
     | '/_authenticated/documents'
     | '/_authenticated/finance'
+    | '/_authenticated/formations'
     | '/_authenticated/help'
     | '/_authenticated/help-requests'
     | '/_authenticated/inventory'
     | '/_authenticated/loyalty'
     | '/_authenticated/member'
     | '/_authenticated/mindmap'
+    | '/_authenticated/my-history'
     | '/_authenticated/my-space'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
@@ -500,6 +572,7 @@ export interface FileRouteTypes {
     | '/_authenticated/terrain'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
+    | '/_authenticated/admin/import'
     | '/_authenticated/admin/loyalty-rules'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/roles'
@@ -547,6 +620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/advantages': {
+      id: '/_authenticated/advantages'
+      path: '/advantages'
+      fullPath: '/advantages'
+      preLoaderRoute: typeof AuthenticatedAdvantagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/blog': {
       id: '/_authenticated/blog'
       path: '/blog'
@@ -554,11 +634,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBlogRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/charter': {
       id: '/_authenticated/charter'
       path: '/charter'
       fullPath: '/charter'
       preLoaderRoute: typeof AuthenticatedCharterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/directory': {
+      id: '/_authenticated/directory'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof AuthenticatedDirectoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/documents': {
@@ -573,6 +667,13 @@ declare module '@tanstack/react-router' {
       path: '/finance'
       fullPath: '/finance'
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/formations': {
+      id: '/_authenticated/formations'
+      path: '/formations'
+      fullPath: '/formations'
+      preLoaderRoute: typeof AuthenticatedFormationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/help': {
@@ -615,6 +716,13 @@ declare module '@tanstack/react-router' {
       path: '/mindmap'
       fullPath: '/mindmap'
       preLoaderRoute: typeof AuthenticatedMindmapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-history': {
+      id: '/_authenticated/my-history'
+      path: '/my-history'
+      fullPath: '/my-history'
+      preLoaderRoute: typeof AuthenticatedMyHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/my-space': {
@@ -699,6 +807,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/cockpit'
       fullPath: '/admin/cockpit'
       preLoaderRoute: typeof AuthenticatedAdminCockpitRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/import': {
+      id: '/_authenticated/admin/import'
+      path: '/admin/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AuthenticatedAdminImportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/loyalty-rules': {
@@ -811,16 +926,21 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
+  AuthenticatedAdvantagesRoute: typeof AuthenticatedAdvantagesRoute
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
+  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedCharterRoute: typeof AuthenticatedCharterRoute
+  AuthenticatedDirectoryRoute: typeof AuthenticatedDirectoryRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedFormationsRoute: typeof AuthenticatedFormationsRoute
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHelpRequestsRoute: typeof AuthenticatedHelpRequestsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedLoyaltyRoute: typeof AuthenticatedLoyaltyRoute
   AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
+  AuthenticatedMyHistoryRoute: typeof AuthenticatedMyHistoryRoute
   AuthenticatedMySpaceRoute: typeof AuthenticatedMySpaceRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -832,6 +952,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
+  AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminLoyaltyRulesRoute: typeof AuthenticatedAdminLoyaltyRulesRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
@@ -851,16 +972,21 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
+  AuthenticatedAdvantagesRoute: AuthenticatedAdvantagesRoute,
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
+  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedCharterRoute: AuthenticatedCharterRoute,
+  AuthenticatedDirectoryRoute: AuthenticatedDirectoryRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedFormationsRoute: AuthenticatedFormationsRoute,
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHelpRequestsRoute: AuthenticatedHelpRequestsRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedLoyaltyRoute: AuthenticatedLoyaltyRoute,
   AuthenticatedMemberRoute: AuthenticatedMemberRoute,
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
+  AuthenticatedMyHistoryRoute: AuthenticatedMyHistoryRoute,
   AuthenticatedMySpaceRoute: AuthenticatedMySpaceRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
@@ -872,6 +998,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
+  AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminLoyaltyRulesRoute: AuthenticatedAdminLoyaltyRulesRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,

@@ -360,7 +360,7 @@ function HelpCenterPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {sheets.map((item) => {
-            const member = item.profiles as { display_name: string | null } | null;
+            const member = item.profiles as unknown as { display_name: string | null } | null;
             return (
               <article key={item.id} className="rounded-xl border border-border bg-card p-5">
                 <h2 className="font-display text-base font-bold">{item.role_title}</h2>

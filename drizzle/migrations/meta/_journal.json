@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789463230136,
+      "tag": "0000_advantages_and_formations",
+      "breakpoints": true
+    }
+  ]
+}
