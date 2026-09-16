@@ -32,6 +32,9 @@ import {
   UploadCloud,
   BookUser,
   LifeBuoy,
+  Gift,
+  History,
+  GraduationCap,
   HandHeart as HandHeartIcon,
 } from "lucide-react";
 const HandHeart = HandHeartIcon;
@@ -91,6 +94,8 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true },
       { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true },
+      { to: "/calendar", label: "Calendrier partagé", icon: CalendarDays, audience: "all" },
+      { to: "/formations", label: "Formations & lives", icon: GraduationCap, audience: "all" },
       { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
       { to: "/directory", label: "Annuaire du réseau", icon: BookUser, audience: "all" },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
@@ -109,6 +114,8 @@ const NAV_GROUPS: NavGroup[] = [
       },
       { to: "/finance", label: "Mes finances", icon: Euro, audience: "all", hideForParticulier: true },
       { to: "/participations", label: "Mes participations", icon: CalendarCheck, audience: "all" },
+      { to: "/advantages", label: "Mes avantages", icon: Gift, audience: "all" },
+      { to: "/my-history", label: "Mon historique", icon: History, audience: "all" },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "all" },
       { to: "/my-space", label: "Mon espace personnel", icon: Settings2, audience: "all" },
       { to: "/profile", label: "Mon profil & mes chiens", icon: UserRound, audience: "all" },
