@@ -51,12 +51,13 @@
 ## Lot 8 — Migration Pilot-Asso (page par page, sans écraser l'existant)
 - [x] Statistiques stratégiques
 - [x] Mes participations
-- [ ] Mon espace personnel (récap + préférences d'affichage)
-- [ ] Centre d'aide + demandes d'aide
-- [ ] Annuaire complet (Directory) + import CSV d'adhérents
-- [ ] Calendrier partagé (activités, événements, réservations)
-- [ ] Formations & bibliothèque de ressources
-- [ ] Avantages adhérents & codes promo
+- [x] Mon espace personnel (récap + préférences d'affichage)
+- [x] Centre d'aide + demandes d'aide
+- [x] Annuaire complet (Directory) + import CSV d'adhérents
+- [x] Mon historique (journal de mes actions)
+- [x] Calendrier partagé (activités, événements, formations, réservations)
+- [x] Formations & lives (inscriptions)
+- [x] Avantages adhérents & codes promo
 - [ ] Concours, calendrier de l'Avent, animations membres
 - [ ] Paiements, remboursements, partages sociaux
 - [ ] Stock / inventaire détaillé
