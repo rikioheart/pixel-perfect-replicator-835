@@ -16,6 +16,7 @@ import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticated/charter'
+import { Route as AuthenticatedContestsRouteImport } from './routes/_authenticated/contests'
 import { Route as AuthenticatedDirectoryRouteImport } from './routes/_authenticated/directory'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
@@ -33,6 +34,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedParticipationsRouteImport } from './routes/_authenticated/participations'
 import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedReimbursementsRouteImport } from './routes/_authenticated/reimbursements'
 import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated/statistics'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
@@ -88,6 +90,11 @@ const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
 const AuthenticatedCharterRoute = AuthenticatedCharterRouteImport.update({
   id: '/charter',
   path: '/charter',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedContestsRoute = AuthenticatedContestsRouteImport.update({
+  id: '/contests',
+  path: '/contests',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDirectoryRoute = AuthenticatedDirectoryRouteImport.update({
@@ -178,6 +185,12 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReimbursementsRoute =
+  AuthenticatedReimbursementsRouteImport.update({
+    id: '/reimbursements',
+    path: '/reimbursements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStatisticsRoute = AuthenticatedStatisticsRouteImport.update({
   id: '/statistics',
   path: '/statistics',
@@ -310,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/charter': typeof AuthenticatedCharterRoute
+  '/contests': typeof AuthenticatedContestsRoute
   '/directory': typeof AuthenticatedDirectoryRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
@@ -327,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/reimbursements': typeof AuthenticatedReimbursementsRoute
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
@@ -357,6 +372,7 @@ export interface FileRoutesByTo {
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/charter': typeof AuthenticatedCharterRoute
+  '/contests': typeof AuthenticatedContestsRoute
   '/directory': typeof AuthenticatedDirectoryRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
@@ -374,6 +390,7 @@ export interface FileRoutesByTo {
   '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/reimbursements': typeof AuthenticatedReimbursementsRoute
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
@@ -406,6 +423,7 @@ export interface FileRoutesById {
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/charter': typeof AuthenticatedCharterRoute
+  '/_authenticated/contests': typeof AuthenticatedContestsRoute
   '/_authenticated/directory': typeof AuthenticatedDirectoryRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
@@ -423,6 +441,7 @@ export interface FileRoutesById {
   '/_authenticated/participations': typeof AuthenticatedParticipationsRoute
   '/_authenticated/partners': typeof AuthenticatedPartnersRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/reimbursements': typeof AuthenticatedReimbursementsRoute
   '/_authenticated/statistics': typeof AuthenticatedStatisticsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
@@ -455,6 +474,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/calendar'
     | '/charter'
+    | '/contests'
     | '/directory'
     | '/documents'
     | '/finance'
@@ -472,6 +492,7 @@ export interface FileRouteTypes {
     | '/participations'
     | '/partners'
     | '/profile'
+    | '/reimbursements'
     | '/statistics'
     | '/tasks'
     | '/terrain'
@@ -502,6 +523,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/calendar'
     | '/charter'
+    | '/contests'
     | '/directory'
     | '/documents'
     | '/finance'
@@ -519,6 +541,7 @@ export interface FileRouteTypes {
     | '/participations'
     | '/partners'
     | '/profile'
+    | '/reimbursements'
     | '/statistics'
     | '/tasks'
     | '/terrain'
@@ -550,6 +573,7 @@ export interface FileRouteTypes {
     | '/_authenticated/blog'
     | '/_authenticated/calendar'
     | '/_authenticated/charter'
+    | '/_authenticated/contests'
     | '/_authenticated/directory'
     | '/_authenticated/documents'
     | '/_authenticated/finance'
@@ -567,6 +591,7 @@ export interface FileRouteTypes {
     | '/_authenticated/participations'
     | '/_authenticated/partners'
     | '/_authenticated/profile'
+    | '/_authenticated/reimbursements'
     | '/_authenticated/statistics'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
@@ -646,6 +671,13 @@ declare module '@tanstack/react-router' {
       path: '/charter'
       fullPath: '/charter'
       preLoaderRoute: typeof AuthenticatedCharterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contests': {
+      id: '/_authenticated/contests'
+      path: '/contests'
+      fullPath: '/contests'
+      preLoaderRoute: typeof AuthenticatedContestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/directory': {
@@ -765,6 +797,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reimbursements': {
+      id: '/_authenticated/reimbursements'
+      path: '/reimbursements'
+      fullPath: '/reimbursements'
+      preLoaderRoute: typeof AuthenticatedReimbursementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/statistics': {
@@ -930,6 +969,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedCharterRoute: typeof AuthenticatedCharterRoute
+  AuthenticatedContestsRoute: typeof AuthenticatedContestsRoute
   AuthenticatedDirectoryRoute: typeof AuthenticatedDirectoryRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
@@ -947,6 +987,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedParticipationsRoute: typeof AuthenticatedParticipationsRoute
   AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedReimbursementsRoute: typeof AuthenticatedReimbursementsRoute
   AuthenticatedStatisticsRoute: typeof AuthenticatedStatisticsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
@@ -976,6 +1017,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedCharterRoute: AuthenticatedCharterRoute,
+  AuthenticatedContestsRoute: AuthenticatedContestsRoute,
   AuthenticatedDirectoryRoute: AuthenticatedDirectoryRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
@@ -993,6 +1035,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedParticipationsRoute: AuthenticatedParticipationsRoute,
   AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedReimbursementsRoute: AuthenticatedReimbursementsRoute,
   AuthenticatedStatisticsRoute: AuthenticatedStatisticsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
