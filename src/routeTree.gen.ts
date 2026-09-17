@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AssociationRouteImport } from './routes/association'
 import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authenticated/advantages'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
@@ -38,6 +39,7 @@ import { Route as AuthenticatedReimbursementsRouteImport } from './routes/_authe
 import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated/statistics'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
+import { Route as ProProIdRouteImport } from './routes/pro.$proId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
@@ -65,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssociationRoute = AssociationRouteImport.update({
+  id: '/association',
+  path: '/association',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
@@ -206,6 +213,11 @@ const AuthenticatedTerrainRoute = AuthenticatedTerrainRouteImport.update({
   path: '/terrain',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ProProIdRoute = ProProIdRouteImport.update({
+  id: '/pro/$proId',
+  path: '/pro/$proId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -318,6 +330,7 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/association': typeof AssociationRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
@@ -345,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/pro/$proId': typeof ProProIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -367,6 +381,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/association': typeof AssociationRoute
   '/activities': typeof AuthenticatedActivitiesRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
@@ -394,6 +409,7 @@ export interface FileRoutesByTo {
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/pro/$proId': typeof ProProIdRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -418,6 +434,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/association': typeof AssociationRoute
   '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
   '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
@@ -445,6 +462,7 @@ export interface FileRoutesById {
   '/_authenticated/statistics': typeof AuthenticatedStatisticsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
+  '/pro/$proId': typeof ProProIdRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
@@ -469,6 +487,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/association'
     | '/activities'
     | '/advantages'
     | '/blog'
@@ -496,6 +515,7 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/pro/$proId'
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/import'
@@ -518,6 +538,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/association'
     | '/activities'
     | '/advantages'
     | '/blog'
@@ -545,6 +566,7 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/pro/$proId'
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/import'
@@ -568,6 +590,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/association'
     | '/_authenticated/activities'
     | '/_authenticated/advantages'
     | '/_authenticated/blog'
@@ -595,6 +618,7 @@ export interface FileRouteTypes {
     | '/_authenticated/statistics'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
+    | '/pro/$proId'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
     | '/_authenticated/admin/import'
@@ -619,6 +643,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AssociationRoute: typeof AssociationRoute
+  ProProIdRoute: typeof ProProIdRoute
   ApiPublicResetDemoRoute: typeof ApiPublicResetDemoRoute
 }
 
@@ -636,6 +662,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/association': {
+      id: '/association'
+      path: '/association'
+      fullPath: '/association'
+      preLoaderRoute: typeof AssociationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/activities': {
@@ -826,6 +859,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/terrain'
       preLoaderRoute: typeof AuthenticatedTerrainRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/pro/$proId': {
+      id: '/pro/$proId'
+      path: '/pro/$proId'
+      fullPath: '/pro/$proId'
+      preLoaderRoute: typeof ProProIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -1065,6 +1105,8 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AssociationRoute: AssociationRoute,
+  ProProIdRoute: ProProIdRoute,
   ApiPublicResetDemoRoute: ApiPublicResetDemoRoute,
 }
 export const routeTree = rootRouteImport
