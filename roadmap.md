@@ -58,7 +58,7 @@
 - [x] Calendrier partagé (activités, événements, formations, réservations)
 - [x] Formations & lives (inscriptions)
 - [x] Avantages adhérents & codes promo
-- [ ] Concours, calendrier de l'Avent, animations membres
-- [ ] Paiements, remboursements, partages sociaux
+- [x] Concours, calendrier de l'Avent, animations membres
+- [x] Paiements, remboursements
 - [ ] Stock / inventaire détaillé
 - [ ] Page publique de l'association + carte pro publique
