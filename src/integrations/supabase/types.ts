@@ -1125,6 +1125,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "mindmap_config_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
         ]
       }
       participations: {
@@ -1290,6 +1297,13 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_details_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "public_professionals"
             referencedColumns: ["id"]
           },
         ]
@@ -2216,7 +2230,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_professionals: {
+        Row: {
+          bio: string | null
+          city: string | null
+          company_name: string | null
+          department: string | null
+          description: string | null
+          display_name: string | null
+          first_name: string | null
+          id: string | null
+          professional_category: string | null
+          social_links: Json | null
+          website_url: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       apply_loyalty_rules: {
