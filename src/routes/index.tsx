@@ -1,5 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,7 +73,15 @@ function AuthPage() {
             <li>Nargis, Loiret — et tout le réseau</li>
           </ul>
         </div>
-        <p className="text-xs opacity-60">Plateforme interne — accès réservé aux membres.</p>
+        <div className="space-y-3">
+          <Link
+            to="/association"
+            className="inline-flex items-center gap-2 rounded-md border border-navy-foreground/30 px-3 py-1.5 text-xs transition-colors hover:bg-navy-foreground/10"
+          >
+            Découvrir l'association <ArrowRight className="size-3.5" />
+          </Link>
+          <p className="text-xs opacity-60">Plateforme interne — accès réservé aux membres.</p>
+        </div>
       </section>
 
       <section className="flex items-center justify-center bg-background p-6">
