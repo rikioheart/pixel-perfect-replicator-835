@@ -46,6 +46,9 @@ function InventoryPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", category: "", quantity: "0", alert_threshold: "0", location: "" });
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("ALL");
+  const [alertOnly, setAlertOnly] = useState(false);
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["inventory"],
@@ -87,6 +90,20 @@ function InventoryPage() {
   });
 
   const lowStock = items.filter((item) => item.quantity <= item.alert_threshold);
+  const categories = Array.from(
+    new Set(items.map((item) => item.category).filter((c): c is string => Boolean(c))),
+  ).sort();
+  const filtered = items.filter((item) => {
+    const matchesSearch =
+      search.trim().length === 0 ||
+      `${item.name} ${item.category ?? ""} ${item.location ?? ""}`
+        .toLowerCase()
+        .includes(search.trim().toLowerCase());
+    const matchesCategory = category === "ALL" || item.category === category;
+    const matchesAlert = !alertOnly || item.quantity <= item.alert_threshold;
+    return matchesSearch && matchesCategory && matchesAlert;
+  });
+  const totalUnits = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <AppShell
