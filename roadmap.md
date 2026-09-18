@@ -62,3 +62,9 @@
 - [x] Paiements, remboursements
 - [x] Stock / inventaire détaillé (recherche, filtres, alertes)
 - [x] Page publique de l'association + carte pro publique
+
+## Lot 9 — Intégrations externes (demandé 18/09)
+- [ ] Google Calendar (synchronisation agenda)
+- [ ] Météo (activités terrain)
+- [ ] Google Drive (documents et photos)
+- [ ] Liens Google Forms (questionnaires / formulaires)
