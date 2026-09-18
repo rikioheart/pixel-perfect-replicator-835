@@ -60,5 +60,5 @@
 - [x] Avantages adhérents & codes promo
 - [x] Concours, calendrier de l'Avent, animations membres
 - [x] Paiements, remboursements
-- [ ] Stock / inventaire détaillé
-- [ ] Page publique de l'association + carte pro publique
+- [x] Stock / inventaire détaillé (recherche, filtres, alertes)
+- [x] Page publique de l'association + carte pro publique
