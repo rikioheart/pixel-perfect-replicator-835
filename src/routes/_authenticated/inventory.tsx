@@ -187,13 +187,64 @@ function InventoryPage() {
         </div>
       ) : null}
 
+      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+        <div className="panel p-3">
+          <p className="text-xs text-muted-foreground">Références</p>
+          <p className="text-xl font-semibold">{items.length}</p>
+        </div>
+        <div className="panel p-3">
+          <p className="text-xs text-muted-foreground">Unités en stock</p>
+          <p className="text-xl font-semibold">{totalUnits}</p>
+        </div>
+        <div className="panel p-3">
+          <p className="text-xs text-muted-foreground">Sous le seuil</p>
+          <p className="text-xl font-semibold">{lowStock.length}</p>
+        </div>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Input
+          placeholder="Rechercher un article, une catégorie, un emplacement…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-xs"
+        />
+        <Button
+          variant={category === "ALL" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setCategory("ALL")}
+        >
+          Toutes
+        </Button>
+        {categories.map((cat) => (
+          <Button
+            key={cat}
+            variant={category === cat ? "default" : "outline"}
+            size="sm"
+            onClick={() => setCategory(cat)}
+          >
+            {cat}
+          </Button>
+        ))}
+        <Button
+          variant={alertOnly ? "destructive" : "outline"}
+          size="sm"
+          className="gap-2"
+          onClick={() => setAlertOnly((value) => !value)}
+        >
+          <AlertTriangle className="size-4" /> Stock bas
+        </Button>
+      </div>
+
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement de l'inventaire…</p>
-      ) : items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucun article enregistré.</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          {items.length === 0 ? "Aucun article enregistré." : "Aucun article ne correspond à ce filtre."}
+        </p>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {items.map((item) => (
+          {filtered.map((item) => (
             <Card key={item.id}>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
