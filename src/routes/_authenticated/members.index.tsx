@@ -41,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/members/")({
 });
 
 function MembersPage() {
+  const { isBureau, loading: authLoading } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [typeFilter, setTypeFilter] = useState("ALL");
