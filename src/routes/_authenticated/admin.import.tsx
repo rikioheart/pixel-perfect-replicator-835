@@ -164,6 +164,8 @@ function ImportPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  if (!authLoading && !isBureau) return <BureauOnly title="Import d'adhérents" />;
+
   return (
     <AppShell
       title="Import d'adhérents"
