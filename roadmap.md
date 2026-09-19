@@ -68,3 +68,8 @@
 - [ ] Météo (activités terrain)
 - [ ] Google Drive (documents et photos)
 - [ ] Liens Google Forms (questionnaires / formulaires)
+
+## Corrections post-test (19/09)
+- [x] Liaison Centre d'aide / Demandes d'aide → profils (noms affichés)
+- [x] Garde "réservé au Bureau" sur Import d'adhérents et Adhérents
+- [ ] Test du profil particulier (compte à créer)
