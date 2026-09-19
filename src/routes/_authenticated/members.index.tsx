@@ -77,6 +77,8 @@ function MembersPage() {
     });
   }, [members, search, statusFilter, typeFilter]);
 
+  if (!authLoading && !isBureau) return <BureauOnly title="Adhérents" />;
+
   return (
     <AppShell
       title="Adhérents"
