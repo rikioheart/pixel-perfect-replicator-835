@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { importMembers } from "@/lib/member-import.functions";
+import { useAuth } from "@/hooks/useAuth";
+import { BureauOnly } from "@/components/BureauOnly";
 
 export const Route = createFileRoute("/_authenticated/admin/import")({
   head: () => ({
