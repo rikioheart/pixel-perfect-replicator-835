@@ -15,6 +15,13 @@
       "when": 1789676133466,
       "tag": "0001_public_professionals_view",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789847082233,
+      "tag": "0002_link_help_tables_to_profiles",
+      "breakpoints": true
     }
   ]
 }

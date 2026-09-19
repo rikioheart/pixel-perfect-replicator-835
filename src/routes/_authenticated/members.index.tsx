@@ -20,6 +20,8 @@ import {
   MEMBERSHIP_TYPE_LABEL,
   memberFullName,
 } from "@/lib/members";
+import { useAuth } from "@/hooks/useAuth";
+import { BureauOnly } from "@/components/BureauOnly";
 
 export const Route = createFileRoute("/_authenticated/members/")({
   head: () => ({
@@ -41,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/members/")({
 });
 
 function MembersPage() {
+  const { isBureau, loading: authLoading } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [typeFilter, setTypeFilter] = useState("ALL");
@@ -73,6 +76,8 @@ function MembersPage() {
         .some((value) => String(value).toLowerCase().includes(needle));
     });
   }, [members, search, statusFilter, typeFilter]);
+
+  if (!authLoading && !isBureau) return <BureauOnly title="Adhérents" />;
 
   return (
     <AppShell

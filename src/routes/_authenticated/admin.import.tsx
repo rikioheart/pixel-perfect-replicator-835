@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { importMembers } from "@/lib/member-import.functions";
+import { useAuth } from "@/hooks/useAuth";
+import { BureauOnly } from "@/components/BureauOnly";
 
 export const Route = createFileRoute("/_authenticated/admin/import")({
   head: () => ({
@@ -98,6 +100,7 @@ function parseCsv(text: string) {
 
 function ImportPage() {
   const queryClient = useQueryClient();
+  const { isBureau, loading: authLoading } = useAuth();
   const runImport = useServerFn(importMembers);
   const [fileName, setFileName] = useState("");
   const [analysis, setAnalysis] = useState<ReturnType<typeof parseCsv> | null>(null);
@@ -163,6 +166,8 @@ function ImportPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
+  if (!authLoading && !isBureau) return <BureauOnly title="Import d'adhérents" />;
 
   return (
     <AppShell
