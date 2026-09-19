@@ -100,6 +100,7 @@ function parseCsv(text: string) {
 
 function ImportPage() {
   const queryClient = useQueryClient();
+  const { isBureau, loading: authLoading } = useAuth();
   const runImport = useServerFn(importMembers);
   const [fileName, setFileName] = useState("");
   const [analysis, setAnalysis] = useState<ReturnType<typeof parseCsv> | null>(null);
