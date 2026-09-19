@@ -20,6 +20,8 @@ import {
   MEMBERSHIP_TYPE_LABEL,
   memberFullName,
 } from "@/lib/members";
+import { useAuth } from "@/hooks/useAuth";
+import { BureauOnly } from "@/components/BureauOnly";
 
 export const Route = createFileRoute("/_authenticated/members/")({
   head: () => ({
