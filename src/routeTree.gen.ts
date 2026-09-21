@@ -39,8 +39,10 @@ import { Route as AuthenticatedReimbursementsRouteImport } from './routes/_authe
 import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated/statistics'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
+import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
@@ -213,6 +215,11 @@ const AuthenticatedTerrainRoute = AuthenticatedTerrainRouteImport.update({
   path: '/terrain',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const PartageTokenRoute = PartageTokenRouteImport.update({
+  id: '/partage/$token',
+  path: '/partage/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProProIdRoute = ProProIdRouteImport.update({
   id: '/pro/$proId',
   path: '/pro/$proId',
@@ -223,6 +230,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminAdvisorRoute =
+  AuthenticatedAdminAdvisorRouteImport.update({
+    id: '/admin/advisor',
+    path: '/admin/advisor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/admin/audit',
   path: '/admin/audit',
@@ -358,7 +371,9 @@ export interface FileRoutesByFullPath {
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -409,7 +424,9 @@ export interface FileRoutesByTo {
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -462,7 +479,9 @@ export interface FileRoutesById {
   '/_authenticated/statistics': typeof AuthenticatedStatisticsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
+  '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
@@ -515,7 +534,9 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/partage/$token'
     | '/pro/$proId'
+    | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/import'
@@ -566,7 +587,9 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/partage/$token'
     | '/pro/$proId'
+    | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/import'
@@ -618,7 +641,9 @@ export interface FileRouteTypes {
     | '/_authenticated/statistics'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
+    | '/partage/$token'
     | '/pro/$proId'
+    | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
     | '/_authenticated/admin/import'
@@ -644,6 +669,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AssociationRoute: typeof AssociationRoute
+  PartageTokenRoute: typeof PartageTokenRoute
   ProProIdRoute: typeof ProProIdRoute
   ApiPublicResetDemoRoute: typeof ApiPublicResetDemoRoute
 }
@@ -860,6 +886,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTerrainRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/partage/$token': {
+      id: '/partage/$token'
+      path: '/partage/$token'
+      fullPath: '/partage/$token'
+      preLoaderRoute: typeof PartageTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pro/$proId': {
       id: '/pro/$proId'
       path: '/pro/$proId'
@@ -872,6 +905,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/advisor': {
+      id: '/_authenticated/admin/advisor'
+      path: '/admin/advisor'
+      fullPath: '/admin/advisor'
+      preLoaderRoute: typeof AuthenticatedAdminAdvisorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/audit': {
@@ -1031,6 +1071,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedStatisticsRoute: typeof AuthenticatedStatisticsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
+  AuthenticatedAdminAdvisorRoute: typeof AuthenticatedAdminAdvisorRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
@@ -1079,6 +1120,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedStatisticsRoute: AuthenticatedStatisticsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
+  AuthenticatedAdminAdvisorRoute: AuthenticatedAdminAdvisorRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
@@ -1106,6 +1148,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AssociationRoute: AssociationRoute,
+  PartageTokenRoute: PartageTokenRoute,
   ProProIdRoute: ProProIdRoute,
   ApiPublicResetDemoRoute: ApiPublicResetDemoRoute,
 }
