@@ -26,6 +26,7 @@ import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/h
 import { Route as AuthenticatedHelpRequestsRouteImport } from './routes/_authenticated/help-requests'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedLoyaltyRouteImport } from './routes/_authenticated/loyalty'
+import { Route as AuthenticatedMairiesRouteImport } from './routes/_authenticated/mairies'
 import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
 import { Route as AuthenticatedMindmapRouteImport } from './routes/_authenticated/mindmap'
 import { Route as AuthenticatedMyHistoryRouteImport } from './routes/_authenticated/my-history'
@@ -35,12 +36,15 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedParticipationsRouteImport } from './routes/_authenticated/participations'
 import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedProposalsRouteImport } from './routes/_authenticated/proposals'
 import { Route as AuthenticatedReimbursementsRouteImport } from './routes/_authenticated/reimbursements'
 import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated/statistics'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
+import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
@@ -145,6 +149,11 @@ const AuthenticatedLoyaltyRoute = AuthenticatedLoyaltyRouteImport.update({
   path: '/loyalty',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMairiesRoute = AuthenticatedMairiesRouteImport.update({
+  id: '/mairies',
+  path: '/mairies',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMemberRoute = AuthenticatedMemberRouteImport.update({
   id: '/member',
   path: '/member',
@@ -192,6 +201,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProposalsRoute = AuthenticatedProposalsRouteImport.update({
+  id: '/proposals',
+  path: '/proposals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReimbursementsRoute =
   AuthenticatedReimbursementsRouteImport.update({
     id: '/reimbursements',
@@ -213,6 +227,11 @@ const AuthenticatedTerrainRoute = AuthenticatedTerrainRouteImport.update({
   path: '/terrain',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const PartageTokenRoute = PartageTokenRouteImport.update({
+  id: '/partage/$token',
+  path: '/partage/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProProIdRoute = ProProIdRouteImport.update({
   id: '/pro/$proId',
   path: '/pro/$proId',
@@ -223,6 +242,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminAdvisorRoute =
+  AuthenticatedAdminAdvisorRouteImport.update({
+    id: '/admin/advisor',
+    path: '/admin/advisor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/admin/audit',
   path: '/admin/audit',
@@ -345,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
+  '/mairies': typeof AuthenticatedMairiesRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/my-history': typeof AuthenticatedMyHistoryRoute
@@ -354,11 +380,14 @@ export interface FileRoutesByFullPath {
   '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/proposals': typeof AuthenticatedProposalsRoute
   '/reimbursements': typeof AuthenticatedReimbursementsRoute
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -396,6 +425,7 @@ export interface FileRoutesByTo {
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
+  '/mairies': typeof AuthenticatedMairiesRoute
   '/member': typeof AuthenticatedMemberRoute
   '/mindmap': typeof AuthenticatedMindmapRoute
   '/my-history': typeof AuthenticatedMyHistoryRoute
@@ -405,11 +435,14 @@ export interface FileRoutesByTo {
   '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/proposals': typeof AuthenticatedProposalsRoute
   '/reimbursements': typeof AuthenticatedReimbursementsRoute
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -449,6 +482,7 @@ export interface FileRoutesById {
   '/_authenticated/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/loyalty': typeof AuthenticatedLoyaltyRoute
+  '/_authenticated/mairies': typeof AuthenticatedMairiesRoute
   '/_authenticated/member': typeof AuthenticatedMemberRoute
   '/_authenticated/mindmap': typeof AuthenticatedMindmapRoute
   '/_authenticated/my-history': typeof AuthenticatedMyHistoryRoute
@@ -458,11 +492,14 @@ export interface FileRoutesById {
   '/_authenticated/participations': typeof AuthenticatedParticipationsRoute
   '/_authenticated/partners': typeof AuthenticatedPartnersRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/proposals': typeof AuthenticatedProposalsRoute
   '/_authenticated/reimbursements': typeof AuthenticatedReimbursementsRoute
   '/_authenticated/statistics': typeof AuthenticatedStatisticsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
+  '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
@@ -502,6 +539,7 @@ export interface FileRouteTypes {
     | '/help-requests'
     | '/inventory'
     | '/loyalty'
+    | '/mairies'
     | '/member'
     | '/mindmap'
     | '/my-history'
@@ -511,11 +549,14 @@ export interface FileRouteTypes {
     | '/participations'
     | '/partners'
     | '/profile'
+    | '/proposals'
     | '/reimbursements'
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/partage/$token'
     | '/pro/$proId'
+    | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/import'
@@ -553,6 +594,7 @@ export interface FileRouteTypes {
     | '/help-requests'
     | '/inventory'
     | '/loyalty'
+    | '/mairies'
     | '/member'
     | '/mindmap'
     | '/my-history'
@@ -562,11 +604,14 @@ export interface FileRouteTypes {
     | '/participations'
     | '/partners'
     | '/profile'
+    | '/proposals'
     | '/reimbursements'
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/partage/$token'
     | '/pro/$proId'
+    | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
     | '/admin/import'
@@ -605,6 +650,7 @@ export interface FileRouteTypes {
     | '/_authenticated/help-requests'
     | '/_authenticated/inventory'
     | '/_authenticated/loyalty'
+    | '/_authenticated/mairies'
     | '/_authenticated/member'
     | '/_authenticated/mindmap'
     | '/_authenticated/my-history'
@@ -614,11 +660,14 @@ export interface FileRouteTypes {
     | '/_authenticated/participations'
     | '/_authenticated/partners'
     | '/_authenticated/profile'
+    | '/_authenticated/proposals'
     | '/_authenticated/reimbursements'
     | '/_authenticated/statistics'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
+    | '/partage/$token'
     | '/pro/$proId'
+    | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
     | '/_authenticated/admin/import'
@@ -644,6 +693,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AssociationRoute: typeof AssociationRoute
+  PartageTokenRoute: typeof PartageTokenRoute
   ProProIdRoute: typeof ProProIdRoute
   ApiPublicResetDemoRoute: typeof ApiPublicResetDemoRoute
 }
@@ -769,6 +819,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLoyaltyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mairies': {
+      id: '/_authenticated/mairies'
+      path: '/mairies'
+      fullPath: '/mairies'
+      preLoaderRoute: typeof AuthenticatedMairiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/member': {
       id: '/_authenticated/member'
       path: '/member'
@@ -832,6 +889,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/proposals': {
+      id: '/_authenticated/proposals'
+      path: '/proposals'
+      fullPath: '/proposals'
+      preLoaderRoute: typeof AuthenticatedProposalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reimbursements': {
       id: '/_authenticated/reimbursements'
       path: '/reimbursements'
@@ -860,6 +924,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTerrainRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/partage/$token': {
+      id: '/partage/$token'
+      path: '/partage/$token'
+      fullPath: '/partage/$token'
+      preLoaderRoute: typeof PartageTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pro/$proId': {
       id: '/pro/$proId'
       path: '/pro/$proId'
@@ -872,6 +943,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/advisor': {
+      id: '/_authenticated/admin/advisor'
+      path: '/admin/advisor'
+      fullPath: '/admin/advisor'
+      preLoaderRoute: typeof AuthenticatedAdminAdvisorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/audit': {
@@ -1018,6 +1096,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpRequestsRoute: typeof AuthenticatedHelpRequestsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedLoyaltyRoute: typeof AuthenticatedLoyaltyRoute
+  AuthenticatedMairiesRoute: typeof AuthenticatedMairiesRoute
   AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
   AuthenticatedMindmapRoute: typeof AuthenticatedMindmapRoute
   AuthenticatedMyHistoryRoute: typeof AuthenticatedMyHistoryRoute
@@ -1027,10 +1106,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedParticipationsRoute: typeof AuthenticatedParticipationsRoute
   AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedProposalsRoute: typeof AuthenticatedProposalsRoute
   AuthenticatedReimbursementsRoute: typeof AuthenticatedReimbursementsRoute
   AuthenticatedStatisticsRoute: typeof AuthenticatedStatisticsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
+  AuthenticatedAdminAdvisorRoute: typeof AuthenticatedAdminAdvisorRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
@@ -1066,6 +1147,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpRequestsRoute: AuthenticatedHelpRequestsRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedLoyaltyRoute: AuthenticatedLoyaltyRoute,
+  AuthenticatedMairiesRoute: AuthenticatedMairiesRoute,
   AuthenticatedMemberRoute: AuthenticatedMemberRoute,
   AuthenticatedMindmapRoute: AuthenticatedMindmapRoute,
   AuthenticatedMyHistoryRoute: AuthenticatedMyHistoryRoute,
@@ -1075,10 +1157,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedParticipationsRoute: AuthenticatedParticipationsRoute,
   AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedProposalsRoute: AuthenticatedProposalsRoute,
   AuthenticatedReimbursementsRoute: AuthenticatedReimbursementsRoute,
   AuthenticatedStatisticsRoute: AuthenticatedStatisticsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
+  AuthenticatedAdminAdvisorRoute: AuthenticatedAdminAdvisorRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
@@ -1106,6 +1190,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AssociationRoute: AssociationRoute,
+  PartageTokenRoute: PartageTokenRoute,
   ProProIdRoute: ProProIdRoute,
   ApiPublicResetDemoRoute: ApiPublicResetDemoRoute,
 }
