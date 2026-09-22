@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,6 +47,7 @@ const KIND_LABEL: Record<Exclude<Filter, "ALL">, string> = {
 
 /** Recherche globale accessible depuis toutes les pages (Ctrl/⌘ + K). */
 export function GlobalSearch() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
   const [filter, setFilter] = useState<Filter>("ALL");
@@ -268,11 +269,14 @@ export function GlobalSearch() {
                 <p className="text-sm text-muted-foreground">Aucun résultat.</p>
               ) : (
                 filtered.map((hit) => (
-                  <Link
+                  <button
                     key={hit.id}
-                    to={hit.to}
-                    onClick={() => setOpen(false)}
-                    className="block rounded-md border border-border p-3 text-sm hover:bg-muted"
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      void navigate({ to: hit.to as never });
+                    }}
+                    className="block w-full rounded-md border border-border p-3 text-left text-sm hover:bg-muted"
                   >
                     <p className="font-medium">{hit.title}</p>
                     <p className="text-xs text-muted-foreground">
@@ -282,7 +286,7 @@ export function GlobalSearch() {
                         ? ` · ${new Date(hit.date).toLocaleDateString("fr-FR")}`
                         : ""}
                     </p>
-                  </Link>
+                  </button>
                 ))
               )}
             </div>
