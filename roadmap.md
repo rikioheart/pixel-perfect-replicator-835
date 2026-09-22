@@ -73,3 +73,11 @@
 - [x] Liaison Centre d'aide / Demandes d'aide → profils (noms affichés)
 - [x] Garde "réservé au Bureau" sur Import d'adhérents et Adhérents
 - [ ] Test du profil particulier (compte à créer)
+
+## Lot collaboration (22/09) — fait
+- [x] Fils de discussion (projets, tâches, événements, documents)
+- [x] Liens de partage externe + page publique /partage/:token
+- [x] Recherche globale (Ctrl/⌘ + K) avec filtres et date
+- [x] Conseiller d'équipe (recommandations priorisées)
+- [x] Écrans Mairies & institutions et Propositions
+- [x] Menu mobile complet (pages principales incluses)
