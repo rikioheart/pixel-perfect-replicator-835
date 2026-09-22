@@ -222,12 +222,36 @@ function DocumentsPage() {
                       Ouvrir
                     </a>
                   </Button>
+                  <ShareLinkButton
+                    entityType="document"
+                    entityId={doc.id}
+                    defaultLabel={doc.title}
+                  />
                   {isBureau ? (
-                    <Button variant="ghost" size="icon" className="size-8" onClick={() => remove.mutate(doc.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Supprimer le document"
+                      className="size-8"
+                      onClick={() => remove.mutate(doc.id)}
+                    >
                       <Trash2 className="size-4" />
                     </Button>
                   ) : null}
                 </div>
+                <details>
+                  <summary className="cursor-pointer text-xs text-muted-foreground">
+                    Discussion
+                  </summary>
+                  <div className="pt-2">
+                    <Comments
+                      entityType="document"
+                      entityId={doc.id}
+                      entityTitle={doc.title}
+                      linkUrl="/documents"
+                    />
+                  </div>
+                </details>
               </CardContent>
             </Card>
           ))}

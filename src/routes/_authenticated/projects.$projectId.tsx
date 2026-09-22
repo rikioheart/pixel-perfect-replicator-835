@@ -136,14 +136,19 @@ function ProjectDetail() {
       title={project.title}
       subtitle={project.project_categories?.name ?? "Projet associatif"}
       actions={
-        isBureau ? (
-          <NewTaskDialog
-            projectId={projectId}
-            members={members ?? []}
-            userId={user?.id ?? ""}
-            onCreated={() => queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })}
-          />
-        ) : null
+        <>
+          <ShareLinkButton entityType="project" entityId={projectId} defaultLabel={project.title} />
+          {isBureau ? (
+            <NewTaskDialog
+              projectId={projectId}
+              members={members ?? []}
+              userId={user?.id ?? ""}
+              onCreated={() =>
+                queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })
+              }
+            />
+          ) : null}
+        </>
       }
     >
       <div className="grid gap-6 lg:grid-cols-3">
