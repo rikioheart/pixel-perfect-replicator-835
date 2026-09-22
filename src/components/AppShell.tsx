@@ -38,6 +38,9 @@ import {
   ReceiptText,
   GraduationCap,
   HandHeart as HandHeartIcon,
+  Sparkles,
+  Building2,
+  Lightbulb,
 } from "lucide-react";
 const HandHeart = HandHeartIcon;
 import { ExternalLink } from "lucide-react";
@@ -45,6 +48,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import { useExternalLinks } from "@/lib/home-config";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 
@@ -79,6 +83,8 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
       { to: "/statistics", label: "Statistiques", icon: BarChart3, audience: "bureau" },
       { to: "/admin/import", label: "Import d'adhérents", icon: UploadCloud, audience: "bureau" },
+      { to: "/admin/advisor", label: "Conseiller d'équipe", icon: Sparkles, audience: "bureau" },
+      { to: "/mairies", label: "Mairies & institutions", icon: Building2, audience: "bureau" },
     ],
   },
   {
@@ -103,6 +109,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/directory", label: "Annuaire du réseau", icon: BookUser, audience: "all" },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: MapPin, audience: "pro" },
+      { to: "/proposals", label: "Propositions", icon: Lightbulb, audience: "all" },
     ],
   },
   {
@@ -280,6 +287,7 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             {actions}
+            <GlobalSearch />
             <NotificationBell />
             <Button
               variant="outline"
@@ -296,14 +304,27 @@ export function AppShell({
           </div>
         </header>
 
-        <div className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden">
-          {groups.flatMap((group) => group.items).map((item) => (
-            <Button key={`${item.to}-${item.label}`} asChild variant="ghost" size="sm">
-              <Link to={item.to}>{item.label}</Link>
-            </Button>
-          ))}
-
-        </div>
+        <nav
+          aria-label="Navigation principale"
+          className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden"
+        >
+          {[...primary, ...groups.flatMap((group) => group.items)].map((item) => {
+            const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+            return (
+              <Button
+                key={`m-${item.to}-${item.label}`}
+                asChild
+                variant={active ? "default" : "ghost"}
+                size="sm"
+                className="shrink-0"
+              >
+                <Link to={item.to} aria-current={active ? "page" : undefined}>
+                  {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
+                </Link>
+              </Button>
+            );
+          })}
+        </nav>
 
         <main className="flex-1 p-6">{children}</main>
       </div>
