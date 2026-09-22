@@ -35,6 +35,8 @@ import {
   PROJECT_STATUS_LABEL,
   formatDate,
 } from "@/lib/domain";
+import { Comments } from "@/components/Comments";
+import { ShareLinkButton } from "@/components/ShareLinkButton";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -136,14 +138,19 @@ function ProjectDetail() {
       title={project.title}
       subtitle={project.project_categories?.name ?? "Projet associatif"}
       actions={
-        isBureau ? (
-          <NewTaskDialog
-            projectId={projectId}
-            members={members ?? []}
-            userId={user?.id ?? ""}
-            onCreated={() => queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })}
-          />
-        ) : null
+        <>
+          <ShareLinkButton entityType="project" entityId={projectId} defaultLabel={project.title} />
+          {isBureau ? (
+            <NewTaskDialog
+              projectId={projectId}
+              members={members ?? []}
+              userId={user?.id ?? ""}
+              onCreated={() =>
+                queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })
+              }
+            />
+          ) : null}
+        </>
       }
     >
       <div className="grid gap-6 lg:grid-cols-3">
@@ -253,6 +260,16 @@ function ProjectDetail() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="mt-6">
+        <Comments
+          entityType="project"
+          entityId={projectId}
+          entityTitle={project.title}
+          participants={(members ?? []).map((member) => member.user_id)}
+          linkUrl={`/projects/${projectId}`}
+        />
       </div>
     </AppShell>
   );

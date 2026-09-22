@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useConfigOptions } from "@/lib/config-options";
 import { TASK_STATUS_LABEL, PRIORITY_LABEL, formatDate } from "@/lib/domain";
+import { Comments } from "@/components/Comments";
 
 export type TaskRow = {
   id: string;
@@ -176,6 +177,19 @@ export function TaskCard({
           </Button>
         </div>
       ) : null}
+
+      <details>
+        <summary className="cursor-pointer text-xs text-muted-foreground">Discussion</summary>
+        <div className="pt-2">
+          <Comments
+            entityType="task"
+            entityId={task.id}
+            entityTitle={task.title}
+            participants={[task.assigned_user_id]}
+            linkUrl="/tasks"
+          />
+        </div>
+      </details>
     </div>
   );
 }

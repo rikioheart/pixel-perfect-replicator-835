@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Comments } from "@/components/Comments";
+import { ShareLinkButton } from "@/components/ShareLinkButton";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   head: () => ({
@@ -119,11 +121,14 @@ function EventDetailPage() {
       title={event.title}
       subtitle={event.event_type.replace("_", " ")}
       actions={
-        <Button asChild variant="outline" size="sm" className="gap-2">
-          <Link to="/events">
-            <ArrowLeft className="size-4" /> Retour
-          </Link>
-        </Button>
+        <>
+          <ShareLinkButton entityType="event" entityId={eventId} defaultLabel={event.title} />
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link to="/events">
+              <ArrowLeft className="size-4" /> Retour
+            </Link>
+          </Button>
+        </>
       }
     >
       {event.image_url ? (
@@ -202,6 +207,16 @@ function EventDetailPage() {
             </Card>
           ) : null}
         </div>
+      </div>
+
+      <div className="mt-6">
+        <Comments
+          entityType="event"
+          entityId={eventId}
+          entityTitle={event.title}
+          participants={participations.map((p) => p.user_id)}
+          linkUrl={`/events/${eventId}`}
+        />
       </div>
     </AppShell>
   );

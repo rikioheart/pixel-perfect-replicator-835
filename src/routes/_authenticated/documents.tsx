@@ -3,6 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { FileText, Plus, Trash2 } from "lucide-react";
+import { Comments } from "@/components/Comments";
+import { ShareLinkButton } from "@/components/ShareLinkButton";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -222,12 +224,36 @@ function DocumentsPage() {
                       Ouvrir
                     </a>
                   </Button>
+                  <ShareLinkButton
+                    entityType="document"
+                    entityId={doc.id}
+                    defaultLabel={doc.title}
+                  />
                   {isBureau ? (
-                    <Button variant="ghost" size="icon" className="size-8" onClick={() => remove.mutate(doc.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Supprimer le document"
+                      className="size-8"
+                      onClick={() => remove.mutate(doc.id)}
+                    >
                       <Trash2 className="size-4" />
                     </Button>
                   ) : null}
                 </div>
+                <details>
+                  <summary className="cursor-pointer text-xs text-muted-foreground">
+                    Discussion
+                  </summary>
+                  <div className="pt-2">
+                    <Comments
+                      entityType="document"
+                      entityId={doc.id}
+                      entityTitle={doc.title}
+                      linkUrl="/documents"
+                    />
+                  </div>
+                </details>
               </CardContent>
             </Card>
           ))}
