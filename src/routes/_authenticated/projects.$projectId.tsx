@@ -35,6 +35,8 @@ import {
   PROJECT_STATUS_LABEL,
   formatDate,
 } from "@/lib/domain";
+import { Comments } from "@/components/Comments";
+import { ShareLinkButton } from "@/components/ShareLinkButton";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -258,6 +260,16 @@ function ProjectDetail() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="mt-6">
+        <Comments
+          entityType="project"
+          entityId={projectId}
+          entityTitle={project.title}
+          participants={(members ?? []).map((member) => member.user_id)}
+          linkUrl={`/projects/${projectId}`}
+        />
       </div>
     </AppShell>
   );
