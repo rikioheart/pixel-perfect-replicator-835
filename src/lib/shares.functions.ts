@@ -3,6 +3,10 @@ import { z } from "zod";
 
 const TokenSchema = z.object({ token: z.string().min(10).max(80) });
 
+export type ShareStatus = "ok" | "missing" | "expired" | "revoked" | "forbidden";
+
+export type SharedResult = { status: ShareStatus; payload: SharedPayload | null };
+
 export type SharedPayload = {
   entityType: "project" | "event" | "document";
   label: string | null;
@@ -18,7 +22,7 @@ export type SharedPayload = {
  */
 export const getSharedEntity = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => TokenSchema.parse(input))
-  .handler(async ({ data }): Promise<SharedPayload | null> => {
+  .handler(async ({ data }): Promise<SharedResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: share } = await supabaseAdmin
@@ -27,8 +31,11 @@ export const getSharedEntity = createServerFn({ method: "GET" })
       .eq("token", data.token)
       .maybeSingle();
 
-    if (!share || share.revoked) return null;
-    if (share.expires_at && new Date(share.expires_at).getTime() < Date.now()) return null;
+    if (!share) return { status: "missing", payload: null };
+    if (share.revoked) return { status: "revoked", payload: null };
+    if (share.expires_at && new Date(share.expires_at).getTime() < Date.now()) {
+      return { status: "expired", payload: null };
+    }
 
     await supabaseAdmin
       .from("public_shares")
@@ -44,8 +51,8 @@ export const getSharedEntity = createServerFn({ method: "GET" })
         .select("title, description, status, deadline, progress_percent")
         .eq("id", share.entity_id)
         .maybeSingle();
-      if (!row) return null;
-      return {
+      if (!row) return { status: "missing", payload: null };
+      return { status: "ok", payload: {
         entityType: "project",
         label: share.label,
         title: row.title,
@@ -56,7 +63,7 @@ export const getSharedEntity = createServerFn({ method: "GET" })
           { label: "Avancement", value: `${row.progress_percent ?? 0} %` },
         ],
         url: null,
-      };
+      } };
     }
 
     if (share.entity_type === "event") {
@@ -65,8 +72,8 @@ export const getSharedEntity = createServerFn({ method: "GET" })
         .select("title, description, location, start_date, end_date, status")
         .eq("id", share.entity_id)
         .maybeSingle();
-      if (!row) return null;
-      return {
+      if (!row) return { status: "missing", payload: null };
+      return { status: "ok", payload: {
         entityType: "event",
         label: share.label,
         title: row.title,
@@ -77,16 +84,20 @@ export const getSharedEntity = createServerFn({ method: "GET" })
           { label: "Statut", value: row.status },
         ],
         url: null,
-      };
+      } };
     }
 
     const { data: row } = await supabaseAdmin
       .from("documents")
-      .select("title, category, url, created_at")
+      .select("title, category, url, created_at, visibility")
       .eq("id", share.entity_id)
       .maybeSingle();
-    if (!row) return null;
-    return {
+    if (!row) return { status: "missing", payload: null };
+    // Un document réservé au Bureau ne doit jamais sortir, même via un ancien lien.
+    if ((row.visibility ?? "").toUpperCase() === "BUREAU") {
+      return { status: "forbidden", payload: null };
+    }
+    return { status: "ok", payload: {
       entityType: "document",
       label: share.label,
       title: row.title,
@@ -96,5 +107,5 @@ export const getSharedEntity = createServerFn({ method: "GET" })
         { label: "Ajouté le", value: fmt(row.created_at) },
       ],
       url: row.url,
-    };
+    } };
   });
