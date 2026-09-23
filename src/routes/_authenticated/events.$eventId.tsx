@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Comments } from "@/components/Comments";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
+import { LoadingState } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   head: () => ({
@@ -101,7 +102,7 @@ function EventDetailPage() {
   if (isLoading) {
     return (
       <AppShell title="Événement">
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <LoadingState label="Chargement des informations…" rows={4} />
       </AppShell>
     );
   }

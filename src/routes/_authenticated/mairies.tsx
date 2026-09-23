@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
+import { LoadingState } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/mairies")({
   head: () => ({
@@ -151,7 +152,7 @@ function MairiesPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <LoadingState label="Chargement des informations…" rows={4} />
       ) : filtered.length === 0 ? (
         <EmptyState
           title="Aucun contact institutionnel"

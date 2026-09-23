@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { NOTIFICATION_TYPES, notificationLabel } from "@/lib/notification-types";
 import { cn } from "@/lib/utils";
+import { LoadingState } from "@/components/LoadingState";
 
 
 export const Route = createFileRoute("/_authenticated/notifications")({
@@ -183,7 +184,7 @@ function NotificationsPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <LoadingState label="Chargement des informations…" rows={4} />
       ) : filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground">Aucune notification pour ces critères.</p>
       ) : (
