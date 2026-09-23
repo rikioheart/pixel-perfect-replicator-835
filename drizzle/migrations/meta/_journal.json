@@ -29,6 +29,13 @@
       "when": 1789897609572,
       "tag": "0003_collab_comments_shares_advisor",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790150376669,
+      "tag": "0004_harden_public_shares",
+      "breakpoints": true
     }
   ]
 }
