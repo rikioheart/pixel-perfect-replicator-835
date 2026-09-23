@@ -4,6 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { LoadingState } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/participations")({
   head: () => ({
@@ -70,7 +71,7 @@ function ParticipationsPage() {
       subtitle="Vos inscriptions aux activités et événements, et votre présence enregistrée."
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <LoadingState label="Chargement des informations…" rows={4} />
       ) : items.length === 0 ? (
         <EmptyState
           title="Aucune inscription pour l'instant"

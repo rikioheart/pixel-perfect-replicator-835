@@ -2423,6 +2423,10 @@ export type Database = {
         Args: { _activity_id: string; _event_id: string; _user_id: string }
         Returns: number
       }
+      can_share_entity: {
+        Args: { _entity_id: string; _entity_type: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_project: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean

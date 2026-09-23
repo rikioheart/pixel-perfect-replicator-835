@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { LoadingState } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/professionals/$proId")({
   head: () => ({
@@ -78,7 +79,7 @@ function ProfessionalDetailPage() {
   if (isLoading) {
     return (
       <AppShell title="Professionnel">
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <LoadingState label="Chargement des informations…" rows={4} />
       </AppShell>
     );
   }

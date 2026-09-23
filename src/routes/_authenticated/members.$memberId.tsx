@@ -18,6 +18,7 @@ import {
 import { MemberForm } from "@/components/MemberForm";
 import { memberFormSchema, type MemberFormValues } from "@/lib/member-schema";
 import { updateMember } from "@/lib/members.functions";
+import { LoadingState } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/members/$memberId")({
   head: () => ({
@@ -88,7 +89,7 @@ function MemberDetailPage() {
   if (isLoading) {
     return (
       <AppShell title="Fiche adhérent">
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <LoadingState label="Chargement des informations…" rows={4} />
       </AppShell>
     );
   }
