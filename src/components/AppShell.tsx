@@ -191,12 +191,14 @@ export function AppShell({
       <Link
         key={`${item.to}-${item.label}`}
         to={item.to}
+        aria-current={active ? "page" : undefined}
         className={cn(
-          "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
-          active ? "surface-wine" : "opacity-80 hover:bg-sidebar-accent hover:opacity-100",
+          "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+          active ? "surface-wine" : "hover:bg-sidebar-accent",
         )}
       >
-        <item.icon className="size-4" />
+        <item.icon className="size-4" aria-hidden="true" />
         {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
       </Link>
     );
@@ -204,8 +206,14 @@ export function AppShell({
 
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="surface-night sticky top-0 hidden h-screen w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex">
+    <div className="flex min-h-dvh bg-background">
+      <a
+        href="#contenu-principal"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+      >
+        Aller au contenu principal
+      </a>
+      <aside aria-label="Menu latéral" className="surface-night sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex">
         <div>
           <div className="flex items-center gap-3 pb-8">
             <img
@@ -215,21 +223,21 @@ export function AppShell({
             />
             <div className="leading-tight">
               <p className="font-display text-sm">La Voix du Chien</p>
-              <p className="text-xs opacity-70">{isBureau ? "Cockpit Bureau" : "Espace adhérent"}</p>
+              <p className="text-xs">{isBureau ? "Cockpit Bureau" : "Espace adhérent"}</p>
             </div>
           </div>
-          <nav className="space-y-5">
+          <nav aria-label="Navigation des pages" className="space-y-5">
             <div className="space-y-1">{primary.map(renderLink)}</div>
 
             {groups.length ? (
               <details className="group">
-                <summary className="cursor-pointer list-none px-3 py-2 text-[11px] font-semibold uppercase tracking-wide opacity-50 hover:opacity-80">
+                <summary className="cursor-pointer list-none rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   Tout le reste
                 </summary>
                 <div className="mt-2 space-y-4">
                   {groups.map((group) => (
                     <div key={group.title} className="space-y-1">
-                      <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-40">
+                      <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide">
                         {group.title}
                       </p>
                       {group.items.map(renderLink)}
@@ -241,7 +249,7 @@ export function AppShell({
 
             {externalLinks.length ? (
               <div className="space-y-1 border-t border-sidebar-border pt-4">
-                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide opacity-40">
+                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide">
                   Outils partagés
                 </p>
                 {externalLinks.map((link) => (
@@ -250,10 +258,13 @@ export function AppShell({
                     href={link.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm opacity-80 transition-colors hover:bg-sidebar-accent hover:opacity-100"
+                    className="flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <ExternalLink className="size-4" />
-                    {link.label}
+                    <ExternalLink className="size-4" aria-hidden="true" />
+                    <span>
+                      {link.label}
+                      <span className="sr-only"> (s'ouvre dans un nouvel onglet)</span>
+                    </span>
                   </a>
                 ))}
               </div>
@@ -265,16 +276,16 @@ export function AppShell({
             <p className="truncate font-medium">
               {profile?.display_name ?? profile?.first_name ?? "Membre"}
             </p>
-            <p className="text-xs opacity-70">{isBureau ? "Bureau" : profile?.membership_type}</p>
+            <p className="text-xs">{isBureau ? "Bureau" : profile?.membership_type}</p>
           </div>
           <button
             onClick={async () => {
               await signOut();
               void navigate({ to: "/" });
             }}
-            className="flex items-center gap-2 text-xs opacity-80 hover:opacity-100"
+            className="flex min-h-11 items-center gap-2 rounded-md text-xs hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <LogOut className="size-3.5" /> Se déconnecter
+            <LogOut className="size-3.5" aria-hidden="true" /> Se déconnecter
           </button>
         </div>
       </aside>
@@ -298,14 +309,14 @@ export function AppShell({
                 void navigate({ to: "/" });
               }}
             >
-              <LogOut className="size-4" />
+              <LogOut className="size-4" aria-hidden="true" />
               Se déconnecter
             </Button>
           </div>
         </header>
 
         <nav
-          aria-label="Navigation principale"
+          aria-label="Navigation principale (mobile)"
           className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden"
         >
           {[...primary, ...groups.flatMap((group) => group.items)].map((item) => {
@@ -326,7 +337,9 @@ export function AppShell({
           })}
         </nav>
 
-        <main className="flex-1 p-6">{children}</main>
+        <main id="contenu-principal" tabIndex={-1} className="flex-1 p-6 focus:outline-none">
+          {children}
+        </main>
       </div>
     </div>
   );
