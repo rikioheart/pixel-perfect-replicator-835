@@ -73,60 +73,119 @@ export type Database = {
       }
       activities: {
         Row: {
+          before_coming: string | null
           capacity: number | null
           created_at: string
           created_by: string | null
           date: string | null
           description: string | null
+          dog_policy: string
           eligible_for_loyalty: boolean
+          for_you_if: string | null
           id: string
           image_url: string | null
+          is_public: boolean
           location: string | null
+          max_dogs: number | null
           price_member: number
           price_public: number
+          professional_id: string | null
           professional_ids: string[]
+          referent_id: string | null
           status: string
           title: string
+          to_bring: string | null
           type: string
           updated_at: string
+          waitlist_enabled: boolean
+          with_your_dog: string | null
         }
         Insert: {
+          before_coming?: string | null
           capacity?: number | null
           created_at?: string
           created_by?: string | null
           date?: string | null
           description?: string | null
+          dog_policy?: string
           eligible_for_loyalty?: boolean
+          for_you_if?: string | null
           id?: string
           image_url?: string | null
+          is_public?: boolean
           location?: string | null
+          max_dogs?: number | null
           price_member?: number
           price_public?: number
+          professional_id?: string | null
           professional_ids?: string[]
+          referent_id?: string | null
           status?: string
           title: string
+          to_bring?: string | null
           type?: string
           updated_at?: string
+          waitlist_enabled?: boolean
+          with_your_dog?: string | null
         }
         Update: {
+          before_coming?: string | null
           capacity?: number | null
           created_at?: string
           created_by?: string | null
           date?: string | null
           description?: string | null
+          dog_policy?: string
           eligible_for_loyalty?: boolean
+          for_you_if?: string | null
           id?: string
           image_url?: string | null
+          is_public?: boolean
           location?: string | null
+          max_dogs?: number | null
           price_member?: number
           price_public?: number
+          professional_id?: string | null
           professional_ids?: string[]
+          referent_id?: string | null
           status?: string
           title?: string
+          to_bring?: string | null
           type?: string
           updated_at?: string
+          waitlist_enabled?: boolean
+          with_your_dog?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "activities_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_referent_id_fkey"
+            columns: ["referent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_referent_id_fkey"
+            columns: ["referent_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       advantage_claims: {
         Row: {
@@ -164,8 +223,10 @@ export type Database = {
           created_by: string | null
           description: string | null
           id: string
+          is_public: boolean
           kind: string
           partner_name: string | null
+          professional_id: string | null
           promo_code: string | null
           quantity: number | null
           status: string
@@ -180,8 +241,10 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          is_public?: boolean
           kind?: string
           partner_name?: string | null
+          professional_id?: string | null
           promo_code?: string | null
           quantity?: number | null
           status?: string
@@ -196,8 +259,10 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          is_public?: boolean
           kind?: string
           partner_name?: string | null
+          professional_id?: string | null
           promo_code?: string | null
           quantity?: number | null
           status?: string
@@ -206,7 +271,22 @@ export type Database = {
           valid_from?: string | null
           valid_until?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "advantages_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "advantages_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       audit_logs: {
         Row: {
@@ -454,12 +534,193 @@ export type Database = {
         }
         Relationships: []
       }
+      dog_goals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dog_id: string
+          id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dog_id: string
+          id?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dog_id?: string
+          id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_goals_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dog_observations: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          dog_id: string
+          id: string
+        }
+        Insert: {
+          author_id?: string
+          body: string
+          created_at?: string
+          dog_id: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          dog_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_observations_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dog_professional_access: {
+        Row: {
+          can_activities: boolean
+          can_goals: boolean
+          can_identity: boolean
+          can_info: boolean
+          can_observations: boolean
+          created_at: string
+          dog_id: string
+          expires_at: string | null
+          granted_by: string | null
+          id: string
+          professional_id: string
+          revoked: boolean
+        }
+        Insert: {
+          can_activities?: boolean
+          can_goals?: boolean
+          can_identity?: boolean
+          can_info?: boolean
+          can_observations?: boolean
+          created_at?: string
+          dog_id: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          professional_id: string
+          revoked?: boolean
+        }
+        Update: {
+          can_activities?: boolean
+          can_goals?: boolean
+          can_identity?: boolean
+          can_info?: boolean
+          can_observations?: boolean
+          created_at?: string
+          dog_id?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          professional_id?: string
+          revoked?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_professional_access_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dog_professional_access_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dog_professional_access_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dog_referents: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dog_id: string
+          id: string
+          professional_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dog_id: string
+          id?: string
+          professional_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dog_id?: string
+          id?: string
+          professional_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_referents_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dog_referents_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dog_referents_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dogs: {
         Row: {
           birth_date: string | null
           breed: string | null
           character: string | null
           created_at: string
+          household_id: string | null
           id: string
           name: string
           needs: string | null
@@ -475,6 +736,7 @@ export type Database = {
           breed?: string | null
           character?: string | null
           created_at?: string
+          household_id?: string | null
           id?: string
           name: string
           needs?: string | null
@@ -490,6 +752,7 @@ export type Database = {
           breed?: string | null
           character?: string | null
           created_at?: string
+          household_id?: string | null
           id?: string
           name?: string
           needs?: string | null
@@ -500,61 +763,134 @@ export type Database = {
           useful_information?: string | null
           visibility?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dogs_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events: {
         Row: {
+          before_coming: string | null
+          capacity: number | null
           created_at: string
           created_by: string | null
           description: string | null
+          dog_policy: string
           end_date: string | null
           event_type: string
           financial_summary: Json
+          for_you_if: string | null
           id: string
           image_url: string | null
           location: string | null
+          max_dogs: number | null
+          price_member: number
+          price_public: number
+          professional_id: string | null
           professional_ids: string[]
+          referent_id: string | null
           start_date: string | null
           status: string
           title: string
+          to_bring: string | null
           updated_at: string
           visibility: string
+          waitlist_enabled: boolean
+          with_your_dog: string | null
         }
         Insert: {
+          before_coming?: string | null
+          capacity?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          dog_policy?: string
           end_date?: string | null
           event_type?: string
           financial_summary?: Json
+          for_you_if?: string | null
           id?: string
           image_url?: string | null
           location?: string | null
+          max_dogs?: number | null
+          price_member?: number
+          price_public?: number
+          professional_id?: string | null
           professional_ids?: string[]
+          referent_id?: string | null
           start_date?: string | null
           status?: string
           title: string
+          to_bring?: string | null
           updated_at?: string
           visibility?: string
+          waitlist_enabled?: boolean
+          with_your_dog?: string | null
         }
         Update: {
+          before_coming?: string | null
+          capacity?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          dog_policy?: string
           end_date?: string | null
           event_type?: string
           financial_summary?: Json
+          for_you_if?: string | null
           id?: string
           image_url?: string | null
           location?: string | null
+          max_dogs?: number | null
+          price_member?: number
+          price_public?: number
+          professional_id?: string | null
           professional_ids?: string[]
+          referent_id?: string | null
           start_date?: string | null
           status?: string
           title?: string
+          to_bring?: string | null
           updated_at?: string
           visibility?: string
+          waitlist_enabled?: boolean
+          with_your_dog?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_referent_id_fkey"
+            columns: ["referent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_referent_id_fkey"
+            columns: ["referent_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       formation_registrations: {
         Row: {
@@ -746,6 +1082,108 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      household_children: {
+        Row: {
+          birth_year: number | null
+          created_at: string
+          first_name: string
+          household_id: string
+          id: string
+        }
+        Insert: {
+          birth_year?: number | null
+          created_at?: string
+          first_name: string
+          household_id: string
+          id?: string
+        }
+        Update: {
+          birth_year?: number | null
+          created_at?: string
+          first_name?: string
+          household_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_children_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      household_members: {
+        Row: {
+          created_at: string
+          household_id: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          household_id: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          household_id?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_members_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      households: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       in_app_notifications: {
         Row: {
@@ -1209,36 +1647,143 @@ export type Database = {
           },
         ]
       }
+      participation_dogs: {
+        Row: {
+          created_at: string
+          dog_id: string
+          id: string
+          participation_id: string
+        }
+        Insert: {
+          created_at?: string
+          dog_id: string
+          id?: string
+          participation_id: string
+        }
+        Update: {
+          created_at?: string
+          dog_id?: string
+          id?: string
+          participation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participation_dogs_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participation_dogs_participation_id_fkey"
+            columns: ["participation_id"]
+            isOneToOne: false
+            referencedRelation: "participations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      participation_members: {
+        Row: {
+          created_at: string
+          household_child_id: string | null
+          id: string
+          participation_id: string
+          role: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          household_child_id?: string | null
+          id?: string
+          participation_id: string
+          role?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          household_child_id?: string | null
+          id?: string
+          participation_id?: string
+          role?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participation_members_household_child_id_fkey"
+            columns: ["household_child_id"]
+            isOneToOne: false
+            referencedRelation: "household_children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participation_members_participation_id_fkey"
+            columns: ["participation_id"]
+            isOneToOne: false
+            referencedRelation: "participations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participation_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participation_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participations: {
         Row: {
           activity_id: string | null
           created_at: string
           event_id: string | null
+          household_id: string | null
           id: string
+          notes: string | null
+          registered_at: string
           registration_status: string
           role: string
           updated_at: string
           user_id: string
+          validated_at: string | null
+          validated_by: string | null
         }
         Insert: {
           activity_id?: string | null
           created_at?: string
           event_id?: string | null
+          household_id?: string | null
           id?: string
+          notes?: string | null
+          registered_at?: string
           registration_status?: string
           role?: string
           updated_at?: string
           user_id: string
+          validated_at?: string | null
+          validated_by?: string | null
         }
         Update: {
           activity_id?: string | null
           created_at?: string
           event_id?: string | null
+          household_id?: string | null
           id?: string
+          notes?: string | null
+          registered_at?: string
           registration_status?: string
           role?: string
           updated_at?: string
           user_id?: string
+          validated_at?: string | null
+          validated_by?: string | null
         }
         Relationships: [
           {
@@ -1253,6 +1798,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participations_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
             referencedColumns: ["id"]
           },
         ]
@@ -1416,6 +1968,105 @@ export type Database = {
         }
         Relationships: []
       }
+      professional_collaborations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          happened_on: string | null
+          id: string
+          is_public: boolean
+          professional_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          happened_on?: string | null
+          id?: string
+          is_public?: boolean
+          professional_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          happened_on?: string | null
+          id?: string
+          is_public?: boolean
+          professional_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_collaborations_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "professional_collaborations_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      professional_internal_details: {
+        Row: {
+          admin_info: Json
+          contract_url: string | null
+          created_at: string
+          id: string
+          internal_notes: string | null
+          partnership_data: Json
+          partnership_percentage: number
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          admin_info?: Json
+          contract_url?: string | null
+          created_at?: string
+          id?: string
+          internal_notes?: string | null
+          partnership_data?: Json
+          partnership_percentage?: number
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          admin_info?: Json
+          contract_url?: string | null
+          created_at?: string
+          id?: string
+          internal_notes?: string | null
+          partnership_data?: Json
+          partnership_percentage?: number
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_internal_details_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "professional_internal_details_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_proposals: {
         Row: {
           created_at: string
@@ -1454,6 +2105,87 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      professional_public_profile: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_name: string
+          id: string
+          logo_url: string | null
+          profile_id: string
+          public_city: string | null
+          public_email: string | null
+          public_phone: string | null
+          review_comment: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sector: string | null
+          slug: string
+          social_links: Json
+          specialties: string[]
+          status: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_name: string
+          id?: string
+          logo_url?: string | null
+          profile_id: string
+          public_city?: string | null
+          public_email?: string | null
+          public_phone?: string | null
+          review_comment?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sector?: string | null
+          slug: string
+          social_links?: Json
+          specialties?: string[]
+          status?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          id?: string
+          logo_url?: string | null
+          profile_id?: string
+          public_city?: string | null
+          public_email?: string | null
+          public_phone?: string | null
+          review_comment?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sector?: string | null
+          slug?: string
+          social_links?: Json
+          specialties?: string[]
+          status?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_public_profile_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "professional_public_profile_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       professional_services: {
         Row: {
@@ -2423,8 +3155,16 @@ export type Database = {
         Args: { _activity_id: string; _event_id: string; _user_id: string }
         Returns: number
       }
+      can_manage_dog: {
+        Args: { _dog_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_share_entity: {
         Args: { _entity_id: string; _entity_type: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_participation: {
+        Args: { _pid: string; _user_id: string }
         Returns: boolean
       }
       can_view_project: {
@@ -2432,6 +3172,8 @@ export type Database = {
         Returns: boolean
       }
       claim_bureau_bootstrap: { Args: never; Returns: boolean }
+      get_pro_dogs: { Args: never; Returns: Json }
+      get_public_pro_page: { Args: { _slug: string }; Returns: Json }
       has_permission: {
         Args: { _permission_code: string; _user_id: string }
         Returns: boolean
@@ -2441,11 +3183,20 @@ export type Database = {
         Returns: boolean
       }
       is_bureau: { Args: { _user_id: string }; Returns: boolean }
+      is_household_admin: {
+        Args: { _household_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_household_member: {
+        Args: { _household_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_professional: { Args: { _user_id: string }; Returns: boolean }
       is_project_member: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      list_public_pros: { Args: never; Returns: Json }
       notify_once: {
         Args: {
           _entity_id: string
@@ -2458,13 +3209,38 @@ export type Database = {
         }
         Returns: undefined
       }
+      occupied_spots: {
+        Args: { _activity_id: string; _event_id: string }
+        Returns: number
+      }
+      pro_dog_perm: {
+        Args: { _dog_id: string; _section: string; _user_id: string }
+        Returns: boolean
+      }
+      pro_slug_for: { Args: { _profile_id: string }; Returns: string }
       recompute_loyalty_all: { Args: never; Returns: number }
       recompute_loyalty_for_member: {
         Args: { _user_id: string }
         Returns: number
       }
+      register_participation: {
+        Args: {
+          _activity_id: string
+          _child_ids: string[]
+          _dog_ids: string[]
+          _event_id: string
+          _household_id: string
+          _notes: string
+          _user_ids: string[]
+        }
+        Returns: Json
+      }
       run_daily_reminders: { Args: never; Returns: undefined }
       run_weekly_bureau_digest: { Args: never; Returns: undefined }
+      spots_info: {
+        Args: { _activity_id: string; _event_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
