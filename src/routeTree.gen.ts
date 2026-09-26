@@ -54,6 +54,7 @@ import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
+import { Route as AuthenticatedEspaceProCarteRouteImport } from './routes/_authenticated/espace-pro.carte'
 import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events.index'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events.$eventId'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
@@ -300,6 +301,12 @@ const AuthenticatedAdminValidationRoute =
     path: '/admin/validation',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEspaceProCarteRoute =
+  AuthenticatedEspaceProCarteRouteImport.update({
+    id: '/espace-pro/carte',
+    path: '/espace-pro/carte',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEventsIndexRoute =
   AuthenticatedEventsIndexRouteImport.update({
     id: '/events/',
@@ -403,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -459,6 +467,7 @@ export interface FileRoutesByTo {
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -517,6 +526,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/_authenticated/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
@@ -575,6 +585,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/settings'
     | '/admin/validation'
+    | '/espace-pro/carte'
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
@@ -631,6 +642,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/settings'
     | '/admin/validation'
+    | '/espace-pro/carte'
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
@@ -688,6 +700,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/roles'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/validation'
+    | '/_authenticated/espace-pro/carte'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/members/$memberId'
     | '/_authenticated/members/new'
@@ -1028,6 +1041,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminValidationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/espace-pro/carte': {
+      id: '/_authenticated/espace-pro/carte'
+      path: '/espace-pro/carte'
+      fullPath: '/espace-pro/carte'
+      preLoaderRoute: typeof AuthenticatedEspaceProCarteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/events/': {
       id: '/_authenticated/events/'
       path: '/events'
@@ -1140,6 +1160,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
+  AuthenticatedEspaceProCarteRoute: typeof AuthenticatedEspaceProCarteRoute
   AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
@@ -1191,6 +1212,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
+  AuthenticatedEspaceProCarteRoute: AuthenticatedEspaceProCarteRoute,
   AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
