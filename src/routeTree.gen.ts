@@ -43,6 +43,7 @@ import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
 import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
+import { Route as ProfessionnelsSlugRouteImport } from './routes/professionnels.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
@@ -53,6 +54,7 @@ import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
+import { Route as AuthenticatedEspaceProCarteRouteImport } from './routes/_authenticated/espace-pro.carte'
 import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events.index'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events.$eventId'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
@@ -237,6 +239,11 @@ const ProProIdRoute = ProProIdRouteImport.update({
   path: '/pro/$proId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfessionnelsSlugRoute = ProfessionnelsSlugRouteImport.update({
+  id: '/professionnels/$slug',
+  path: '/professionnels/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -292,6 +299,12 @@ const AuthenticatedAdminValidationRoute =
   AuthenticatedAdminValidationRouteImport.update({
     id: '/admin/validation',
     path: '/admin/validation',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEspaceProCarteRoute =
+  AuthenticatedEspaceProCarteRouteImport.update({
+    id: '/espace-pro/carte',
+    path: '/espace-pro/carte',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedEventsIndexRoute =
@@ -387,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/professionnels/$slug': typeof ProfessionnelsSlugRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -396,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -442,6 +457,7 @@ export interface FileRoutesByTo {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/professionnels/$slug': typeof ProfessionnelsSlugRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -451,6 +467,7 @@ export interface FileRoutesByTo {
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -499,6 +516,7 @@ export interface FileRoutesById {
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/professionnels/$slug': typeof ProfessionnelsSlugRoute
   '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -508,6 +526,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
+  '/_authenticated/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
@@ -556,6 +575,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/partage/$token'
     | '/pro/$proId'
+    | '/professionnels/$slug'
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
@@ -565,6 +585,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/settings'
     | '/admin/validation'
+    | '/espace-pro/carte'
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
@@ -611,6 +632,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/partage/$token'
     | '/pro/$proId'
+    | '/professionnels/$slug'
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
@@ -620,6 +642,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/settings'
     | '/admin/validation'
+    | '/espace-pro/carte'
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
@@ -667,6 +690,7 @@ export interface FileRouteTypes {
     | '/_authenticated/terrain'
     | '/partage/$token'
     | '/pro/$proId'
+    | '/professionnels/$slug'
     | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
@@ -676,6 +700,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/roles'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/validation'
+    | '/_authenticated/espace-pro/carte'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/members/$memberId'
     | '/_authenticated/members/new'
@@ -695,6 +720,7 @@ export interface RootRouteChildren {
   AssociationRoute: typeof AssociationRoute
   PartageTokenRoute: typeof PartageTokenRoute
   ProProIdRoute: typeof ProProIdRoute
+  ProfessionnelsSlugRoute: typeof ProfessionnelsSlugRoute
   ApiPublicResetDemoRoute: typeof ApiPublicResetDemoRoute
 }
 
@@ -938,6 +964,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProProIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/professionnels/$slug': {
+      id: '/professionnels/$slug'
+      path: '/professionnels/$slug'
+      fullPath: '/professionnels/$slug'
+      preLoaderRoute: typeof ProfessionnelsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -1006,6 +1039,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/validation'
       fullPath: '/admin/validation'
       preLoaderRoute: typeof AuthenticatedAdminValidationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/espace-pro/carte': {
+      id: '/_authenticated/espace-pro/carte'
+      path: '/espace-pro/carte'
+      fullPath: '/espace-pro/carte'
+      preLoaderRoute: typeof AuthenticatedEspaceProCarteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/events/': {
@@ -1120,6 +1160,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
+  AuthenticatedEspaceProCarteRoute: typeof AuthenticatedEspaceProCarteRoute
   AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
@@ -1171,6 +1212,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
+  AuthenticatedEspaceProCarteRoute: AuthenticatedEspaceProCarteRoute,
   AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
@@ -1192,6 +1234,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssociationRoute: AssociationRoute,
   PartageTokenRoute: PartageTokenRoute,
   ProProIdRoute: ProProIdRoute,
+  ProfessionnelsSlugRoute: ProfessionnelsSlugRoute,
   ApiPublicResetDemoRoute: ApiPublicResetDemoRoute,
 }
 export const routeTree = rootRouteImport
