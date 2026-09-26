@@ -43,6 +43,7 @@ import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
 import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
+import { Route as ProfessionnelsSlugRouteImport } from './routes/professionnels.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
@@ -237,6 +238,11 @@ const ProProIdRoute = ProProIdRouteImport.update({
   path: '/pro/$proId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfessionnelsSlugRoute = ProfessionnelsSlugRouteImport.update({
+  id: '/professionnels/$slug',
+  path: '/professionnels/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -387,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/professionnels/$slug': typeof ProfessionnelsSlugRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -442,6 +449,7 @@ export interface FileRoutesByTo {
   '/terrain': typeof AuthenticatedTerrainRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/professionnels/$slug': typeof ProfessionnelsSlugRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -499,6 +507,7 @@ export interface FileRoutesById {
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
+  '/professionnels/$slug': typeof ProfessionnelsSlugRoute
   '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -556,6 +565,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/partage/$token'
     | '/pro/$proId'
+    | '/professionnels/$slug'
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
@@ -611,6 +621,7 @@ export interface FileRouteTypes {
     | '/terrain'
     | '/partage/$token'
     | '/pro/$proId'
+    | '/professionnels/$slug'
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
@@ -667,6 +678,7 @@ export interface FileRouteTypes {
     | '/_authenticated/terrain'
     | '/partage/$token'
     | '/pro/$proId'
+    | '/professionnels/$slug'
     | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
@@ -695,6 +707,7 @@ export interface RootRouteChildren {
   AssociationRoute: typeof AssociationRoute
   PartageTokenRoute: typeof PartageTokenRoute
   ProProIdRoute: typeof ProProIdRoute
+  ProfessionnelsSlugRoute: typeof ProfessionnelsSlugRoute
   ApiPublicResetDemoRoute: typeof ApiPublicResetDemoRoute
 }
 
@@ -936,6 +949,13 @@ declare module '@tanstack/react-router' {
       path: '/pro/$proId'
       fullPath: '/pro/$proId'
       preLoaderRoute: typeof ProProIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/professionnels/$slug': {
+      id: '/professionnels/$slug'
+      path: '/professionnels/$slug'
+      fullPath: '/professionnels/$slug'
+      preLoaderRoute: typeof ProfessionnelsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -1192,6 +1212,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssociationRoute: AssociationRoute,
   PartageTokenRoute: PartageTokenRoute,
   ProProIdRoute: ProProIdRoute,
+  ProfessionnelsSlugRoute: ProfessionnelsSlugRoute,
   ApiPublicResetDemoRoute: ApiPublicResetDemoRoute,
 }
 export const routeTree = rootRouteImport
