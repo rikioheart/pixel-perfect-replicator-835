@@ -48,12 +48,15 @@ function PublicAssociationPage() {
   const { data: pros = [] } = useQuery({
     queryKey: ["public-professionals"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("public_professionals")
-        .select("id, display_name, first_name, city, department, company_name, professional_category, description")
-        .limit(24);
+      const { data, error } = await supabase.rpc("list_public_pros");
       if (error) throw error;
-      return data;
+      return ((data ?? []) as unknown as {
+        slug: string;
+        display_name: string;
+        specialties: string[];
+        sector: string | null;
+        public_city: string | null;
+      }[]).slice(0, 24);
     },
   });
 
@@ -133,29 +136,23 @@ function PublicAssociationPage() {
             <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {pros.map((pro) => (
                 <Link
-                  key={pro.id as string}
-                  to="/pro/$proId"
-                  params={{ proId: pro.id as string }}
+                  key={pro.slug}
+                  to="/professionnels/$slug"
+                  params={{ slug: pro.slug }}
                   className="panel block p-4 transition-colors hover:bg-accent"
                 >
                   <p className="flex items-center gap-2 font-medium">
-                    <Briefcase className="size-4 text-primary" />
-                    {pro.company_name ?? pro.display_name ?? pro.first_name ?? "Professionnel"}
+                    <Briefcase className="size-4 text-primary" aria-hidden />
+                    {pro.display_name}
                   </p>
-                  {pro.professional_category ? (
-                    <Badge variant="secondary" className="mt-2">
-                      {pro.professional_category}
-                    </Badge>
-                  ) : null}
-                  {pro.city ? (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {pro.specialties.slice(0, 3).map((s) => (
+                      <Badge key={s} variant="secondary">{s}</Badge>
+                    ))}
+                  </div>
+                  {pro.sector || pro.public_city ? (
                     <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="size-3" /> {pro.city}
-                      {pro.department ? ` (${pro.department})` : ""}
-                    </p>
-                  ) : null}
-                  {pro.description ? (
-                    <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
-                      {pro.description}
+                      <MapPin className="size-3" aria-hidden /> {[pro.sector, pro.public_city].filter(Boolean).join(" · ")}
                     </p>
                   ) : null}
                 </Link>
