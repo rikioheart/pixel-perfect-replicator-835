@@ -51,10 +51,14 @@ import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as AuthenticatedAdminLoyaltyRulesRouteImport } from './routes/_authenticated/admin.loyalty-rules'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
+import { Route as AuthenticatedAdminProsRouteImport } from './routes/_authenticated/admin.pros'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
+import { Route as AuthenticatedEspaceProIndexRouteImport } from './routes/_authenticated/espace-pro.index'
 import { Route as AuthenticatedEspaceProCarteRouteImport } from './routes/_authenticated/espace-pro.carte'
+import { Route as AuthenticatedEspaceProChiensRouteImport } from './routes/_authenticated/espace-pro.chiens'
+import { Route as AuthenticatedEspaceProCollaborationsRouteImport } from './routes/_authenticated/espace-pro.collaborations'
 import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events.index'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events.$eventId'
 import { Route as AuthenticatedMembersIndexRouteImport } from './routes/_authenticated/members.index'
@@ -284,6 +288,11 @@ const AuthenticatedAdminPermissionsRoute =
     path: '/admin/permissions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminProsRoute = AuthenticatedAdminProsRouteImport.update({
+  id: '/admin/pros',
+  path: '/admin/pros',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRolesRoute = AuthenticatedAdminRolesRouteImport.update({
   id: '/admin/roles',
   path: '/admin/roles',
@@ -301,10 +310,28 @@ const AuthenticatedAdminValidationRoute =
     path: '/admin/validation',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEspaceProIndexRoute =
+  AuthenticatedEspaceProIndexRouteImport.update({
+    id: '/espace-pro/',
+    path: '/espace-pro/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEspaceProCarteRoute =
   AuthenticatedEspaceProCarteRouteImport.update({
     id: '/espace-pro/carte',
     path: '/espace-pro/carte',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEspaceProChiensRoute =
+  AuthenticatedEspaceProChiensRouteImport.update({
+    id: '/espace-pro/chiens',
+    path: '/espace-pro/chiens',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEspaceProCollaborationsRoute =
+  AuthenticatedEspaceProCollaborationsRouteImport.update({
+    id: '/espace-pro/collaborations',
+    path: '/espace-pro/collaborations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedEventsIndexRoute =
@@ -407,10 +434,13 @@ export interface FileRoutesByFullPath {
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/admin/pros': typeof AuthenticatedAdminProsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
+  '/espace-pro/chiens': typeof AuthenticatedEspaceProChiensRoute
+  '/espace-pro/collaborations': typeof AuthenticatedEspaceProCollaborationsRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -418,6 +448,7 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/espace-pro/': typeof AuthenticatedEspaceProIndexRoute
   '/events/': typeof AuthenticatedEventsIndexRoute
   '/members/': typeof AuthenticatedMembersIndexRoute
   '/professionals/': typeof AuthenticatedProfessionalsIndexRoute
@@ -464,10 +495,13 @@ export interface FileRoutesByTo {
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/admin/pros': typeof AuthenticatedAdminProsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
+  '/espace-pro/chiens': typeof AuthenticatedEspaceProChiensRoute
+  '/espace-pro/collaborations': typeof AuthenticatedEspaceProCollaborationsRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/members/new': typeof AuthenticatedMembersNewRoute
@@ -475,6 +509,7 @@ export interface FileRoutesByTo {
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/espace-pro': typeof AuthenticatedEspaceProIndexRoute
   '/events': typeof AuthenticatedEventsIndexRoute
   '/members': typeof AuthenticatedMembersIndexRoute
   '/professionals': typeof AuthenticatedProfessionalsIndexRoute
@@ -523,10 +558,13 @@ export interface FileRoutesById {
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/_authenticated/admin/pros': typeof AuthenticatedAdminProsRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/_authenticated/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
+  '/_authenticated/espace-pro/chiens': typeof AuthenticatedEspaceProChiensRoute
+  '/_authenticated/espace-pro/collaborations': typeof AuthenticatedEspaceProCollaborationsRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/members/$memberId': typeof AuthenticatedMembersMemberIdRoute
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
@@ -534,6 +572,7 @@ export interface FileRoutesById {
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/espace-pro/': typeof AuthenticatedEspaceProIndexRoute
   '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
   '/_authenticated/members/': typeof AuthenticatedMembersIndexRoute
   '/_authenticated/professionals/': typeof AuthenticatedProfessionalsIndexRoute
@@ -582,10 +621,13 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
+    | '/admin/pros'
     | '/admin/roles'
     | '/admin/settings'
     | '/admin/validation'
     | '/espace-pro/carte'
+    | '/espace-pro/chiens'
+    | '/espace-pro/collaborations'
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
@@ -593,6 +635,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin/'
+    | '/espace-pro/'
     | '/events/'
     | '/members/'
     | '/professionals/'
@@ -639,10 +682,13 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
+    | '/admin/pros'
     | '/admin/roles'
     | '/admin/settings'
     | '/admin/validation'
     | '/espace-pro/carte'
+    | '/espace-pro/chiens'
+    | '/espace-pro/collaborations'
     | '/events/$eventId'
     | '/members/$memberId'
     | '/members/new'
@@ -650,6 +696,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/api/public/reset-demo'
     | '/admin'
+    | '/espace-pro'
     | '/events'
     | '/members'
     | '/professionals'
@@ -697,10 +744,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/loyalty-rules'
     | '/_authenticated/admin/permissions'
+    | '/_authenticated/admin/pros'
     | '/_authenticated/admin/roles'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/validation'
     | '/_authenticated/espace-pro/carte'
+    | '/_authenticated/espace-pro/chiens'
+    | '/_authenticated/espace-pro/collaborations'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/members/$memberId'
     | '/_authenticated/members/new'
@@ -708,6 +758,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projects/$projectId'
     | '/api/public/reset-demo'
     | '/_authenticated/admin/'
+    | '/_authenticated/espace-pro/'
     | '/_authenticated/events/'
     | '/_authenticated/members/'
     | '/_authenticated/professionals/'
@@ -1020,6 +1071,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPermissionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/pros': {
+      id: '/_authenticated/admin/pros'
+      path: '/admin/pros'
+      fullPath: '/admin/pros'
+      preLoaderRoute: typeof AuthenticatedAdminProsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/roles': {
       id: '/_authenticated/admin/roles'
       path: '/admin/roles'
@@ -1041,11 +1099,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminValidationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/espace-pro/': {
+      id: '/_authenticated/espace-pro/'
+      path: '/espace-pro'
+      fullPath: '/espace-pro/'
+      preLoaderRoute: typeof AuthenticatedEspaceProIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/espace-pro/carte': {
       id: '/_authenticated/espace-pro/carte'
       path: '/espace-pro/carte'
       fullPath: '/espace-pro/carte'
       preLoaderRoute: typeof AuthenticatedEspaceProCarteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/espace-pro/chiens': {
+      id: '/_authenticated/espace-pro/chiens'
+      path: '/espace-pro/chiens'
+      fullPath: '/espace-pro/chiens'
+      preLoaderRoute: typeof AuthenticatedEspaceProChiensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/espace-pro/collaborations': {
+      id: '/_authenticated/espace-pro/collaborations'
+      path: '/espace-pro/collaborations'
+      fullPath: '/espace-pro/collaborations'
+      preLoaderRoute: typeof AuthenticatedEspaceProCollaborationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/events/': {
@@ -1157,16 +1236,20 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminLoyaltyRulesRoute: typeof AuthenticatedAdminLoyaltyRulesRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
+  AuthenticatedAdminProsRoute: typeof AuthenticatedAdminProsRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
   AuthenticatedEspaceProCarteRoute: typeof AuthenticatedEspaceProCarteRoute
+  AuthenticatedEspaceProChiensRoute: typeof AuthenticatedEspaceProChiensRoute
+  AuthenticatedEspaceProCollaborationsRoute: typeof AuthenticatedEspaceProCollaborationsRoute
   AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
   AuthenticatedProfessionalsProIdRoute: typeof AuthenticatedProfessionalsProIdRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedEspaceProIndexRoute: typeof AuthenticatedEspaceProIndexRoute
   AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
   AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
   AuthenticatedProfessionalsIndexRoute: typeof AuthenticatedProfessionalsIndexRoute
@@ -1209,16 +1292,21 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminLoyaltyRulesRoute: AuthenticatedAdminLoyaltyRulesRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
+  AuthenticatedAdminProsRoute: AuthenticatedAdminProsRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
   AuthenticatedEspaceProCarteRoute: AuthenticatedEspaceProCarteRoute,
+  AuthenticatedEspaceProChiensRoute: AuthenticatedEspaceProChiensRoute,
+  AuthenticatedEspaceProCollaborationsRoute:
+    AuthenticatedEspaceProCollaborationsRoute,
   AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
   AuthenticatedProfessionalsProIdRoute: AuthenticatedProfessionalsProIdRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedEspaceProIndexRoute: AuthenticatedEspaceProIndexRoute,
   AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
   AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
   AuthenticatedProfessionalsIndexRoute: AuthenticatedProfessionalsIndexRoute,
