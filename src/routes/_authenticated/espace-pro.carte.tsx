@@ -129,7 +129,7 @@ function ProCardPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const pct = completion({ ...payload.call(null as never) === undefined ? {} : {}, display_name: form.display_name, logo_url: form.logo_url, specialties: form.specialties.split(",").filter((s) => s.trim()), sector: form.sector, description: form.description, website_url: form.website_url, public_email: form.public_email, public_phone: form.public_phone });
+  const pct = completion({ display_name: form.display_name, logo_url: form.logo_url, specialties: form.specialties.split(",").filter((s) => s.trim()), sector: form.sector, description: form.description, website_url: form.website_url, public_email: form.public_email, public_phone: form.public_phone });
 
   const field = (key: keyof Form, label: string, props: Partial<React.ComponentProps<typeof Input>> = {}) => (
     <div>
