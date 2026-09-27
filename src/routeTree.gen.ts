@@ -44,6 +44,7 @@ import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticate
 import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
 import { Route as ProfessionnelsSlugRouteImport } from './routes/professionnels.$slug'
+import { Route as AuthenticatedActivitiesActivityIdRouteImport } from './routes/_authenticated/activities.$activityId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
@@ -248,6 +249,12 @@ const ProfessionnelsSlugRoute = ProfessionnelsSlugRouteImport.update({
   path: '/professionnels/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedActivitiesActivityIdRoute =
+  AuthenticatedActivitiesActivityIdRouteImport.update({
+    id: '/$activityId',
+    path: '/$activityId',
+    getParentRoute: () => AuthenticatedActivitiesRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -396,7 +403,7 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/association': typeof AssociationRoute
-  '/activities': typeof AuthenticatedActivitiesRoute
+  '/activities': typeof AuthenticatedActivitiesRouteWithChildren
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
@@ -428,6 +435,7 @@ export interface FileRoutesByFullPath {
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
+  '/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -457,7 +465,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/association': typeof AssociationRoute
-  '/activities': typeof AuthenticatedActivitiesRoute
+  '/activities': typeof AuthenticatedActivitiesRouteWithChildren
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
@@ -489,6 +497,7 @@ export interface FileRoutesByTo {
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
+  '/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -520,7 +529,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/association': typeof AssociationRoute
-  '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
+  '/_authenticated/activities': typeof AuthenticatedActivitiesRouteWithChildren
   '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
@@ -552,6 +561,7 @@ export interface FileRoutesById {
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
+  '/_authenticated/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
@@ -615,6 +625,7 @@ export interface FileRouteTypes {
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
+    | '/activities/$activityId'
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
@@ -676,6 +687,7 @@ export interface FileRouteTypes {
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
+    | '/activities/$activityId'
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
@@ -738,6 +750,7 @@ export interface FileRouteTypes {
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
+    | '/_authenticated/activities/$activityId'
     | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
@@ -1022,6 +1035,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessionnelsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/activities/$activityId': {
+      id: '/_authenticated/activities/$activityId'
+      path: '/$activityId'
+      fullPath: '/activities/$activityId'
+      preLoaderRoute: typeof AuthenticatedActivitiesActivityIdRouteImport
+      parentRoute: typeof AuthenticatedActivitiesRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -1200,8 +1220,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedActivitiesRouteChildren {
+  AuthenticatedActivitiesActivityIdRoute: typeof AuthenticatedActivitiesActivityIdRoute
+}
+
+const AuthenticatedActivitiesRouteChildren: AuthenticatedActivitiesRouteChildren =
+  {
+    AuthenticatedActivitiesActivityIdRoute:
+      AuthenticatedActivitiesActivityIdRoute,
+  }
+
+const AuthenticatedActivitiesRouteWithChildren =
+  AuthenticatedActivitiesRoute._addFileChildren(
+    AuthenticatedActivitiesRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
+  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRouteWithChildren
   AuthenticatedAdvantagesRoute: typeof AuthenticatedAdvantagesRoute
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
@@ -1257,7 +1292,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
+  AuthenticatedActivitiesRoute: AuthenticatedActivitiesRouteWithChildren,
   AuthenticatedAdvantagesRoute: AuthenticatedAdvantagesRoute,
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
