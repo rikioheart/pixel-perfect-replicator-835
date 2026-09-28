@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AssociationRouteImport } from './routes/association'
-import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
 import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authenticated/advantages'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
@@ -44,6 +43,7 @@ import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticate
 import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
 import { Route as ProfessionnelsSlugRouteImport } from './routes/professionnels.$slug'
+import { Route as AuthenticatedActivitiesIndexRouteImport } from './routes/_authenticated/activities.index'
 import { Route as AuthenticatedActivitiesActivityIdRouteImport } from './routes/_authenticated/activities.$activityId'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
@@ -84,11 +84,6 @@ const AssociationRoute = AssociationRouteImport.update({
   id: '/association',
   path: '/association',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
-  id: '/activities',
-  path: '/activities',
-  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdvantagesRoute = AuthenticatedAdvantagesRouteImport.update({
   id: '/advantages',
@@ -249,11 +244,17 @@ const ProfessionnelsSlugRoute = ProfessionnelsSlugRouteImport.update({
   path: '/professionnels/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedActivitiesIndexRoute =
+  AuthenticatedActivitiesIndexRouteImport.update({
+    id: '/activities/',
+    path: '/activities/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedActivitiesActivityIdRoute =
   AuthenticatedActivitiesActivityIdRouteImport.update({
-    id: '/$activityId',
-    path: '/$activityId',
-    getParentRoute: () => AuthenticatedActivitiesRoute,
+    id: '/activities/$activityId',
+    path: '/activities/$activityId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
@@ -403,7 +404,6 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/association': typeof AssociationRoute
-  '/activities': typeof AuthenticatedActivitiesRouteWithChildren
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
@@ -455,6 +455,7 @@ export interface FileRoutesByFullPath {
   '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
+  '/activities/': typeof AuthenticatedActivitiesIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/espace-pro/': typeof AuthenticatedEspaceProIndexRoute
   '/events/': typeof AuthenticatedEventsIndexRoute
@@ -465,7 +466,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/association': typeof AssociationRoute
-  '/activities': typeof AuthenticatedActivitiesRouteWithChildren
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
@@ -517,6 +517,7 @@ export interface FileRoutesByTo {
   '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
+  '/activities': typeof AuthenticatedActivitiesIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/espace-pro': typeof AuthenticatedEspaceProIndexRoute
   '/events': typeof AuthenticatedEventsIndexRoute
@@ -529,7 +530,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/association': typeof AssociationRoute
-  '/_authenticated/activities': typeof AuthenticatedActivitiesRouteWithChildren
   '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
@@ -581,6 +581,7 @@ export interface FileRoutesById {
   '/_authenticated/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
   '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
+  '/_authenticated/activities/': typeof AuthenticatedActivitiesIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/espace-pro/': typeof AuthenticatedEspaceProIndexRoute
   '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
@@ -593,7 +594,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/association'
-    | '/activities'
     | '/advantages'
     | '/blog'
     | '/calendar'
@@ -645,6 +645,7 @@ export interface FileRouteTypes {
     | '/professionals/$proId'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
+    | '/activities/'
     | '/admin/'
     | '/espace-pro/'
     | '/events/'
@@ -655,7 +656,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/association'
-    | '/activities'
     | '/advantages'
     | '/blog'
     | '/calendar'
@@ -707,6 +707,7 @@ export interface FileRouteTypes {
     | '/professionals/$proId'
     | '/projects/$projectId'
     | '/api/public/reset-demo'
+    | '/activities'
     | '/admin'
     | '/espace-pro'
     | '/events'
@@ -718,7 +719,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/association'
-    | '/_authenticated/activities'
     | '/_authenticated/advantages'
     | '/_authenticated/blog'
     | '/_authenticated/calendar'
@@ -770,6 +770,7 @@ export interface FileRouteTypes {
     | '/_authenticated/professionals/$proId'
     | '/_authenticated/projects/$projectId'
     | '/api/public/reset-demo'
+    | '/_authenticated/activities/'
     | '/_authenticated/admin/'
     | '/_authenticated/espace-pro/'
     | '/_authenticated/events/'
@@ -810,13 +811,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/association'
       preLoaderRoute: typeof AssociationRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/activities': {
-      id: '/_authenticated/activities'
-      path: '/activities'
-      fullPath: '/activities'
-      preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/advantages': {
       id: '/_authenticated/advantages'
@@ -1035,12 +1029,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfessionnelsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/activities/': {
+      id: '/_authenticated/activities/'
+      path: '/activities'
+      fullPath: '/activities/'
+      preLoaderRoute: typeof AuthenticatedActivitiesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/activities/$activityId': {
       id: '/_authenticated/activities/$activityId'
-      path: '/$activityId'
+      path: '/activities/$activityId'
       fullPath: '/activities/$activityId'
       preLoaderRoute: typeof AuthenticatedActivitiesActivityIdRouteImport
-      parentRoute: typeof AuthenticatedActivitiesRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -1220,23 +1221,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedActivitiesRouteChildren {
-  AuthenticatedActivitiesActivityIdRoute: typeof AuthenticatedActivitiesActivityIdRoute
-}
-
-const AuthenticatedActivitiesRouteChildren: AuthenticatedActivitiesRouteChildren =
-  {
-    AuthenticatedActivitiesActivityIdRoute:
-      AuthenticatedActivitiesActivityIdRoute,
-  }
-
-const AuthenticatedActivitiesRouteWithChildren =
-  AuthenticatedActivitiesRoute._addFileChildren(
-    AuthenticatedActivitiesRouteChildren,
-  )
-
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRouteWithChildren
   AuthenticatedAdvantagesRoute: typeof AuthenticatedAdvantagesRoute
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
@@ -1265,6 +1250,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedStatisticsRoute: typeof AuthenticatedStatisticsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedTerrainRoute: typeof AuthenticatedTerrainRoute
+  AuthenticatedActivitiesActivityIdRoute: typeof AuthenticatedActivitiesActivityIdRoute
   AuthenticatedAdminAdvisorRoute: typeof AuthenticatedAdminAdvisorRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
@@ -1283,6 +1269,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
   AuthenticatedProfessionalsProIdRoute: typeof AuthenticatedProfessionalsProIdRoute
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
+  AuthenticatedActivitiesIndexRoute: typeof AuthenticatedActivitiesIndexRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedEspaceProIndexRoute: typeof AuthenticatedEspaceProIndexRoute
   AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
@@ -1292,7 +1279,6 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedActivitiesRoute: AuthenticatedActivitiesRouteWithChildren,
   AuthenticatedAdvantagesRoute: AuthenticatedAdvantagesRoute,
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
@@ -1321,6 +1307,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedStatisticsRoute: AuthenticatedStatisticsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedTerrainRoute: AuthenticatedTerrainRoute,
+  AuthenticatedActivitiesActivityIdRoute:
+    AuthenticatedActivitiesActivityIdRoute,
   AuthenticatedAdminAdvisorRoute: AuthenticatedAdminAdvisorRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
@@ -1340,6 +1328,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
   AuthenticatedProfessionalsProIdRoute: AuthenticatedProfessionalsProIdRoute,
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
+  AuthenticatedActivitiesIndexRoute: AuthenticatedActivitiesIndexRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedEspaceProIndexRoute: AuthenticatedEspaceProIndexRoute,
   AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
