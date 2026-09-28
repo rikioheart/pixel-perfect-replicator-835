@@ -23,7 +23,7 @@ export function ProQrCard({ slug, name, published }: { slug: string; name: strin
 
   const print = () => {
     const w = window.open("", "_blank", "width=480,height=640");
-    if (!w) return toast.error("Autorisez les fenêtres pour imprimer.");
+    if (!w) { toast.error("Autorisez les fenêtres pour imprimer."); return; }
     w.document.write(`<!doctype html><html lang="fr"><head><title>Carte ${name}</title>
       <style>body{font-family:Georgia,serif;display:flex;justify-content:center;padding:24px}
       .card{border:2px solid #6b1d2a;border-radius:16px;padding:24px;text-align:center;width:320px}

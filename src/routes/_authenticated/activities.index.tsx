@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { DOG_POLICY_LABEL } from "@/lib/pro-card";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarDays, MapPin, Plus, Sparkles } from "lucide-react";
@@ -60,6 +61,13 @@ function ActivitiesPage() {
     price_member: "0",
     image_url: "",
     eligible_for_loyalty: true,
+    capacity: "",
+    dog_policy: "OPTIONAL",
+    max_dogs: "",
+    for_you_if: "",
+    to_bring: "",
+    before_coming: "",
+    with_your_dog: "",
   });
 
   const { data: activities = [], isLoading } = useQuery({
@@ -130,6 +138,13 @@ function ActivitiesPage() {
         price_member: Number(form.price_member) || 0,
         image_url: form.image_url.trim() || null,
         eligible_for_loyalty: form.eligible_for_loyalty,
+        capacity: form.capacity ? Number(form.capacity) : null,
+        dog_policy: form.dog_policy,
+        max_dogs: form.max_dogs ? Number(form.max_dogs) : null,
+        for_you_if: form.for_you_if.trim() || null,
+        to_bring: form.to_bring.trim() || null,
+        before_coming: form.before_coming.trim() || null,
+        with_your_dog: form.with_your_dog.trim() || null,
         created_by: user?.id ?? null,
       });
       if (error) throw error;
@@ -147,6 +162,13 @@ function ActivitiesPage() {
         price_member: "0",
         image_url: "",
         eligible_for_loyalty: true,
+        capacity: "",
+        dog_policy: "OPTIONAL",
+        max_dogs: "",
+        for_you_if: "",
+        to_bring: "",
+        before_coming: "",
+        with_your_dog: "",
       });
       void queryClient.invalidateQueries({ queryKey: ["activities"] });
     },
@@ -253,6 +275,28 @@ function ActivitiesPage() {
                     />
                   </div>
                 </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="act-cap">Capacité</Label>
+                    <Input id="act-cap" type="number" min="1" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label htmlFor="act-dp">Chiens</Label>
+                    <select id="act-dp" className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={form.dog_policy} onChange={(e) => setForm({ ...form, dog_policy: e.target.value })}>
+                      {Object.entries(DOG_POLICY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="act-md">Chiens max.</Label>
+                    <Input id="act-md" type="number" min="1" value={form.max_dogs} onChange={(e) => setForm({ ...form, max_dogs: e.target.value })} />
+                  </div>
+                </div>
+                {([["for_you_if", "Faite pour vous si…"], ["to_bring", "À prévoir"], ["before_coming", "Avant de venir"], ["with_your_dog", "Avec votre chien"]] as const).map(([k, l]) => (
+                  <div key={k}>
+                    <Label htmlFor={`act-${k}`}>{l}</Label>
+                    <Textarea id={`act-${k}`} rows={2} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
+                  </div>
+                ))}
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
@@ -298,7 +342,7 @@ function ActivitiesPage() {
                 ) : null}
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-base">{activity.title}</CardTitle>
+                    <CardTitle className="text-base"><Link to="/activities/$activityId" params={{ activityId: activity.id }} className="hover:underline">{activity.title}</Link></CardTitle>
                     <Badge variant="secondary">{activity.type}</Badge>
                   </div>
                 </CardHeader>
@@ -339,13 +383,10 @@ function ActivitiesPage() {
                       </Button>
                     </div>
                   ) : (
-                    <Button
-                      size="sm"
-                      className="w-full"
-                      onClick={() => register.mutate(activity.id)}
-                      disabled={register.isPending}
-                    >
-                      S'inscrire
+                    <Button asChild size="sm" className="w-full">
+                      <Link to="/activities/$activityId" params={{ activityId: activity.id }}>
+                        Voir et s'inscrire · {DOG_POLICY_LABEL[activity.dog_policy]}
+                      </Link>
                     </Button>
                   )}
                 </CardContent>

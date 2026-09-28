@@ -79,7 +79,7 @@ function ProCardPage() {
       setForm({
         display_name: card.display_name, slug: card.slug, logo_url: card.logo_url ?? "",
         specialties: card.specialties.join(", "), sector: card.sector ?? "", description: card.description ?? "",
-        website_url: card.website_url ?? "", instagram: s.instagram ?? "", facebook: s.facebook ?? "", linkedin: s.linkedin ?? "",
+        website_url: card.website_url ?? "", instagram: s["instagram"] ?? "", facebook: s["facebook"] ?? "", linkedin: s["linkedin"] ?? "",
         public_email: card.public_email ?? "", public_phone: card.public_phone ?? "", public_city: card.public_city ?? "",
       });
     } else if (profile) {

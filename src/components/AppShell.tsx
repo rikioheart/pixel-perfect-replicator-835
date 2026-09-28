@@ -71,6 +71,15 @@ type NavGroup = { title: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
+    title: "Espace professionnel",
+    items: [
+      { to: "/espace-pro", label: "Tableau de bord pro", icon: LayoutDashboard, audience: "pro" },
+      { to: "/espace-pro/carte", label: "Ma carte professionnelle", icon: Briefcase, audience: "pro" },
+      { to: "/espace-pro/chiens", label: "Chiens accompagnés", icon: UserRound, audience: "pro" },
+      { to: "/espace-pro/collaborations", label: "Collaborations", icon: Handshake, audience: "pro" },
+    ],
+  },
+  {
     title: "Cockpit Bureau",
     items: [
       { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
@@ -85,6 +94,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/import", label: "Import d'adhérents", icon: UploadCloud, audience: "bureau" },
       { to: "/admin/advisor", label: "Conseiller d'équipe", icon: Sparkles, audience: "bureau" },
       { to: "/mairies", label: "Mairies & institutions", icon: Building2, audience: "bureau" },
+      { to: "/admin/pros", label: "Fiches professionnelles", icon: Briefcase, audience: "bureau" },
     ],
   },
   {
@@ -129,6 +139,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/my-history", label: "Mon historique", icon: History, audience: "all" },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "all" },
       { to: "/my-space", label: "Mon espace personnel", icon: Settings2, audience: "all" },
+      { to: "/foyer", label: "Mon foyer", icon: Users, audience: "all" },
       { to: "/profile", label: "Mon profil & mes chiens", icon: UserRound, audience: "all" },
       { to: "/help", label: "Centre d'aide", icon: LifeBuoy, audience: "all" },
       { to: "/help-requests", label: "Demandes d'aide", icon: HandHeart, audience: "all" },

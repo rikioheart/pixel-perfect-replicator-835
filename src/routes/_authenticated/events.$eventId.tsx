@@ -11,6 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Comments } from "@/components/Comments";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 import { LoadingState } from "@/components/LoadingState";
+import { useState } from "react";
+import { RegistrationWizard } from "@/components/RegistrationWizard";
+import { ExperienceSections, SpotsBadge, useSpots } from "@/components/ExperienceBits";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   head: () => ({
@@ -76,6 +79,8 @@ function EventDetailPage() {
   });
 
   const mine = participations.find((p) => p.user_id === user?.id);
+  const [wizard, setWizard] = useState(false);
+  const { data: spots } = useSpots({ eventId });
 
   const toggle = useMutation({
     mutationFn: async () => {
@@ -84,16 +89,10 @@ function EventDetailPage() {
         if (error) throw error;
         return;
       }
-      const { error } = await supabase.from("participations").insert({
-        user_id: user!.id,
-        event_id: eventId,
-        role: "PARTICIPANT",
-        registration_status: "PENDING",
-      });
-      if (error) throw error;
+      setWizard(true);
     },
     onSuccess: () => {
-      toast.success(mine ? "Inscription annulée." : "Inscription enregistrée.");
+      if (mine) toast.success("Inscription annulée.");
       void queryClient.invalidateQueries({ queryKey: ["event-participations", eventId] });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -157,6 +156,7 @@ function EventDetailPage() {
               </p>
             ) : null}
             <Badge variant="secondary">{event.status}</Badge>
+            <SpotsBadge spots={spots} />
             <div className="pt-2">
               <Button onClick={() => toggle.mutate()} disabled={toggle.isPending}>
                 {mine ? "Annuler ma participation" : "Je participe"}
@@ -210,6 +210,8 @@ function EventDetailPage() {
         </div>
       </div>
 
+      <div className="mt-4"><ExperienceSections item={event} /></div>
+      <RegistrationWizard open={wizard} onOpenChange={setWizard} target={{ eventId, title: event.title, dogPolicy: event.dog_policy, maxDogs: event.max_dogs, full: Boolean(spots?.full), waitlist: Boolean(spots?.waitlist) }} />
       <div className="mt-6">
         <Comments
           entityType="event"

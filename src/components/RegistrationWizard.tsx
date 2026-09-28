@@ -91,7 +91,7 @@ export function RegistrationWizard({ open, onOpenChange, target }: { open: boole
   );
 
   return (
-    <SidePanel open={open} onOpenChange={onOpenChange} title={`Je participe — ${target.title}`} description={result ? undefined : `Étape ${step + 1} sur ${steps.length} : ${current}`}>
+    <SidePanel open={open} onOpenChange={onOpenChange} title={`Je participe — ${target.title}`} description={result ? "" : `Étape ${step + 1} sur ${steps.length} : ${current}`}>
       {result ? (
         <div className="space-y-3 text-sm" role="status">
           <CheckCircle2 className="size-10 text-primary" aria-hidden />
