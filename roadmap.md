@@ -81,3 +81,18 @@
 - [x] Conseiller d'équipe (recommandations priorisées)
 - [x] Écrans Mairies & institutions et Propositions
 - [x] Menu mobile complet (pages principales incluses)
+
+## Lot 10 — Pros, QR, foyers, inscriptions (prompts 3 & 4) — en cours
+- [x] Modèle foyer/enfants/chiens, accès partagés, référents
+- [x] Carte pro publique /professionnels/[slug], QR, espace pro, validation Bureau
+- [x] Fiche activité + parcours « Je participe » (capacité, liste d'attente)
+- [ ] Page Mon foyer (adultes, enfants, chiens, partage, référents)
+- [ ] Événements : parcours d'inscription familial
+
+## Lot 11 — Projets, contributions, parcours (prompt 5) — à faire
+- [ ] contributions, project_memberships, tasks.contribution_id
+- [ ] Fiche projet enrichie + « Comment aimeriez-vous contribuer ? »
+- [ ] Parcours « Je veux aider » traité par le Bureau
+- [ ] Mur « Ce que nous construisons ensemble » + préférence show_association_updates (public = publications publiques)
+- [ ] Timeline « Mon parcours avec La Voix du Chien » (liens vers chiens sans détails)
+- Interdit : score, classement, top contributeurs
