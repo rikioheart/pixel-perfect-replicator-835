@@ -21,6 +21,7 @@ import { Route as AuthenticatedDirectoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedFormationsRouteImport } from './routes/_authenticated/formations'
+import { Route as AuthenticatedFoyerRouteImport } from './routes/_authenticated/foyer'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedHelpRequestsRouteImport } from './routes/_authenticated/help-requests'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
@@ -128,6 +129,11 @@ const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
 const AuthenticatedFormationsRoute = AuthenticatedFormationsRouteImport.update({
   id: '/formations',
   path: '/formations',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFoyerRoute = AuthenticatedFoyerRouteImport.update({
+  id: '/foyer',
+  path: '/foyer',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
@@ -413,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/formations': typeof AuthenticatedFormationsRoute
+  '/foyer': typeof AuthenticatedFoyerRoute
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -475,6 +482,7 @@ export interface FileRoutesByTo {
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/formations': typeof AuthenticatedFormationsRoute
+  '/foyer': typeof AuthenticatedFoyerRoute
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -539,6 +547,7 @@ export interface FileRoutesById {
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/formations': typeof AuthenticatedFormationsRoute
+  '/_authenticated/foyer': typeof AuthenticatedFoyerRoute
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
@@ -603,6 +612,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/finance'
     | '/formations'
+    | '/foyer'
     | '/help'
     | '/help-requests'
     | '/inventory'
@@ -665,6 +675,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/finance'
     | '/formations'
+    | '/foyer'
     | '/help'
     | '/help-requests'
     | '/inventory'
@@ -728,6 +739,7 @@ export interface FileRouteTypes {
     | '/_authenticated/documents'
     | '/_authenticated/finance'
     | '/_authenticated/formations'
+    | '/_authenticated/foyer'
     | '/_authenticated/help'
     | '/_authenticated/help-requests'
     | '/_authenticated/inventory'
@@ -873,6 +885,13 @@ declare module '@tanstack/react-router' {
       path: '/formations'
       fullPath: '/formations'
       preLoaderRoute: typeof AuthenticatedFormationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/foyer': {
+      id: '/_authenticated/foyer'
+      path: '/foyer'
+      fullPath: '/foyer'
+      preLoaderRoute: typeof AuthenticatedFoyerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/help': {
@@ -1231,6 +1250,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedFormationsRoute: typeof AuthenticatedFormationsRoute
+  AuthenticatedFoyerRoute: typeof AuthenticatedFoyerRoute
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHelpRequestsRoute: typeof AuthenticatedHelpRequestsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
@@ -1288,6 +1308,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedFormationsRoute: AuthenticatedFormationsRoute,
+  AuthenticatedFoyerRoute: AuthenticatedFoyerRoute,
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHelpRequestsRoute: AuthenticatedHelpRequestsRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
