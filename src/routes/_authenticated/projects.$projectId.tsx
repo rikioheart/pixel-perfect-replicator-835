@@ -36,6 +36,8 @@ import {
   formatDate,
 } from "@/lib/domain";
 import { Comments } from "@/components/Comments";
+import { ProjectContribute, ProjectStorySections } from "@/components/ProjectContribute";
+import { Textarea } from "@/components/ui/textarea";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
@@ -215,6 +217,27 @@ function ProjectDetail() {
               </div>
             </div>
           ) : null}
+          {isBureau ? (
+            <details className="border-t border-border pt-4">
+              <summary className="cursor-pointer text-sm font-medium">Modifier la présentation du projet</summary>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {([
+                  ["why", "Pourquoi ce projet existe"],
+                  ["for_whom", "Pour qui"],
+                  ["objective", "Objectif"],
+                  ["done_steps", "Étapes réalisées"],
+                  ["next_steps", "Prochaines étapes"],
+                  ["current_needs", "Besoins actuels"],
+                  ["how_to_contribute", "Comment contribuer"],
+                ] as const).map(([k, l]) => (
+                  <div key={k}>
+                    <Label htmlFor={`pj-${k}`} className="text-xs">{l}</Label>
+                    <Textarea id={`pj-${k}`} rows={2} defaultValue={project[k] ?? ""} onBlur={(e) => { if (e.target.value !== (project[k] ?? "")) updateProject({ [k]: e.target.value.trim() || null }); }} />
+                  </div>
+                ))}
+              </div>
+            </details>
+          ) : null}
         </div>
 
         <div className="panel p-5">
@@ -240,8 +263,13 @@ function ProjectDetail() {
         </div>
       </div>
 
+      <div className="mt-6 space-y-4">
+        <ProjectStorySections project={project} />
+        <ProjectContribute projectId={projectId} />
+      </div>
+
       <div className="mt-6">
-        <h2 className="mb-4 text-lg">Tâches du projet</h2>
+        <h2 className="mb-4 text-lg">Actions du projet</h2>
         {(tasks ?? []).length === 0 ? (
           <p className="text-sm text-muted-foreground">Aucune tâche créée pour ce projet.</p>
         ) : (
