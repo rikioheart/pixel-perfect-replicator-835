@@ -43,6 +43,13 @@
       "when": 1790335501013,
       "tag": "0005_households_pros_participations",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790680168801,
+      "tag": "0006_contributions_updates_journey",
+      "breakpoints": true
     }
   ]
 }
