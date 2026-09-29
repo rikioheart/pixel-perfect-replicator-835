@@ -288,6 +288,47 @@ export type Database = {
           },
         ]
       }
+      association_updates: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_public: boolean
+          kind: string
+          project_id: string | null
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_public?: boolean
+          kind: string
+          project_id?: string | null
+          title: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_public?: boolean
+          kind?: string
+          project_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "association_updates_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -497,6 +538,73 @@ export type Database = {
           winners?: Json
         }
         Relationships: []
+      }
+      contributions: {
+        Row: {
+          bureau_reply: string | null
+          completed_at: string | null
+          contribution_type: string
+          created_at: string
+          description: string | null
+          estimated_time: string | null
+          id: string
+          project_id: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bureau_reply?: string | null
+          completed_at?: string | null
+          contribution_type: string
+          created_at?: string
+          description?: string | null
+          estimated_time?: string | null
+          id?: string
+          project_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          bureau_reply?: string | null
+          completed_at?: string | null
+          contribution_type?: string
+          created_at?: string
+          description?: string | null
+          estimated_time?: string | null
+          id?: string
+          project_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contributions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contributions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       documents: {
         Row: {
@@ -2391,10 +2499,16 @@ export type Database = {
           category_id: string | null
           created_at: string
           created_by: string | null
+          current_needs: string | null
           deadline: string | null
           description: string | null
+          done_steps: string | null
+          for_whom: string | null
+          how_to_contribute: string | null
           id: string
           mindmap_node_id: string | null
+          next_steps: string | null
+          objective: string | null
           owner_id: string | null
           parent_project_id: string | null
           priority: string
@@ -2405,16 +2519,23 @@ export type Database = {
           title: string
           updated_at: string
           visibility: string
+          why: string | null
         }
         Insert: {
           archived_at?: string | null
           category_id?: string | null
           created_at?: string
           created_by?: string | null
+          current_needs?: string | null
           deadline?: string | null
           description?: string | null
+          done_steps?: string | null
+          for_whom?: string | null
+          how_to_contribute?: string | null
           id?: string
           mindmap_node_id?: string | null
+          next_steps?: string | null
+          objective?: string | null
           owner_id?: string | null
           parent_project_id?: string | null
           priority?: string
@@ -2425,16 +2546,23 @@ export type Database = {
           title: string
           updated_at?: string
           visibility?: string
+          why?: string | null
         }
         Update: {
           archived_at?: string | null
           category_id?: string | null
           created_at?: string
           created_by?: string | null
+          current_needs?: string | null
           deadline?: string | null
           description?: string | null
+          done_steps?: string | null
+          for_whom?: string | null
+          how_to_contribute?: string | null
           id?: string
           mindmap_node_id?: string | null
+          next_steps?: string | null
+          objective?: string | null
           owner_id?: string | null
           parent_project_id?: string | null
           priority?: string
@@ -2445,6 +2573,7 @@ export type Database = {
           title?: string
           updated_at?: string
           visibility?: string
+          why?: string | null
         }
         Relationships: [
           {
@@ -2820,6 +2949,7 @@ export type Database = {
         Row: {
           assigned_user_id: string | null
           completed_at: string | null
+          contribution_id: string | null
           created_at: string
           created_by: string | null
           deadline: string | null
@@ -2843,6 +2973,7 @@ export type Database = {
         Insert: {
           assigned_user_id?: string | null
           completed_at?: string | null
+          contribution_id?: string | null
           created_at?: string
           created_by?: string | null
           deadline?: string | null
@@ -2866,6 +2997,7 @@ export type Database = {
         Update: {
           assigned_user_id?: string | null
           completed_at?: string | null
+          contribution_id?: string | null
           created_at?: string
           created_by?: string | null
           deadline?: string | null
@@ -2887,6 +3019,13 @@ export type Database = {
           visibility?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_contribution_id_fkey"
+            columns: ["contribution_id"]
+            isOneToOne: false
+            referencedRelation: "contributions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_parent_task_id_fkey"
             columns: ["parent_task_id"]
@@ -3069,6 +3208,7 @@ export type Database = {
           notify_in_app: boolean
           notify_reminders: boolean
           reduced_motion: boolean
+          show_association_updates: boolean
           text_size: string
           updated_at: string
           user_id: string
@@ -3081,6 +3221,7 @@ export type Database = {
           notify_in_app?: boolean
           notify_reminders?: boolean
           reduced_motion?: boolean
+          show_association_updates?: boolean
           text_size?: string
           updated_at?: string
           user_id: string
@@ -3093,6 +3234,7 @@ export type Database = {
           notify_in_app?: boolean
           notify_reminders?: boolean
           reduced_motion?: boolean
+          show_association_updates?: boolean
           text_size?: string
           updated_at?: string
           user_id?: string
