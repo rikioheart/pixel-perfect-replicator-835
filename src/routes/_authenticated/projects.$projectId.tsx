@@ -126,7 +126,7 @@ function ProjectDetail() {
     );
   }
 
-  const updateProject = async (patch: { status?: string; progress_percent?: number }) => {
+  const updateProject = async (patch: Record<string, string | number | null>) => {
     const { error } = await supabase.from("projects").update(patch).eq("id", projectId);
     if (error) {
       toast.error(error.message);
