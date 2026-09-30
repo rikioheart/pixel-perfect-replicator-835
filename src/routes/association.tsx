@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { HeartHandshake, MapPin, Globe, Briefcase, ArrowRight } from "lucide-react";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import { UpdatesWall } from "@/components/UpdatesWall";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -160,6 +161,8 @@ function PublicAssociationPage() {
             </div>
           )}
         </section>
+
+        <UpdatesWall publicOnly compact limit={5} />
 
         <section className="panel flex flex-wrap items-center justify-between gap-4 p-6">
           <div>
