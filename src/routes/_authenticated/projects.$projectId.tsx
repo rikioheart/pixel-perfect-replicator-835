@@ -37,7 +37,6 @@ import {
 } from "@/lib/domain";
 import { Comments } from "@/components/Comments";
 import { ProjectContribute, ProjectStorySections } from "@/components/ProjectContribute";
-import { Textarea } from "@/components/ui/textarea";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
@@ -127,7 +126,7 @@ function ProjectDetail() {
   }
 
   const updateProject = async (patch: Record<string, string | number | null>) => {
-    const { error } = await supabase.from("projects").update(patch).eq("id", projectId);
+    const { error } = await supabase.from("projects").update(patch as never).eq("id", projectId);
     if (error) {
       toast.error(error.message);
       return;

@@ -51,7 +51,7 @@ function JourneyPage() {
         });
       }
       for (const c of contribs.data ?? []) {
-        out.push({ date: c.created_at, icon: HandHeart, title: `Proposition d'aide : ${c.title}`, detail: CONTRIBUTION_STATUS_LABEL[c.status] });
+        out.push({ date: c.created_at, icon: HandHeart, title: `Proposition d’aide : ${c.title}`, detail: CONTRIBUTION_STATUS_LABEL[c.status] ?? c.status });
         if (c.completed_at) out.push({ date: c.completed_at, icon: Sparkles, title: `Contribution réalisée : ${c.title}` });
       }
       for (const t of tasks.data ?? []) out.push({ date: t.completed_at!, icon: ListChecks, title: `Action terminée : ${t.title}` });
