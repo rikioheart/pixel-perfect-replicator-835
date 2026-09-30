@@ -12,6 +12,7 @@ export type UserPreferences = {
   notify_email: boolean;
   notify_in_app: boolean;
   notify_reminders: boolean;
+  show_association_updates: boolean;
 };
 
 const DEFAULTS: Omit<UserPreferences, "user_id"> = {
@@ -22,6 +23,7 @@ const DEFAULTS: Omit<UserPreferences, "user_id"> = {
   notify_email: true,
   notify_in_app: true,
   notify_reminders: true,
+  show_association_updates: true,
 };
 
 export const TEXT_SIZES: [string, string][] = [

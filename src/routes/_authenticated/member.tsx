@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { HomeHero } from "@/components/HomeHero";
 import { NewsFeed } from "@/components/NewsFeed";
+import { UpdatesWall } from "@/components/UpdatesWall";
+import { useUserPreferences } from "@/lib/user-preferences";
 import { EmptyState } from "@/components/EmptyState";
 import { LoyaltyCardMini, ProfileCompletionCard } from "@/components/EngagementCards";
 import { Badge } from "@/components/ui/badge";
@@ -259,6 +261,7 @@ function MemberDashboard() {
 
           <div className="space-y-6">
             <NewsFeed />
+            <MemberWall />
             {isPro ? (
               <div className="panel p-5">
                 <div className="mb-2 flex items-center gap-2">
@@ -316,4 +319,10 @@ function StatCard({
       <p className="mt-2 font-display text-3xl">{value}</p>
     </div>
   );
+}
+
+function MemberWall() {
+  const { preferences } = useUserPreferences();
+  if (!preferences || preferences.show_association_updates === false) return null;
+  return <UpdatesWall limit={4} compact />;
 }

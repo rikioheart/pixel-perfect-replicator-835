@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AssociationRouteImport } from './routes/association'
 import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authenticated/advantages'
+import { Route as AuthenticatedAvanceesRouteImport } from './routes/_authenticated/avancees'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticated/charter'
@@ -33,6 +34,7 @@ import { Route as AuthenticatedMyHistoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMySpaceRouteImport } from './routes/_authenticated/my-space'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedParcoursRouteImport } from './routes/_authenticated/parcours'
 import { Route as AuthenticatedParticipationsRouteImport } from './routes/_authenticated/participations'
 import { Route as AuthenticatedPartnersRouteImport } from './routes/_authenticated/partners'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -50,6 +52,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
+import { Route as AuthenticatedAdminContributionsRouteImport } from './routes/_authenticated/admin.contributions'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as AuthenticatedAdminLoyaltyRulesRouteImport } from './routes/_authenticated/admin.loyalty-rules'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
@@ -89,6 +92,11 @@ const AssociationRoute = AssociationRouteImport.update({
 const AuthenticatedAdvantagesRoute = AuthenticatedAdvantagesRouteImport.update({
   id: '/advantages',
   path: '/advantages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAvanceesRoute = AuthenticatedAvanceesRouteImport.update({
+  id: '/avancees',
+  path: '/avancees',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedBlogRoute = AuthenticatedBlogRouteImport.update({
@@ -193,6 +201,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedParcoursRoute = AuthenticatedParcoursRouteImport.update({
+  id: '/parcours',
+  path: '/parcours',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedParticipationsRoute =
   AuthenticatedParticipationsRouteImport.update({
     id: '/participations',
@@ -282,6 +295,12 @@ const AuthenticatedAdminCockpitRoute =
   AuthenticatedAdminCockpitRouteImport.update({
     id: '/admin/cockpit',
     path: '/admin/cockpit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminContributionsRoute =
+  AuthenticatedAdminContributionsRouteImport.update({
+    id: '/admin/contributions',
+    path: '/admin/contributions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminImportRoute =
@@ -411,6 +430,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/association': typeof AssociationRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
+  '/avancees': typeof AuthenticatedAvanceesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/charter': typeof AuthenticatedCharterRoute
@@ -431,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/my-space': typeof AuthenticatedMySpaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/parcours': typeof AuthenticatedParcoursRoute
   '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -446,6 +467,7 @@ export interface FileRoutesByFullPath {
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
@@ -474,6 +496,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/association': typeof AssociationRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
+  '/avancees': typeof AuthenticatedAvanceesRoute
   '/blog': typeof AuthenticatedBlogRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/charter': typeof AuthenticatedCharterRoute
@@ -494,6 +517,7 @@ export interface FileRoutesByTo {
   '/my-space': typeof AuthenticatedMySpaceRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/parcours': typeof AuthenticatedParcoursRoute
   '/participations': typeof AuthenticatedParticipationsRoute
   '/partners': typeof AuthenticatedPartnersRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -509,6 +533,7 @@ export interface FileRoutesByTo {
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
@@ -539,6 +564,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/association': typeof AssociationRoute
   '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
+  '/_authenticated/avancees': typeof AuthenticatedAvanceesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/charter': typeof AuthenticatedCharterRoute
@@ -559,6 +585,7 @@ export interface FileRoutesById {
   '/_authenticated/my-space': typeof AuthenticatedMySpaceRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/parcours': typeof AuthenticatedParcoursRoute
   '/_authenticated/participations': typeof AuthenticatedParticipationsRoute
   '/_authenticated/partners': typeof AuthenticatedPartnersRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -574,6 +601,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
+  '/_authenticated/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
@@ -604,6 +632,7 @@ export interface FileRouteTypes {
     | '/'
     | '/association'
     | '/advantages'
+    | '/avancees'
     | '/blog'
     | '/calendar'
     | '/charter'
@@ -624,6 +653,7 @@ export interface FileRouteTypes {
     | '/my-space'
     | '/notifications'
     | '/onboarding'
+    | '/parcours'
     | '/participations'
     | '/partners'
     | '/profile'
@@ -639,6 +669,7 @@ export interface FileRouteTypes {
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/contributions'
     | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
@@ -667,6 +698,7 @@ export interface FileRouteTypes {
     | '/'
     | '/association'
     | '/advantages'
+    | '/avancees'
     | '/blog'
     | '/calendar'
     | '/charter'
@@ -687,6 +719,7 @@ export interface FileRouteTypes {
     | '/my-space'
     | '/notifications'
     | '/onboarding'
+    | '/parcours'
     | '/participations'
     | '/partners'
     | '/profile'
@@ -702,6 +735,7 @@ export interface FileRouteTypes {
     | '/admin/advisor'
     | '/admin/audit'
     | '/admin/cockpit'
+    | '/admin/contributions'
     | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
@@ -731,6 +765,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/association'
     | '/_authenticated/advantages'
+    | '/_authenticated/avancees'
     | '/_authenticated/blog'
     | '/_authenticated/calendar'
     | '/_authenticated/charter'
@@ -751,6 +786,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-space'
     | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
+    | '/_authenticated/parcours'
     | '/_authenticated/participations'
     | '/_authenticated/partners'
     | '/_authenticated/profile'
@@ -766,6 +802,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/cockpit'
+    | '/_authenticated/admin/contributions'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/loyalty-rules'
     | '/_authenticated/admin/permissions'
@@ -829,6 +866,13 @@ declare module '@tanstack/react-router' {
       path: '/advantages'
       fullPath: '/advantages'
       preLoaderRoute: typeof AuthenticatedAdvantagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/avancees': {
+      id: '/_authenticated/avancees'
+      path: '/avancees'
+      fullPath: '/avancees'
+      preLoaderRoute: typeof AuthenticatedAvanceesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/blog': {
@@ -971,6 +1015,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/parcours': {
+      id: '/_authenticated/parcours'
+      path: '/parcours'
+      fullPath: '/parcours'
+      preLoaderRoute: typeof AuthenticatedParcoursRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/participations': {
       id: '/_authenticated/participations'
       path: '/participations'
@@ -1088,6 +1139,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/cockpit'
       fullPath: '/admin/cockpit'
       preLoaderRoute: typeof AuthenticatedAdminCockpitRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/contributions': {
+      id: '/_authenticated/admin/contributions'
+      path: '/admin/contributions'
+      fullPath: '/admin/contributions'
+      preLoaderRoute: typeof AuthenticatedAdminContributionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/import': {
@@ -1242,6 +1300,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdvantagesRoute: typeof AuthenticatedAdvantagesRoute
+  AuthenticatedAvanceesRoute: typeof AuthenticatedAvanceesRoute
   AuthenticatedBlogRoute: typeof AuthenticatedBlogRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedCharterRoute: typeof AuthenticatedCharterRoute
@@ -1262,6 +1321,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMySpaceRoute: typeof AuthenticatedMySpaceRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedParcoursRoute: typeof AuthenticatedParcoursRoute
   AuthenticatedParticipationsRoute: typeof AuthenticatedParticipationsRoute
   AuthenticatedPartnersRoute: typeof AuthenticatedPartnersRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -1274,6 +1334,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminAdvisorRoute: typeof AuthenticatedAdminAdvisorRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
+  AuthenticatedAdminContributionsRoute: typeof AuthenticatedAdminContributionsRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminLoyaltyRulesRoute: typeof AuthenticatedAdminLoyaltyRulesRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
@@ -1300,6 +1361,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdvantagesRoute: AuthenticatedAdvantagesRoute,
+  AuthenticatedAvanceesRoute: AuthenticatedAvanceesRoute,
   AuthenticatedBlogRoute: AuthenticatedBlogRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedCharterRoute: AuthenticatedCharterRoute,
@@ -1320,6 +1382,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMySpaceRoute: AuthenticatedMySpaceRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedParcoursRoute: AuthenticatedParcoursRoute,
   AuthenticatedParticipationsRoute: AuthenticatedParticipationsRoute,
   AuthenticatedPartnersRoute: AuthenticatedPartnersRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
@@ -1333,6 +1396,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminAdvisorRoute: AuthenticatedAdminAdvisorRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
+  AuthenticatedAdminContributionsRoute: AuthenticatedAdminContributionsRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminLoyaltyRulesRoute: AuthenticatedAdminLoyaltyRulesRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,

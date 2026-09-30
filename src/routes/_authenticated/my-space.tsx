@@ -308,6 +308,14 @@ function MySpacePage() {
               onCheckedChange={(checked) => save.mutate({ notify_reminders: checked })}
             />
           </div>
+          <div className="flex items-center justify-between gap-4">
+            <Label htmlFor="updates">Afficher « Ce que nous construisons ensemble » sur mon accueil</Label>
+            <Switch
+              id="updates"
+              checked={preferences.show_association_updates}
+              onCheckedChange={(checked) => save.mutate({ show_association_updates: checked })}
+            />
+          </div>
         </div>
       )}
     </AppShell>
