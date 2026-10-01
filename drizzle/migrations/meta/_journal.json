@@ -50,6 +50,13 @@
       "when": 1790680168801,
       "tag": "0006_contributions_updates_journey",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790843898002,
+      "tag": "0007_a9_people_foundation",
+      "breakpoints": true
     }
   ]
 }

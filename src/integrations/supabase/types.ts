@@ -1228,6 +1228,7 @@ export type Database = {
           created_at: string
           household_id: string
           id: string
+          person_id: string | null
           role: string
           user_id: string
         }
@@ -1235,6 +1236,7 @@ export type Database = {
           created_at?: string
           household_id: string
           id?: string
+          person_id?: string | null
           role?: string
           user_id: string
         }
@@ -1242,6 +1244,7 @@ export type Database = {
           created_at?: string
           household_id?: string
           id?: string
+          person_id?: string | null
           role?: string
           user_id?: string
         }
@@ -1251,6 +1254,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_members_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
             referencedColumns: ["id"]
           },
           {
@@ -1271,6 +1281,8 @@ export type Database = {
       }
       households: {
         Row: {
+          children_count: number | null
+          children_presence: string
           created_at: string
           created_by: string
           id: string
@@ -1278,6 +1290,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          children_count?: number | null
+          children_presence?: string
           created_at?: string
           created_by?: string
           id?: string
@@ -1285,6 +1299,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          children_count?: number | null
+          children_presence?: string
           created_at?: string
           created_by?: string
           id?: string
@@ -1675,9 +1691,12 @@ export type Database = {
         Row: {
           created_at: string
           end_date: string | null
+          external_id: string | null
           id: string
           membership_type: string
           notes: string | null
+          person_id: string | null
+          source: string
           start_date: string | null
           status: string
           updated_at: string
@@ -1688,9 +1707,12 @@ export type Database = {
         Insert: {
           created_at?: string
           end_date?: string | null
+          external_id?: string | null
           id?: string
           membership_type?: string
           notes?: string | null
+          person_id?: string | null
+          source?: string
           start_date?: string | null
           status?: string
           updated_at?: string
@@ -1701,9 +1723,12 @@ export type Database = {
         Update: {
           created_at?: string
           end_date?: string | null
+          external_id?: string | null
           id?: string
           membership_type?: string
           notes?: string | null
+          person_id?: string | null
+          source?: string
           start_date?: string | null
           status?: string
           updated_at?: string
@@ -1711,7 +1736,15 @@ export type Database = {
           validated_at?: string | null
           validated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "memberships_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mindmap_config: {
         Row: {
@@ -1797,6 +1830,7 @@ export type Database = {
           household_child_id: string | null
           id: string
           participation_id: string
+          person_id: string | null
           role: string
           user_id: string | null
         }
@@ -1805,6 +1839,7 @@ export type Database = {
           household_child_id?: string | null
           id?: string
           participation_id: string
+          person_id?: string | null
           role?: string
           user_id?: string | null
         }
@@ -1813,6 +1848,7 @@ export type Database = {
           household_child_id?: string | null
           id?: string
           participation_id?: string
+          person_id?: string | null
           role?: string
           user_id?: string | null
         }
@@ -1829,6 +1865,13 @@ export type Database = {
             columns: ["participation_id"]
             isOneToOne: false
             referencedRelation: "participations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participation_members_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
             referencedColumns: ["id"]
           },
           {
@@ -1953,6 +1996,51 @@ export type Database = {
           type?: string
           updated_at?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      people: {
+        Row: {
+          city: string | null
+          created_at: string
+          created_by: string | null
+          department: string | null
+          display_name: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          display_name?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          display_name?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2359,6 +2447,7 @@ export type Database = {
           membership_date: string | null
           membership_status: string
           membership_type: string
+          person_id: string | null
           phone: string | null
           public_visibility: boolean
           updated_at: string
@@ -2379,6 +2468,7 @@ export type Database = {
           membership_date?: string | null
           membership_status?: string
           membership_type?: string
+          person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
           updated_at?: string
@@ -2399,11 +2489,20 @@ export type Database = {
           membership_date?: string | null
           membership_status?: string
           membership_type?: string
+          person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_categories: {
         Row: {
@@ -2431,6 +2530,7 @@ export type Database = {
           id: string
           joined_at: string
           participation_status: string
+          person_id: string | null
           project_id: string
           project_role: string
           user_id: string
@@ -2439,6 +2539,7 @@ export type Database = {
           id?: string
           joined_at?: string
           participation_status?: string
+          person_id?: string | null
           project_id: string
           project_role?: string
           user_id: string
@@ -2447,11 +2548,19 @@ export type Database = {
           id?: string
           joined_at?: string
           participation_status?: string
+          person_id?: string | null
           project_id?: string
           project_role?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "project_members_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_members_project_id_fkey"
             columns: ["project_id"]
@@ -3084,49 +3193,213 @@ export type Database = {
           },
         ]
       }
-      terrain_reservations: {
+      terrain_reservation_dogs: {
         Row: {
           created_at: string
-          date: string
-          end_time: string
-          id: string
-          professional_id: string
-          purpose: string | null
-          resource_id: string
-          start_time: string
-          status: string
-          updated_at: string
+          dog_id: string
+          reservation_id: string
         }
         Insert: {
           created_at?: string
-          date: string
-          end_time: string
-          id?: string
-          professional_id: string
-          purpose?: string | null
-          resource_id: string
-          start_time: string
-          status?: string
-          updated_at?: string
+          dog_id: string
+          reservation_id: string
         }
         Update: {
           created_at?: string
-          date?: string
-          end_time?: string
-          id?: string
-          professional_id?: string
-          purpose?: string | null
-          resource_id?: string
-          start_time?: string
-          status?: string
-          updated_at?: string
+          dog_id?: string
+          reservation_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "terrain_reservation_dogs_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservation_dogs_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "terrain_reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      terrain_reservation_people: {
+        Row: {
+          created_at: string
+          person_id: string
+          reservation_id: string
+        }
+        Insert: {
+          created_at?: string
+          person_id: string
+          reservation_id: string
+        }
+        Update: {
+          created_at?: string
+          person_id?: string
+          reservation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terrain_reservation_people_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservation_people_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "terrain_reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      terrain_reservation_professionals: {
+        Row: {
+          created_at: string
+          professional_id: string
+          reservation_id: string
+        }
+        Insert: {
+          created_at?: string
+          professional_id: string
+          reservation_id: string
+        }
+        Update: {
+          created_at?: string
+          professional_id?: string
+          reservation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terrain_reservation_professionals_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservation_professionals_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservation_professionals_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "terrain_reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      terrain_reservations: {
+        Row: {
+          activity_id: string | null
+          created_at: string
+          date: string
+          decision_note: string | null
+          end_time: string
+          equipment_requested: string | null
+          event_id: string | null
+          id: string
+          professional_id: string
+          project_id: string | null
+          purpose: string | null
+          requested_by: string | null
+          resource_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          start_time: string
+          status: string
+          task_id: string | null
+          updated_at: string
+          usage_type: string
+        }
+        Insert: {
+          activity_id?: string | null
+          created_at?: string
+          date: string
+          decision_note?: string | null
+          end_time: string
+          equipment_requested?: string | null
+          event_id?: string | null
+          id?: string
+          professional_id: string
+          project_id?: string | null
+          purpose?: string | null
+          requested_by?: string | null
+          resource_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_time: string
+          status?: string
+          task_id?: string | null
+          updated_at?: string
+          usage_type?: string
+        }
+        Update: {
+          activity_id?: string | null
+          created_at?: string
+          date?: string
+          decision_note?: string | null
+          end_time?: string
+          equipment_requested?: string | null
+          event_id?: string | null
+          id?: string
+          professional_id?: string
+          project_id?: string | null
+          purpose?: string | null
+          requested_by?: string | null
+          resource_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_time?: string
+          status?: string
+          task_id?: string | null
+          updated_at?: string
+          usage_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terrain_reservations_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "terrain_reservations_resource_id_fkey"
             columns: ["resource_id"]
             isOneToOne: false
             referencedRelation: "terrain_resources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservations_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
             referencedColumns: ["id"]
           },
         ]
@@ -3301,6 +3574,10 @@ export type Database = {
         Args: { _dog_id: string; _user_id: string }
         Returns: boolean
       }
+      can_manage_terrain_reservation: {
+        Args: { _rid: string; _user_id: string }
+        Returns: boolean
+      }
       can_share_entity: {
         Args: { _entity_id: string; _entity_type: string; _user_id: string }
         Returns: boolean
@@ -3314,6 +3591,7 @@ export type Database = {
         Returns: boolean
       }
       claim_bureau_bootstrap: { Args: never; Returns: boolean }
+      current_person_id: { Args: { _user_id: string }; Returns: string }
       get_pro_dogs: { Args: never; Returns: Json }
       get_public_pro_page: { Args: { _slug: string }; Returns: Json }
       has_permission: {
