@@ -415,6 +415,7 @@ export type Database = {
           entity_id: string
           entity_type: string
           id: string
+          sensitivity: string
           updated_at: string
         }
         Insert: {
@@ -424,6 +425,7 @@ export type Database = {
           entity_id: string
           entity_type: string
           id?: string
+          sensitivity?: string
           updated_at?: string
         }
         Update: {
@@ -433,6 +435,7 @@ export type Database = {
           entity_id?: string
           entity_type?: string
           id?: string
+          sensitivity?: string
           updated_at?: string
         }
         Relationships: [
@@ -612,6 +615,7 @@ export type Database = {
           created_at: string
           id: string
           proof_type: string | null
+          sensitivity: string
           title: string
           updated_at: string
           uploaded_by: string | null
@@ -623,6 +627,7 @@ export type Database = {
           created_at?: string
           id?: string
           proof_type?: string | null
+          sensitivity?: string
           title: string
           updated_at?: string
           uploaded_by?: string | null
@@ -634,6 +639,7 @@ export type Database = {
           created_at?: string
           id?: string
           proof_type?: string | null
+          sensitivity?: string
           title?: string
           updated_at?: string
           uploaded_by?: string | null
@@ -684,6 +690,7 @@ export type Database = {
           created_at: string
           dog_id: string
           id: string
+          sensitivity: string
         }
         Insert: {
           author_id?: string
@@ -691,6 +698,7 @@ export type Database = {
           created_at?: string
           dog_id: string
           id?: string
+          sensitivity?: string
         }
         Update: {
           author_id?: string
@@ -698,6 +706,7 @@ export type Database = {
           created_at?: string
           dog_id?: string
           id?: string
+          sensitivity?: string
         }
         Relationships: [
           {
@@ -716,6 +725,7 @@ export type Database = {
           can_identity: boolean
           can_info: boolean
           can_observations: boolean
+          context: string | null
           created_at: string
           dog_id: string
           expires_at: string | null
@@ -723,6 +733,10 @@ export type Database = {
           id: string
           professional_id: string
           revoked: boolean
+          revoked_at: string | null
+          revoked_by: string | null
+          sensitivity: string
+          source_access_id: string | null
         }
         Insert: {
           can_activities?: boolean
@@ -730,6 +744,7 @@ export type Database = {
           can_identity?: boolean
           can_info?: boolean
           can_observations?: boolean
+          context?: string | null
           created_at?: string
           dog_id: string
           expires_at?: string | null
@@ -737,6 +752,10 @@ export type Database = {
           id?: string
           professional_id: string
           revoked?: boolean
+          revoked_at?: string | null
+          revoked_by?: string | null
+          sensitivity?: string
+          source_access_id?: string | null
         }
         Update: {
           can_activities?: boolean
@@ -744,6 +763,7 @@ export type Database = {
           can_identity?: boolean
           can_info?: boolean
           can_observations?: boolean
+          context?: string | null
           created_at?: string
           dog_id?: string
           expires_at?: string | null
@@ -751,6 +771,10 @@ export type Database = {
           id?: string
           professional_id?: string
           revoked?: boolean
+          revoked_at?: string | null
+          revoked_by?: string | null
+          sensitivity?: string
+          source_access_id?: string | null
         }
         Relationships: [
           {
@@ -772,6 +796,13 @@ export type Database = {
             columns: ["professional_id"]
             isOneToOne: false
             referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dog_professional_access_source_access_id_fkey"
+            columns: ["source_access_id"]
+            isOneToOne: false
+            referencedRelation: "dog_professional_access"
             referencedColumns: ["id"]
           },
         ]
@@ -3582,12 +3613,20 @@ export type Database = {
         Args: { _entity_id: string; _entity_type: string; _user_id: string }
         Returns: boolean
       }
+      can_view_comment_target: {
+        Args: { _id: string; _type: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_participation: {
         Args: { _pid: string; _user_id: string }
         Returns: boolean
       }
       can_view_project: {
         Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_terrain_reservation: {
+        Args: { _rid: string; _user_id: string }
         Returns: boolean
       }
       claim_bureau_bootstrap: { Args: never; Returns: boolean }
@@ -3655,11 +3694,35 @@ export type Database = {
         }
         Returns: Json
       }
+      revoke_dog_access: { Args: { _access_id: string }; Returns: undefined }
       run_daily_reminders: { Args: never; Returns: undefined }
       run_weekly_bureau_digest: { Args: never; Returns: undefined }
+      share_dog_access: {
+        Args: {
+          _activities: boolean
+          _context: string
+          _dog_id: string
+          _expires_at: string
+          _goals: boolean
+          _identity: boolean
+          _info: boolean
+          _observations: boolean
+          _professional_id: string
+        }
+        Returns: string
+      }
       spots_info: {
         Args: { _activity_id: string; _event_id: string }
         Returns: Json
+      }
+      terrain_busy_slots: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          date: string
+          end_time: string
+          resource_id: string
+          start_time: string
+        }[]
       }
     }
     Enums: {

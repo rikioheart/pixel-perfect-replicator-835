@@ -57,6 +57,13 @@
       "when": 1790843898002,
       "tag": "0007_a9_people_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790933152754,
+      "tag": "0008_a10_security_rls_sharing",
+      "breakpoints": true
     }
   ]
 }
