@@ -11,3 +11,12 @@
 
 - `people` = personne associative (avec ou sans compte) ; `profiles.person_id` la relie au compte, et les tables de liens (memberships, household_members, project_members, participation_members) portent `person_id` rempli automatiquement depuis `user_id`. Pourquoi : séparer authentification, compte et personne sans casser l'existant.
 - Schéma : les migrations passent par l'outil de migration de la plateforme (journal dans drizzle/migrations) ; ne jamais écrire drizzle/schema.ts à la main. Pourquoi : un seul chemin de migration.
+
+## Sécurité (A10)
+- Fonctions internes (fidélité, notifications, rappels) : EXECUTE retiré à anon/authenticated ; seuls déclencheurs et service_role les appellent. Pourquoi : empêcher l'attribution forgée de tampons ou notifications.
+- Type et statut d'adhésion modifiables uniquement par le Bureau (trigger guard_profile_membership) ; is_professional exige ACTIVE. Pourquoi : aucune auto-escalade de rôle.
+- Accès Bureau aux dossiers chiens = is_bureau ET permission dogs.read_sensitive. Pourquoi : Bureau ≠ accès illimité.
+- Partage de dossier chien uniquement via share_dog_access/revoke_dog_access (sous-ensemble des droits du donneur, contexte obligatoire, expiration bornée, révocation en cascade via source_access_id, journal audit_logs). Pourquoi : partage traçable sans escalade.
+- Sensibilité à 3 niveaux PUBLIC/INTERNE/SENSIBLE (colonne sensitivity) ; jamais de lien public sur un document BUREAU ou SENSIBLE. Pourquoi : modèle unique de confidentialité.
+- Commentaires lisibles selon l'objet parent (can_view_comment_target) ; réservations terrain lisibles par les seules personnes concernées, créneaux libres/occupés via terrain_busy_slots, chevauchement refusé par la base.
+- Tests RLS : script API réel avec comptes d'essai (connexion par mot de passe), jamais seulement l'interface.
