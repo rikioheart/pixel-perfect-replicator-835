@@ -64,6 +64,13 @@
       "when": 1790933152754,
       "tag": "0008_a10_security_rls_sharing",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791056274708,
+      "tag": "0009_a10_share_fixes",
+      "breakpoints": true
     }
   ]
 }
