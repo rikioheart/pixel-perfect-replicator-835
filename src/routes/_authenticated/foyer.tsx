@@ -40,56 +40,67 @@ const PERMS = [
 ] as const;
 type PermKey = (typeof PERMS)[number][0];
 
+const PRIVATE_SECTIONS = [
+  ["info", "Informations"],
+  ["goals", "Objectifs"],
+  ["observations", "Observations et suivis"],
+] as const;
+
 function DogSharing({ dogId, dogName, onClose }: { dogId: string; dogName: string; onClose: () => void }) {
   const qc = useQueryClient();
   const { data: pros = [] } = useProOptions();
   const [pro, setPro] = useState("");
   const [perms, setPerms] = useState<Record<PermKey, boolean>>({ can_identity: true, can_info: false, can_goals: false, can_activities: false, can_observations: false });
   const [until, setUntil] = useState("");
+  const [context, setContext] = useState("");
 
   const { data } = useQuery({
     queryKey: ["dog-sharing", dogId],
     queryFn: async () => {
-      const [acc, refs] = await Promise.all([
+      const [acc, refs, dog] = await Promise.all([
         supabase.from("dog_professional_access").select("*").eq("dog_id", dogId),
         supabase.from("dog_referents").select("*").eq("dog_id", dogId),
+        supabase.from("dogs").select("private_sections, referent_can_share_followup").eq("id", dogId).maybeSingle(),
       ]);
-      return { access: acc.data ?? [], refs: refs.data ?? [] };
+      return { access: acc.data ?? [], refs: refs.data ?? [], dog: dog.data };
     },
   });
-  const nameOf = (id: string) => pros.find((p) => p.id === id)?.name ?? "Professionnel";
+  const nameOf = (id: string | null) => pros.find((p) => p.id === id)?.name ?? "Professionnel";
   const refresh = () => void qc.invalidateQueries({ queryKey: ["dog-sharing", dogId] });
 
   const grant = useMutation({
     mutationFn: async () => {
       if (!pro) throw new Error("Choisissez un professionnel.");
-      const { error } = await supabase.from("dog_professional_access").upsert(
-        { dog_id: dogId, professional_id: pro, ...perms, revoked: false, expires_at: until ? new Date(until).toISOString() : null },
-        { onConflict: "dog_id,professional_id" },
-      );
+      if (context.trim().length < 3) throw new Error("Indiquez le contexte du partage.");
+      const { error } = await supabase.rpc("share_dog_access", {
+        _dog_id: dogId, _professional_id: pro,
+        _identity: perms.can_identity, _info: perms.can_info, _goals: perms.can_goals,
+        _activities: perms.can_activities, _observations: perms.can_observations,
+        _context: context.trim(),
+        _expires_at: until ? new Date(until).toISOString() : (null as unknown as string),
+      });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Accès partagé."); refresh(); },
+    onSuccess: () => { toast.success("Accès partagé."); setContext(""); refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
   const revoke = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("dog_professional_access").update({ revoked: true }).eq("id", id);
+      const { error } = await supabase.rpc("revoke_dog_access", { _access_id: id });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Accès retiré."); refresh(); },
-  });
-  const toggleRef = useMutation({
-    mutationFn: async (proId: string) => {
-      const existing = data?.refs.find((r) => r.professional_id === proId);
-      const { error } = existing
-        ? await supabase.from("dog_referents").delete().eq("id", existing.id)
-        : await supabase.from("dog_referents").insert({ dog_id: dogId, professional_id: proId });
-      if (error) throw error;
-    },
-    onSuccess: refresh,
+    onSuccess: () => { toast.success("Accès retiré (et les partages qui en découlent)."); refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
+  const updateDog = useMutation({
+    mutationFn: async (patch: { private_sections?: string[]; referent_can_share_followup?: boolean }) => {
+      const { error } = await supabase.from("dogs").update(patch).eq("id", dogId);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Préférence enregistrée."); refresh(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const privateSections = data?.dog?.private_sections ?? [];
 
   return (
     <SidePanel open onOpenChange={(o) => !o && onClose()} title={`Partage — ${dogName}`} description="Vous choisissez ce que chaque professionnel peut voir. Retirable à tout moment.">
@@ -105,6 +116,8 @@ function DogSharing({ dogId, dogName, onClose }: { dogId: string; dogName: strin
                   {PERMS.filter(([k]) => a[k]).map(([, l]) => l).join(", ") || "Aucune rubrique"}
                   {a.expires_at ? ` · jusqu'au ${new Date(a.expires_at).toLocaleDateString("fr-FR")}` : ""}
                 </p>
+                {a.context ? <p className="text-xs text-muted-foreground">Contexte : {a.context}</p> : null}
+                {a.source_access_id ? <p className="text-xs text-muted-foreground">Partagé par le référent {nameOf(a.granted_by)}</p> : null}
               </div>
               <Button size="sm" variant="ghost" onClick={() => revoke.mutate(a.id)}>Retirer</Button>
             </div>
@@ -125,9 +138,26 @@ function DogSharing({ dogId, dogName, onClose }: { dogId: string; dogName: strin
               </label>
             ))}
           </fieldset>
+          <Label htmlFor="sh-ctx">Contexte (obligatoire)</Label>
+          <Input id="sh-ctx" placeholder="Ex. suivi éducatif printemps" value={context} onChange={(e) => setContext(e.target.value)} />
           <Label htmlFor="sh-until">Jusqu'au (facultatif)</Label>
           <Input id="sh-until" type="date" value={until} onChange={(e) => setUntil(e.target.value)} />
           <Button className="gap-2" onClick={() => grant.mutate()} disabled={grant.isPending}><Share2 className="size-4" aria-hidden /> Partager</Button>
+        </section>
+        <section className="space-y-2 border-t border-border pt-4">
+          <h3 className="font-medium">Confidentialité</h3>
+          <label className="flex min-h-9 items-center gap-2">
+            <input type="checkbox" checked={Boolean(data?.dog?.referent_can_share_followup)}
+              onChange={(e) => updateDog.mutate({ referent_can_share_followup: e.target.checked })} />
+            J'autorise mon référent à partager le suivi (objectifs, observations) avec d'autres professionnels
+          </label>
+          <p className="text-xs text-muted-foreground">Rubriques privées, cachées au Bureau :</p>
+          {PRIVATE_SECTIONS.map(([k, l]) => (
+            <label key={k} className="flex min-h-9 items-center gap-2">
+              <input type="checkbox" checked={privateSections.includes(k)}
+                onChange={(e) => updateDog.mutate({ private_sections: e.target.checked ? [...privateSections, k] : privateSections.filter((s) => s !== k) })} /> {l}
+            </label>
+          ))}
         </section>
         <section className="space-y-2 border-t border-border pt-4">
           <h3 className="font-medium">Professionnels référents</h3>
