@@ -865,6 +865,8 @@ export type Database = {
           needs: string | null
           owner_id: string
           photo_url: string | null
+          private_sections: string[]
+          referent_can_share_followup: boolean
           sex: string | null
           updated_at: string
           useful_information: string | null
@@ -881,6 +883,8 @@ export type Database = {
           needs?: string | null
           owner_id: string
           photo_url?: string | null
+          private_sections?: string[]
+          referent_can_share_followup?: boolean
           sex?: string | null
           updated_at?: string
           useful_information?: string | null
@@ -897,6 +901,8 @@ export type Database = {
           needs?: string | null
           owner_id?: string
           photo_url?: string | null
+          private_sections?: string[]
+          referent_can_share_followup?: boolean
           sex?: string | null
           updated_at?: string
           useful_information?: string | null
@@ -1574,29 +1580,44 @@ export type Database = {
       loyalty_stamps: {
         Row: {
           activity_id: string | null
+          awarded_by: string | null
           card_id: string
           created_at: string
+          event_id: string | null
           id: string
+          manual_key: string | null
           note: string | null
+          notified_bureau_id: string | null
           professional_id: string | null
+          reason: string | null
           stamps: number
         }
         Insert: {
           activity_id?: string | null
+          awarded_by?: string | null
           card_id: string
           created_at?: string
+          event_id?: string | null
           id?: string
+          manual_key?: string | null
           note?: string | null
+          notified_bureau_id?: string | null
           professional_id?: string | null
+          reason?: string | null
           stamps?: number
         }
         Update: {
           activity_id?: string | null
+          awarded_by?: string | null
           card_id?: string
           created_at?: string
+          event_id?: string | null
           id?: string
+          manual_key?: string | null
           note?: string | null
+          notified_bureau_id?: string | null
           professional_id?: string | null
+          reason?: string | null
           stamps?: number
         }
         Relationships: [
@@ -2472,6 +2493,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           first_name: string | null
+          hide_sensitive_dogs: boolean
           id: string
           involvement_level: string | null
           last_name: string | null
@@ -2493,6 +2515,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           first_name?: string | null
+          hide_sensitive_dogs?: boolean
           id: string
           involvement_level?: string | null
           last_name?: string | null
@@ -2514,6 +2537,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           first_name?: string | null
+          hide_sensitive_dogs?: boolean
           id?: string
           involvement_level?: string | null
           last_name?: string | null
@@ -3601,6 +3625,18 @@ export type Database = {
         Args: { _activity_id: string; _event_id: string; _user_id: string }
         Returns: number
       }
+      award_manual_stamp: {
+        Args: {
+          _activity_id: string
+          _bureau_id: string
+          _event_id: string
+          _member_id: string
+          _reason: string
+        }
+        Returns: Json
+      }
+      bureau_dog_full: { Args: { _user_id: string }; Returns: boolean }
+      bureau_dogs: { Args: never; Returns: Json }
       can_manage_dog: {
         Args: { _dog_id: string; _user_id: string }
         Returns: boolean
@@ -3617,6 +3653,10 @@ export type Database = {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
       }
+      can_view_dog_operational: {
+        Args: { _dog_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_participation: {
         Args: { _pid: string; _user_id: string }
         Returns: boolean
@@ -3631,6 +3671,10 @@ export type Database = {
       }
       claim_bureau_bootstrap: { Args: never; Returns: boolean }
       current_person_id: { Args: { _user_id: string }; Returns: string }
+      dog_section_visible: {
+        Args: { _dog_id: string; _section: string; _user_id: string }
+        Returns: boolean
+      }
       get_pro_dogs: { Args: never; Returns: Json }
       get_public_pro_page: { Args: { _slug: string }; Returns: Json }
       has_permission: {
@@ -3642,6 +3686,10 @@ export type Database = {
         Returns: boolean
       }
       is_bureau: { Args: { _user_id: string }; Returns: boolean }
+      is_dog_keeper: {
+        Args: { _dog_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_household_admin: {
         Args: { _household_id: string; _user_id: string }
         Returns: boolean
@@ -3655,6 +3703,8 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      list_bureau_members: { Args: never; Returns: Json }
+      list_particuliers: { Args: never; Returns: Json }
       list_public_pros: { Args: never; Returns: Json }
       notify_once: {
         Args: {

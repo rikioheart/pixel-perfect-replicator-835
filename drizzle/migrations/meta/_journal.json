@@ -71,6 +71,13 @@
       "when": 1791056274708,
       "tag": "0009_a10_share_fixes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791096457709,
+      "tag": "0010_dog_visibility_manual_stamps",
+      "breakpoints": true
     }
   ]
 }
