@@ -96,6 +96,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/mairies", label: "Mairies & institutions", icon: Building2, audience: "bureau" },
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
       { to: "/admin/pros", label: "Fiches professionnelles", icon: Briefcase, audience: "bureau" },
+      { to: "/admin/chiens", label: "Chiens de l'association", icon: Briefcase, audience: "bureau" },
     ],
   },
   {

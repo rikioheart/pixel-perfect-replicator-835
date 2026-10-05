@@ -77,8 +77,8 @@ function ReferentShare({ dog }: { dog: ProDog }) {
     mutationFn: async () => {
       if (!pro || context.trim().length < 3) throw new Error("Choisissez un professionnel et un contexte.");
       const { error } = await supabase.rpc("share_dog_access", {
-        _dog_id: dog.id, _professional_id: pro, _identity: !!sel.identity, _info: !!sel.info, _goals: !!sel.goals,
-        _activities: !!sel.activities, _observations: !!sel.observations, _context: context.trim(),
+        _dog_id: dog.id, _professional_id: pro, _identity: !!sel["identity"], _info: !!sel["info"], _goals: !!sel["goals"],
+        _activities: !!sel["activities"], _observations: !!sel["observations"], _context: context.trim(),
         _expires_at: null as unknown as string,
       });
       if (error) throw error;
