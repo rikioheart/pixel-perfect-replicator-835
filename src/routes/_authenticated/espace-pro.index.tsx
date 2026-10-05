@@ -86,7 +86,7 @@ function ProDashboard() {
           </Link>
         ))}
       </nav>
-      {card?.status === "ACTIVE" ? <div className="mt-6 max-w-xl"><ManualStampCard /></div> : null}
+      <div className="mt-6 max-w-xl"><ManualStampCard /></div>
     </AppShell>
   );
 }
