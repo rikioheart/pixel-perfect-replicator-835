@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PRO_STATUS_LABEL, completion } from "@/lib/pro-card";
+import { ManualStampCard } from "@/components/ManualStampCard";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/")({
   head: () => ({
@@ -85,6 +86,7 @@ function ProDashboard() {
           </Link>
         ))}
       </nav>
+      {card?.status === "ACTIVE" ? <div className="mt-6 max-w-xl"><ManualStampCard /></div> : null}
     </AppShell>
   );
 }
