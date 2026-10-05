@@ -169,6 +169,7 @@ function DogCard({ dog }: { dog: ProDog }) {
         </div>
         <div className="flex flex-col items-end gap-1">
           {dog.is_referent ? <Badge className="gap-1"><Star className="size-3" aria-hidden /> Référent</Badge> : null}
+          {dog.operational && !dog.is_referent ? <Badge variant="outline">Activité / terrain</Badge> : null}
           {dog.expires_at ? <span className="text-xs text-muted-foreground">Accès jusqu'au {new Date(dog.expires_at).toLocaleDateString("fr-FR")}</span> : null}
         </div>
       </header>
@@ -217,6 +218,8 @@ function DogCard({ dog }: { dog: ProDog }) {
           <Button size="sm" onClick={() => addObs.mutate()} disabled={addObs.isPending}>Ajouter l'observation</Button>
         </div>
       ) : <Hidden label="Observations" />}
+
+      {dog.is_referent ? <ReferentShare dog={dog} /> : null}
     </article>
   );
 }
