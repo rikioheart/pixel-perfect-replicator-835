@@ -20,3 +20,5 @@
 - Sensibilité à 3 niveaux PUBLIC/INTERNE/SENSIBLE (colonne sensitivity) ; jamais de lien public sur un document BUREAU ou SENSIBLE. Pourquoi : modèle unique de confidentialité.
 - Commentaires lisibles selon l'objet parent (can_view_comment_target) ; réservations terrain lisibles par les seules personnes concernées, créneaux libres/occupés via terrain_busy_slots, chevauchement refusé par la base.
 - Tests RLS : script API réel avec comptes d'essai (connexion par mot de passe), jamais seulement l'interface.
+- Chiens : la table dogs n'est lue en direct que par le propriétaire/foyer ; Bureau via bureau_dogs() (rubriques privées masquées, retrait personnel via profiles.hide_sensitive_dogs), pros via get_pro_dogs() (accès partagé + vue opérationnelle can_view_dog_operational). Pourquoi : visibilité par rubrique impossible avec une RLS par ligne.
+- Tampons manuels uniquement via award_manual_stamp (pro validé, particulier, Bureau notifié, clé manual_key unique). Pourquoi : traçabilité et anti-doublon.

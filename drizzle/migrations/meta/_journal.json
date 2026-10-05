@@ -78,6 +78,13 @@
       "when": 1791096457709,
       "tag": "0010_dog_visibility_manual_stamps",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791212206501,
+      "tag": "0011_fix_bureau_dogs_var",
+      "breakpoints": true
     }
   ]
 }

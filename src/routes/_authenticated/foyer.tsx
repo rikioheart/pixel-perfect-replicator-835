@@ -100,6 +100,17 @@ function DogSharing({ dogId, dogName, onClose }: { dogId: string; dogName: strin
     onSuccess: () => { toast.success("Préférence enregistrée."); refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
+  const toggleRef = useMutation({
+    mutationFn: async (proId: string) => {
+      const existing = data?.refs.find((r) => r.professional_id === proId);
+      const { error } = existing
+        ? await supabase.from("dog_referents").delete().eq("id", existing.id)
+        : await supabase.from("dog_referents").insert({ dog_id: dogId, professional_id: proId });
+      if (error) throw error;
+    },
+    onSuccess: refresh,
+    onError: (e: Error) => toast.error(e.message),
+  });
   const privateSections = data?.dog?.private_sections ?? [];
 
   return (
