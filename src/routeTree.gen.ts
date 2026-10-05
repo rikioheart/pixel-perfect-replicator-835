@@ -51,6 +51,7 @@ import { Route as AuthenticatedActivitiesActivityIdRouteImport } from './routes/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAdvisorRouteImport } from './routes/_authenticated/admin.advisor'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
+import { Route as AuthenticatedAdminChiensRouteImport } from './routes/_authenticated/admin.chiens'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
 import { Route as AuthenticatedAdminContributionsRouteImport } from './routes/_authenticated/admin.contributions'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
@@ -291,6 +292,12 @@ const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   path: '/admin/audit',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminChiensRoute =
+  AuthenticatedAdminChiensRouteImport.update({
+    id: '/admin/chiens',
+    path: '/admin/chiens',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCockpitRoute =
   AuthenticatedAdminCockpitRouteImport.update({
     id: '/admin/cockpit',
@@ -466,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/chiens': typeof AuthenticatedAdminChiensRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -532,6 +540,7 @@ export interface FileRoutesByTo {
   '/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/chiens': typeof AuthenticatedAdminChiensRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -600,6 +609,7 @@ export interface FileRoutesById {
   '/_authenticated/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/chiens': typeof AuthenticatedAdminChiensRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/_authenticated/admin/contributions': typeof AuthenticatedAdminContributionsRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
@@ -668,6 +678,7 @@ export interface FileRouteTypes {
     | '/activities/$activityId'
     | '/admin/advisor'
     | '/admin/audit'
+    | '/admin/chiens'
     | '/admin/cockpit'
     | '/admin/contributions'
     | '/admin/import'
@@ -734,6 +745,7 @@ export interface FileRouteTypes {
     | '/activities/$activityId'
     | '/admin/advisor'
     | '/admin/audit'
+    | '/admin/chiens'
     | '/admin/cockpit'
     | '/admin/contributions'
     | '/admin/import'
@@ -801,6 +813,7 @@ export interface FileRouteTypes {
     | '/_authenticated/activities/$activityId'
     | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/chiens'
     | '/_authenticated/admin/cockpit'
     | '/_authenticated/admin/contributions'
     | '/_authenticated/admin/import'
@@ -1134,6 +1147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/chiens': {
+      id: '/_authenticated/admin/chiens'
+      path: '/admin/chiens'
+      fullPath: '/admin/chiens'
+      preLoaderRoute: typeof AuthenticatedAdminChiensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/cockpit': {
       id: '/_authenticated/admin/cockpit'
       path: '/admin/cockpit'
@@ -1333,6 +1353,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivitiesActivityIdRoute: typeof AuthenticatedActivitiesActivityIdRoute
   AuthenticatedAdminAdvisorRoute: typeof AuthenticatedAdminAdvisorRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminChiensRoute: typeof AuthenticatedAdminChiensRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
   AuthenticatedAdminContributionsRoute: typeof AuthenticatedAdminContributionsRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
@@ -1395,6 +1416,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedActivitiesActivityIdRoute,
   AuthenticatedAdminAdvisorRoute: AuthenticatedAdminAdvisorRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminChiensRoute: AuthenticatedAdminChiensRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
   AuthenticatedAdminContributionsRoute: AuthenticatedAdminContributionsRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
