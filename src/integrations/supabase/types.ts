@@ -609,6 +609,80 @@ export type Database = {
           },
         ]
       }
+      delegations: {
+        Row: {
+          created_at: string
+          delegate_id: string
+          delegator_id: string
+          ends_at: string
+          id: string
+          permission_code: string
+          reason: string
+          revoked_at: string | null
+          revoked_by: string | null
+          scope_id: string
+          scope_type: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          delegate_id: string
+          delegator_id: string
+          ends_at: string
+          id?: string
+          permission_code: string
+          reason: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scope_id: string
+          scope_type: string
+          starts_at?: string
+        }
+        Update: {
+          created_at?: string
+          delegate_id?: string
+          delegator_id?: string
+          ends_at?: string
+          id?: string
+          permission_code?: string
+          reason?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scope_id?: string
+          scope_type?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delegations_delegate_id_fkey"
+            columns: ["delegate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delegations_delegate_id_fkey"
+            columns: ["delegate_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delegations_delegator_id_fkey"
+            columns: ["delegator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delegations_delegator_id_fkey"
+            columns: ["delegator_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           category: string | null
@@ -1683,6 +1757,9 @@ export type Database = {
           end_date: string | null
           function_type: string
           id: string
+          person_id: string | null
+          scope_id: string | null
+          scope_type: string
           start_date: string | null
           user_id: string
         }
@@ -1692,6 +1769,9 @@ export type Database = {
           end_date?: string | null
           function_type: string
           id?: string
+          person_id?: string | null
+          scope_id?: string | null
+          scope_type?: string
           start_date?: string | null
           user_id: string
         }
@@ -1701,10 +1781,21 @@ export type Database = {
           end_date?: string | null
           function_type?: string
           id?: string
+          person_id?: string | null
+          scope_id?: string | null
+          scope_type?: string
           start_date?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "member_functions_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       member_imports: {
         Row: {
@@ -3670,6 +3761,17 @@ export type Database = {
         Returns: boolean
       }
       claim_bureau_bootstrap: { Args: never; Returns: boolean }
+      create_delegation: {
+        Args: {
+          _code: string
+          _delegate: string
+          _ends_at: string
+          _reason: string
+          _scope_id: string
+          _scope_type: string
+        }
+        Returns: string
+      }
       current_person_id: { Args: { _user_id: string }; Returns: string }
       dog_section_visible: {
         Args: { _dog_id: string; _section: string; _user_id: string }
@@ -3683,6 +3785,15 @@ export type Database = {
       }
       has_role: {
         Args: { _role_code: string; _user_id: string }
+        Returns: boolean
+      }
+      has_scoped_permission: {
+        Args: {
+          _code: string
+          _scope_id: string
+          _scope_type: string
+          _user_id: string
+        }
         Returns: boolean
       }
       is_bureau: { Args: { _user_id: string }; Returns: boolean }
@@ -3699,6 +3810,10 @@ export type Database = {
         Returns: boolean
       }
       is_professional: { Args: { _user_id: string }; Returns: boolean }
+      is_project_coordinator: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_project_member: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
@@ -3744,6 +3859,7 @@ export type Database = {
         }
         Returns: Json
       }
+      revoke_delegation: { Args: { _id: string }; Returns: undefined }
       revoke_dog_access: { Args: { _access_id: string }; Returns: undefined }
       run_daily_reminders: { Args: never; Returns: undefined }
       run_weekly_bureau_digest: { Args: never; Returns: undefined }
