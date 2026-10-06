@@ -75,12 +75,14 @@ export type Database = {
         Row: {
           before_coming: string | null
           capacity: number | null
+          category: string
           created_at: string
           created_by: string | null
           date: string | null
           description: string | null
           dog_policy: string
           eligible_for_loyalty: boolean
+          equipment: string | null
           for_you_if: string | null
           id: string
           image_url: string | null
@@ -93,6 +95,7 @@ export type Database = {
           professional_ids: string[]
           referent_id: string | null
           status: string
+          terrain_reservation_id: string | null
           title: string
           to_bring: string | null
           type: string
@@ -103,12 +106,14 @@ export type Database = {
         Insert: {
           before_coming?: string | null
           capacity?: number | null
+          category?: string
           created_at?: string
           created_by?: string | null
           date?: string | null
           description?: string | null
           dog_policy?: string
           eligible_for_loyalty?: boolean
+          equipment?: string | null
           for_you_if?: string | null
           id?: string
           image_url?: string | null
@@ -121,6 +126,7 @@ export type Database = {
           professional_ids?: string[]
           referent_id?: string | null
           status?: string
+          terrain_reservation_id?: string | null
           title: string
           to_bring?: string | null
           type?: string
@@ -131,12 +137,14 @@ export type Database = {
         Update: {
           before_coming?: string | null
           capacity?: number | null
+          category?: string
           created_at?: string
           created_by?: string | null
           date?: string | null
           description?: string | null
           dog_policy?: string
           eligible_for_loyalty?: boolean
+          equipment?: string | null
           for_you_if?: string | null
           id?: string
           image_url?: string | null
@@ -149,6 +157,7 @@ export type Database = {
           professional_ids?: string[]
           referent_id?: string | null
           status?: string
+          terrain_reservation_id?: string | null
           title?: string
           to_bring?: string | null
           type?: string
@@ -183,6 +192,13 @@ export type Database = {
             columns: ["referent_id"]
             isOneToOne: false
             referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_terrain_reservation_id_fkey"
+            columns: ["terrain_reservation_id"]
+            isOneToOne: false
+            referencedRelation: "terrain_reservations"
             referencedColumns: ["id"]
           },
         ]
@@ -750,6 +766,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "dog_goals_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dog_indicators: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          dog_id: string
+          family: string
+          id: string
+          label: string
+          note: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          dog_id: string
+          family: string
+          id?: string
+          label: string
+          note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          dog_id?: string
+          family?: string
+          id?: string
+          label?: string
+          note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_indicators_dog_id_fkey"
             columns: ["dog_id"]
             isOneToOne: false
             referencedRelation: "dogs"
@@ -3202,6 +3262,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          activity_id: string | null
           assigned_user_id: string | null
           completed_at: string | null
           contribution_id: string | null
@@ -3219,6 +3280,8 @@ export type Database = {
           started_at: string | null
           status: string
           submitted_at: string | null
+          team_label: string | null
+          terrain_reservation_id: string | null
           title: string
           updated_at: string
           validated_at: string | null
@@ -3226,6 +3289,7 @@ export type Database = {
           visibility: string
         }
         Insert: {
+          activity_id?: string | null
           assigned_user_id?: string | null
           completed_at?: string | null
           contribution_id?: string | null
@@ -3243,6 +3307,8 @@ export type Database = {
           started_at?: string | null
           status?: string
           submitted_at?: string | null
+          team_label?: string | null
+          terrain_reservation_id?: string | null
           title: string
           updated_at?: string
           validated_at?: string | null
@@ -3250,6 +3316,7 @@ export type Database = {
           visibility?: string
         }
         Update: {
+          activity_id?: string | null
           assigned_user_id?: string | null
           completed_at?: string | null
           contribution_id?: string | null
@@ -3267,6 +3334,8 @@ export type Database = {
           started_at?: string | null
           status?: string
           submitted_at?: string | null
+          team_label?: string | null
+          terrain_reservation_id?: string | null
           title?: string
           updated_at?: string
           validated_at?: string | null
@@ -3274,6 +3343,13 @@ export type Database = {
           visibility?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_contribution_id_fkey"
             columns: ["contribution_id"]
@@ -3293,6 +3369,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_terrain_reservation_id_fkey"
+            columns: ["terrain_reservation_id"]
+            isOneToOne: false
+            referencedRelation: "terrain_reservations"
             referencedColumns: ["id"]
           },
         ]
@@ -3343,16 +3426,19 @@ export type Database = {
         Row: {
           created_at: string
           dog_id: string
+          referent_professional_id: string | null
           reservation_id: string
         }
         Insert: {
           created_at?: string
           dog_id: string
+          referent_professional_id?: string | null
           reservation_id: string
         }
         Update: {
           created_at?: string
           dog_id?: string
+          referent_professional_id?: string | null
           reservation_id?: string
         }
         Relationships: [
@@ -3361,6 +3447,20 @@ export type Database = {
             columns: ["dog_id"]
             isOneToOne: false
             referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservation_dogs_referent_professional_id_fkey"
+            columns: ["referent_professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terrain_reservation_dogs_referent_professional_id_fkey"
+            columns: ["referent_professional_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
             referencedColumns: ["id"]
           },
           {
@@ -3447,17 +3547,20 @@ export type Database = {
       }
       terrain_reservations: {
         Row: {
+          access_mode: string
           activity_id: string | null
           created_at: string
           date: string
           decision_note: string | null
           end_time: string
+          equipment_granted: string | null
           equipment_requested: string | null
           event_id: string | null
           id: string
           professional_id: string
           project_id: string | null
           purpose: string | null
+          rental_terms: string | null
           requested_by: string | null
           resource_id: string
           reviewed_at: string | null
@@ -3467,19 +3570,23 @@ export type Database = {
           task_id: string | null
           updated_at: string
           usage_type: string
+          work_category: string
         }
         Insert: {
+          access_mode?: string
           activity_id?: string | null
           created_at?: string
           date: string
           decision_note?: string | null
           end_time: string
+          equipment_granted?: string | null
           equipment_requested?: string | null
           event_id?: string | null
           id?: string
           professional_id: string
           project_id?: string | null
           purpose?: string | null
+          rental_terms?: string | null
           requested_by?: string | null
           resource_id: string
           reviewed_at?: string | null
@@ -3489,19 +3596,23 @@ export type Database = {
           task_id?: string | null
           updated_at?: string
           usage_type?: string
+          work_category?: string
         }
         Update: {
+          access_mode?: string
           activity_id?: string | null
           created_at?: string
           date?: string
           decision_note?: string | null
           end_time?: string
+          equipment_granted?: string | null
           equipment_requested?: string | null
           event_id?: string | null
           id?: string
           professional_id?: string
           project_id?: string | null
           purpose?: string | null
+          rental_terms?: string | null
           requested_by?: string | null
           resource_id?: string
           reviewed_at?: string | null
@@ -3511,6 +3622,7 @@ export type Database = {
           task_id?: string | null
           updated_at?: string
           usage_type?: string
+          work_category?: string
         }
         Relationships: [
           {
@@ -3728,12 +3840,20 @@ export type Database = {
       }
       bureau_dog_full: { Args: { _user_id: string }; Returns: boolean }
       bureau_dogs: { Args: never; Returns: Json }
+      can_edit_dog_indicators: {
+        Args: { _dog_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_manage_dog: {
         Args: { _dog_id: string; _user_id: string }
         Returns: boolean
       }
       can_manage_terrain_reservation: {
         Args: { _rid: string; _user_id: string }
+        Returns: boolean
+      }
+      can_request_terrain: {
+        Args: { _activity_id: string; _project_id: string; _user_id: string }
         Returns: boolean
       }
       can_share_entity: {
@@ -3777,6 +3897,7 @@ export type Database = {
         Args: { _dog_id: string; _section: string; _user_id: string }
         Returns: boolean
       }
+      entity_peek: { Args: { _id: string; _type: string }; Returns: Json }
       get_pro_dogs: { Args: never; Returns: Json }
       get_public_pro_page: { Args: { _slug: string }; Returns: Json }
       has_permission: {
