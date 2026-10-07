@@ -96,3 +96,10 @@
 - [x] Mur « Ce que nous construisons ensemble » + préférence show_association_updates (public = publications publiques)
 - [x] Timeline « Mon parcours avec La Voix du Chien » (liens vers chiens sans détails)
 - Interdit : score, classement, top contributeurs
+
+## Lot 12 — A11→A13 gouvernance, métier, terrain
+- [x] Responsabilités contextuelles, délégations, coordinateur limité
+- [x] Indicateurs chien, fiche contextuelle (entity_peek)
+- [x] Réservation terrain : catégories, gratuit/location, matériel, cycle de validation
+- [ ] Écran Bureau « Gouvernance » et « Besoins de décision » (A14)
+- [ ] Bouton flottant contextuel unique (A14)
