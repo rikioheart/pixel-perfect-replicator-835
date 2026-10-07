@@ -41,13 +41,23 @@ export const Route = createFileRoute("/_authenticated/terrain")({
   component: TerrainPage,
 });
 
+const WORK_CATEGORY: Record<string, string> = {
+  EDUCATION: "Éducation", SPORT: "Sport", COLLECTIF: "Collectif", FORMATION: "Formation",
+  ACCOMPAGNEMENT: "Accompagnement", EVENEMENT: "Événement", PROJET_ASSOCIATIF: "Projet associatif", AUTRE: "Autre",
+};
+const STATUS_LABEL: Record<string, string> = {
+  DRAFT: "Brouillon", PENDING: "En attente", CHANGES_REQUESTED: "Modification demandée",
+  APPROVED: "Validée", REFUSED: "Refusée", CANCELLED: "Annulée",
+};
+
 function TerrainPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [resourceOpen, setResourceOpen] = useState(false);
   const [resourceName, setResourceName] = useState("");
   const [resourceLocation, setResourceLocation] = useState("");
-  const [booking, setBooking] = useState({ resource_id: "", date: "", start_time: "", end_time: "", purpose: "" });
+  const emptyBooking = { resource_id: "", date: "", start_time: "", end_time: "", purpose: "", work_category: "AUTRE", access_mode: "GRATUIT", equipment_requested: "" };
+  const [booking, setBooking] = useState(emptyBooking);
 
   const { data: resources = [] } = useQuery({
     queryKey: ["terrain-resources"],
@@ -97,6 +107,7 @@ function TerrainPage() {
         throw new Error("L'heure de fin doit être après l'heure de début.");
       const clash = reservations.some(
         (r) =>
+          ["PENDING", "APPROVED"].includes(r.status) &&
           r.resource_id === booking.resource_id &&
           r.date === booking.date &&
           booking.start_time < r.end_time &&
@@ -110,12 +121,36 @@ function TerrainPage() {
         start_time: booking.start_time,
         end_time: booking.end_time,
         purpose: booking.purpose || null,
+        work_category: booking.work_category,
+        access_mode: booking.access_mode,
+        equipment_requested: booking.equipment_requested || null,
+        requested_by: user!.id,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success("Réservation enregistrée.");
-      setBooking({ resource_id: "", date: "", start_time: "", end_time: "", purpose: "" });
+      setBooking(emptyBooking);
+      void queryClient.invalidateQueries({ queryKey: ["terrain-reservations"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const decide = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      let decision_note: string | null = null;
+      if (status === "REFUSED" || status === "CHANGES_REQUESTED") {
+        decision_note = window.prompt("Motif / modification demandée :") ?? null;
+        if (!decision_note) throw new Error("Un motif est nécessaire.");
+      }
+      const { error } = await supabase
+        .from("terrain_reservations")
+        .update(decision_note ? { status, decision_note } : { status })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Décision enregistrée.");
       void queryClient.invalidateQueries({ queryKey: ["terrain-reservations"] });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -123,7 +158,7 @@ function TerrainPage() {
 
   const cancel = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("terrain_reservations").delete().eq("id", id);
+      const { error } = await supabase.from("terrain_reservations").update({ status: "CANCELLED" }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -225,6 +260,26 @@ function TerrainPage() {
               </div>
             </div>
             <div>
+              <Label htmlFor="bk-cat">Catégorie de travail</Label>
+              <select id="bk-cat" className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                value={booking.work_category} onChange={(e) => setBooking({ ...booking, work_category: e.target.value })}>
+                {Object.entries(WORK_CATEGORY).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="bk-mode">Mise à disposition</Label>
+              <select id="bk-mode" className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                value={booking.access_mode} onChange={(e) => setBooking({ ...booking, access_mode: e.target.value })}>
+                <option value="GRATUIT">Gratuit</option>
+                <option value="LOCATION">Location (conditions fixées par le Bureau)</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="bk-eq">Matériel demandé</Label>
+              <Input id="bk-eq" value={booking.equipment_requested}
+                onChange={(e) => setBooking({ ...booking, equipment_requested: e.target.value })} />
+            </div>
+            <div>
               <Label htmlFor="bk-purpose">Objet</Label>
               <Input
                 id="bk-purpose"
@@ -261,11 +316,29 @@ function TerrainPage() {
                       {reservation.start_time.slice(0, 5)} – {reservation.end_time.slice(0, 5)}
                       {reservation.purpose ? ` · ${reservation.purpose}` : ""}
                     </p>
+                    <p className="text-xs text-muted-foreground">
+                      {WORK_CATEGORY[reservation.work_category] ?? reservation.work_category} ·{" "}
+                      {reservation.access_mode === "LOCATION" ? "Location" : "Gratuit"}
+                      {reservation.equipment_requested ? ` · Matériel : ${reservation.equipment_requested}` : ""}
+                      {reservation.equipment_granted ? ` (accordé : ${reservation.equipment_granted})` : ""}
+                      {reservation.decision_note ? ` · Bureau : ${reservation.decision_note}` : ""}
+                    </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <Badge variant="outline">{reservation.status}</Badge>
-                    {isBureau || reservation.professional_id === user?.id ? (
-                      <Button variant="ghost" size="sm" onClick={() => cancel.mutate(reservation.id)}>
+                    <Badge variant="outline">{STATUS_LABEL[reservation.status] ?? reservation.status}</Badge>
+                    {isBureau && ["PENDING", "CHANGES_REQUESTED"].includes(reservation.status) ? (
+                      <>
+                        <Button size="sm" variant="outline" onClick={() => decide.mutate({ id: reservation.id, status: "APPROVED" })}>Valider</Button>
+                        <Button size="sm" variant="ghost" onClick={() => decide.mutate({ id: reservation.id, status: "CHANGES_REQUESTED" })}>Modifier</Button>
+                        <Button size="sm" variant="ghost" onClick={() => decide.mutate({ id: reservation.id, status: "REFUSED" })}>Refuser</Button>
+                      </>
+                    ) : null}
+                    {!isBureau && reservation.status === "CHANGES_REQUESTED" && reservation.requested_by === user?.id ? (
+                      <Button size="sm" variant="outline" onClick={() => decide.mutate({ id: reservation.id, status: "PENDING" })}>Renvoyer</Button>
+                    ) : null}
+                    {reservation.status !== "CANCELLED" && reservation.status !== "REFUSED" &&
+                    (isBureau || reservation.requested_by === user?.id || reservation.professional_id === user?.id) ? (
+                      <Button variant="ghost" size="sm" aria-label="Annuler la réservation" onClick={() => cancel.mutate(reservation.id)}>
                         <Trash2 className="size-4" />
                       </Button>
                     ) : null}
