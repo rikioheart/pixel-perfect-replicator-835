@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/professionals/$proId")({
   errorComponent: ({ error }) => (
     <AppShell title="Professionnel">
       <p role="alert" className="text-sm text-destructive">
-        {error.message}
+        {error instanceof Error ? error.message : "Erreur inattendue"}
       </p>
     </AppShell>
   ),

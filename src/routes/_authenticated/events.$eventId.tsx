@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
   errorComponent: ({ error }) => (
     <AppShell title="Événement">
       <p role="alert" className="text-sm text-destructive">
-        {error.message}
+        {error instanceof Error ? error.message : "Erreur inattendue"}
       </p>
     </AppShell>
   ),
