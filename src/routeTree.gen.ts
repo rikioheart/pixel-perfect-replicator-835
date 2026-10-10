@@ -62,6 +62,7 @@ import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminProsRouteImport } from './routes/_authenticated/admin.pros'
 import { Route as AuthenticatedAdminRolesRouteImport } from './routes/_authenticated/admin.roles'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminSuiviFinancierRouteImport } from './routes/_authenticated/admin.suivi-financier'
 import { Route as AuthenticatedAdminValidationRouteImport } from './routes/_authenticated/admin.validation'
 import { Route as AuthenticatedEspaceProIndexRouteImport } from './routes/_authenticated/espace-pro.index'
 import { Route as AuthenticatedEspaceProCarteRouteImport } from './routes/_authenticated/espace-pro.carte'
@@ -356,6 +357,12 @@ const AuthenticatedAdminSettingsRoute =
     path: '/admin/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSuiviFinancierRoute =
+  AuthenticatedAdminSuiviFinancierRouteImport.update({
+    id: '/admin/suivi-financier',
+    path: '/admin/suivi-financier',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminValidationRoute =
   AuthenticatedAdminValidationRouteImport.update({
     id: '/admin/validation',
@@ -496,6 +503,7 @@ export interface FileRoutesByFullPath {
   '/admin/pros': typeof AuthenticatedAdminProsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/suivi-financier': typeof AuthenticatedAdminSuiviFinancierRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/espace-pro/chiens': typeof AuthenticatedEspaceProChiensRoute
@@ -565,6 +573,7 @@ export interface FileRoutesByTo {
   '/admin/pros': typeof AuthenticatedAdminProsRoute
   '/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/suivi-financier': typeof AuthenticatedAdminSuiviFinancierRoute
   '/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/espace-pro/chiens': typeof AuthenticatedEspaceProChiensRoute
@@ -636,6 +645,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/pros': typeof AuthenticatedAdminProsRoute
   '/_authenticated/admin/roles': typeof AuthenticatedAdminRolesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/suivi-financier': typeof AuthenticatedAdminSuiviFinancierRoute
   '/_authenticated/admin/validation': typeof AuthenticatedAdminValidationRoute
   '/_authenticated/espace-pro/carte': typeof AuthenticatedEspaceProCarteRoute
   '/_authenticated/espace-pro/chiens': typeof AuthenticatedEspaceProChiensRoute
@@ -707,6 +717,7 @@ export interface FileRouteTypes {
     | '/admin/pros'
     | '/admin/roles'
     | '/admin/settings'
+    | '/admin/suivi-financier'
     | '/admin/validation'
     | '/espace-pro/carte'
     | '/espace-pro/chiens'
@@ -776,6 +787,7 @@ export interface FileRouteTypes {
     | '/admin/pros'
     | '/admin/roles'
     | '/admin/settings'
+    | '/admin/suivi-financier'
     | '/admin/validation'
     | '/espace-pro/carte'
     | '/espace-pro/chiens'
@@ -846,6 +858,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/pros'
     | '/_authenticated/admin/roles'
     | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/suivi-financier'
     | '/_authenticated/admin/validation'
     | '/_authenticated/espace-pro/carte'
     | '/_authenticated/espace-pro/chiens'
@@ -1249,6 +1262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/suivi-financier': {
+      id: '/_authenticated/admin/suivi-financier'
+      path: '/admin/suivi-financier'
+      fullPath: '/admin/suivi-financier'
+      preLoaderRoute: typeof AuthenticatedAdminSuiviFinancierRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/validation': {
       id: '/_authenticated/admin/validation'
       path: '/admin/validation'
@@ -1402,6 +1422,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminProsRoute: typeof AuthenticatedAdminProsRoute
   AuthenticatedAdminRolesRoute: typeof AuthenticatedAdminRolesRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminSuiviFinancierRoute: typeof AuthenticatedAdminSuiviFinancierRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
   AuthenticatedEspaceProCarteRoute: typeof AuthenticatedEspaceProCarteRoute
   AuthenticatedEspaceProChiensRoute: typeof AuthenticatedEspaceProChiensRoute
@@ -1466,6 +1487,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminProsRoute: AuthenticatedAdminProsRoute,
   AuthenticatedAdminRolesRoute: AuthenticatedAdminRolesRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminSuiviFinancierRoute: AuthenticatedAdminSuiviFinancierRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
   AuthenticatedEspaceProCarteRoute: AuthenticatedEspaceProCarteRoute,
   AuthenticatedEspaceProChiensRoute: AuthenticatedEspaceProChiensRoute,
