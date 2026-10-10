@@ -702,6 +702,8 @@ export type Database = {
       documents: {
         Row: {
           category: string | null
+          context_id: string | null
+          context_type: string | null
           created_at: string
           id: string
           proof_type: string | null
@@ -714,6 +716,8 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          context_id?: string | null
+          context_type?: string | null
           created_at?: string
           id?: string
           proof_type?: string | null
@@ -726,6 +730,8 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          context_id?: string | null
+          context_type?: string | null
           created_at?: string
           id?: string
           proof_type?: string | null
@@ -1171,6 +1177,66 @@ export type Database = {
           },
         ]
       }
+      form_responses: {
+        Row: {
+          answers: Json
+          candidate_person_id: string | null
+          consent_given: boolean
+          created_at: string
+          form_id: string
+          id: string
+          match_status: string
+          respondent_email: string | null
+          respondent_name: string | null
+          respondent_user_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+        }
+        Insert: {
+          answers?: Json
+          candidate_person_id?: string | null
+          consent_given?: boolean
+          created_at?: string
+          form_id: string
+          id?: string
+          match_status?: string
+          respondent_email?: string | null
+          respondent_name?: string | null
+          respondent_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Update: {
+          answers?: Json
+          candidate_person_id?: string | null
+          consent_given?: boolean
+          created_at?: string
+          form_id?: string
+          id?: string
+          match_status?: string
+          respondent_email?: string | null
+          respondent_name?: string | null
+          respondent_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_responses_candidate_person_id_fkey"
+            columns: ["candidate_person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_responses_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       formation_registrations: {
         Row: {
           created_at: string
@@ -1248,6 +1314,60 @@ export type Database = {
           location?: string | null
           speaker_name?: string | null
           start_time?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      forms: {
+        Row: {
+          audience: string
+          consent_required: boolean
+          contact: string | null
+          context_id: string | null
+          context_type: string | null
+          created_at: string
+          created_by: string | null
+          data_usage: string
+          fields: Json
+          id: string
+          kind: string
+          purpose: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string
+          consent_required?: boolean
+          contact?: string | null
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_usage: string
+          fields?: Json
+          id?: string
+          kind?: string
+          purpose: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          consent_required?: boolean
+          contact?: string | null
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_usage?: string
+          fields?: Json
+          id?: string
+          kind?: string
+          purpose?: string
           status?: string
           title?: string
           updated_at?: string
@@ -4012,6 +4132,16 @@ export type Database = {
       spots_info: {
         Args: { _activity_id: string; _event_id: string }
         Returns: Json
+      }
+      submit_form_response: {
+        Args: {
+          _answers: Json
+          _consent: boolean
+          _email: string
+          _form_id: string
+          _name: string
+        }
+        Returns: string
       }
       terrain_busy_slots: {
         Args: { _from: string; _to: string }
