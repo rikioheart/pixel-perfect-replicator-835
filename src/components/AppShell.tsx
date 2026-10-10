@@ -61,6 +61,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useExternalLinks } from "@/lib/home-config";
+import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, MEMBER_HUB_TABS } from "@/lib/nav-rules";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 
 type Audience = "bureau" | "all" | "pro";
@@ -72,6 +73,7 @@ type NavItem = {
   audience: Audience;
   /** Entrées principales : 5 maximum par rôle, le reste est replié. */
   primary?: boolean;
+  primaryForParticulier?: boolean;
   /** Masqué pour les adhérents particuliers (ni bureau, ni professionnel). */
   hideForParticulier?: boolean;
   /** Libellé alternatif pour les membres du bureau. */
@@ -114,7 +116,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Aujourd’hui et contribuer",
     items: [
-      { to: "/member", label: "Mon espace", icon: UserRound, audience: "all", primary: true },
+      { to: "/member", label: "Mon Compagnon & Moi", icon: UserRound, audience: "all", primary: true, primaryForParticulier: true },
       { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all", primary: true },
       { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all", primary: true },
       { to: "/avancees", label: "Ce que nous construisons", icon: Sparkles, audience: "all" },
@@ -125,14 +127,14 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Participer et communauté",
     items: [
-      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true },
-      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true },
+      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true, primaryForParticulier: true },
+      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true, primaryForParticulier: true },
       { to: "/calendar", label: "Calendrier partagé", icon: CalendarDays, audience: "all" },
       { to: "/forms", label: "Formulaires", icon: CalendarDays, audience: "all" },
       { to: "/formations", label: "Formations & lives", icon: GraduationCap, audience: "all" },
       { to: "/contests", label: "Concours & animations", icon: Trophy, audience: "all" },
       { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
-      { to: "/directory", label: "Annuaire du réseau", icon: BookUser, audience: "all" },
+      { to: "/directory", label: "Annuaire du réseau", icon: BookUser, audience: "all", primaryForParticulier: true },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: MapPin, audience: "pro" },
       { to: "/proposals", label: "Propositions", icon: Lightbulb, audience: "all" },
@@ -158,7 +160,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/parcours", label: "Mon parcours", icon: History, audience: "all" },
       { to: "/foyer", label: "Mon foyer", icon: Users, audience: "all" },
       { to: "/profile", label: "Mon profil & mes chiens", icon: UserRound, audience: "all" },
-      { to: "/help", label: "Centre d'aide", icon: LifeBuoy, audience: "all" },
+      { to: "/help", label: "Centre d'aide", icon: LifeBuoy, audience: "all", primaryForParticulier: true },
       { to: "/help-requests", label: "Demandes d'aide", icon: HandHeart, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
     ],
