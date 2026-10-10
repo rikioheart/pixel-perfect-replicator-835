@@ -104,3 +104,11 @@
 - [ ] Écran Bureau « Gouvernance » et « Besoins de décision » (A14)
 - [x] Action contextuelle unique « Créer » selon rôle et permissions (A14)
 - [x] Navigation par intentions, recherche sécurisée, notifications et fiches contextuelles (A15–A16)
+
+## Lot 13 — A17→A20 calendrier, documents, formulaires
+- [x] Calendrier unique (agenda/semaine/mois) depuis les sources métier, conflits terrain signalés, fiches contextuelles
+- [x] Documents rattachés à un contexte (activité, événement, projet, réservation…) + sensibilité
+- [x] Formulaires (publics/internes, liés au contexte), soumission contrôlée, rapprochement de personne à valider
+- [ ] Formulaires et documents dans la recherche globale (A21)
+- [ ] Tests authentifiés par rôle et mobile des nouveaux parcours
+- [ ] Liaison Google Drive (connexion à faire par l'utilisateur)
