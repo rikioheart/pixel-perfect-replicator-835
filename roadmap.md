@@ -112,3 +112,13 @@
 - [ ] Formulaires et documents dans la recherche globale (A21)
 - [ ] Tests authentifiés par rôle et mobile des nouveaux parcours
 - [ ] Liaison Google Drive (connexion à faire par l'utilisateur)
+
+## Lot 14 — A21→A26 finances, HelloAsso, IA
+- [x] Suivi financier opérationnel (Bureau + droit finances), justificatifs, statuts, journal d'audit
+- [x] Locations de terrain suivies sur décision du Bureau (jamais automatiquement)
+- [x] Export CSV + copie pour tableur ; import HelloAsso idempotent avec journal et validation des cas ambigus
+- [x] Assistant IA sur projets et formulaires (résumé, incohérences, compte rendu), validation humaine tracée
+- [ ] Google Sheets en direct (connexion Google à faire par l'utilisateur)
+- [ ] Synchronisation HelloAsso automatique (identifiants API HelloAsso à fournir)
+- [ ] Rattacher une adhésion « personne sans compte » à la création du compte
+- [ ] Tests IA par rôle avec comptes d'essai (fuite, référent, partage)

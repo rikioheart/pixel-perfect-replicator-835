@@ -32,3 +32,6 @@
 - Recherche et notifications : les fonctions de lecture filtrent côté base selon les droits, et les notifications métier sont émises par déclencheur plutôt que par l'interface. Pourquoi : aucun résultat hors périmètre et aucun doublon selon l'écran utilisé.
 - Calendrier : agrège les tables métier (RLS) sans table calendrier. Pourquoi : aucune donnée dupliquée.
 - Réponses aux formulaires uniquement via submit_form_response ; un e-mail identique crée un rapprochement TO_REVIEW, jamais une personne. Pourquoi : pas de doublon ni d'identité présumée.
+- Finances : finance_entries = suivi opérationnel, jamais comptabilité ; écriture Bureau + finance.update, audit par trigger. Pourquoi : préparer la compta sans la remplacer.
+- HelloAsso : uniquement via import_helloasso_membership (idempotent sur source+external_id, ambiguïté ⇒ integration_events TO_REVIEW, journal systématique). Pourquoi : aucun doublon ni fusion automatique.
+- IA : les serveurs IA lisent les données avec la session de l'utilisateur (RLS), jamais en admin ; propositions validées tracées dans ai_suggestions. Pourquoi : l'IA ne voit que ce que l'utilisateur voit.
