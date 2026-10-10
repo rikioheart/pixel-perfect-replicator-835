@@ -35,3 +35,4 @@
 - Finances : finance_entries = suivi opérationnel, jamais comptabilité ; écriture Bureau + finance.update, audit par trigger. Pourquoi : préparer la compta sans la remplacer.
 - HelloAsso : uniquement via import_helloasso_membership (idempotent sur source+external_id, ambiguïté ⇒ integration_events TO_REVIEW, journal systématique). Pourquoi : aucun doublon ni fusion automatique.
 - IA : les serveurs IA lisent les données avec la session de l'utilisateur (RLS), jamais en admin ; propositions validées tracées dans ai_suggestions. Pourquoi : l'IA ne voit que ce que l'utilisateur voit.
+- Liens externes : stockés dans documents (url + context_type/context_id + sensitivity + service indicatif) via le composant ExternalLinks ; ajout autorisé par can_add_context_resource, SENSIBLE réservé au Bureau, aucune synchronisation. Pourquoi : un seul système documentaire, le lien marche sans API.

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ExternalLinks } from "@/components/ExternalLinks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, CalendarRange, MapPin, Users } from "lucide-react";
@@ -212,6 +213,7 @@ function EventDetailPage() {
 
       <div className="mt-4"><ExperienceSections item={event} /></div>
       <RegistrationWizard open={wizard} onOpenChange={setWizard} target={{ eventId, title: event.title, dogPolicy: event.dog_policy, maxDogs: event.max_dogs, full: Boolean(spots?.full), waitlist: Boolean(spots?.waitlist) }} />
+      <div className="mt-6"><ExternalLinks contextType="EVENT" contextId={eventId} /></div>
       <div className="mt-6">
         <Comments
           entityType="event"

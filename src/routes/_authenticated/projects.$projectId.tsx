@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ExternalLinks } from "@/components/ExternalLinks";
 import { AiAssist } from "@/components/AiAssist";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -294,6 +295,7 @@ function ProjectDetail() {
         )}
       </div>
 
+      <div className="mt-6"><ExternalLinks contextType="PROJECT" contextId={projectId} /></div>
       <div className="mt-6">
         <Comments
           entityType="project"
