@@ -88,7 +88,7 @@ function MemberDashboard() {
     ? "Vos prochaines activités, vos tâches en cours et vos tampons à valider."
     : isBureau
       ? "Vos tâches assignées et les événements proches."
-      : "Votre compagnon, vos sorties à venir à venir, votre carte fidélité et les dernières publications.";
+      : "Votre compagnon, vos sorties à venir, votre carte fidélité et les dernières publications.";
 
   return (
     <AppShell
