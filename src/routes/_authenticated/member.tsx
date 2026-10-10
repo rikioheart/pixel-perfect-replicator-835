@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { HomeHero } from "@/components/HomeHero";
+import { MyDogHome } from "@/components/MyDogHome";
+import { memberRoleLabel } from "@/lib/dog-timeline";
 import { NewsFeed } from "@/components/NewsFeed";
 import { UpdatesWall } from "@/components/UpdatesWall";
 import { useUserPreferences } from "@/lib/user-preferences";
@@ -35,9 +37,7 @@ export const Route = createFileRoute("/_authenticated/member")({
 });
 
 function MemberDashboard() {
-  const { user, profile, isBureau } = useAuth();
-  const type = (profile?.membership_type ?? "").toUpperCase();
-  const isPro = type.includes("PRO");
+  const { user, profile, isBureau, isPro } = useAuth();
 
   const { data } = useQuery({
     queryKey: ["member-home", user?.id],
@@ -78,24 +78,17 @@ function MemberDashboard() {
   const tasks = data?.tasks ?? [];
   const open = tasks.filter((task) => !["COMPLETED", "ARCHIVED", "CANCELLED"].includes(task.status));
   const done = tasks.filter((task) => task.status === "COMPLETED");
-  const isVolunteer = tasks.some((task) => task.is_volunteer_task);
   const upcoming = (data?.participations ?? [])
     .filter((p) => p.events?.start_date && p.events.start_date >= new Date().toISOString())
     .sort((a, b) => (a.events?.start_date ?? "").localeCompare(b.events?.start_date ?? ""));
 
-  const roleLabel = isBureau
-    ? "Bureau"
-    : isPro
-      ? "Professionnel adhérent"
-      : isVolunteer
-        ? "Bénévole"
-        : "Adhérent";
+  const roleLabel = memberRoleLabel({ isBureau, isPro });
 
   const welcome = isPro
     ? "Vos prochaines activités, vos tâches en cours et vos tampons à valider."
-    : isVolunteer
-      ? "Vos tâches assignées et les événements proches. Demander de l'aide est un signe d'engagement."
-      : "Vos inscriptions à venir, votre carte fidélité et les dernières publications.";
+    : isBureau
+      ? "Vos tâches assignées et les événements proches."
+      : "Votre compagnon, vos sorties à venir à venir, votre carte fidélité et les dernières publications.";
 
   return (
     <AppShell
@@ -113,6 +106,8 @@ function MemberDashboard() {
           roleLabel={roleLabel}
           message={welcome}
         />
+
+        {!isBureau && user ? <MyDogHome userId={user.id} /> : null}
 
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm">
