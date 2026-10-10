@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/avancees")({
 });
 
 function WallPage() {
-  const { user, isBureau, profile } = useAuth();
+  const { user, isBureau, isPro } = useAuth();
   const qc = useQueryClient();
   const canPost = isBureau || isPro;
   const [open, setOpen] = useState(false);
