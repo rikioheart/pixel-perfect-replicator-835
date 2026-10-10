@@ -4,7 +4,18 @@ import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export type PeekType = "dog" | "project" | "activity" | "reservation" | "task" | "person";
+export type PeekType =
+  | "dog"
+  | "project"
+  | "activity"
+  | "event"
+  | "reservation"
+  | "task"
+  | "person"
+  | "professional"
+  | "document"
+  | "participation"
+  | "resource";
 type Peek = { title?: string; subtitle?: string; status?: string; can_open?: boolean; link?: string;
   indicators?: { family: string; label: string }[] };
 
@@ -27,7 +38,13 @@ export function EntityPeek({ type, id, children }: { type: PeekType; id: string;
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" className="underline-offset-2 hover:underline focus-visible:underline">{children}</button>
+        <button
+          type="button"
+          className="min-h-11 rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label="Afficher les informations autorisées"
+        >
+          {children}
+        </button>
       </PopoverTrigger>
       <PopoverContent className="w-72 text-sm">
         {q.isLoading ? <p className="text-muted-foreground">Chargement…</p> : !q.data ? (
@@ -39,7 +56,7 @@ export function EntityPeek({ type, id, children }: { type: PeekType; id: string;
             {q.data.indicators?.length ? (
               <ul className="space-y-1">
                 {q.data.indicators.map((i, n) => (
-                  <li key={n} className="flex items-center gap-2 text-xs">
+                  <li key={`${i.family}-${i.label}-${n}`} className="flex items-center gap-2 text-xs">
                     <span aria-hidden className={FAMILY[i.family]?.cls}>{FAMILY[i.family]?.icon}</span>
                     <span>{i.label}</span><span className="sr-only">({i.family})</span>
                   </li>
