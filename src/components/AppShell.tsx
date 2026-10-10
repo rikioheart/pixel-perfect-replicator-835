@@ -41,6 +41,7 @@ import {
   Sparkles,
   Building2,
   Lightbulb,
+  Menu,
 } from "lucide-react";
 const HandHeart = HandHeartIcon;
 import { ExternalLink } from "lucide-react";
@@ -49,6 +50,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { QuickCreateMenu } from "@/components/QuickCreateMenu";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useExternalLinks } from "@/lib/home-config";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 
@@ -71,7 +82,7 @@ type NavGroup = { title: string; items: NavItem[] };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    title: "Espace professionnel",
+    title: "Mon activité professionnelle",
     items: [
       { to: "/espace-pro", label: "Tableau de bord pro", icon: LayoutDashboard, audience: "pro" },
       { to: "/espace-pro/carte", label: "Ma carte professionnelle", icon: Briefcase, audience: "pro" },
@@ -80,7 +91,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Cockpit Bureau",
+    title: "Gouvernance",
     items: [
       { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
       { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau", primary: true },
@@ -100,7 +111,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Avancer ensemble",
+    title: "Aujourd’hui et contribuer",
     items: [
       { to: "/member", label: "Mon espace", icon: UserRound, audience: "all", primary: true },
       { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all", primary: true },
@@ -111,7 +122,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Vie de l'association",
+    title: "Participer et communauté",
     items: [
       { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true },
       { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true },
@@ -126,7 +137,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Moi",
+    title: "Mon espace et ressources",
     items: [
       {
         to: "/loyalty",
@@ -151,7 +162,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Configuration",
+    title: "Intelligence et configuration",
     items: [
       { to: "/admin/loyalty-rules", label: "Règles de fidélité", icon: Stamp, audience: "bureau" },
       { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
@@ -200,7 +211,7 @@ export function AppShell({
     items: group.items.filter((item) => secondary.includes(item)),
   })).filter((group) => group.items.length > 0);
 
-  const renderLink = (item: NavItem) => {
+  const renderLink = (item: NavItem, mobile = false) => {
     const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
     return (
       <Link
@@ -214,7 +225,11 @@ export function AppShell({
         )}
       >
         <item.icon className="size-4" aria-hidden="true" />
-        {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
+        {mobile ? (
+          <SheetClose asChild>
+            <span>{isBureau && item.bureauLabel ? item.bureauLabel : item.label}</span>
+          </SheetClose>
+        ) : isBureau && item.bureauLabel ? item.bureauLabel : item.label}
       </Link>
     );
   };
@@ -313,6 +328,7 @@ export function AppShell({
           </div>
           <div className="flex items-center gap-2">
             {actions}
+            <QuickCreateMenu />
             <GlobalSearch />
             <NotificationBell />
             <Button
@@ -330,27 +346,42 @@ export function AppShell({
           </div>
         </header>
 
-        <nav
-          aria-label="Navigation principale (mobile)"
-          className="flex gap-2 overflow-x-auto border-b border-border bg-card px-4 py-2 md:hidden"
-        >
-          {[...primary, ...groups.flatMap((group) => group.items)].map((item) => {
-            const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-            return (
-              <Button
-                key={`m-${item.to}-${item.label}`}
-                asChild
-                variant={active ? "default" : "ghost"}
-                size="sm"
-                className="shrink-0"
-              >
-                <Link to={item.to} aria-current={active ? "page" : undefined}>
-                  {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
-                </Link>
+        <div className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-2 md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2" aria-label="Ouvrir le menu principal">
+                <Menu className="size-4" aria-hidden="true" /> Menu
               </Button>
-            );
-          })}
-        </nav>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[88vw] overflow-y-auto p-0 sm:max-w-sm">
+              <SheetHeader className="border-b border-border p-5 text-left">
+                <SheetTitle>La Voix du Chien</SheetTitle>
+                <SheetDescription>{isBureau ? "Gouvernance et actions" : "Votre espace associatif"}</SheetDescription>
+              </SheetHeader>
+              <nav aria-label="Navigation mobile" className="space-y-6 p-4">
+                {NAV_GROUPS.map((group) => {
+                  const groupItems = group.items.filter((item) => visible.includes(item));
+                  if (!groupItems.length) return null;
+                  return (
+                    <div key={group.title} className="space-y-1">
+                      <p className="px-3 pb-1 text-[11px] font-semibold uppercase text-muted-foreground">
+                        {group.title}
+                      </p>
+                      {groupItems.map((item) => renderLink(item, true))}
+                    </div>
+                  );
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
+          <p className="truncate text-sm font-medium">
+            {visible.find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`))?.label ?? title}
+          </p>
+          <div className="flex items-center gap-1">
+            <GlobalSearch />
+            <NotificationBell />
+          </div>
+        </div>
 
         <main id="contenu-principal" tabIndex={-1} className="flex-1 p-6 focus:outline-none">
           {children}

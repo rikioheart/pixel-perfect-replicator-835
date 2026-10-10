@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
@@ -13,36 +13,53 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-type Filter = "ALL" | "person" | "pro" | "document" | "request" | "project" | "task" | "event";
+type Filter =
+  | "ALL"
+  | "person"
+  | "professional"
+  | "dog"
+  | "document"
+  | "project"
+  | "task"
+  | "activity"
+  | "event"
+  | "resource"
+  | "participation";
 
 type Hit = {
   id: string;
-  kind: Exclude<Filter, "ALL">;
+  kind: string;
   title: string;
   subtitle: string;
-  to: string;
+  link: string;
   date: string | null;
 };
 
 const FILTERS: { code: Filter; label: string }[] = [
   { code: "ALL", label: "Tout" },
   { code: "person", label: "Personnes" },
-  { code: "pro", label: "Professionnels" },
+  { code: "professional", label: "Professionnels" },
+  { code: "dog", label: "Chiens" },
   { code: "document", label: "Documents" },
-  { code: "request", label: "Demandes" },
   { code: "project", label: "Projets" },
   { code: "task", label: "Tâches" },
+  { code: "activity", label: "Activités" },
   { code: "event", label: "Événements" },
+  { code: "resource", label: "Ressources" },
+  { code: "participation", label: "Participations" },
 ];
 
-const KIND_LABEL: Record<Exclude<Filter, "ALL">, string> = {
+const KIND_LABEL: Record<string, string> = {
   person: "Personne",
-  pro: "Professionnel",
+  professional: "Professionnel",
+  dog: "Chien",
   document: "Document",
-  request: "Demande d'aide",
   project: "Projet",
   task: "Tâche",
+  activity: "Activité",
   event: "Événement",
+  resource: "Ressource",
+  participation: "Participation",
 };
 
 /** Recherche globale accessible depuis toutes les pages (Ctrl/⌘ + K). */
@@ -50,6 +67,7 @@ export function GlobalSearch() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
+  const [debouncedTerm, setDebouncedTerm] = useState("");
   const [filter, setFilter] = useState<Filter>("ALL");
   const [since, setSince] = useState("");
 
@@ -64,140 +82,26 @@ export function GlobalSearch() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const search = term.trim();
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedTerm(term.trim()), 300);
+    return () => window.clearTimeout(timer);
+  }, [term]);
+
+  const search = debouncedTerm;
 
   const { data: hits = [], isFetching } = useQuery({
     queryKey: ["global-search", search, filter, since],
     enabled: open && search.length >= 2,
     queryFn: async () => {
-      const like = `%${search}%`;
-      const want = (kind: Filter) => filter === "ALL" || filter === kind;
-      const results: Hit[] = [];
-
-      if (want("person") || want("pro")) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("id, display_name, first_name, last_name, city, membership_type, created_at")
-          .or(
-            `display_name.ilike.${like},first_name.ilike.${like},last_name.ilike.${like},city.ilike.${like}`,
-          )
-          .limit(20);
-        for (const row of data ?? []) {
-          const isPro = (row.membership_type ?? "").toUpperCase().includes("PRO");
-          if (!want(isPro ? "pro" : "person")) continue;
-          results.push({
-            id: `profile-${row.id}`,
-            kind: isPro ? "pro" : "person",
-            title:
-              row.display_name ||
-              `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim() ||
-              "Adhérent",
-            subtitle: row.city ?? row.membership_type ?? "",
-            to: isPro ? `/professionals/${row.id}` : `/members/${row.id}`,
-            date: row.created_at,
-          });
-        }
-      }
-
-      if (want("document")) {
-        const { data } = await supabase
-          .from("documents")
-          .select("id, title, category, created_at")
-          .ilike("title", like)
-          .limit(15);
-        for (const row of data ?? []) {
-          results.push({
-            id: `doc-${row.id}`,
-            kind: "document",
-            title: row.title,
-            subtitle: row.category ?? "Document",
-            to: "/documents",
-            date: row.created_at,
-          });
-        }
-      }
-
-      if (want("request")) {
-        const { data } = await supabase
-          .from("help_requests")
-          .select("id, message, type, status, created_at")
-          .ilike("message", like)
-          .limit(15);
-        for (const row of data ?? []) {
-          results.push({
-            id: `req-${row.id}`,
-            kind: "request",
-            title: row.message.slice(0, 70),
-            subtitle: `${row.type} · ${row.status}`,
-            to: "/help-requests",
-            date: row.created_at,
-          });
-        }
-      }
-
-      if (want("project")) {
-        const { data } = await supabase
-          .from("projects")
-          .select("id, title, status, created_at")
-          .ilike("title", like)
-          .limit(15);
-        for (const row of data ?? []) {
-          results.push({
-            id: `proj-${row.id}`,
-            kind: "project",
-            title: row.title,
-            subtitle: row.status,
-            to: `/projects/${row.id}`,
-            date: row.created_at,
-          });
-        }
-      }
-
-      if (want("task")) {
-        const { data } = await supabase
-          .from("tasks")
-          .select("id, title, status, created_at")
-          .ilike("title", like)
-          .limit(15);
-        for (const row of data ?? []) {
-          results.push({
-            id: `task-${row.id}`,
-            kind: "task",
-            title: row.title,
-            subtitle: row.status,
-            to: "/tasks",
-            date: row.created_at,
-          });
-        }
-      }
-
-      if (want("event")) {
-        const { data } = await supabase
-          .from("events")
-          .select("id, title, location, start_date, created_at")
-          .ilike("title", like)
-          .limit(15);
-        for (const row of data ?? []) {
-          results.push({
-            id: `event-${row.id}`,
-            kind: "event",
-            title: row.title,
-            subtitle: row.location ?? "Événement",
-            to: `/events/${row.id}`,
-            date: row.start_date ?? row.created_at,
-          });
-        }
-      }
-
-      return results;
+      const { data, error } = await supabase.rpc("global_search", {
+        _term: search,
+        _kind: filter === "ALL" ? null : filter,
+        _since: since || null,
+      });
+      if (error) throw error;
+      return (data ?? []) as Hit[];
     },
   });
-
-  const filtered = useMemo(() => {
-    if (!since) return hits;
-    const from = new Date(since).getTime();
-    return hits.filter((hit) => (hit.date ? new Date(hit.date).getTime() >= from : false));
-  }, [hits, since]);
 
   return (
     <>
@@ -217,7 +121,7 @@ export function GlobalSearch() {
           <DialogHeader>
             <DialogTitle>Rechercher</DialogTitle>
             <DialogDescription>
-              Personnes, professionnels, documents, demandes, projets, tâches et événements.
+              Uniquement les personnes, chiens et objets que vous êtes autorisé à ouvrir.
             </DialogDescription>
           </DialogHeader>
 
@@ -265,28 +169,29 @@ export function GlobalSearch() {
                 </p>
               ) : isFetching ? (
                 <p className="text-sm text-muted-foreground">Recherche…</p>
-              ) : filtered.length === 0 ? (
+              ) : hits.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Aucun résultat.</p>
               ) : (
-                filtered.map((hit) => (
-                  <button
+                hits.map((hit) => (
+                  <Button
                     key={hit.id}
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       setOpen(false);
-                      void navigate({ to: hit.to as never });
+                      void navigate({ to: hit.link as never });
                     }}
-                    className="block w-full rounded-md border border-border p-3 text-left text-sm hover:bg-muted"
+                    className="h-auto min-h-14 w-full justify-start rounded-md border border-border p-3 text-left text-sm"
                   >
-                    <p className="font-medium">{hit.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {KIND_LABEL[hit.kind]}
-                      {hit.subtitle ? ` · ${hit.subtitle}` : ""}
-                      {hit.date
-                        ? ` · ${new Date(hit.date).toLocaleDateString("fr-FR")}`
-                        : ""}
-                    </p>
-                  </button>
+                    <span>
+                      <span className="block font-medium">{hit.title}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {KIND_LABEL[hit.kind] ?? hit.kind}
+                        {hit.subtitle ? ` · ${hit.subtitle}` : ""}
+                        {hit.date ? ` · ${new Date(hit.date).toLocaleDateString("fr-FR")}` : ""}
+                      </span>
+                    </span>
+                  </Button>
                 ))
               )}
             </div>

@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { LoadingState } from "@/components/LoadingState";
+import { EntityPeek } from "@/components/EntityPeek";
 
 export const Route = createFileRoute("/_authenticated/participations")({
   head: () => ({
@@ -85,23 +86,27 @@ function ParticipationsPage() {
       ) : (
         <div className="space-y-2">
           {items.map((item) => (
-            <Link
+            <div
               key={item.id}
-              to={item.link}
               className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/40"
             >
               <div>
-                <p className="font-semibold">{item.title}</p>
+                <EntityPeek type="participation" id={item.id}>
+                  <span className="font-semibold">{item.title}</span>
+                </EntityPeek>
                 <p className="text-xs text-muted-foreground">
                   {ROLE_LABELS[item.role] ?? item.role}
                   {item.date ? ` · ${new Date(item.date).toLocaleDateString("fr-FR")}` : ""}
                   {item.location ? ` · ${item.location}` : ""}
                 </p>
               </div>
-              <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
-                {item.status === "CONFIRMED" ? "Confirmée" : "En attente"}
-              </span>
-            </Link>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                  {item.status === "CONFIRMED" ? "Confirmée" : "En attente"}
+                </span>
+                <Link to={item.link} className="text-xs font-semibold text-primary hover:underline">Ouvrir</Link>
+              </div>
+            </div>
           ))}
         </div>
       )}
