@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getSharedEntity } from "@/lib/shares.functions";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/LoadingState";
-import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 
 export const Route = createFileRoute("/partage/$token")({
   head: () => ({
@@ -76,7 +76,7 @@ function SharedPage() {
         Aller au contenu
       </a>
       <header className="surface-night flex items-center gap-3 px-6 py-4">
-        <img src={logoAsset.url} alt="Logo La Voix du Chien" className="size-9 object-contain" />
+        <img src={logoMark.url} alt="Logo La Voix du Chien" className="size-9 rounded-full object-contain" />
         <div className="leading-tight">
           <p className="font-display text-sm">La Voix du Chien</p>
           <p className="text-xs">Partage en lecture seule</p>

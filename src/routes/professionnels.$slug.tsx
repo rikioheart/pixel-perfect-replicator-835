@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, CalendarDays, Dog, Gift, Globe, Handshake, Mail, MapPin, Phone } from "lucide-react";
-import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +74,7 @@ function PublicProCard() {
       <header className="surface-night">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-center gap-3">
-            <img src={logoAsset.url} alt="Logo de La Voix du Chien" className="size-9 rounded-full bg-navy-foreground/10 object-contain p-1" />
+            <img src={logoMark.url} alt="Logo de La Voix du Chien" className="size-9 rounded-full object-contain p-1" />
             <span className="font-display text-sm">La Voix du Chien</span>
           </div>
           <Button asChild variant="outline" size="sm">

@@ -70,6 +70,7 @@ import { useExternalLinks } from "@/lib/home-config";
 import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, MEMBER_HUB_TABS } from "@/lib/nav-rules";
 import { setNavSectionOpen, useNavSectionsOpen } from "@/lib/nav-state";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 
 type Audience = "bureau" | "all" | "pro";
 
