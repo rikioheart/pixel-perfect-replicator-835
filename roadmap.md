@@ -128,3 +128,10 @@
 - [x] Reconnaissance indicative Drive/Docs/Forms/Sheets/Agenda/Meet/Rintintin, lien générique sinon
 - [x] Liens sur tâches, réservations terrain, formations (même composant, à placer)
 - [ ] Connecteur Rintintin : en attente de confirmation officielle d'une API
+
+## Lot 17 — Stabilisation
+- [x] Menu : état « Tout le reste » et défilement mémorisés, tiroir mobile fermé au changement de page
+- [x] Statut pro via la base (menu, création rapide, formations)
+- [x] Onglets « Mon Compagnon & Moi » reliant les pages personnelles existantes
+- [ ] Remplacer les détections pro restantes (statistiques, annuaire, avancées, accueil membre)
+- [ ] Vérifier connecté particulier/pro sur mobile
