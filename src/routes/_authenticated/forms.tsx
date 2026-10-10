@@ -80,7 +80,7 @@ function FormsPage() {
       const [ct, cid] = f.context ? f.context.split(":") : [null, null];
       const { error } = await supabase.from("forms").insert({
         title: f.title.trim(), purpose: f.purpose.trim(), data_usage: f.data_usage.trim(), contact: f.contact || null,
-        audience: f.audience, kind: f.kind, context_type: ct, context_id: cid, fields, created_by: user?.id,
+        audience: f.audience, kind: f.kind, context_type: ct, context_id: cid, fields: fields as never, created_by: user?.id ?? null,
       });
       if (error) throw error;
     },
@@ -97,7 +97,7 @@ function FormsPage() {
   });
   const review = useMutation({
     mutationFn: async ({ id, match_status }: { id: string; match_status: string }) => {
-      const { error } = await supabase.from("form_responses").update({ match_status, reviewed_by: user?.id, reviewed_at: new Date().toISOString() }).eq("id", id);
+      const { error } = await supabase.from("form_responses").update({ match_status, reviewed_by: user?.id ?? null, reviewed_at: new Date().toISOString() }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Rapprochement enregistré."); void qc.invalidateQueries({ queryKey: ["form-responses"] }); },

@@ -58,7 +58,7 @@ function PublicForm() {
     if (missing) return setErr(`« ${missing.label} » est obligatoire.`);
     setState("sending");
     const { error } = await supabase.rpc("submit_form_response", {
-      _form_id: form.id, _answers: answers, _name: anon ? name : null, _email: anon ? email : null, _consent: consent,
+      _form_id: form.id, _answers: answers, _name: anon ? name : "", _email: anon ? email : "", _consent: consent,
     });
     if (error) { setErr(error.message); setState("idle"); } else setState("done");
   };

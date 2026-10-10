@@ -145,7 +145,7 @@ function CalendarPage() {
             <Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Période précédente"><ChevronLeft className="size-4" /></Button>
             <span className="min-w-36 text-center text-sm font-semibold capitalize">
               {view === "month" ? cursor.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
-                : `Semaine du ${days[0].toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`}
+                : `Semaine du ${days[0]!.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`}
             </span>
             <Button size="icon" variant="ghost" onClick={() => move(1)} aria-label="Période suivante"><ChevronRight className="size-4" /></Button>
           </div>
