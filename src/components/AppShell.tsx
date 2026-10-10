@@ -258,7 +258,21 @@ export function AppShell({
         aria-label="Menu latéral"
         className="surface-night sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex"
       >
-...
+        <div>
+          <div className="flex items-center gap-3 pb-8">
+            <img
+              src={logoAsset.url}
+              alt="Logo La Voix du Chien"
+              className="size-10 rounded-full bg-navy-foreground/10 object-contain p-0.5"
+            />
+            <div className="leading-tight">
+              <p className="font-display text-sm">La Voix du Chien</p>
+              <p className="text-xs">{isBureau ? "Cockpit Bureau" : isPro ? "Espace professionnel" : "Espace adhérent"}</p>
+            </div>
+          </div>
+          <nav aria-label="Navigation des pages" className="space-y-5">
+            <div className="space-y-1">{primary.map((item) => renderLink(item))}</div>
+
             {groups.length ? (
               <details
                 className="group"
