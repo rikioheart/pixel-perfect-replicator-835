@@ -22,6 +22,7 @@ import { Route as AuthenticatedDirectoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedFormationsRouteImport } from './routes/_authenticated/formations'
+import { Route as AuthenticatedFormsRouteImport } from './routes/_authenticated/forms'
 import { Route as AuthenticatedFoyerRouteImport } from './routes/_authenticated/foyer'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedHelpRequestsRouteImport } from './routes/_authenticated/help-requests'
@@ -43,6 +44,7 @@ import { Route as AuthenticatedReimbursementsRouteImport } from './routes/_authe
 import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated/statistics'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticated/terrain'
+import { Route as FormulaireFormIdRouteImport } from './routes/formulaire.$formId'
 import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
 import { Route as ProfessionnelsSlugRouteImport } from './routes/professionnels.$slug'
@@ -138,6 +140,11 @@ const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
 const AuthenticatedFormationsRoute = AuthenticatedFormationsRouteImport.update({
   id: '/formations',
   path: '/formations',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFormsRoute = AuthenticatedFormsRouteImport.update({
+  id: '/forms',
+  path: '/forms',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFoyerRoute = AuthenticatedFoyerRouteImport.update({
@@ -248,6 +255,11 @@ const AuthenticatedTerrainRoute = AuthenticatedTerrainRouteImport.update({
   id: '/terrain',
   path: '/terrain',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const FormulaireFormIdRoute = FormulaireFormIdRouteImport.update({
+  id: '/formulaire/$formId',
+  path: '/formulaire/$formId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PartageTokenRoute = PartageTokenRouteImport.update({
   id: '/partage/$token',
@@ -446,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/formations': typeof AuthenticatedFormationsRoute
+  '/forms': typeof AuthenticatedFormsRoute
   '/foyer': typeof AuthenticatedFoyerRoute
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
@@ -467,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/formulaire/$formId': typeof FormulaireFormIdRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
@@ -513,6 +527,7 @@ export interface FileRoutesByTo {
   '/documents': typeof AuthenticatedDocumentsRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/formations': typeof AuthenticatedFormationsRoute
+  '/forms': typeof AuthenticatedFormsRoute
   '/foyer': typeof AuthenticatedFoyerRoute
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
@@ -534,6 +549,7 @@ export interface FileRoutesByTo {
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/terrain': typeof AuthenticatedTerrainRoute
+  '/formulaire/$formId': typeof FormulaireFormIdRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
@@ -582,6 +598,7 @@ export interface FileRoutesById {
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/formations': typeof AuthenticatedFormationsRoute
+  '/_authenticated/forms': typeof AuthenticatedFormsRoute
   '/_authenticated/foyer': typeof AuthenticatedFoyerRoute
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/help-requests': typeof AuthenticatedHelpRequestsRoute
@@ -603,6 +620,7 @@ export interface FileRoutesById {
   '/_authenticated/statistics': typeof AuthenticatedStatisticsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/terrain': typeof AuthenticatedTerrainRoute
+  '/formulaire/$formId': typeof FormulaireFormIdRoute
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
@@ -651,6 +669,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/finance'
     | '/formations'
+    | '/forms'
     | '/foyer'
     | '/help'
     | '/help-requests'
@@ -672,6 +691,7 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/formulaire/$formId'
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
@@ -718,6 +738,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/finance'
     | '/formations'
+    | '/forms'
     | '/foyer'
     | '/help'
     | '/help-requests'
@@ -739,6 +760,7 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/tasks'
     | '/terrain'
+    | '/formulaire/$formId'
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
@@ -786,6 +808,7 @@ export interface FileRouteTypes {
     | '/_authenticated/documents'
     | '/_authenticated/finance'
     | '/_authenticated/formations'
+    | '/_authenticated/forms'
     | '/_authenticated/foyer'
     | '/_authenticated/help'
     | '/_authenticated/help-requests'
@@ -807,6 +830,7 @@ export interface FileRouteTypes {
     | '/_authenticated/statistics'
     | '/_authenticated/tasks'
     | '/_authenticated/terrain'
+    | '/formulaire/$formId'
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
@@ -845,6 +869,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AssociationRoute: typeof AssociationRoute
+  FormulaireFormIdRoute: typeof FormulaireFormIdRoute
   PartageTokenRoute: typeof PartageTokenRoute
   ProProIdRoute: typeof ProProIdRoute
   ProfessionnelsSlugRoute: typeof ProfessionnelsSlugRoute
@@ -942,6 +967,13 @@ declare module '@tanstack/react-router' {
       path: '/formations'
       fullPath: '/formations'
       preLoaderRoute: typeof AuthenticatedFormationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/forms': {
+      id: '/_authenticated/forms'
+      path: '/forms'
+      fullPath: '/forms'
+      preLoaderRoute: typeof AuthenticatedFormsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/foyer': {
@@ -1090,6 +1122,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/terrain'
       preLoaderRoute: typeof AuthenticatedTerrainRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/formulaire/$formId': {
+      id: '/formulaire/$formId'
+      path: '/formulaire/$formId'
+      fullPath: '/formulaire/$formId'
+      preLoaderRoute: typeof FormulaireFormIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/partage/$token': {
       id: '/partage/$token'
@@ -1329,6 +1368,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedFormationsRoute: typeof AuthenticatedFormationsRoute
+  AuthenticatedFormsRoute: typeof AuthenticatedFormsRoute
   AuthenticatedFoyerRoute: typeof AuthenticatedFoyerRoute
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHelpRequestsRoute: typeof AuthenticatedHelpRequestsRoute
@@ -1391,6 +1431,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedFormationsRoute: AuthenticatedFormationsRoute,
+  AuthenticatedFormsRoute: AuthenticatedFormsRoute,
   AuthenticatedFoyerRoute: AuthenticatedFoyerRoute,
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHelpRequestsRoute: AuthenticatedHelpRequestsRoute,
@@ -1451,6 +1492,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AssociationRoute: AssociationRoute,
+  FormulaireFormIdRoute: FormulaireFormIdRoute,
   PartageTokenRoute: PartageTokenRoute,
   ProProIdRoute: ProProIdRoute,
   ProfessionnelsSlugRoute: ProfessionnelsSlugRoute,
