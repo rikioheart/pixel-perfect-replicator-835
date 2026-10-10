@@ -141,6 +141,13 @@
       "when": 1791631435700,
       "tag": "0019_a21_a26_finance_integrations_ai",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791631450550,
+      "tag": "0020_fix_finance_permission_code",
+      "breakpoints": true
     }
   ]
 }
