@@ -186,21 +186,29 @@ export function AppShell({
   actions?: ReactNode;
   children: ReactNode;
 }) {
-  const { profile, isBureau, signOut } = useAuth();
+  const { profile, isBureau, isPro, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
-  const isParticulier = !isBureau && !isPro;
+  const viewer = { isBureau, isPro };
   const externalLinks = useExternalLinks();
-  const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => {
-    if (item.hideForParticulier && isParticulier) return false;
-    if (item.audience === "bureau") return isBureau;
-    if (item.audience === "pro") return isBureau || isPro;
-    return true;
-  });
+  const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => isNavItemVisible(item, viewer));
 
-  const primary = visible.filter((item) => item.primary).slice(0, 5);
+  // Chaque page remonte AppShell : on mémorise l'état du menu hors de la page.
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const asideRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    setMoreOpen(window.localStorage.getItem("lvdc.nav.more") === "1");
+    const y = Number(window.sessionStorage.getItem("lvdc.nav.scroll") ?? 0);
+    if (asideRef.current && y) asideRef.current.scrollTop = y;
+  }, []);
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  const primary = visible.filter((item) => isNavItemPrimary(item, viewer)).slice(0, 5);
+  const hubTab = memberHubTabFor(pathname);
   const primaryPaths = new Set(primary.map((item) => item.to));
   const seen = new Set(primaryPaths);
   const secondary = visible.filter((item) => {
@@ -242,24 +250,23 @@ export function AppShell({
       >
         Aller au contenu principal
       </a>
-      <aside aria-label="Menu latéral" className="surface-night sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex">
-        <div>
-          <div className="flex items-center gap-3 pb-8">
-            <img
-              src={logoAsset.url}
-              alt="Logo La Voix du Chien"
-              className="size-10 rounded-full bg-navy-foreground/10 object-contain p-0.5"
-            />
-            <div className="leading-tight">
-              <p className="font-display text-sm">La Voix du Chien</p>
-              <p className="text-xs">{isBureau ? "Cockpit Bureau" : "Espace adhérent"}</p>
-            </div>
-          </div>
-          <nav aria-label="Navigation des pages" className="space-y-5">
-            <div className="space-y-1">{primary.map((item) => renderLink(item))}</div>
-
+      <aside
+        ref={asideRef}
+        onScroll={(e) => window.sessionStorage.setItem("lvdc.nav.scroll", String(e.currentTarget.scrollTop))}
+        aria-label="Menu latéral"
+        className="surface-night sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex"
+      >
+...
             {groups.length ? (
-              <details className="group">
+              <details
+                className="group"
+                open={moreOpen}
+                onToggle={(e) => {
+                  const open = e.currentTarget.open;
+                  setMoreOpen(open);
+                  window.localStorage.setItem("lvdc.nav.more", open ? "1" : "0");
+                }}
+              >
                 <summary className="cursor-pointer list-none rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   Tout le reste
                 </summary>
@@ -348,7 +355,7 @@ export function AppShell({
         </header>
 
         <div className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-2 md:hidden">
-          <Sheet>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2" aria-label="Ouvrir le menu principal">
                 <Menu className="size-4" aria-hidden="true" /> Menu
@@ -385,6 +392,23 @@ export function AppShell({
         </div>
 
         <main id="contenu-principal" tabIndex={-1} className="flex-1 p-6 focus:outline-none">
+          {hubTab && !isBureau ? (
+            <nav aria-label="Mon Compagnon & Moi" className="-mt-2 mb-5 flex gap-1 overflow-x-auto border-b border-border pb-2">
+              {MEMBER_HUB_TABS.map((t) => (
+                <Link
+                  key={t.to}
+                  to={t.to}
+                  aria-current={hubTab === t.to ? "page" : undefined}
+                  className={cn(
+                    "whitespace-nowrap rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    hubTab === t.to ? "bg-primary text-primary-foreground" : "hover:bg-accent",
+                  )}
+                >
+                  {t.label}
+                </Link>
+              ))}
+            </nav>
+          ) : null}
           {children}
         </main>
       </div>
