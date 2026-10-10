@@ -747,6 +747,7 @@ export type Database = {
           id: string
           proof_type: string | null
           sensitivity: string
+          service: string | null
           title: string
           updated_at: string
           uploaded_by: string | null
@@ -761,6 +762,7 @@ export type Database = {
           id?: string
           proof_type?: string | null
           sensitivity?: string
+          service?: string | null
           title: string
           updated_at?: string
           uploaded_by?: string | null
@@ -775,6 +777,7 @@ export type Database = {
           id?: string
           proof_type?: string | null
           sensitivity?: string
+          service?: string | null
           title?: string
           updated_at?: string
           uploaded_by?: string | null
@@ -4162,6 +4165,10 @@ export type Database = {
       }
       bureau_dog_full: { Args: { _user_id: string }; Returns: boolean }
       bureau_dogs: { Args: never; Returns: Json }
+      can_add_context_resource: {
+        Args: { _id: string; _type: string; _user_id: string }
+        Returns: boolean
+      }
       can_edit_dog_indicators: {
         Args: { _dog_id: string; _user_id: string }
         Returns: boolean
