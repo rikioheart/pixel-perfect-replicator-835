@@ -99,8 +99,8 @@ function Page() {
 
   const importHelloAsso = async (file: File) => {
     const rows = parseHelloAssoCsv(await file.text());
-    if (rows.length === 0) return toast.error("Aucune ligne lisible. Colonnes attendues : id, email, prenom, nom, debut, fin, montant.");
-    if (!confirm(`Importer ${rows.length} adhésion(s) HelloAsso ?\nAucune fusion automatique : les cas ambigus seront mis « à valider ».`)) return;
+    if (rows.length === 0) { toast.error("Aucune ligne lisible. Colonnes attendues : id, email, prenom, nom, debut, fin, montant."); return undefined; }
+    if (!confirm(`Importer ${rows.length} adhésion(s) HelloAsso ?\nAucune fusion automatique : les cas ambigus seront mis « à valider ».`)) return undefined;
     const counts: Record<string, number> = {};
     for (const r of rows.slice(0, 1000)) {
       const { data, error } = await supabase.rpc("import_helloasso_membership", {
@@ -111,6 +111,7 @@ function Page() {
     }
     toast.success(Object.entries(counts).map(([k, v]) => `${OUT_FR[k] ?? k} : ${v}`).join(" · "));
     refresh();
+    return undefined;
   };
 
   const list = useMemo(() => (entries.data ?? []).filter((e) => !filter || e.status === filter || e.direction === filter), [entries.data, filter]);
