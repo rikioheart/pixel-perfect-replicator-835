@@ -62,6 +62,7 @@ import {
 } from "@/components/ui/sheet";
 import { useExternalLinks } from "@/lib/home-config";
 import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, MEMBER_HUB_TABS } from "@/lib/nav-rules";
+import { setNavSectionOpen, useNavSectionsOpen } from "@/lib/nav-state";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 
 type Audience = "bureau" | "all" | "pro";
@@ -196,12 +197,11 @@ export function AppShell({
   const externalLinks = useExternalLinks();
   const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => isNavItemVisible(item, viewer));
 
-  // Chaque page remonte AppShell : on mémorise l'état du menu hors de la page.
-  const [moreOpen, setMoreOpen] = useState(false);
+  // Chaque page remonte AppShell : l'état des sections vit dans un store global persistant.
+  const isOpen = useNavSectionsOpen();
   const [mobileOpen, setMobileOpen] = useState(false);
   const asideRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    setMoreOpen(window.localStorage.getItem("lvdc.nav.more") === "1");
     const y = Number(window.sessionStorage.getItem("lvdc.nav.scroll") ?? 0);
     if (asideRef.current && y) asideRef.current.scrollTop = y;
   }, []);
@@ -276,25 +276,33 @@ export function AppShell({
             {groups.length ? (
               <details
                 className="group"
-                open={moreOpen}
-                onToggle={(e) => {
-                  const open = e.currentTarget.open;
-                  setMoreOpen(open);
-                  window.localStorage.setItem("lvdc.nav.more", open ? "1" : "0");
-                }}
+                open={isOpen("__more")}
+                onToggle={(e) => setNavSectionOpen("__more", e.currentTarget.open)}
               >
                 <summary className="cursor-pointer list-none rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   Tout le reste
                 </summary>
-                <div className="mt-2 space-y-4">
-                  {groups.map((group) => (
-                    <div key={group.title} className="space-y-1">
-                      <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide">
-                        {group.title}
-                      </p>
-                      {group.items.map((item) => renderLink(item))}
-                    </div>
-                  ))}
+                <div className="mt-2 space-y-2">
+                  {groups.map((group) => {
+                    const hasActive = group.items.some(
+                      (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
+                    );
+                    return (
+                      <details
+                        key={group.title}
+                        open={hasActive || isOpen(group.title)}
+                        onToggle={(e) => {
+                          if (!hasActive) setNavSectionOpen(group.title, e.currentTarget.open);
+                        }}
+                        className="space-y-1"
+                      >
+                        <summary className="cursor-pointer list-none rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                          {group.title}
+                        </summary>
+                        {group.items.map((item) => renderLink(item))}
+                      </details>
+                    );
+                  })}
                 </div>
               </details>
             ) : null}

@@ -29,11 +29,13 @@ export const MEMBER_HUB_TABS = [
   { to: "/member", label: "Accueil" },
   { to: "/foyer", label: "Mon foyer & mes chiens" },
   { to: "/participations", label: "Mes sorties" },
+  { to: "/terrain", label: "Mes réservations" },
   { to: "/loyalty", label: "Mon pass & tampons" },
   { to: "/advantages", label: "Avantages" },
   { to: "/parcours", label: "Mon parcours" },
+  { to: "/my-history", label: "Historique" },
   { to: "/profile", label: "Profil" },
-  { to: "/my-space", label: "Préférences" },
+  { to: "/my-space", label: "Mon espace & préférences" },
 ] as const;
 
 export function memberHubTabFor(pathname: string): string | null {
