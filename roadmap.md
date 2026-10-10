@@ -122,3 +122,9 @@
 - [ ] Synchronisation HelloAsso automatique (identifiants API HelloAsso à fournir)
 - [ ] Rattacher une adhésion « personne sans compte » à la création du compte
 - [ ] Tests IA par rôle avec comptes d'essai (fuite, référent, partage)
+
+## Lot 15 — Liens externes (niveaux 1-2)
+- [x] « Ajouter une ressource » sur projets, activités, événements (coller un lien, titre facultatif, ouvrir)
+- [x] Reconnaissance indicative Drive/Docs/Forms/Sheets/Agenda/Meet/Rintintin, lien générique sinon
+- [ ] Liens sur tâches, réservations terrain, formations (même composant, à placer)
+- [ ] Connecteur Rintintin : en attente de confirmation officielle d'une API
