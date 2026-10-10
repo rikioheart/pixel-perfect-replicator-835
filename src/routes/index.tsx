@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -52,7 +52,7 @@ function AuthPage() {
       <section className="surface-night flex flex-col justify-between p-10">
         <div className="flex items-center gap-3">
           <img
-            src={logoAsset.url}
+            src={logoMark.url}
             alt="Logo de l'association La Voix du Chien"
             className="size-12 rounded-full bg-navy-foreground/10 object-contain p-1"
           />

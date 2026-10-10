@@ -70,6 +70,7 @@ import { useExternalLinks } from "@/lib/home-config";
 import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, MEMBER_HUB_TABS } from "@/lib/nav-rules";
 import { setNavSectionOpen, useNavSectionsOpen } from "@/lib/nav-state";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 
 type Audience = "bureau" | "all" | "pro";
 
@@ -269,7 +270,7 @@ export function AppShell({
             <img
               src={logoAsset.url}
               alt="Logo La Voix du Chien"
-              className="size-10 rounded-full bg-navy-foreground/10 object-contain p-0.5"
+              className="h-10 w-auto max-w-44 object-contain"
             />
             <div className="leading-tight">
               <p className="font-display text-sm">La Voix du Chien</p>

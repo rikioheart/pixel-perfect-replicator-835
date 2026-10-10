@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { HeartHandshake, MapPin, Globe, Briefcase, ArrowRight } from "lucide-react";
-import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 import { UpdatesWall } from "@/components/UpdatesWall";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -67,7 +67,7 @@ function PublicAssociationPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-center gap-3">
             <img
-              src={logoAsset.url}
+              src={logoMark.url}
               alt="Logo de l'association La Voix du Chien"
               className="size-10 rounded-full bg-navy-foreground/10 object-contain p-1"
             />

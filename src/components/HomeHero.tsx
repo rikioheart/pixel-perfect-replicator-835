@@ -1,5 +1,5 @@
 import { Sparkles, ExternalLink } from "lucide-react";
-import logoAsset from "@/assets/logo-lvdc.png.asset.json";
+import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 import { useHomeMedia, useExternalLinks } from "@/lib/home-config";
 
 /**
@@ -34,7 +34,7 @@ export function HomeHero({
 
       <div className="flex flex-wrap items-center gap-5 p-5">
         <img
-          src={logoAsset.url}
+          src={logoMark.url}
           alt="Logo de l'association La Voix du Chien"
           className="size-16 shrink-0 rounded-full bg-card object-contain p-1 ring-1 ring-border sm:size-20"
         />
