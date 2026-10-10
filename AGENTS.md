@@ -30,3 +30,5 @@
 - Indicateurs chien (dog_indicators) : 4 familles VERT/JAUNE/BLEU/NOIR, libellé obligatoire, jamais une note ; lisibles en vue opérationnelle. Pourquoi : adapter l'environnement, pas juger.
 - Fiches contextuelles via entity_peek(type,id) (champs autorisés + can_open) et le composant EntityPeek. Pourquoi : une seule source filtrée pour toutes les fenêtres.
 - Recherche et notifications : les fonctions de lecture filtrent côté base selon les droits, et les notifications métier sont émises par déclencheur plutôt que par l'interface. Pourquoi : aucun résultat hors périmètre et aucun doublon selon l'écran utilisé.
+- Calendrier : agrège les tables métier (RLS) sans table calendrier. Pourquoi : aucune donnée dupliquée.
+- Réponses aux formulaires uniquement via submit_form_response ; un e-mail identique crée un rapprochement TO_REVIEW, jamais une personne. Pourquoi : pas de doublon ni d'identité présumée.
