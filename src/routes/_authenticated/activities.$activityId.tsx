@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ExternalLinks } from "@/components/ExternalLinks";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -116,6 +117,7 @@ function ActivityDetail() {
         </aside>
       </div>
       <RegistrationWizard open={open} onOpenChange={setOpen} target={{ activityId, title: a.title, dogPolicy: a.dog_policy, maxDogs: a.max_dogs, full: Boolean(spots?.full), waitlist: Boolean(spots?.waitlist) }} />
+      <div className="mt-6"><ExternalLinks contextType="ACTIVITY" contextId={activityId} /></div>
     </AppShell>
   );
 }
