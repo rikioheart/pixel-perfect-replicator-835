@@ -361,6 +361,7 @@ export function AppShell({
           <div className="flex items-center gap-2">
             {actions}
             <QuickCreateMenu />
+            <div className="hidden items-center gap-2 md:flex">
             <GlobalSearch />
             <NotificationBell />
             <Button
@@ -375,6 +376,7 @@ export function AppShell({
               <LogOut className="size-4" aria-hidden="true" />
               Se déconnecter
             </Button>
+            </div>
           </div>
         </header>
 
