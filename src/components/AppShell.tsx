@@ -405,6 +405,16 @@ export function AppShell({
                     </div>
                   );
                 })}
+                <Button
+                  variant="outline"
+                  className="min-h-11 w-full justify-start gap-2"
+                  onClick={async () => {
+                    await signOut();
+                    void navigate({ to: "/" });
+                  }}
+                >
+                  <LogOut className="size-4" aria-hidden="true" /> Se déconnecter
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
