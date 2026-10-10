@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/avancees")({
 function WallPage() {
   const { user, isBureau, profile } = useAuth();
   const qc = useQueryClient();
-  const canPost = isBureau || (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const canPost = isBureau || isPro;
   const [open, setOpen] = useState(false);
   const [help, setHelp] = useState(false);
   const [form, setForm] = useState({ kind: "PROJET", title: "", body: "", is_public: false });

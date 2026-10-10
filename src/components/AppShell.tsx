@@ -400,16 +400,22 @@ export function AppShell({
                 <SheetDescription>{isBureau ? "Gouvernance et actions" : "Votre espace associatif"}</SheetDescription>
               </SheetHeader>
               <nav aria-label="Navigation mobile" className="space-y-6 p-4">
+                <div className="space-y-1 border-b border-border pb-4">{primary.map((item) => renderLink(item, true))}</div>
                 {NAV_GROUPS.map((group) => {
                   const groupItems = group.items.filter((item) => visible.includes(item));
                   if (!groupItems.length) return null;
                   return (
-                    <div key={group.title} className="space-y-1">
-                      <p className="px-3 pb-1 text-[11px] font-semibold uppercase text-muted-foreground">
+                    <details
+                      key={group.title}
+                      className="space-y-1"
+                      open={groupItems.some((item) => pathname === item.to || pathname.startsWith(`${item.to}/`)) || isOpen(`m:${group.title}`)}
+                      onToggle={(e) => setNavSectionOpen(`m:${group.title}`, e.currentTarget.open)}
+                    >
+                      <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-md px-3 text-[11px] font-semibold uppercase text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                         {group.title}
-                      </p>
+                      </summary>
                       {groupItems.map((item) => renderLink(item, true))}
-                    </div>
+                    </details>
                   );
                 })}
                 <Button

@@ -30,3 +30,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environnement local (le .env publique est géré par Lovable)
+.env.*
+!.env.example
