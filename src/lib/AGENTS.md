@@ -1,0 +1,3 @@
+- Navigation rules live in src/lib/nav-rules.ts; pro status comes from is_professional (label only as fallback). Why: one tested rule set; RLS stays the security boundary.
+- Carnet de vie du chien : construit côté client depuis les tables existantes (participation_dogs, dog_goals, dog_observations) via src/lib/dog-timeline.ts, sans table dédiée ni données humaines. Pourquoi : aucune donnée dupliquée, RLS inchangée.
+- Libellé de rôle de l'accueil : dérivé uniquement de is_bureau/is_professional (memberRoleLabel), jamais des tâches. Pourquoi : une tâche ne change pas l'identité.
