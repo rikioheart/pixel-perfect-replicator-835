@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AiAssist } from "@/components/AiAssist";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +34,7 @@ const KIND_FR: Record<string, string> = { INSCRIPTION: "Inscription", DEMANDE: "
 const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "INTERNE", kind: "COLLECTE", context: "", fields: "Nom\nMessage*" };
 
 function FormsPage() {
-  const { user } = useAuth();
+  const { user, isBureau } = useAuth();
   const qc = useQueryClient();
   const [f, setF] = useState(EMPTY);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -147,6 +148,7 @@ function FormsPage() {
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">{fm.purpose}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
+                  {(mine || isBureau) && <AiAssist type="form" id={fm.id} actions={["SUMMARY", "INCONSISTENCIES"]} />}
                   {fm.status === "PUBLISHED" && (
                     <>
                       <Button size="sm" asChild><a href={`/formulaire/${fm.id}`}>Répondre</a></Button>

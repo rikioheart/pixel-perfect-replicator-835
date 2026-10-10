@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AiAssist } from "@/components/AiAssist";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -141,6 +142,7 @@ function ProjectDetail() {
       subtitle={project.project_categories?.name ?? "Projet associatif"}
       actions={
         <>
+          <AiAssist type="project" id={projectId} actions={["SUMMARY", "INCONSISTENCIES", "MINUTES"]} />
           <ShareLinkButton entityType="project" entityId={projectId} defaultLabel={project.title} />
           {isBureau ? (
             <NewTaskDialog

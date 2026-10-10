@@ -95,6 +95,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
       { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau", primary: true },
+      { to: "/admin/suivi-financier", label: "Suivi financier", icon: Euro, audience: "bureau" },
       { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all", hideForParticulier: true },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "bureau", primary: true },
       { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau", primary: true },
