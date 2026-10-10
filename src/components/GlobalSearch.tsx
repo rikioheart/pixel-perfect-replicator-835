@@ -93,11 +93,12 @@ export function GlobalSearch() {
     queryKey: ["global-search", search, filter, since],
     enabled: open && search.length >= 2,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("global_search", {
+      const params: { _term: string; _kind?: string; _since?: string } = {
         _term: search,
-        _kind: filter === "ALL" ? undefined : filter,
-        _since: since || undefined,
-      });
+      };
+      if (filter !== "ALL") params._kind = filter;
+      if (since) params._since = since;
+      const { data, error } = await supabase.rpc("global_search", params);
       if (error) throw error;
       return (data ?? []) as Hit[];
     },
