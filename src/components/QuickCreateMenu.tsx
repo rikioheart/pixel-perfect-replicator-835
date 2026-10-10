@@ -49,7 +49,7 @@ export function QuickCreateMenu() {
   const actions = ACTIONS.filter((action) => {
     if (action.bureauOnly && !isBureau) return false;
     if (action.proOnly && !isBureau && !isPro) return false;
-    if (action.permission && !can(action.permission)) return false;
+    if (action.permission && !isBureau && !can(action.permission)) return false;
     return true;
   });
 
