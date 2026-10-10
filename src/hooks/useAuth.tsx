@@ -1,3 +1,4 @@
+import type React from "react";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,7 +31,12 @@ type AuthState = {
   signOut: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthState | undefined>(undefined);
+// Contexte unique conservé entre rechargements à chaud, sinon le fournisseur et
+// les pages peuvent référencer deux contextes différents après une modification.
+const globalCtx = globalThis as typeof globalThis & {
+  __lvdcAuthContext?: React.Context<AuthState | undefined>;
+};
+const AuthContext = (globalCtx.__lvdcAuthContext ??= createContext<AuthState | undefined>(undefined));
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
