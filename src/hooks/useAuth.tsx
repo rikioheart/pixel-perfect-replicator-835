@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { fallbackIsPro } from "@/lib/nav-rules";
 
 export type Profile = {
   id: string;
@@ -22,6 +23,7 @@ type AuthState = {
   profile: Profile | null;
   roles: string[];
   isBureau: boolean;
+  isPro: boolean;
   loading: boolean;
   rolesReady: boolean;
   refresh: () => Promise<void>;
@@ -34,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
+  const [isPro, setIsPro] = useState(false);
   const [loading, setLoading] = useState(true);
   const [rolesReady, setRolesReady] = useState(false);
 
@@ -73,6 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .map((row) => (row as { roles: { code: string } | null }).roles?.code)
       .filter((code): code is string => Boolean(code));
     setRoles(codes);
+    // Statut pro décidé par la base (is_professional) ; repli sur le libellé si indisponible.
+    const proRes = await supabase.rpc("is_professional", { _user_id: userId });
+    setIsPro(proRes.error ? fallbackIsPro(profile?.membership_type) : Boolean(proRes.data));
     setRolesReady(true);
   };
 
@@ -108,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     roles,
     isBureau: roles.includes("ADMIN_BUREAU"),
+    isPro,
     loading,
     rolesReady,
     refresh: async () => {

@@ -80,7 +80,7 @@ const EMPTY = {
 
 function FormationsPage() {
   const { user, isBureau, profile } = useAuth();
-  const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const isPro = useAuth().isPro;
   const canCreate = isBureau || isPro;
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);

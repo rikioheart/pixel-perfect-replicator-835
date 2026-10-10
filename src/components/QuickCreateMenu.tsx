@@ -47,7 +47,7 @@ const ACTIONS: CreateAction[] = [
 export function QuickCreateMenu() {
   const { isBureau, profile } = useAuth();
   const { can } = useMyPermissions();
-  const isPro = (profile?.membership_type ?? "").toUpperCase().includes("PRO");
+  const isPro = useAuth().isPro;
   const actions = ACTIONS.filter((action) => {
     if (action.bureauOnly && !isBureau) return false;
     if (action.proOnly && !isBureau && !isPro) return false;
