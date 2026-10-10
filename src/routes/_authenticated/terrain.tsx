@@ -95,7 +95,6 @@ function TerrainPage() {
   const addResource = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Connexion requise.");
-      const userId = user.id;
       if (resourceName.trim().length < 2) throw new Error("Nom de ressource trop court.");
       const { error } = await supabase
         .from("terrain_resources")
@@ -114,6 +113,8 @@ function TerrainPage() {
 
   const book = useMutation({
     mutationFn: async () => {
+      if (!user) throw new Error("Connexion requise.");
+      const userId = user.id;
       if (!booking.resource_id) throw new Error("Choisissez une ressource.");
       if (!booking.date || !booking.start_time || !booking.end_time)
         throw new Error("Date et créneau obligatoires.");
