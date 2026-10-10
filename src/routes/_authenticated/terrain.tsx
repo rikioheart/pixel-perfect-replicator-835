@@ -113,6 +113,8 @@ function TerrainPage() {
 
   const book = useMutation({
     mutationFn: async () => {
+      if (!user) throw new Error("Connexion requise.");
+      const userId = user.id;
       if (!booking.resource_id) throw new Error("Choisissez une ressource.");
       if (!booking.date || !booking.start_time || !booking.end_time)
         throw new Error("Date et créneau obligatoires.");
@@ -129,7 +131,7 @@ function TerrainPage() {
       if (clash) throw new Error("Ce créneau est déjà réservé.");
       const { data: created, error } = await supabase.from("terrain_reservations").insert({
         resource_id: booking.resource_id,
-        professional_id: user.id,
+        professional_id: userId,
         date: booking.date,
         start_time: booking.start_time,
         end_time: booking.end_time,
@@ -137,7 +139,7 @@ function TerrainPage() {
         work_category: booking.work_category,
         access_mode: booking.access_mode,
         equipment_requested: booking.equipment_requested || null,
-        requested_by: user.id,
+        requested_by: userId,
       }).select("id").single();
       if (error) throw error;
       const personIds = selectedPeople.length
