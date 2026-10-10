@@ -4,8 +4,8 @@ export type TimelineItem = {
   kind: "OUTING" | "GOAL" | "OBSERVATION";
   title: string;
   date: string;
-  detail?: string;
-  upcoming?: boolean;
+  detail?: string | undefined;
+  upcoming?: boolean | undefined;
 };
 
 export const INDICATOR_FAMILY_LABEL: Record<string, string> = {
