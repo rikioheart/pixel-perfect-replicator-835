@@ -304,6 +304,45 @@ export type Database = {
           },
         ]
       }
+      ai_suggestions: {
+        Row: {
+          action: string
+          context_id: string | null
+          context_type: string | null
+          created_at: string
+          final_text: string | null
+          id: string
+          proposal: string
+          status: string
+          user_id: string
+          validated_at: string | null
+        }
+        Insert: {
+          action: string
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          final_text?: string | null
+          id?: string
+          proposal: string
+          status?: string
+          user_id?: string
+          validated_at?: string | null
+        }
+        Update: {
+          action?: string
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          final_text?: string | null
+          id?: string
+          proposal?: string
+          status?: string
+          user_id?: string
+          validated_at?: string | null
+        }
+        Relationships: []
+      }
       association_updates: {
         Row: {
           body: string | null
@@ -1177,6 +1216,121 @@ export type Database = {
           },
         ]
       }
+      finance_entries: {
+        Row: {
+          activity_id: string | null
+          amount: number
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          direction: string
+          entry_date: string
+          external_ref: string | null
+          external_source: string | null
+          id: string
+          internal_note: string | null
+          membership_id: string | null
+          payment_method: string | null
+          person_id: string | null
+          project_id: string | null
+          receipt_url: string | null
+          reimbursement_id: string | null
+          reservation_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          activity_id?: string | null
+          amount: number
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          direction: string
+          entry_date?: string
+          external_ref?: string | null
+          external_source?: string | null
+          id?: string
+          internal_note?: string | null
+          membership_id?: string | null
+          payment_method?: string | null
+          person_id?: string | null
+          project_id?: string | null
+          receipt_url?: string | null
+          reimbursement_id?: string | null
+          reservation_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          activity_id?: string | null
+          amount?: number
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          direction?: string
+          entry_date?: string
+          external_ref?: string | null
+          external_source?: string | null
+          id?: string
+          internal_note?: string | null
+          membership_id?: string | null
+          payment_method?: string | null
+          person_id?: string | null
+          project_id?: string | null
+          receipt_url?: string | null
+          reimbursement_id?: string | null
+          reservation_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_entries_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_entries_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_entries_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_entries_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_entries_reimbursement_id_fkey"
+            columns: ["reimbursement_id"]
+            isOneToOne: false
+            referencedRelation: "reimbursements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_entries_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "terrain_reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_responses: {
         Row: {
           answers: Json
@@ -1642,6 +1796,54 @@ export type Database = {
           recipient_id?: string
           sender_id?: string | null
           title?: string
+        }
+        Relationships: []
+      }
+      integration_events: {
+        Row: {
+          candidates: Json | null
+          created_at: string
+          created_by: string | null
+          entity_id: string | null
+          entity_type: string | null
+          external_id: string | null
+          id: string
+          message: string | null
+          outcome: string
+          payload: Json | null
+          resolved_at: string | null
+          resolved_by: string | null
+          source: string
+        }
+        Insert: {
+          candidates?: Json | null
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          external_id?: string | null
+          id?: string
+          message?: string | null
+          outcome: string
+          payload?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source: string
+        }
+        Update: {
+          candidates?: Json | null
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          external_id?: string | null
+          id?: string
+          message?: string | null
+          outcome?: string
+          payload?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source?: string
         }
         Relationships: []
       }
@@ -4047,6 +4249,19 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      import_helloasso_membership: {
+        Args: {
+          _amount: number
+          _email: string
+          _end: string
+          _ext_id: string
+          _first: string
+          _last: string
+          _start: string
+          _type?: string
+        }
+        Returns: Json
       }
       is_bureau: { Args: { _user_id: string }; Returns: boolean }
       is_dog_keeper: {

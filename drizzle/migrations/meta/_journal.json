@@ -134,6 +134,13 @@
       "when": 1791630903277,
       "tag": "0018_a17_a20_forms_document_context",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791631435700,
+      "tag": "0019_a21_a26_finance_integrations_ai",
+      "breakpoints": true
     }
   ]
 }
