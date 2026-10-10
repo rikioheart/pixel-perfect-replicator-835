@@ -11,6 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { EntityPeek } from "@/components/EntityPeek";
+import { useMyHouseholds } from "@/lib/households";
+import { useProOptions } from "@/lib/pro-card";
+import { useMemberOptions } from "@/components/MemberPicker";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +62,14 @@ function TerrainPage() {
   const [resourceLocation, setResourceLocation] = useState("");
   const emptyBooking = { resource_id: "", date: "", start_time: "", end_time: "", purpose: "", work_category: "AUTRE", access_mode: "GRATUIT", equipment_requested: "" };
   const [booking, setBooking] = useState(emptyBooking);
+  const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
+  const [selectedDogs, setSelectedDogs] = useState<string[]>([]);
+  const [selectedPros, setSelectedPros] = useState<string[]>([]);
+  const { data: households = [] } = useMyHouseholds(user?.id);
+  const { data: pros = [] } = useProOptions();
+  const { data: members = [] } = useMemberOptions();
+  const selectablePeople = isBureau ? members : members.filter((member) => households.some((household) => household.adults.some((adult) => adult.user_id === member.id)));
+  const selectableDogs = households.flatMap((household) => household.dogs);
 
   const { data: resources = [] } = useQuery({
     queryKey: ["terrain-resources"],
@@ -114,7 +126,7 @@ function TerrainPage() {
           booking.end_time > r.start_time,
       );
       if (clash) throw new Error("Ce créneau est déjà réservé.");
-      const { error } = await supabase.from("terrain_reservations").insert({
+      const { data: created, error } = await supabase.from("terrain_reservations").insert({
         resource_id: booking.resource_id,
         professional_id: user!.id,
         date: booking.date,
@@ -125,12 +137,25 @@ function TerrainPage() {
         access_mode: booking.access_mode,
         equipment_requested: booking.equipment_requested || null,
         requested_by: user!.id,
-      });
+      }).select("id").single();
       if (error) throw error;
+      const personIds = selectedPeople.length
+        ? (await supabase.from("profiles").select("id, person_id").in("id", selectedPeople)).data?.map((row) => row.person_id).filter((id): id is string => Boolean(id)) ?? []
+        : [];
+      const writes = [];
+      if (personIds.length) writes.push(supabase.from("terrain_reservation_people").insert(personIds.map((person_id) => ({ reservation_id: created.id, person_id }))));
+      if (selectedDogs.length) writes.push(supabase.from("terrain_reservation_dogs").insert(selectedDogs.map((dog_id) => ({ reservation_id: created.id, dog_id }))));
+      if (selectedPros.length) writes.push(supabase.from("terrain_reservation_professionals").insert(selectedPros.map((professional_id) => ({ reservation_id: created.id, professional_id }))));
+      const results = await Promise.all(writes);
+      const relationError = results.find((result) => result.error)?.error;
+      if (relationError) throw relationError;
     },
     onSuccess: () => {
       toast.success("Réservation enregistrée.");
       setBooking(emptyBooking);
+      setSelectedPeople([]);
+      setSelectedDogs([]);
+      setSelectedPros([]);
       void queryClient.invalidateQueries({ queryKey: ["terrain-reservations"] });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -287,6 +312,28 @@ function TerrainPage() {
                 onChange={(e) => setBooking({ ...booking, purpose: e.target.value })}
               />
             </div>
+            <fieldset className="space-y-2 rounded-md border border-border p-3">
+              <legend className="px-1 text-xs font-medium">Contexte de la réservation</legend>
+              <p className="text-xs text-muted-foreground">Associez seulement les personnes, chiens et professionnels réellement concernés.</p>
+              {selectablePeople.length ? <div>
+                <p className="text-xs font-medium">Personnes</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {selectablePeople.map((person) => <label key={person.id} className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={selectedPeople.includes(person.id)} onChange={(event) => setSelectedPeople(event.target.checked ? [...selectedPeople, person.id] : selectedPeople.filter((id) => id !== person.id))} />{person.name}</label>)}
+                </div>
+              </div> : null}
+              {selectableDogs.length ? <div>
+                <p className="text-xs font-medium">Chiens</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {selectableDogs.map((dog) => <label key={dog.id} className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={selectedDogs.includes(dog.id)} onChange={(event) => setSelectedDogs(event.target.checked ? [...selectedDogs, dog.id] : selectedDogs.filter((id) => id !== dog.id))} />{dog.name}</label>)}
+                </div>
+              </div> : null}
+              {(isBureau || pros.length) ? <div>
+                <p className="text-xs font-medium">Professionnels</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {pros.map((pro) => <label key={pro.id} className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={selectedPros.includes(pro.id)} onChange={(event) => setSelectedPros(event.target.checked ? [...selectedPros, pro.id] : selectedPros.filter((id) => id !== pro.id))} />{pro.name}</label>)}
+                </div>
+              </div> : null}
+            </fieldset>
             <Button className="w-full" onClick={() => book.mutate()} disabled={book.isPending}>
               Réserver
             </Button>
@@ -307,9 +354,9 @@ function TerrainPage() {
                   className="flex items-center justify-between gap-3 border-b border-border pb-2 last:border-0"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-medium">
-                      {(reservation.terrain_resources as { name: string } | null)?.name ?? "Ressource"}
-                    </p>
+                    <EntityPeek type="reservation" id={reservation.id}>
+                      <span className="truncate font-medium">{(reservation.terrain_resources as { name: string } | null)?.name ?? "Ressource"}</span>
+                    </EntityPeek>
                     <p className="flex items-center gap-2 text-xs text-muted-foreground">
                       <CalendarClock className="size-3.5" />
                       {new Date(reservation.date).toLocaleDateString("fr-FR")} ·{" "}

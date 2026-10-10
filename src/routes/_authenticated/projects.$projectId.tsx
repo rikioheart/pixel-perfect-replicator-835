@@ -38,6 +38,7 @@ import {
 import { Comments } from "@/components/Comments";
 import { ProjectContribute, ProjectStorySections } from "@/components/ProjectContribute";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
+import { EntityPeek } from "@/components/EntityPeek";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -247,11 +248,13 @@ function ProjectDetail() {
             <ul className="space-y-3 text-sm">
               {members?.map((member) => (
                 <li key={member.id} className="flex items-center justify-between gap-2">
-                  <span className="truncate">
-                    {member.profiles?.display_name ||
-                      `${member.profiles?.first_name ?? ""} ${member.profiles?.last_name ?? ""}`.trim() ||
-                      "Membre"}
-                  </span>
+                  <EntityPeek type="person" id={member.user_id}>
+                    <span className="truncate">
+                      {member.profiles?.display_name ||
+                        `${member.profiles?.first_name ?? ""} ${member.profiles?.last_name ?? ""}`.trim() ||
+                        "Membre"}
+                    </span>
+                  </EntityPeek>
                   <Badge variant="secondary">
                     {PROJECT_ROLE_LABEL[member.project_role] ?? member.project_role}
                   </Badge>
