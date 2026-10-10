@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 export type PeekType =
   | "dog"
@@ -38,13 +39,14 @@ export function EntityPeek({ type, id, children }: { type: PeekType; id: string;
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button
+        <Button
           type="button"
+          variant="link"
           className="min-h-11 rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Afficher les informations autorisées"
         >
           {children}
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72 text-sm">
         {q.isLoading ? <p className="text-muted-foreground">Chargement…</p> : !q.data ? (

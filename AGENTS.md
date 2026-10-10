@@ -29,3 +29,4 @@
 - Réservation terrain : statuts DRAFT/PENDING/CHANGES_REQUESTED/APPROVED/REFUSED/CANCELLED ; triggers a_guard (seul le Bureau décide, demandeur modifie en DRAFT/CHANGES_REQUESTED) puis b_check (conflit sur PENDING/APPROVED) ; access_mode GRATUIT/LOCATION sans aucun calcul de prix. Pourquoi : réservation ≠ tarification ≠ facturation ≠ paiement.
 - Indicateurs chien (dog_indicators) : 4 familles VERT/JAUNE/BLEU/NOIR, libellé obligatoire, jamais une note ; lisibles en vue opérationnelle. Pourquoi : adapter l'environnement, pas juger.
 - Fiches contextuelles via entity_peek(type,id) (champs autorisés + can_open) et le composant EntityPeek. Pourquoi : une seule source filtrée pour toutes les fenêtres.
+- Recherche et notifications : les fonctions de lecture filtrent côté base selon les droits, et les notifications métier sont émises par déclencheur plutôt que par l'interface. Pourquoi : aucun résultat hors périmètre et aucun doublon selon l'écran utilisé.

@@ -213,7 +213,7 @@ export function AppShell({
 
   const renderLink = (item: NavItem, mobile = false) => {
     const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-    return (
+    const link = (
       <Link
         key={`${item.to}-${item.label}`}
         to={item.to}
@@ -225,13 +225,10 @@ export function AppShell({
         )}
       >
         <item.icon className="size-4" aria-hidden="true" />
-        {mobile ? (
-          <SheetClose asChild>
-            <span>{isBureau && item.bureauLabel ? item.bureauLabel : item.label}</span>
-          </SheetClose>
-        ) : isBureau && item.bureauLabel ? item.bureauLabel : item.label}
+        {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
       </Link>
     );
+    return mobile ? <SheetClose key={`${item.to}-${item.label}`} asChild>{link}</SheetClose> : link;
   };
 
 
@@ -257,7 +254,7 @@ export function AppShell({
             </div>
           </div>
           <nav aria-label="Navigation des pages" className="space-y-5">
-            <div className="space-y-1">{primary.map(renderLink)}</div>
+            <div className="space-y-1">{primary.map((item) => renderLink(item))}</div>
 
             {groups.length ? (
               <details className="group">
@@ -270,7 +267,7 @@ export function AppShell({
                       <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide">
                         {group.title}
                       </p>
-                      {group.items.map(renderLink)}
+                      {group.items.map((item) => renderLink(item))}
                     </div>
                   ))}
                 </div>
@@ -308,15 +305,17 @@ export function AppShell({
             </p>
             <p className="text-xs">{isBureau ? "Bureau" : profile?.membership_type}</p>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={async () => {
               await signOut();
               void navigate({ to: "/" });
             }}
-            className="flex min-h-11 items-center gap-2 rounded-md text-xs hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="min-h-11 justify-start gap-2 px-0 text-xs hover:underline"
           >
             <LogOut className="size-3.5" aria-hidden="true" /> Se déconnecter
-          </button>
+          </Button>
         </div>
       </aside>
 

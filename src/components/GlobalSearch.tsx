@@ -32,7 +32,7 @@ type Hit = {
   title: string;
   subtitle: string;
   link: string;
-  date: string | null;
+  occurred_at: string | null;
 };
 
 const FILTERS: { code: Filter; label: string }[] = [
@@ -95,8 +95,8 @@ export function GlobalSearch() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("global_search", {
         _term: search,
-        _kind: filter === "ALL" ? null : filter,
-        _since: since || null,
+        _kind: filter === "ALL" ? undefined : filter,
+        _since: since || undefined,
       });
       if (error) throw error;
       return (data ?? []) as Hit[];
@@ -188,7 +188,7 @@ export function GlobalSearch() {
                       <span className="block text-xs text-muted-foreground">
                         {KIND_LABEL[hit.kind] ?? hit.kind}
                         {hit.subtitle ? ` · ${hit.subtitle}` : ""}
-                        {hit.date ? ` · ${new Date(hit.date).toLocaleDateString("fr-FR")}` : ""}
+                        {hit.occurred_at ? ` · ${new Date(hit.occurred_at).toLocaleDateString("fr-FR")}` : ""}
                       </span>
                     </span>
                   </Button>

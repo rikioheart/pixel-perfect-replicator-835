@@ -42,12 +42,13 @@ function ParticipationsPage() {
     queryKey: ["my-participations", user?.id],
     enabled: Boolean(user?.id),
     queryFn: async () => {
+      if (!user) return [];
       const { data } = await supabase
         .from("participations")
         .select(
           "id, role, registration_status, created_at, activity_id, event_id, activities(title, date, location), events(title, start_date, location)",
         )
-        .eq("user_id", user!.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       return (data ?? []).map((row) => {
