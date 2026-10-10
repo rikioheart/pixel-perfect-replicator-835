@@ -102,4 +102,5 @@
 - [x] Indicateurs chien, fiche contextuelle (entity_peek)
 - [x] Réservation terrain : catégories, gratuit/location, matériel, cycle de validation
 - [ ] Écran Bureau « Gouvernance » et « Besoins de décision » (A14)
-- [ ] Bouton flottant contextuel unique (A14)
+- [x] Action contextuelle unique « Créer » selon rôle et permissions (A14)
+- [x] Navigation par intentions, recherche sécurisée, notifications et fiches contextuelles (A15–A16)

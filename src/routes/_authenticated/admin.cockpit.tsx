@@ -162,11 +162,11 @@ function CockpitPage() {
   const privateParticipants = [...participantIds].filter((id) => !proIds.has(id));
 
   const kpis = [
-    { label: "Tâches en cours", value: inProgress.length, icon: ListChecks },
-    { label: "Besoins d'aide", value: blocked.length, icon: HelpCircle },
-    { label: "À valider", value: toValidate.length, icon: ShieldCheck },
-    { label: "Terminées", value: doneTasks.length, icon: Sparkles },
-    { label: "Projets actifs cette semaine", value: movingProjects.length, icon: FolderKanban },
+    { label: "Tâches en cours", value: inProgress.length, icon: ListChecks, to: "/tasks" },
+    { label: "Besoins d'aide", value: blocked.length, icon: HelpCircle, to: "/help-requests" },
+    { label: "À valider", value: toValidate.length, icon: ShieldCheck, to: "/admin/validation" },
+    { label: "Terminées", value: doneTasks.length, icon: Sparkles, to: "/tasks" },
+    { label: "Projets actifs cette semaine", value: movingProjects.length, icon: FolderKanban, to: "/projects" },
   ];
 
   return (
@@ -183,13 +183,13 @@ function CockpitPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="panel p-4">
+          <Link key={kpi.label} to={kpi.to} className="panel block p-4 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <div className="flex items-center justify-between text-muted-foreground">
               <span className="text-xs uppercase tracking-wide">{kpi.label}</span>
               <kpi.icon className="size-4" />
             </div>
             <p className="mt-2 font-display text-3xl">{kpi.value}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -219,6 +219,7 @@ function CockpitPage() {
               main={t.title}
               sub={`${nameOf(t.assigned_user_id)} · ${TASK_STATUS_LABEL[t.status] ?? t.status}`}
               right={t.deadline ? formatDate(t.deadline) : undefined}
+              to="/tasks"
             />
           ))}
         </Block>
@@ -231,7 +232,7 @@ function CockpitPage() {
           emptyLabel="Aucun besoin d'aide signalé pour le moment."
         >
           {blocked.map((t) => (
-            <Row key={t.id} main={t.title} sub={nameOf(t.assigned_user_id)} right="Besoin d'aide" />
+            <Row key={t.id} main={t.title} sub={nameOf(t.assigned_user_id)} right="Besoin d'aide" to="/tasks" />
           ))}
         </Block>
 
@@ -257,13 +258,13 @@ function CockpitPage() {
 
         <Block icon={Sparkles} title="Quelles actions sont terminées ?" empty={doneTasks.length === 0}>
           {doneTasks.slice(0, 12).map((t) => (
-            <Row key={t.id} main={t.title} sub={nameOf(t.assigned_user_id)} right="Validée" />
+            <Row key={t.id} main={t.title} sub={nameOf(t.assigned_user_id)} right="Validée" to="/tasks" />
           ))}
         </Block>
 
         <Block icon={FolderKanban} title="Quels projets avancent cette semaine ?" empty={movingProjects.length === 0}>
           {movingProjects.map((p) => (
-            <Row key={p.id} main={p.title} sub={`${p.progress_percent}% · maj ${formatDate(p.updated_at)}`} />
+            <Row key={p.id} main={p.title} sub={`${p.progress_percent}% · maj ${formatDate(p.updated_at)}`} to={`/projects/${p.id}`} />
           ))}
         </Block>
 
@@ -274,6 +275,7 @@ function CockpitPage() {
               main={e.title}
               sub={`${e.event_type} · ${e.start_date ? formatDate(e.start_date) : "date à définir"}`}
               right={e.status}
+              to={`/events/${e.id}`}
             />
           ))}
         </Block>
@@ -285,6 +287,7 @@ function CockpitPage() {
               main={a.title}
               sub={`${a.type} · ${a.date ? formatDate(a.date) : "date à définir"}`}
               right={a.capacity ? `${a.capacity} places` : undefined}
+              to={`/activities/${a.id}`}
             />
           ))}
         </Block>
@@ -398,9 +401,9 @@ function Block({
   );
 }
 
-function Row({ main, sub, right }: { main: string; sub?: string | undefined; right?: string | undefined }) {
-  return (
-    <div className="flex items-center justify-between gap-3 border-b border-border pb-2 last:border-0">
+function Row({ main, sub, right, to }: { main: string; sub?: string | undefined; right?: string | undefined; to?: string }) {
+  const content = (
+    <>
       <div className="min-w-0">
         <p className="truncate font-medium">{main}</p>
         {sub ? <p className="truncate text-xs text-muted-foreground">{sub}</p> : null}
@@ -410,6 +413,11 @@ function Row({ main, sub, right }: { main: string; sub?: string | undefined; rig
       ) : (
         <AlertTriangle className="hidden" />
       )}
-    </div>
+    </>
+  );
+  return to ? (
+    <Link to={to} className="flex min-h-11 items-center justify-between gap-3 border-b border-border pb-2 hover:text-primary last:border-0">{content}</Link>
+  ) : (
+    <div className="flex min-h-11 items-center justify-between gap-3 border-b border-border pb-2 last:border-0">{content}</div>
   );
 }

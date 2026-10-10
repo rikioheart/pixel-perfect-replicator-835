@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { notifyBureau, notifyMembers } from "@/lib/collab-notify";
 
 export const Route = createFileRoute("/_authenticated/help-requests")({
   head: () => ({
@@ -81,11 +80,12 @@ function HelpRequestsPage() {
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!user) throw new Error("Connexion requise.");
       if (message.trim().length < 5) throw new Error("Décrivez votre besoin en quelques mots.");
       const { data, error } = await supabase
         .from("help_requests")
         .insert({
-          user_id: user!.id,
+          user_id: user.id,
           type,
           message: message.trim(),
           skills: skills
@@ -96,15 +96,6 @@ function HelpRequestsPage() {
         .select("id")
         .single();
       if (error) throw error;
-      await notifyBureau({
-        senderId: user!.id,
-        kind: "HELP_REQUEST",
-        title: type === "NEEDS_HELP" ? "Un membre a besoin d'aide" : "Un membre propose son aide",
-        message: message.trim().slice(0, 160),
-        linkUrl: "/help-requests",
-        entityType: "help_request",
-        entityId: data.id,
-      });
     },
     onSuccess: () => {
       toast.success("Votre demande est transmise au Bureau.");
@@ -118,21 +109,12 @@ function HelpRequestsPage() {
 
   const update = useMutation({
     mutationFn: async ({ id, status, recipient }: { id: string; status: string; recipient: string }) => {
+      if (!user) throw new Error("Connexion requise.");
       const { error } = await supabase
         .from("help_requests")
-        .update({ status, response: response.trim() || null, handled_by: user!.id })
+        .update({ status, response: response.trim() || null, handled_by: user.id })
         .eq("id", id);
       if (error) throw error;
-      await notifyMembers({
-        recipients: [recipient],
-        senderId: user!.id,
-        kind: "HELP_REQUEST_UPDATE",
-        title: status === "RESOLVED" ? "Votre demande est résolue" : "Le Bureau a pris votre demande en charge",
-        message: response.trim() || null,
-        linkUrl: "/help-requests",
-        entityType: "help_request",
-        entityId: id,
-      });
     },
     onSuccess: () => {
       toast.success("Demande mise à jour.");
