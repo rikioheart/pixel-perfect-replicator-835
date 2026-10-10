@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { GraduationCap, Plus, Users, Link2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { ExternalLinks } from "@/components/ExternalLinks";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -173,7 +174,7 @@ function FormationsPage() {
             const registered = people.some((r) => r.user_id === user?.id);
             const full = item.capacity != null && people.length >= item.capacity && !registered;
             return (
-              <article key={item.id} className="rounded-xl border border-border bg-card p-5">
+              <article key={item.id} className="min-w-0 rounded-xl border border-border bg-card p-5">
                 <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1">
                     <GraduationCap className="size-3.5" /> {FORMAT_LABEL[item.format] ?? item.format}
@@ -219,6 +220,7 @@ function FormationsPage() {
                     </a>
                   ) : null}
                 </div>
+                <div className="mt-4"><ExternalLinks contextType="FORMATION" contextId={item.id} embedded /></div>
               </article>
             );
           })}

@@ -126,5 +126,5 @@
 ## Lot 15 — Liens externes (niveaux 1-2)
 - [x] « Ajouter une ressource » sur projets, activités, événements (coller un lien, titre facultatif, ouvrir)
 - [x] Reconnaissance indicative Drive/Docs/Forms/Sheets/Agenda/Meet/Rintintin, lien générique sinon
-- [ ] Liens sur tâches, réservations terrain, formations (même composant, à placer)
+- [x] Liens sur tâches, réservations terrain, formations (même composant, à placer)
 - [ ] Connecteur Rintintin : en attente de confirmation officielle d'une API

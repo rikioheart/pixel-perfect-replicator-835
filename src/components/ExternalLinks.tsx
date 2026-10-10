@@ -15,8 +15,8 @@ export type LinkContext = "PROJECT" | "ACTIVITY" | "EVENT" | "TASK" | "RESERVATI
  * Ressources externes d'un contexte : coller un lien, l'ouvrir. Stockées dans `documents`
  * (url + contexte + sensibilité), aucune synchronisation, aucun appel au service externe.
  */
-export function ExternalLinks({ contextType, contextId, title = "Ressources et liens" }:
-  { contextType: LinkContext; contextId: string; title?: string }) {
+export function ExternalLinks({ contextType, contextId, title = "Ressources et liens", embedded = false }:
+  { contextType: LinkContext; contextId: string; title?: string; embedded?: boolean }) {
   const { user, isBureau } = useAuth();
   const qc = useQueryClient();
   const key = ["external-links", contextType, contextId];
@@ -38,7 +38,8 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
     queryKey: ["can-add-resource", contextType, contextId, user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.rpc("can_add_context_resource", { _user_id: user!.id, _type: contextType, _id: contextId });
+      if (!user) return false;
+      const { data } = await supabase.rpc("can_add_context_resource", { _user_id: user.id, _type: contextType, _id: contextId });
       return Boolean(data);
     },
   });
@@ -69,8 +70,8 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
   const preview = normalizeUrl(url);
 
   return (
-    <section className="rounded-xl border border-border bg-card p-4" aria-labelledby={`links-${contextId}`}>
-      <div className="flex items-center gap-2">
+    <section className={embedded ? "border-t border-border pt-4" : "rounded-xl border border-border bg-card p-4"} aria-labelledby={`links-${contextId}`}>
+      <div className="flex flex-wrap items-center gap-2">
         <Link2 className="size-4 text-primary" aria-hidden />
         <h2 id={`links-${contextId}`} className="flex-1 font-semibold">{title}</h2>
         {canAdd && !adding && <Button size="sm" variant="outline" className="min-h-11 sm:min-h-9" onClick={() => setAdding(true)}><Plus className="mr-1 size-3.5" />Ajouter une ressource</Button>}

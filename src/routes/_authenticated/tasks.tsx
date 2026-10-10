@@ -27,6 +27,8 @@ export const Route = createFileRoute("/_authenticated/tasks")({
           "Suivi des tâches de l'association : démarrage, blocages, dépôt de preuves et validation par le Bureau.",
       },
       { property: "og:title", content: "Tâches — La Voix du Chien" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         property: "og:description",
         content: "Gérez vos tâches associatives et déposez vos preuves d'avancement.",

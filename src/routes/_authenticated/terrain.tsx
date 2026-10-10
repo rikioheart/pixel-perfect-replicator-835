@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarClock, MapPin, Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { ExternalLinks } from "@/components/ExternalLinks";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -354,8 +355,9 @@ function TerrainPage() {
               reservations.map((reservation) => (
                 <div
                   key={reservation.id}
-                  className="flex items-center justify-between gap-3 border-b border-border pb-2 last:border-0"
+                  className="space-y-3 border-b border-border pb-4 last:border-0"
                 >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <EntityPeek type="reservation" id={reservation.id}>
                       <span className="truncate font-medium">{(reservation.terrain_resources as { name: string } | null)?.name ?? "Ressource"}</span>
@@ -374,7 +376,7 @@ function TerrainPage() {
                       {reservation.decision_note ? ` · Bureau : ${reservation.decision_note}` : ""}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline">{STATUS_LABEL[reservation.status] ?? reservation.status}</Badge>
                     {isBureau && ["PENDING", "CHANGES_REQUESTED"].includes(reservation.status) ? (
                       <>
@@ -393,6 +395,8 @@ function TerrainPage() {
                       </Button>
                     ) : null}
                   </div>
+                  </div>
+                  <ExternalLinks contextType="RESERVATION" contextId={reservation.id} embedded />
                 </div>
               ))
             )}
