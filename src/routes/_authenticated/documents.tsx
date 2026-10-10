@@ -44,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/documents")({
   component: DocumentsPage,
 });
 
-const EMPTY_DOC = { title: "", category: "", proof_type: "", url: "", visibility: "ASSOCIATION" };
+const EMPTY_DOC = { title: "", category: "", proof_type: "", url: "", visibility: "ASSOCIATION", sensitivity: "INTERNE", context: "" };
 
 function DocumentsPage() {
   const { user, isBureau } = useAuth();
@@ -53,6 +53,24 @@ function DocumentsPage() {
   const [form, setForm] = useState(EMPTY_DOC);
   const categories = useConfigOptions("DOCUMENT_CATEGORY");
   const proofTypes = useConfigOptions("PROOF_TYPE");
+  const { data: contexts = [] } = useQuery({
+    queryKey: ["doc-contexts"],
+    enabled: open,
+    queryFn: async () => {
+      const [a, e, p, t] = await Promise.all([
+        supabase.from("activities").select("id, title").limit(100),
+        supabase.from("events").select("id, title").limit(100),
+        supabase.from("projects").select("id, title").limit(100),
+        supabase.from("terrain_reservations").select("id, date, purpose").limit(100),
+      ]);
+      return [
+        ...(a.data ?? []).map((x) => ({ v: `ACTIVITY:${x.id}`, l: `Activité · ${x.title}` })),
+        ...(e.data ?? []).map((x) => ({ v: `EVENT:${x.id}`, l: `Événement · ${x.title}` })),
+        ...(p.data ?? []).map((x) => ({ v: `PROJECT:${x.id}`, l: `Projet · ${x.title}` })),
+        ...(t.data ?? []).map((x) => ({ v: `RESERVATION:${x.id}`, l: `Terrain · ${x.date} ${x.purpose ?? ""}` })),
+      ];
+    },
+  });
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["documents"],
@@ -70,12 +88,16 @@ function DocumentsPage() {
     mutationFn: async () => {
       if (form.title.trim().length < 2) throw new Error("Le titre est obligatoire.");
       if (!/^https?:\/\//.test(form.url)) throw new Error("Le lien doit commencer par http(s)://");
+      const [ct, cid] = form.context ? form.context.split(":") : [null, null];
       const { error } = await supabase.from("documents").insert({
         title: form.title.trim(),
         category: form.category || null,
         proof_type: form.proof_type || null,
         url: form.url,
         visibility: form.visibility,
+        sensitivity: form.sensitivity,
+        context_type: ct,
+        context_id: cid,
         uploaded_by: user?.id ?? null,
       });
       if (error) throw error;
@@ -178,6 +200,23 @@ function DocumentsPage() {
                     >
                       <option value="ASSOCIATION">Tous les membres</option>
                       <option value="BUREAU">Bureau uniquement</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="doc-sens">Sensibilité</Label>
+                    <select id="doc-sens" className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      value={form.sensitivity} onChange={(e) => setForm({ ...form, sensitivity: e.target.value })}>
+                      <option value="PUBLIC">Public</option>
+                      <option value="INTERNE">Interne</option>
+                      <option value="SENSIBLE">Sensible</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="doc-ctx">Rattaché à</Label>
+                    <select id="doc-ctx" className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      value={form.context} onChange={(e) => setForm({ ...form, context: e.target.value })}>
+                      <option value="">L'association</option>
+                      {contexts.map((c) => <option key={c.v} value={c.v}>{c.l}</option>)}
                     </select>
                   </div>
                 </div>

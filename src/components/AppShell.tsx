@@ -127,6 +127,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true },
       { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true },
       { to: "/calendar", label: "Calendrier partagé", icon: CalendarDays, audience: "all" },
+      { to: "/forms", label: "Formulaires", icon: CalendarDays, audience: "all" },
       { to: "/formations", label: "Formations & lives", icon: GraduationCap, audience: "all" },
       { to: "/contests", label: "Concours & animations", icon: Trophy, audience: "all" },
       { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
