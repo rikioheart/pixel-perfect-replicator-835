@@ -1,11 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { isNavItemPrimary, isNavItemVisible, memberHubTabFor } from "./nav-rules";
+import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, memberHubGroupFor, MEMBER_HUB_GROUPS, MEMBER_HUB_TABS } from "./nav-rules";
 
 const particulier = { isBureau: false, isPro: false };
 const pro = { isBureau: false, isPro: true };
 const bureau = { isBureau: true, isPro: false };
 
 describe("navigation par rôle", () => {
+  it("conserve toutes les pages personnelles dans cinq familles", () => {
+    expect(MEMBER_HUB_GROUPS).toHaveLength(5);
+    for (const tab of MEMBER_HUB_TABS) expect(memberHubGroupFor(tab.to)).toBeDefined();
+    expect(memberHubGroupFor('/terrain')?.to).toBe('/participations');
+  });
   it("un particulier ne voit pas les entrées Bureau", () => {
     expect(isNavItemVisible({ audience: "bureau" }, particulier)).toBe(false);
   });
