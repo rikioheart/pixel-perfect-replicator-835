@@ -441,7 +441,7 @@ export function AppShell({
             <div className="mb-5 space-y-2">
             <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
               {MEMBER_HUB_GROUPS.map((t, i) => {
-                const Icon = [PawPrint, CalendarDays, Stamp, UserRound][i];
+                const Icon = [PawPrint, CalendarDays, Stamp, UserRound][i] ?? UserRound;
                 return (
                 <Link
                   key={t.to}
