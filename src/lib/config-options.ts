@@ -50,7 +50,7 @@ export const CONFIG_FAMILIES: { family: string; label: string; hint: string }[] 
   {
     family: "EXTERNAL_LINK",
     label: "Liens externes (Drive, Formulaires)",
-    hint: "Outils Google Drive / Google Form accessibles en un clic — mettez l'URL complète dans la description",
+    hint: "URL complète dans la description. Code ASSOCIATION_WEBSITE = site internet affiché sur la vitrine publique. Les autres liens restent internes.",
   },
 ];
 

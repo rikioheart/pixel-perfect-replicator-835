@@ -67,7 +67,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useExternalLinks } from "@/lib/home-config";
-import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, MEMBER_HUB_TABS } from "@/lib/nav-rules";
+import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, MEMBER_HUB_TABS, MEMBER_HUB_GROUPS, memberHubGroupFor } from "@/lib/nav-rules";
+import { useApplyPreferences } from "@/lib/user-preferences";
+import { OfflineStatus } from "@/components/OfflineStatus";
 import { setNavSectionOpen, useNavSectionsOpen } from "@/lib/nav-state";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
@@ -197,6 +199,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const { profile, isBureau, isPro, signOut } = useAuth();
+  useApplyPreferences();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -218,6 +221,12 @@ export function AppShell({
 
   const primary = visible.filter((item) => isNavItemPrimary(item, viewer)).slice(0, 5);
   const hubTab = memberHubTabFor(pathname);
+  const hubGroup = memberHubGroupFor(pathname);
+  const dock = isBureau
+    ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/calendar", label: "Calendrier", icon: CalendarDays }, { to: "/member", label: "Mon espace", icon: UserRound }]
+    : isPro
+      ? [{ to: "/espace-pro", label: "Espace pro", icon: Briefcase }, { to: "/espace-pro/chiens", label: "Chiens", icon: PawPrint }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }]
+      : [{ to: "/member", label: "Mon chien", icon: PawPrint }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }, { to: "/blog", label: "Actualités", icon: Newspaper }];
   const primaryPaths = new Set(primary.map((item) => item.to));
   const seen = new Set(primaryPaths);
   const secondary = visible.filter((item) => {
@@ -401,15 +410,15 @@ export function AppShell({
               </SheetHeader>
               <nav aria-label="Navigation mobile" className="space-y-6 p-4">
                 <div className="space-y-1 border-b border-border pb-4">{primary.map((item) => renderLink(item, true))}</div>
-                {NAV_GROUPS.map((group) => {
-                  const groupItems = group.items.filter((item) => visible.includes(item));
+                {groups.map((group) => {
+                  const groupItems = group.items;
                   if (!groupItems.length) return null;
                   return (
                     <details
                       key={group.title}
                       className="space-y-1"
-                      open={groupItems.some((item) => pathname === item.to || pathname.startsWith(`${item.to}/`)) || isOpen(`m:${group.title}`)}
-                      onToggle={(e) => setNavSectionOpen(`m:${group.title}`, e.currentTarget.open)}
+                      open={groupItems.some((item) => pathname === item.to || pathname.startsWith(`${item.to}/`)) || isOpen(group.title)}
+                      onToggle={(e) => setNavSectionOpen(group.title, e.currentTarget.open)}
                     >
                       <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-md px-3 text-[11px] font-semibold uppercase text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                         {group.title}
@@ -440,27 +449,39 @@ export function AppShell({
           </div>
         </div>
 
-        <main id="contenu-principal" tabIndex={-1} className="flex-1 p-6 focus:outline-none">
+        <main id="contenu-principal" tabIndex={-1} className="min-w-0 flex-1 px-4 py-5 pb-28 focus:outline-none md:p-6">
+          <OfflineStatus />
           {hubTab && !isBureau ? (
-            <nav aria-label="Mon Compagnon & Moi" className="-mt-2 mb-5 flex gap-1 overflow-x-auto border-b border-border pb-2">
-              {MEMBER_HUB_TABS.map((t) => (
+            <div className="mb-5 space-y-2">
+            <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
+              {MEMBER_HUB_GROUPS.map((t, i) => {
+                const Icon = [PawPrint, CalendarDays, Stamp, UserRound][i];
+                return (
                 <Link
                   key={t.to}
                   to={t.to}
-                  aria-current={hubTab === t.to ? "page" : undefined}
+                  aria-current={hubGroup?.to === t.to ? "page" : undefined}
                   className={cn(
-                    "whitespace-nowrap rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    hubTab === t.to ? "bg-primary text-primary-foreground" : "hover:bg-accent",
+                    "flex min-h-12 items-center justify-center gap-2 rounded-xl px-2 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring",
+                    hubGroup?.to === t.to ? "bg-primary text-primary-foreground" : "hover:bg-accent",
                   )}
                 >
-                  {t.label}
+                  <Icon className="size-4 shrink-0" aria-hidden />{t.label}
                 </Link>
-              ))}
+              );})}
             </nav>
+            <nav aria-label="Pages de cet espace" className="flex flex-wrap gap-2">
+              {MEMBER_HUB_TABS.filter(t => hubGroup?.paths.some(p => p === t.to)).map(t => <Link key={t.to} to={t.to} aria-current={hubTab === t.to ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-lg px-3 text-sm", hubTab === t.to ? "bg-secondary font-medium text-secondary-foreground" : "text-muted-foreground hover:bg-accent")}>{t.label}</Link>)}
+            </nav>
+            </div>
           ) : null}
           {children}
         </main>
       </div>
+      <nav aria-label="Accès rapides mobile" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-card px-1 pt-1 shadow-lg md:hidden" style={{ paddingBottom: "max(.5rem, env(safe-area-inset-bottom))" }}>
+        {dock.map(t => <Link key={t.to} to={t.to} aria-current={pathname === t.to ? "page" : undefined} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px]", pathname === t.to ? "bg-primary font-semibold text-primary-foreground" : "text-muted-foreground")}><t.icon className="size-5" aria-hidden />{t.label}</Link>)}
+        <button onClick={() => setMobileOpen(true)} className="flex min-h-14 flex-col items-center justify-center gap-1 text-[11px]" aria-label="Ouvrir tous les espaces"><Menu className="size-5" aria-hidden />Plus</button>
+      </nav>
     </div>
   );
 }

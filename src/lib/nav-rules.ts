@@ -43,6 +43,18 @@ export function memberHubTabFor(pathname: string): string | null {
   return hit ? hit.to : null;
 }
 
+/** Four stable families; every existing personal page remains reachable. */
+export const MEMBER_HUB_GROUPS = [
+  { label: "Mon chien", to: "/member", paths: ["/member", "/foyer"] },
+  { label: "Sorties", to: "/participations", paths: ["/participations", "/terrain"] },
+  { label: "Mon pass", to: "/loyalty", paths: ["/loyalty", "/advantages"] },
+  { label: "Profil & foyer", to: "/profile", paths: ["/profile", "/my-space", "/parcours", "/my-history"] },
+] as const;
+
+export function memberHubGroupFor(pathname: string) {
+  return MEMBER_HUB_GROUPS.find((g) => g.paths.some((p) => pathname === p || pathname.startsWith(`${p}/`)));
+}
+
 /** Repli si la vérification serveur du statut pro est indisponible. */
 export function fallbackIsPro(membershipType: string | null | undefined): boolean {
   return (membershipType ?? "").toUpperCase().includes("PRO");

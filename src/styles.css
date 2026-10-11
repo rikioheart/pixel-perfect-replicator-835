@@ -66,7 +66,7 @@
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.85rem;
 
   --background: oklch(0.955 0.014 75);
   --foreground: oklch(0.25 0.045 265);
@@ -176,7 +176,7 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 }
 
@@ -200,3 +200,19 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+@layer base {
+  body { line-height: 1.6; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+  button, input, select { min-height: 44px; }
+  input, select, textarea { font-size: 1rem; }
+  h1, h2, h3, p { overflow-wrap: break-word; }
+}
+.prefs-reduced-motion *, .prefs-reduced-motion *::before, .prefs-reduced-motion *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important;
+}
+.prefs-high-contrast { --muted-foreground: oklch(0.32 0.02 265); --border: oklch(0.5 0.02 265); }
+.dark.prefs-high-contrast { --muted-foreground: oklch(0.9 0.01 265); --border: oklch(0.7 0.02 265); }
+.public-cover { background: var(--navy); color: var(--navy-foreground); }
+.public-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, var(--navy), transparent 90%); opacity: .85; }
+.reading-space { line-height: 1.8; }
