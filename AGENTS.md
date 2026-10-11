@@ -36,3 +36,6 @@
 - HelloAsso : uniquement via import_helloasso_membership (idempotent sur source+external_id, ambiguïté ⇒ integration_events TO_REVIEW, journal systématique). Pourquoi : aucun doublon ni fusion automatique.
 - IA : les serveurs IA lisent les données avec la session de l'utilisateur (RLS), jamais en admin ; propositions validées tracées dans ai_suggestions. Pourquoi : l'IA ne voit que ce que l'utilisateur voit.
 - External links use documents (URL, context, sensitivity, service) and ExternalLinks; embedded mode in tasks/reservations/formations. can_add_context_resource controls additions; SENSIBLE is Bureau-only. No sync: links work without APIs.
+
+- Dog profile creation and removal live in the reusable DogProfiles component on the foyer page; the personal profile only edits member details, keeping dog management in one place.
+- Manual stamp entry stays on the loyalty page; the professional home shows device-local pending requests and links there, avoiding duplicate forms and sync effects.

@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, CalendarRange, Dog, Gift, Handshake, IdCard, Inbox, Stamp } from "lucide-react";
+import { Stamp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PRO_STATUS_LABEL, completion } from "@/lib/pro-card";
-import { ManualStampCard } from "@/components/ManualStampCard";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { readQueue } from "@/lib/offline";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/")({
   head: () => ({
@@ -23,27 +25,25 @@ export const Route = createFileRoute("/_authenticated/espace-pro/")({
   component: ProDashboard,
 });
 
-const TILES = [
-  { to: "/espace-pro/carte", label: "Ma carte professionnelle", icon: IdCard },
-  { to: "/activities", label: "Activités", icon: CalendarDays },
-  { to: "/events", label: "Événements", icon: CalendarRange },
-  { to: "/espace-pro/chiens", label: "Chiens accompagnés", icon: Dog },
-  { to: "/espace-pro/collaborations", label: "Collaborations", icon: Handshake },
-  { to: "/advantages", label: "Avantages", icon: Gift },
-  { to: "/loyalty", label: "Fidélité", icon: Stamp },
-  { to: "/proposals", label: "Demandes", icon: Inbox },
-] as const;
-
 function ProDashboard() {
   const { user } = useAuth();
+  const [pendingCount, setPendingCount] = useState(0);
+  useEffect(() => {
+    if (!user) return;
+    const refresh = () => setPendingCount(readQueue(user.id).length);
+    refresh();
+    window.addEventListener("lvdc-offline", refresh);
+    return () => window.removeEventListener("lvdc-offline", refresh);
+  }, [user?.id]);
   const { data } = useQuery({
     queryKey: ["pro-dashboard", user?.id],
     enabled: Boolean(user?.id),
     queryFn: async () => {
+      if (!user) return { card: null, dogs: 0, collabs: 0 };
       const [card, dogs, collabs] = await Promise.all([
-        supabase.from("professional_public_profile").select("*").eq("profile_id", user!.id).maybeSingle(),
+        supabase.from("professional_public_profile").select("*").eq("profile_id", user.id).maybeSingle(),
         supabase.rpc("get_pro_dogs"),
-        supabase.from("professional_collaborations").select("id", { count: "exact", head: true }).eq("professional_id", user!.id),
+        supabase.from("professional_collaborations").select("id", { count: "exact", head: true }).eq("professional_id", user.id),
       ]);
       return {
         card: card.data,
@@ -57,7 +57,7 @@ function ProDashboard() {
 
   return (
     <AppShell title="Espace professionnel" subtitle="Votre activité dans le réseau La Voix du Chien">
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="panel space-y-2 p-4">
           <p className="text-xs text-muted-foreground">Ma carte</p>
           {card ? (
@@ -78,15 +78,12 @@ function ProDashboard() {
           <p className="text-xs text-muted-foreground">Collaborations</p>
           <p className="font-display text-3xl">{data?.collabs ?? "…"}</p>
         </div>
+        <div className="panel p-4">
+          <p className="text-xs text-muted-foreground">Demandes de tampons sur cet appareil</p>
+          <p className="font-display text-3xl">{pendingCount}</p>
+          <Button asChild variant="outline" size="sm" className="mt-3"><Link to="/loyalty"><Stamp className="size-4" aria-hidden /> {pendingCount ? "Vérifier les demandes" : "Attribuer un tampon"}</Link></Button>
+        </div>
       </div>
-      <nav aria-label="Espace professionnel" className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {TILES.map((t) => (
-          <Link key={t.to} to={t.to} className="panel flex min-h-16 items-center gap-3 p-4 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <t.icon className="size-5 text-primary" aria-hidden /> <span className="text-sm font-medium">{t.label}</span>
-          </Link>
-        ))}
-      </nav>
-      <div className="mt-6 max-w-xl"><ManualStampCard /></div>
     </AppShell>
   );
 }

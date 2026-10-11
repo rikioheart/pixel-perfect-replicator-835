@@ -29,11 +29,13 @@ export const Route = createFileRoute("/")({
         content:
           "Découvrez l’association, ses valeurs, les activités du mois et les professionnels partenaires, puis accédez à votre espace.",
       },
-      { property: "og:title", content: "Connexion — La Voix du Chien" },
+      { property: "og:title", content: "La Voix du Chien — Ensemble, à leur rythme" },
       {
         property: "og:description",
-        content: "Espace interne des membres, professionnels et du Bureau de La Voix du Chien.",
+        content: "L’association, ses valeurs, les activités du mois et les professionnels partenaires.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,
