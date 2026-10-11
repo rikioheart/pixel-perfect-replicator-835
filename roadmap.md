@@ -141,3 +141,17 @@
 - [x] Onglets « Mon Compagnon & Moi » reliant les pages personnelles existantes
 - [ ] Remplacer les détections pro restantes (statistiques, annuaire, avancées, accueil membre)
 - [ ] Vérifier connecté particulier/pro sur mobile
+
+## Lot 18 — Harmonisation et hors réseau
+- [x] Vitrine deux tiers / connexion un tiers, photo, valeurs et activités publiques du mois depuis projection SQL dédiée
+- [x] Site configurable via EXTERNAL_LINK / ASSOCIATION_WEBSITE (URL dans description), découverte des partenaires validés
+- [x] Quatre univers personnels conservant les dix pages ; barre basse mobile par rôle ; accordéons mémorisés mobile/PC
+- [x] Préférences de lecture appliquées, mouvement réduit, focus visible, cibles tactiles, fonds et cartes harmonisés
+- [x] QR généré localement ; pass sauvegardé sur le téléphone ; copie vitrine publique hors réseau
+- [x] Tampons locaux en attente, isolés par compte ; RPC existant pour confirmation ; demandes d’un autre jour ou refusées à vérifier sans rejeu automatique
+- [x] 28 tests unitaires ; navigateur 1280px et 390px sans erreur ; menu mémorisé ; pass et file locale testés sans attribution serveur
+- [ ] Vérification du service worker après publication (désactivé volontairement en aperçu)
+- [ ] Synchronisation réelle avec compte professionnel validé et contrôle des notifications Bureau
+- [ ] URL officielle du site à renseigner dans la configuration existante
+
+Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers chiens privés mis en cache. Sans réseau, aucune adhésion ou attribution n’est certifiée. La synchronisation nécessite de rouvrir l’espace pro avec du réseau le jour même. Après changement de jour, vérifier avec le Bureau (RPC actuel utilise la date serveur). Aucune migration historique supprimée ou rejouée.
