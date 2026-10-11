@@ -2840,6 +2840,7 @@ export type Database = {
           profile_id: string
           public_city: string | null
           public_email: string | null
+          public_listing: boolean
           public_phone: string | null
           review_comment: string | null
           reviewed_at: string | null
@@ -2861,6 +2862,7 @@ export type Database = {
           profile_id: string
           public_city?: string | null
           public_email?: string | null
+          public_listing?: boolean
           public_phone?: string | null
           review_comment?: string | null
           reviewed_at?: string | null
@@ -2882,6 +2884,7 @@ export type Database = {
           profile_id?: string
           public_city?: string | null
           public_email?: string | null
+          public_listing?: boolean
           public_phone?: string | null
           review_comment?: string | null
           reviewed_at?: string | null
@@ -2979,6 +2982,7 @@ export type Database = {
           person_id: string | null
           phone: string | null
           public_visibility: boolean
+          statutory_category: string
           updated_at: string
         }
         Insert: {
@@ -3001,6 +3005,7 @@ export type Database = {
           person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
+          statutory_category?: string
           updated_at?: string
         }
         Update: {
@@ -3023,6 +3028,7 @@ export type Database = {
           person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
+          statutory_category?: string
           updated_at?: string
         }
         Relationships: [

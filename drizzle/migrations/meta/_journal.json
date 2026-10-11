@@ -162,6 +162,13 @@
       "when": 1791632274123,
       "tag": "0022_external_links_on_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791717668701,
+      "tag": "0023_statuts_categories_et_referencement_public",
+      "breakpoints": true
     }
   ]
 }

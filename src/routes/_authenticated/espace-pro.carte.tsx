@@ -147,7 +147,7 @@ function ProCardPage() {
     <AppShell
       title="Ma carte professionnelle"
       subtitle="Votre vitrine publique dans le réseau La Voix du Chien"
-      actions={card?.status === "ACTIVE" ? (
+      actions={card?.status === "ACTIVE" && card.public_listing ? (
         <Button asChild size="sm" variant="outline" className="gap-2">
           <Link to="/professionnels/$slug" params={{ slug: card.slug }} target="_blank">
             <ExternalLink className="size-4" aria-hidden /> Voir ma page publique
@@ -170,6 +170,40 @@ function ProCardPage() {
               <p className="text-xs text-muted-foreground">
                 Pas besoin de tout remplir maintenant : enregistrez un brouillon, vous compléterez plus tard.
               </p>
+            ) : null}
+          </div>
+
+          <div className="panel space-y-2 p-4">
+            <h2 className="font-display text-base">Référencement public</h2>
+            <p className="text-xs text-muted-foreground">
+              Votre adhésion professionnelle ne dépend pas de ce choix : vous restez visible des
+              membres dans la plateforme. Le référencement sur la page publique de l'association est
+              facultatif (article 14 des statuts) et possible une fois votre carte validée par le Bureau.
+            </p>
+            <label className="flex min-h-11 items-center gap-3 text-sm">
+              <input
+                type="checkbox"
+                className="size-5 accent-primary"
+                checked={Boolean(card?.public_listing)}
+                disabled={card?.status !== "ACTIVE"}
+                onChange={async (e) => {
+                  if (!card) return;
+                  const { error } = await supabase
+                    .from("professional_public_profile")
+                    .update({ public_listing: e.target.checked })
+                    .eq("id", card.id);
+                  if (error) {
+                    toast.error("Impossible d'enregistrer ce choix.");
+                    return;
+                  }
+                  toast.success(e.target.checked ? "Vous apparaissez sur la page publique." : "Vous n'apparaissez plus sur la page publique.");
+                  await queryClient.invalidateQueries({ queryKey: ["my-pro-card", user?.id] });
+                }}
+              />
+              Apparaître sur la page publique et dans l'annuaire public des professionnels
+            </label>
+            {card?.status !== "ACTIVE" ? (
+              <p className="text-xs text-muted-foreground">Disponible après validation de votre carte par le Bureau.</p>
             ) : null}
           </div>
 
@@ -236,7 +270,7 @@ function ProCardPage() {
         <aside className="space-y-3">
           <h2 className="font-display text-lg">Mon QR code</h2>
           {card ? (
-            <ProQrCard slug={card.slug} name={card.display_name} published={card.status === "ACTIVE"} />
+            <ProQrCard slug={card.slug} name={card.display_name} published={card.status === "ACTIVE" && card.public_listing} />
           ) : (
             <p className="panel p-4 text-sm text-muted-foreground">Enregistrez votre carte pour obtenir votre QR code.</p>
           )}

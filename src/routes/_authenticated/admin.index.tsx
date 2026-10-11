@@ -5,6 +5,10 @@ import { Users, Briefcase, FolderKanban, ShieldCheck, Activity } from "lucide-re
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
+import { useState } from "react";
+import { CalendarClock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { AG_CONVOCATION_DAYS, AG_QUORUM, convocationDeadline, isInAgMonth, nextAgYear, quorumReached } from "@/lib/statutes";
 import { CharterBanner } from "@/components/CharterBanner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +145,7 @@ function AdminDashboard() {
       <div className="mt-6">
         <CharterBanner />
       </div>
+      <AgReminder />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <div key={stat.label} className="panel p-4">
@@ -237,5 +242,41 @@ function AdminDashboard() {
         )}
       </div>
     </AppShell>
+  );
+}
+
+function AgReminder() {
+  const year = nextAgYear(new Date());
+  const [agDate, setAgDate] = useState(`${year}-06-20`);
+  const [present, setPresent] = useState(0);
+  const valid = /^\d{4}-\d{2}-\d{2}$/.test(agDate);
+  return (
+    <section className="panel mb-6 space-y-3 p-5" aria-labelledby="ag-title">
+      <h2 id="ag-title" className="flex items-center gap-2 text-lg">
+        <CalendarClock className="size-5 text-primary" aria-hidden /> Assemblée générale ordinaire {year}
+      </h2>
+      <p className="text-sm text-muted-foreground">
+        Selon les statuts (article 16) : AG chaque année en juin, convocation avec ordre du jour au
+        moins {AG_CONVOCATION_DAYS} jours avant, quorum de {AG_QUORUM} personnes dont des membres du
+        Bureau et des fondateurs. Présentiel, visio ou hybride.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="text-sm">
+          Date envisagée
+          <Input type="date" value={agDate} onChange={(e) => setAgDate(e.target.value)} className="mt-1" />
+        </label>
+        <label className="text-sm">
+          Personnes présentes ou représentées
+          <Input type="number" min={0} value={present} onChange={(e) => setPresent(Number(e.target.value) || 0)} className="mt-1" />
+        </label>
+      </div>
+      {valid ? (
+        <ul className="space-y-1 text-sm">
+          <li>📨 Convocations à envoyer au plus tard le <strong>{new Date(convocationDeadline(agDate)).toLocaleDateString("fr-FR")}</strong>.</li>
+          {!isInAgMonth(agDate) ? <li>⚠️ Cette date n'est pas en juin, comme le prévoient les statuts.</li> : null}
+          <li>{quorumReached(present) ? "✅ Quorum atteint." : `⏳ Quorum non atteint : ${AG_QUORUM - present} personne(s) manquante(s).`}</li>
+        </ul>
+      ) : null}
+    </section>
   );
 }

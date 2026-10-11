@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MEMBER_FUNCTION_LABEL, memberFullName } from "@/lib/members";
+import { MEMBER_FUNCTION_LABEL, STATUTORY_CATEGORIES, STATUTORY_CATEGORY_LABEL, memberFullName } from "@/lib/members";
 import { useConfigOptions } from "@/lib/config-options";
 import { logAudit } from "@/lib/mindmap-actions";
 
@@ -75,7 +75,7 @@ function RolesPage() {
         await supabase
           .from("profiles")
           .select(
-            "id, first_name, last_name, display_name, email, membership_status, membership_type, access_level, involvement_level",
+            "id, first_name, last_name, display_name, email, membership_status, membership_type, access_level, involvement_level, statutory_category",
           )
 
           .order("created_at", { ascending: true })
@@ -426,6 +426,7 @@ function RolesPage() {
                   memberName={name}
                   accessLevel={member.access_level ?? "STANDARD"}
                   involvementLevel={member.involvement_level ?? null}
+                  category={member.statutory_category ?? "ACTIF"}
                 />
               </div>
 
@@ -487,18 +488,20 @@ function MemberLevels({
   memberName,
   accessLevel,
   involvementLevel,
+  category,
 }: {
   memberId: string;
   memberName: string;
   accessLevel: string;
   involvementLevel: string | null;
+  category: string;
 }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const access = useConfigOptions("ACCESS_LEVEL");
   const involvement = useConfigOptions("INVOLVEMENT_LEVEL");
 
-  const save = async (patch: { access_level?: string; involvement_level?: string }) => {
+  const save = async (patch: { access_level?: string; involvement_level?: string; statutory_category?: string }) => {
     const { error } = await supabase.from("profiles").update(patch).eq("id", memberId);
     if (error) {
       toast.error(error.message);
@@ -518,6 +521,27 @@ function MemberLevels({
 
   return (
     <>
+      <div className="md:col-span-2">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Catégorie statutaire (article 5)
+        </p>
+        <Select value={category} onValueChange={(value) => save({ statutory_category: value })}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Catégorie statutaire" />
+          </SelectTrigger>
+          <SelectContent>
+            {STATUTORY_CATEGORIES.map((code) => (
+              <SelectItem key={code} value={code}>
+                {STATUTORY_CATEGORY_LABEL[code]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Se cumule avec les fonctions : un fondateur ou un bienfaiteur peut être au Bureau ou
+          représentant, un membre actif peut être bénévole.
+        </p>
+      </div>
       <div>
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Niveau d'accès
