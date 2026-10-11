@@ -18,11 +18,9 @@ import {
   Users,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { CharterBanner } from "@/components/CharterBanner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PROJECT_STATUS_LABEL, TASK_STATUS_LABEL, formatDate } from "@/lib/domain";
@@ -173,14 +171,7 @@ function CockpitPage() {
     <AppShell
       title="Cockpit de pilotage"
       subtitle="Les réponses du Bureau, en un coup d'œil"
-      actions={
-        <Button asChild variant="secondary">
-          <Link to="/admin/validation">Validations en attente</Link>
-        </Button>
-      }
     >
-      <CharterBanner />
-
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {kpis.map((kpi) => (
           <Link key={kpi.label} to={kpi.to} className="panel block p-4 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">

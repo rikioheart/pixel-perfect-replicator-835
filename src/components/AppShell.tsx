@@ -166,10 +166,10 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/reimbursements", label: "Paiements & remboursements", icon: ReceiptText, audience: "all" },
       { to: "/my-history", label: "Mon historique", icon: History, audience: "all" },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "all" },
-      { to: "/my-space", label: "Mon espace personnel", icon: Settings2, audience: "all" },
+      { to: "/my-space", label: "Mes préférences", icon: Settings2, audience: "all" },
       { to: "/parcours", label: "Mon parcours", icon: RouteIcon, audience: "all" },
       { to: "/foyer", label: "Mon foyer", icon: House, audience: "all" },
-      { to: "/profile", label: "Mon profil & mes chiens", icon: Dog, audience: "all" },
+      { to: "/profile", label: "Mon profil", icon: UserRound, audience: "all" },
       { to: "/help", label: "Centre d'aide", icon: LifeBuoy, audience: "all", primaryForParticulier: true },
       { to: "/help-requests", label: "Demandes d'aide", icon: HandHeart, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
@@ -374,24 +374,12 @@ export function AppShell({
             <h1 className="text-2xl">{title}</h1>
             {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex max-w-full flex-wrap items-center gap-2">
             {actions}
             <QuickCreateMenu />
             <div className="hidden items-center gap-2 md:flex">
             <GlobalSearch />
             <NotificationBell />
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={async () => {
-                await signOut();
-                void navigate({ to: "/" });
-              }}
-            >
-              <LogOut className="size-4" aria-hidden="true" />
-              Se déconnecter
-            </Button>
             </div>
           </div>
         </header>
@@ -440,9 +428,7 @@ export function AppShell({
               </nav>
             </SheetContent>
           </Sheet>
-          <p className="truncate text-sm font-medium">
-            {visible.find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`))?.label ?? title}
-          </p>
+          
           <div className="flex items-center gap-1">
             <GlobalSearch />
             <NotificationBell />
@@ -455,7 +441,7 @@ export function AppShell({
             <div className="mb-5 space-y-2">
             <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
               {MEMBER_HUB_GROUPS.map((t, i) => {
-                const Icon = [PawPrint, CalendarDays, Stamp, UserRound][i];
+                const Icon = [PawPrint, CalendarDays, Stamp, UserRound][i] ?? UserRound;
                 return (
                 <Link
                   key={t.to}
@@ -480,7 +466,7 @@ export function AppShell({
       </div>
       <nav aria-label="Accès rapides mobile" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-card px-1 pt-1 shadow-lg md:hidden" style={{ paddingBottom: "max(.5rem, env(safe-area-inset-bottom))" }}>
         {dock.map(t => <Link key={t.to} to={t.to} aria-current={pathname === t.to ? "page" : undefined} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px]", pathname === t.to ? "bg-primary font-semibold text-primary-foreground" : "text-muted-foreground")}><t.icon className="size-5" aria-hidden />{t.label}</Link>)}
-        <button onClick={() => setMobileOpen(true)} className="flex min-h-14 flex-col items-center justify-center gap-1 text-[11px]" aria-label="Ouvrir tous les espaces"><Menu className="size-5" aria-hidden />Plus</button>
+        <Button variant="ghost" onClick={() => setMobileOpen(true)} className="h-auto min-h-14 flex-col gap-1 px-1 text-[11px]" aria-label="Ouvrir tous les espaces"><Menu className="size-5" aria-hidden />Plus</Button>
       </nav>
     </div>
   );

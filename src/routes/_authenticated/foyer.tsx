@@ -15,6 +15,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { useMemberOptions } from "@/components/MemberPicker";
 import { useMyHouseholds, type HouseholdBundle } from "@/lib/households";
+import { DogProfiles } from "@/components/DogProfiles";
 import { useProOptions } from "@/lib/pro-card";
 
 export const Route = createFileRoute("/_authenticated/foyer")({
@@ -188,11 +189,9 @@ function DogSharing({ dogId, dogName, onClose }: { dogId: string; dogName: strin
 }
 
 function HouseholdCard({ h }: { h: HouseholdBundle }) {
-  const { user } = useAuth();
   const qc = useQueryClient();
   const { data: members = [] } = useMemberOptions();
   const [child, setChild] = useState({ first_name: "", birth_year: "" });
-  const [dog, setDog] = useState({ name: "", breed: "" });
   const [adult, setAdult] = useState("");
   const [sharing, setSharing] = useState<{ id: string; name: string } | null>(null);
   const refresh = () => void qc.invalidateQueries({ queryKey: ["my-households"] });
@@ -243,14 +242,7 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
               <Button size="sm" variant="outline" className="gap-1" onClick={() => setSharing({ id: d.id, name: d.name })}><Share2 className="size-3.5" aria-hidden /> Partage & référents</Button>
             </p>
           ))}
-          <div className="flex gap-1">
-            <Input aria-label="Nom du chien" placeholder="Nom" value={dog.name} onChange={(e) => setDog({ ...dog, name: e.target.value })} />
-            <Input aria-label="Race" placeholder="Race" value={dog.breed} onChange={(e) => setDog({ ...dog, breed: e.target.value })} />
-            <Button size="icon" variant="outline" aria-label="Ajouter le chien" disabled={dog.name.trim().length < 2}
-              onClick={run(() => { const r = supabase.from("dogs").insert({ owner_id: user!.id, household_id: h.id, name: dog.name.trim(), breed: dog.breed.trim() || null }); setDog({ name: "", breed: "" }); return r; }, "Chien ajouté.")}>
-              <Plus className="size-4" aria-hidden />
-            </Button>
-          </div>
+
         </div>
       </div>
       {sharing ? <DogSharing dogId={sharing.id} dogName={sharing.name} onClose={() => setSharing(null)} /> : null}
@@ -260,6 +252,7 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
 
 function FoyerPage() {
   const { user, profile } = useAuth();
+  const [sharing, setSharing] = useState<{ id: string; name: string } | null>(null);
   const qc = useQueryClient();
   const { data: households = [], isLoading } = useMyHouseholds(user?.id);
   const { data: orphanDogs = [] } = useQuery({
@@ -280,13 +273,15 @@ function FoyerPage() {
   });
 
   return (
-    <AppShell title="Mon foyer" subtitle="Les personnes et les chiens que vous inscrivez ensemble"
+    <AppShell title="Mon foyer" subtitle="Vos proches, les fiches de vos chiens et leurs professionnels"
       actions={<Button size="sm" className="gap-2" onClick={() => create.mutate()} disabled={create.isPending}><Plus className="size-4" aria-hidden /> {households.length ? "Autre foyer" : "Créer mon foyer"}</Button>}>
       {isLoading ? <LoadingState rows={3} /> : households.length === 0 ? (
         <EmptyState title="Pas encore de foyer" message="Créez votre foyer pour inscrire en une fois vos proches, vos enfants et vos chiens. Vos chiens existants y seront rattachés." />
       ) : (
         <div className="space-y-4">{households.map((h) => <HouseholdCard key={h.id} h={h} />)}</div>
       )}
+      <DogProfiles households={households} onShare={(id, name) => setSharing({ id, name })} />
+      {sharing ? <DogSharing dogId={sharing.id} dogName={sharing.name} onClose={() => setSharing(null)} /> : null}
     </AppShell>
   );
 }

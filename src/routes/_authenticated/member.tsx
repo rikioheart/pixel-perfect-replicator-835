@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { HandHeart, CalendarDays, ListChecks, FolderKanban, Briefcase } from "lucide-react";
+import { HandHeart, ListChecks, FolderKanban } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
@@ -20,17 +20,19 @@ import { TASK_STATUS_LABEL, PROJECT_ROLE_LABEL, formatDate } from "@/lib/domain"
 export const Route = createFileRoute("/_authenticated/member")({
   head: () => ({
     meta: [
-      { title: "Mon espace membre — La Voix du Chien" },
+      { title: "Mon Compagnon & Moi — La Voix du Chien" },
       {
         name: "description",
         content:
           "Espace personnel du membre : mes tâches, mes inscriptions, ma fidélité et l'actualité de l'association.",
       },
-      { property: "og:title", content: "Mon espace membre — La Voix du Chien" },
+      { property: "og:title", content: "Mon Compagnon & Moi — La Voix du Chien" },
       {
         property: "og:description",
         content: "Un accueil personnalisé selon votre rôle : tâches, événements, fidélité et actualités.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: MemberDashboard,
@@ -43,21 +45,22 @@ function MemberDashboard() {
     queryKey: ["member-home", user?.id],
     enabled: Boolean(user?.id),
     queryFn: async () => {
+      if (!user) return { tasks: [], memberships: [], participations: [], activities: [] };
       const nowIso = new Date().toISOString();
       const [tasks, memberships, participations, activities] = await Promise.all([
         supabase
           .from("tasks")
           .select("id, title, status, deadline, needs_help, is_volunteer_task, projects(title)")
-          .eq("assigned_user_id", user!.id)
+          .eq("assigned_user_id", user.id)
           .order("deadline", { ascending: true }),
         supabase
           .from("project_members")
           .select("project_role, projects(id, title, status, progress_percent, deadline)")
-          .eq("user_id", user!.id),
+          .eq("user_id", user.id),
         supabase
           .from("participations")
           .select("id, registration_status, events(id, title, start_date, location)")
-          .eq("user_id", user!.id)
+          .eq("user_id", user.id)
           .limit(20),
         supabase
           .from("activities")
@@ -92,13 +95,9 @@ function MemberDashboard() {
 
   return (
     <AppShell
-      title="Mon espace"
+      title="Mon Compagnon & Moi"
       subtitle="Ce qui vous concerne, rien de plus"
-      actions={
-        <Button asChild variant="secondary">
-          <Link to="/tasks">Mes tâches</Link>
-        </Button>
-      }
+
     >
       <div className="space-y-6">
         <HomeHero
@@ -110,23 +109,8 @@ function MemberDashboard() {
         {!isBureau && user ? <MyDogHome userId={user.id} /> : null}
 
         <div className="flex flex-wrap gap-2">
-          <Button asChild size="sm">
-            <Link to="/activities">S'inscrire à une activité</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link to="/events">Voir les événements</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link to="/loyalty">Ma carte fidélité</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link to="/professionals">Annuaire des professionnels</Link>
-          </Button>
-          <Button asChild size="sm" variant="ghost" className="gap-2">
-            <Link to="/tasks">
-              <HandHeart className="size-4" /> J'ai besoin d'aide
-            </Link>
-          </Button>
+          <Button asChild size="sm" variant="outline"><Link to="/directory">Annuaire du réseau</Link></Button>
+          <Button asChild size="sm" variant="ghost"><Link to="/help-requests"><HandHeart className="size-4" aria-hidden /> J'ai besoin d'aide</Link></Button>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -257,38 +241,7 @@ function MemberDashboard() {
           <div className="space-y-6">
             <NewsFeed />
             <MemberWall />
-            {isPro ? (
-              <div className="panel p-5">
-                <div className="mb-2 flex items-center gap-2">
-                  <Briefcase className="size-4 text-muted-foreground" />
-                  <h2 className="text-lg">Mon activité pro</h2>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Vos prestations, votre fiche publique et vos réservations de terrain.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Button asChild size="sm" variant="outline">
-                    <Link to="/professionals">Ma fiche</Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link to="/terrain">Réserver le terrain</Link>
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="panel p-5">
-                <div className="mb-2 flex items-center gap-2">
-                  <CalendarDays className="size-4 text-muted-foreground" />
-                  <h2 className="text-lg">Envie de participer ?</h2>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Balades, ateliers, coups de main ponctuels : chacun avance à son rythme.
-                </p>
-                <Button asChild size="sm" variant="outline" className="mt-3">
-                  <Link to="/events">Voir les prochains rendez-vous</Link>
-                </Button>
-              </div>
-            )}
+
           </div>
         </div>
       </div>

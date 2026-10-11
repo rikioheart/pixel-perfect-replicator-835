@@ -35,7 +35,7 @@ export const MEMBER_HUB_TABS = [
   { to: "/parcours", label: "Mon parcours" },
   { to: "/my-history", label: "Historique" },
   { to: "/profile", label: "Profil" },
-  { to: "/my-space", label: "Mon espace & préférences" },
+  { to: "/my-space", label: "Préférences" },
 ] as const;
 
 export function memberHubTabFor(pathname: string): string | null {
