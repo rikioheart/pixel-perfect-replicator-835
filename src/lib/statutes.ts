@@ -5,8 +5,7 @@ export const AG_CONVOCATION_DAYS = 15;
 
 /** Date limite d'envoi des convocations pour une AG à la date donnée (AAAA-MM-JJ). */
 export function convocationDeadline(agDate: string): string {
-  const [y, m, d] = agDate.split("-").map(Number);
-  const date = new Date(Date.UTC(y, m - 1, d));
+  const date = new Date(`${agDate}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() - AG_CONVOCATION_DAYS);
   return date.toISOString().slice(0, 10);
 }

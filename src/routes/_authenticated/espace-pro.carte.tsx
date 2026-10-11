@@ -192,7 +192,10 @@ function ProCardPage() {
                     .from("professional_public_profile")
                     .update({ public_listing: e.target.checked })
                     .eq("id", card.id);
-                  if (error) return toast.error("Impossible d'enregistrer ce choix.");
+                  if (error) {
+                    toast.error("Impossible d'enregistrer ce choix.");
+                    return;
+                  }
                   toast.success(e.target.checked ? "Vous apparaissez sur la page publique." : "Vous n'apparaissez plus sur la page publique.");
                   await queryClient.invalidateQueries({ queryKey: ["my-pro-card", user?.id] });
                 }}
