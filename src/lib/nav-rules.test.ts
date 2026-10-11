@@ -6,8 +6,8 @@ const pro = { isBureau: false, isPro: true };
 const bureau = { isBureau: true, isPro: false };
 
 describe("navigation par rôle", () => {
-  it("conserve toutes les pages personnelles dans cinq familles", () => {
-    expect(MEMBER_HUB_GROUPS).toHaveLength(5);
+  it("conserve toutes les pages personnelles dans quatre familles", () => {
+    expect(MEMBER_HUB_GROUPS).toHaveLength(4);
     for (const tab of MEMBER_HUB_TABS) expect(memberHubGroupFor(tab.to)).toBeDefined();
     expect(memberHubGroupFor('/terrain')?.to).toBe('/participations');
   });

@@ -43,13 +43,12 @@ export function memberHubTabFor(pathname: string): string | null {
   return hit ? hit.to : null;
 }
 
-/** Five stable families; every existing personal page remains reachable. */
+/** Four stable families; every existing personal page remains reachable. */
 export const MEMBER_HUB_GROUPS = [
   { label: "Mon chien", to: "/member", paths: ["/member", "/foyer"] },
   { label: "Sorties", to: "/participations", paths: ["/participations", "/terrain"] },
   { label: "Mon pass", to: "/loyalty", paths: ["/loyalty", "/advantages"] },
-  { label: "Parcours", to: "/parcours", paths: ["/parcours", "/my-history"] },
-  { label: "Mon compte", to: "/profile", paths: ["/profile", "/my-space"] },
+  { label: "Profil & foyer", to: "/profile", paths: ["/profile", "/my-space", "/parcours", "/my-history"] },
 ] as const;
 
 export function memberHubGroupFor(pathname: string) {

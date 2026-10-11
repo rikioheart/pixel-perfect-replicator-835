@@ -48,7 +48,7 @@ const VALUES = [
 ];
 
 function PublicAssociationPage() {
-  const { data: pros = [] } = useQuery({
+  const { data: pros = [], isSuccess: prosLoaded } = useQuery({
     queryKey: ["public-professionals"],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("list_public_pros");
@@ -63,7 +63,7 @@ function PublicAssociationPage() {
     },
   });
 
-  useEffect(() => { if(pros.length) {try {localStorage.setItem('lvdc.public.pros',JSON.stringify(pros));}catch{ /* device storage unavailable */ }} },[pros]);
+  useEffect(() => { if(prosLoaded) {try {localStorage.setItem('lvdc.public.pros',JSON.stringify(pros));}catch{ /* device storage unavailable */ }} },[pros,prosLoaded]);
 
   return (
     <div className="min-h-screen bg-background">

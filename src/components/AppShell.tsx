@@ -453,9 +453,9 @@ export function AppShell({
           <OfflineStatus />
           {hubTab && !isBureau ? (
             <div className="mb-5 space-y-2">
-            <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-3 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-5">
+            <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
               {MEMBER_HUB_GROUPS.map((t, i) => {
-                const Icon = [PawPrint, CalendarDays, Stamp, History, UserRound][i];
+                const Icon = [PawPrint, CalendarDays, Stamp, UserRound][i];
                 return (
                 <Link
                   key={t.to}

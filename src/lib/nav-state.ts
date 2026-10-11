@@ -15,7 +15,7 @@ function load() {
   } catch {
     store.open = new Set();
   }
-  if (window.localStorage.getItem("lvdc.nav.more") === "1") store.open.add("__more");
+  try { if (window.localStorage.getItem("lvdc.nav.more") === "1") store.open.add("__more"); } catch { /* storage disabled */ }
 }
 
 let snapshot = "";
