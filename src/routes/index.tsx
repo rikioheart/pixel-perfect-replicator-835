@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
+import { PublicWelcome } from '@/components/PublicWelcome';
+import { useOnline } from '@/lib/offline';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,11 +23,11 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Connexion — La Voix du Chien" },
+      { title: "La Voix du Chien — Ensemble, à leur rythme" },
       {
         name: "description",
         content:
-          "Accès réservé aux membres de La Voix du Chien : pilotage des projets, tâches et validations de l'association.",
+          "Découvrez l’association, ses valeurs, les activités du mois et les professionnels partenaires, puis accédez à votre espace.",
       },
       { property: "og:title", content: "Connexion — La Voix du Chien" },
       {
@@ -38,54 +40,34 @@ export const Route = createFileRoute("/")({
 });
 
 function AuthPage() {
-  const { session, isBureau, loading, rolesReady } = useAuth();
+  const { session, isBureau, isPro, loading, rolesReady } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && rolesReady && session) {
-      void navigate({ to: isBureau ? "/admin" : "/member" });
+      void navigate({ to: isBureau ? "/admin" : isPro ? "/espace-pro" : "/member" });
     }
-  }, [session, isBureau, loading, rolesReady, navigate]);
+  }, [session, isBureau, isPro, loading, rolesReady, navigate]);
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <section className="surface-night flex flex-col justify-between p-10">
+    <div className="min-h-screen bg-background">
+      <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-8">
         <div className="flex items-center gap-3">
           <img
             src={logoMark.url}
             alt="Logo de l'association La Voix du Chien"
             className="size-12 rounded-full bg-navy-foreground/10 object-contain p-1"
           />
-          <span className="font-display">La Voix du Chien</span>
+          <span className="font-display text-sm sm:text-base">Association La Voix du Chien</span>
         </div>
-        <div className="max-w-md space-y-5 py-16">
-          <h1 className="text-4xl leading-tight">
-            Le cockpit opérationnel de l'association
-          </h1>
-          <p className="text-sm leading-relaxed opacity-80">
-            Piloter les projets, suivre les tâches, apporter la preuve du travail réalisé et faire
-            valider chaque avancée par le Bureau. Un outil de développement associatif, pensé pour
-            les petits progrès continus.
-          </p>
-          <ul className="space-y-2 text-sm opacity-80">
-            <li>Action → preuve → validation → historique</li>
-            <li>Professionnels, particuliers et Bureau réunis</li>
-            <li>Nargis, Loiret — et tout le réseau</li>
-          </ul>
-        </div>
-        <div className="space-y-3">
-          <Link
-            to="/association"
-            className="inline-flex items-center gap-2 rounded-md border border-navy-foreground/30 px-3 py-1.5 text-xs transition-colors hover:bg-navy-foreground/10"
-          >
-            Découvrir l'association <ArrowRight className="size-3.5" />
-          </Link>
-          <p className="text-xs opacity-60">Plateforme interne — accès réservé aux membres.</p>
-        </div>
-      </section>
-
-      <section className="flex items-center justify-center bg-background p-6">
-        <div className="panel w-full max-w-md p-7">
+        <a href="#connexion" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm text-primary-foreground">Espace membres · Connexion<ArrowRight className="size-4" aria-hidden /></a>
+      </header>
+      <main className="mx-auto grid max-w-7xl items-start gap-6 px-4 pb-10 sm:px-8 lg:grid-cols-3">
+      <section className="min-w-0 lg:col-span-2"><PublicWelcome /></section>
+      <section id="connexion" className="scroll-mt-5 lg:sticky lg:top-6">
+        <div className="panel w-full p-5 sm:p-6">
+          <h2 className="mb-2 text-xl">Votre espace associatif</h2>
+          <p className="mb-5 text-sm text-muted-foreground">Retrouvez votre chien, vos sorties et votre participation à la vie de l’association.</p>
           <GoogleSignInButton />
           <Tabs defaultValue="signin">
             <TabsList className="mb-6 grid w-full grid-cols-2">
@@ -101,11 +83,14 @@ function AuthPage() {
           </Tabs>
         </div>
       </section>
+      </main>
+      <footer className="border-t border-border p-5 text-center text-sm text-muted-foreground">Nargis, Loiret · Une place pour chacun, au rythme de son chien.</footer>
     </div>
   );
 }
 
 function GoogleSignInButton() {
+  const online = useOnline();
   const [busy, setBusy] = useState(false);
 
   const signIn = async () => {
@@ -124,7 +109,7 @@ function GoogleSignInButton() {
         type="button"
         variant="outline"
         className="w-full gap-2"
-        disabled={busy}
+        disabled={busy || !online}
         onClick={signIn}
       >
         <GoogleIcon />
@@ -165,6 +150,7 @@ function GoogleIcon() {
 }
 
 function SignInForm() {
+  const online = useOnline();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -211,7 +197,7 @@ function SignInForm() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <Button type="submit" className="w-full" disabled={busy}>
+      <Button type="submit" className="w-full" disabled={busy || !online}>
         {busy ? "Connexion…" : "Se connecter"}
       </Button>
       <button
@@ -226,6 +212,7 @@ function SignInForm() {
 }
 
 function SignUpForm() {
+  const online = useOnline();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -319,7 +306,7 @@ function SignUpForm() {
           </SelectContent>
         </Select>
       </div>
-      <Button type="submit" className="w-full" disabled={busy}>
+      <Button type="submit" className="w-full" disabled={busy || !online}>
         {busy ? "Création…" : "Créer mon compte"}
       </Button>
       <p className="text-xs text-muted-foreground">

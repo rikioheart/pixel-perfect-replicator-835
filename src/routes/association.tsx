@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PublicWelcome } from '@/components/PublicWelcome';
 
 export const Route = createFileRoute("/association")({
   head: () => ({
@@ -77,26 +78,10 @@ function PublicAssociationPage() {
             <Link to="/">Espace membres</Link>
           </Button>
         </div>
-        <div className="mx-auto max-w-5xl px-6 pb-16 pt-10">
-          <h1 className="max-w-2xl text-4xl leading-tight">
-            L'association qui donne de la voix pour les chiens et leurs maîtres
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed opacity-80">
-            Basée à Nargis dans le Loiret, La Voix du Chien réunit des particuliers, des bénévoles et
-            des professionnels du monde canin autour d'activités, de formations et d'événements
-            ouverts à toutes et tous.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild>
-              <Link to="/">
-                Rejoindre l'association <ArrowRight className="ml-2 size-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
       </header>
 
       <main className="mx-auto max-w-5xl space-y-14 px-6 py-14">
+        <PublicWelcome />
         <section>
           <h2 className="font-display text-2xl">Nos valeurs</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
@@ -123,7 +108,7 @@ function PublicAssociationPage() {
           </ul>
         </section>
 
-        <section>
+        <section id="partenaires" className="scroll-mt-6">
           <h2 className="font-display text-2xl">Les professionnels du réseau</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Éducateurs, comportementalistes, toiletteurs et autres partenaires qui accompagnent

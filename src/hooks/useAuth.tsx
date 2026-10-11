@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { fallbackIsPro } from "@/lib/nav-rules";
+import { clearPrivateOffline } from '@/lib/offline';
 
 export type Profile = {
   id: string;
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!userId) {
       setProfile(null);
       setRoles([]);
+      setIsPro(false);
       setRolesReady(true);
       return;
     }
@@ -127,6 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await loadContext(session?.user.id);
     },
     signOut: async () => {
+      if (session?.user.id) clearPrivateOffline(session.user.id);
       await supabase.auth.signOut();
       setProfile(null);
       setRoles([]);
