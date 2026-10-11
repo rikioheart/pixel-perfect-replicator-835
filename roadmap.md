@@ -1,5 +1,11 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Harmonisation et hors réseau — demande actuelle
+- [ ] Alléger les onglets personnels sans supprimer les pages, barre mobile et confort de lecture
+- [ ] Vitrine publique vivante, activités publiques du mois, partenaires et accès 2/3 + 1/3
+- [ ] Préparation hors réseau : vitrine publique, pass personnel et tampons en attente sécurisés
+- [ ] Tests automatiques et vérifications ordinateur/téléphone ; préciser les limites hors réseau
+
 ## Lot 1 — Création rapide "panneau latéral" partout
 - [ ] Bouton + / onglet "Nouveau" avec panneau latéral (Sheet) sur : Activités, Événements, Partenaires (+ avantages), Professionnels
 - [ ] Idem sur Projets et Tâches (création + édition au clic sur une carte)
