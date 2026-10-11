@@ -18,6 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import QRCode from 'qrcode';
+import { useOnline } from '@/lib/offline';
 
 export const Route = createFileRoute("/_authenticated/loyalty")({
   head: () => ({
@@ -46,6 +48,18 @@ function LoyaltyPage() {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [recomputing, setRecomputing] = useState(false);
+  const online = useOnline();
+  const [qrImage, setQrImage] = useState('');
+  useEffect(() => {
+    if(!card?.qr_code || !user) return;
+    let active = true;
+    void QRCode.toDataURL(card.qr_code,{width:220,margin:2}).then(qr => {
+      if(!active) return;
+      setQrImage(qr);
+      localStorage.setItem('lvdc.offline.pass',JSON.stringify({owner:user.id,name:profile?.display_name || 'Mon pass',qr,total:card.total_stamps,savedAt:new Date().toISOString()}));
+    });
+    return () => { active = false; };
+  }, [card?.qr_code,card?.total_stamps,user?.id,profile?.display_name]);
 
   const { data: card, isLoading } = useQuery({
     queryKey: ["loyalty-card", user?.id],
@@ -63,12 +77,12 @@ function LoyaltyPage() {
 
   // Crée la carte à la première visite.
   useEffect(() => {
-    if (!user?.id || isLoading || card) return;
+    if (!user?.id || isLoading || card || !online) return;
     void (async () => {
       await supabase.from("loyalty_cards").insert({ member_id: user.id });
       void queryClient.invalidateQueries({ queryKey: ["loyalty-card", user.id] });
     })();
-  }, [user?.id, isLoading, card, queryClient]);
+  }, [user?.id, isLoading, card, queryClient, online]);
 
   const { data: stamps = [] } = useQuery({
     queryKey: ["loyalty-stamps", card?.id],
@@ -161,7 +175,7 @@ function LoyaltyPage() {
             {card?.qr_code ? (
               <>
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(card.qr_code)}`}
+                  src={qrImage || undefined}
                   alt="QR code de la carte de fidélité"
                   className="mx-auto rounded-md border border-border bg-white p-2"
                   loading="lazy"
@@ -169,6 +183,7 @@ function LoyaltyPage() {
                   height={220}
                 />
                 <p className="break-all text-center text-xs text-muted-foreground">{card.qr_code}</p>
+                <p className="text-center text-xs text-muted-foreground">Pass sauvegardé sur ce téléphone pour le présenter sans réseau. Le QR identifie votre carte ; il ne confirme pas votre adhésion.</p>
               </>
             ) : (
               <p className="text-muted-foreground">Création de votre carte en cours…</p>
