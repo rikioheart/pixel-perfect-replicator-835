@@ -37,6 +37,22 @@ function CharterPage() {
         </p>
       </div>
 
+      <section className="mb-4 space-y-2 rounded-lg border border-border bg-card p-4 text-sm" aria-labelledby="statuts-title">
+        <h2 id="statuts-title" className="font-display text-base">Ce que disent nos statuts</h2>
+        <p>
+          <strong>Article 2 :</strong> l'association promeut une « approche respectueuse, éthique et
+          scientifiquement fondée du chien, prenant en compte ses besoins physiques, émotionnels et
+          sociaux ».
+        </p>
+        <p>
+          <strong>Article 9 :</strong> constitue un motif grave de radiation « l'utilisation de
+          pratiques portant atteinte au bien-être ou à la santé du chien ».
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Chaque membre, particulier comme professionnel, s'engage sur ces bases en rejoignant La Voix du Chien.
+        </p>
+      </section>
+
       <div className="grid gap-4 md:grid-cols-2">
         {PRINCIPLES.map((principle, index) => (
           <Card key={principle.title}>

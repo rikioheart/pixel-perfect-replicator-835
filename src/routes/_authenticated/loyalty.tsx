@@ -115,6 +115,10 @@ function LoyaltyPage() {
 
   return (
     <AppShell title="Ma carte de fidélité" subtitle="Vos tampons et votre historique d'activités">
+      <p className="mb-4 rounded-lg border border-border bg-secondary/40 p-3 text-sm text-muted-foreground">
+        La carte de fidélité fait partie du règlement intérieur de l'association (article 19 des
+        statuts). Elle remercie votre participation, sans jamais comparer les membres entre eux.
+      </p>
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
