@@ -169,6 +169,13 @@
       "when": 1791717668701,
       "tag": "0023_statuts_categories_et_referencement_public",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791734241501,
+      "tag": "0024_public_home_safe_projection",
+      "breakpoints": true
     }
   ]
 }

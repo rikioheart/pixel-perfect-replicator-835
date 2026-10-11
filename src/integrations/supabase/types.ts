@@ -4234,6 +4234,7 @@ export type Database = {
       }
       entity_peek: { Args: { _id: string; _type: string }; Returns: Json }
       get_pro_dogs: { Args: never; Returns: Json }
+      get_public_home: { Args: never; Returns: Json }
       get_public_pro_page: { Args: { _slug: string }; Returns: Json }
       global_search: {
         Args: { _kind?: string; _since?: string; _term: string }
