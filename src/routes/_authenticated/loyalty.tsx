@@ -50,16 +50,6 @@ function LoyaltyPage() {
   const [recomputing, setRecomputing] = useState(false);
   const online = useOnline();
   const [qrImage, setQrImage] = useState('');
-  useEffect(() => {
-    if(!card?.qr_code || !user) return;
-    let active = true;
-    void QRCode.toDataURL(card.qr_code,{width:220,margin:2}).then(qr => {
-      if(!active) return;
-      setQrImage(qr);
-      localStorage.setItem('lvdc.offline.pass',JSON.stringify({owner:user.id,name:profile?.display_name || 'Mon pass',qr,total:card.total_stamps,savedAt:new Date().toISOString()}));
-    });
-    return () => { active = false; };
-  }, [card?.qr_code,card?.total_stamps,user?.id,profile?.display_name]);
 
   const { data: card, isLoading } = useQuery({
     queryKey: ["loyalty-card", user?.id],
@@ -74,6 +64,17 @@ function LoyaltyPage() {
       return data;
     },
   });
+
+  useEffect(() => {
+    if(!card?.qr_code || !user) return;
+    let active = true;
+    void QRCode.toDataURL(card.qr_code,{width:220,margin:2}).then(qr => {
+      if(!active) return;
+      setQrImage(qr);
+      try { localStorage.setItem('lvdc.offline.pass',JSON.stringify({owner:user.id,name:profile?.display_name || 'Mon pass',qr,total:card.total_stamps,savedAt:new Date().toISOString()})); } catch { toast.info('Le stockage de ce téléphone ne permet pas de sauvegarder le pass.'); }
+    });
+    return () => { active = false; };
+  }, [card?.qr_code,card?.total_stamps,user?.id,profile?.display_name]);
 
   // Crée la carte à la première visite.
   useEffect(() => {

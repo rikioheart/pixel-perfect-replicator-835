@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PublicWelcome } from '@/components/PublicWelcome';
+import { useEffect } from 'react';
 
 export const Route = createFileRoute("/association")({
   head: () => ({
@@ -61,6 +62,8 @@ function PublicAssociationPage() {
       }[]).slice(0, 24);
     },
   });
+
+  useEffect(() => { if(pros.length) {try {localStorage.setItem('lvdc.public.pros',JSON.stringify(pros));}catch{ /* device storage unavailable */ }} },[pros]);
 
   return (
     <div className="min-h-screen bg-background">
