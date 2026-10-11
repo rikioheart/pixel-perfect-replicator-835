@@ -37,7 +37,7 @@ export function ManualStampCard() {
     window.addEventListener('lvdc-offline',refresh);
     return () => window.removeEventListener('lvdc-offline',refresh);
   },[user?.id]);
-  useEffect(() => { if(data && user) { setCached(data); localStorage.setItem(`lvdc.offline.options.${user.id}`,JSON.stringify(data)); } },[data,user?.id]);
+  useEffect(() => { if(data && user) { setCached(data); try {localStorage.setItem(`lvdc.offline.options.${user.id}`,JSON.stringify(data));}catch{/* No device cache */} } },[data,user?.id]);
   useEffect(() => {
     if(!online || !user) return;
     let cancelled = false;
@@ -102,7 +102,7 @@ export function ManualStampCard() {
       <Input id="ms-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Ex. séance de suivi du 4 octobre" />
       <Button onClick={() => award.mutate()} disabled={award.isPending || (!data && !cached)}>{online ? 'Attribuer le tampon' : 'Garder la demande en attente'}</Button>
       {!online && <p className="text-sm text-muted-foreground">Le total ne change pas avant confirmation serveur. Reconnectez-vous le jour même ; sinon le Bureau devra vérifier la demande.</p>}
-      {pending.length > 0 && <div role="status" className="space-y-2 rounded-xl bg-secondary p-3"><h3 className="font-medium">{pending.length} demande(s) en attente</h3>{pending.map(i => <div key={i.id} className="flex flex-wrap items-center justify-between gap-2"><p>{(data ?? cached)?.members.find(m => m.id === i.member)?.name ?? 'Adhérent'} · {i.day}<br /><span className="text-xs">{i.state === 'review' || i.day !== parisDay() ? 'À vérifier avec le Bureau : pas de nouvelle attribution automatique.' : 'En attente du retour du réseau.'}</span></p><Button variant="outline" size="sm" onClick={() => {if(user && window.confirm('Retirer cette demande locale ? Aucun tampon confirmé ne sera supprimé.')) saveQueue(user.id,readQueue(user.id).filter(x => x.id !== i.id));}}>Retirer</Button></div>)}</div>}
+      {pending.length > 0 && <div role="status" className="space-y-2 rounded-xl border border-border bg-card p-3"><h3 className="font-medium">{pending.length} demande(s) en attente</h3>{pending.map(i => <div key={i.id} className="flex flex-wrap items-center justify-between gap-2"><p>{(data ?? cached)?.members.find(m => m.id === i.member)?.name ?? 'Adhérent'} · {i.day}<br /><span className="text-xs">{i.state === 'review' || i.day !== parisDay() ? 'À vérifier avec le Bureau : pas de nouvelle attribution automatique.' : 'En attente du retour du réseau.'}</span></p><Button variant="outline" size="sm" onClick={() => {if(user && window.confirm('Retirer cette demande locale ? Aucun tampon confirmé ne sera supprimé.')) saveQueue(user.id,readQueue(user.id).filter(x => x.id !== i.id));}}>Retirer</Button></div>)}</div>}
     </section>
   );
 }

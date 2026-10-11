@@ -14,9 +14,8 @@ export default defineConfig({
     workbox: {
       globPatterns: ['**/*.{js,css,png,jpg,woff2}'],
       additionalManifestEntries: [{url:'/offline.html', revision:'1'}, {url:'/offline.js',revision:'1'}, {url:'/offline.css',revision:'1'}],
-      navigateFallback: '/offline.html', navigateFallbackDenylist: [/^\/~oauth/, /^\/api/],
-      runtimeCaching: [{ urlPattern: ({request, url}) => request.mode === 'navigate' && ['/', '/association'].includes(url.pathname), handler: 'NetworkFirst', options: {cacheName:'lvdc-public-navigation', networkTimeoutSeconds:4, expiration:{maxEntries:2,maxAgeSeconds:86400}} }],
-      navigateFallbackAllowlist: [/^\/(?:association|loyalty|espace-pro(?:\/.*)?)?$/],
+      navigateFallback: undefined,
+      runtimeCaching: [{ urlPattern: ({request, url}) => request.mode === 'navigate' && !url.pathname.startsWith('/~oauth') && !url.pathname.startsWith('/api'), handler: 'NetworkFirst', options: {cacheName:'lvdc-navigation', networkTimeoutSeconds:4, precacheFallback:{fallbackURL:'/offline.html'}, cacheableResponse:{statuses:[200],headers:{'X-LVDC-Public-Cache':'yes'}}, expiration:{maxEntries:2,maxAgeSeconds:86400}} }],
       cleanupOutdatedCaches: true,
     },
   })] },

@@ -12,7 +12,7 @@ export function safeWebsite(value: string | null | undefined) {
 }
 export function PublicWelcome() {
   const query = useQuery({queryKey:['public-home'], queryFn:async () => { const {data,error} = await supabase.rpc('get_public_home'); if(error) throw error; return data as unknown as Home; }});
-  useEffect(() => { if(query.data) localStorage.setItem('lvdc.public.home',JSON.stringify({...query.data,savedAt:new Date().toISOString()})); },[query.data]);
+  useEffect(() => { if(query.data) {try {localStorage.setItem('lvdc.public.home',JSON.stringify({...query.data,savedAt:new Date().toISOString()}));}catch{/* unavailable device storage */}} },[query.data]);
   const website = safeWebsite(query.data?.website);
   return <div className="space-y-8">
     <OfflineStatus />
@@ -36,7 +36,7 @@ export function PublicWelcome() {
     <section aria-labelledby="month-title">
       <h2 id="month-title" className="flex items-center gap-2 text-xl"><CalendarDays className="size-5 text-primary" aria-hidden />Les prochaines activités du mois</h2>
       <p className="mt-2 text-sm text-muted-foreground">Uniquement les activités ouvertes au public ; les inscriptions se font dans l’espace membres.</p>
-      {query.isPending ? <p role="status" className="mt-4 text-sm">Chargement des rencontres…</p> : query.isError ? <p className="mt-4 text-sm">Les activités ne sont pas disponibles pour le moment.</p> : !query.data?.activities.length ? <p className="mt-4 rounded-xl bg-secondary/60 p-4 text-sm">De nouvelles rencontres se préparent. Revenez bientôt découvrir le programme.</p> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{query.data.activities.map(a => <article key={a.id} className="panel p-4"><p className="text-sm font-medium text-primary">{new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',timeZone:'Europe/Paris'})}</p><h3 className="mt-2 text-lg">{a.title}</h3>{a.location && <p className="mt-2 flex gap-2 text-sm text-muted-foreground"><MapPin className="size-4" aria-hidden />{a.location}</p>}</article>)}</div>}
+      {query.isPending ? <p role="status" className="mt-4 text-sm">Chargement des rencontres…</p> : query.isError ? <p className="mt-4 text-sm">Les activités ne sont pas disponibles pour le moment.</p> : !query.data?.activities.length ? <p className="panel mt-4 p-4 text-sm text-muted-foreground">De nouvelles rencontres se préparent. Revenez bientôt découvrir le programme.</p> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{query.data.activities.map(a => <article key={a.id} className="panel p-4"><p className="text-sm font-medium text-primary">{new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',timeZone:'Europe/Paris'})}</p><h3 className="mt-2 text-lg">{a.title}</h3>{a.location && <p className="mt-2 flex gap-2 text-sm text-muted-foreground"><MapPin className="size-4" aria-hidden />{a.location}</p>}</article>)}</div>}
     </section>
     <div className="flex flex-wrap gap-3">
       <Link to="/association" hash="partenaires" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-medium"><HeartHandshake className="size-5" aria-hidden />Découverte des partenaires</Link>

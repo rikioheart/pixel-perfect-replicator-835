@@ -453,7 +453,7 @@ export function AppShell({
           <OfflineStatus />
           {hubTab && !isBureau ? (
             <div className="mb-5 space-y-2">
-            <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-3 gap-1 rounded-2xl bg-secondary/50 p-1 sm:grid-cols-5">
+            <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-3 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-5">
               {MEMBER_HUB_GROUPS.map((t, i) => {
                 const Icon = [PawPrint, CalendarDays, Stamp, History, UserRound][i];
                 return (
@@ -471,7 +471,7 @@ export function AppShell({
               );})}
             </nav>
             <nav aria-label="Pages de cet espace" className="flex flex-wrap gap-2">
-              {MEMBER_HUB_TABS.filter(t => hubGroup?.paths.some(p => p === t.to)).map(t => <Link key={t.to} to={t.to} aria-current={hubTab === t.to ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-lg px-3 text-sm", hubTab === t.to ? "bg-secondary font-medium" : "text-muted-foreground hover:bg-accent")}>{t.label}</Link>)}
+              {MEMBER_HUB_TABS.filter(t => hubGroup?.paths.some(p => p === t.to)).map(t => <Link key={t.to} to={t.to} aria-current={hubTab === t.to ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-lg px-3 text-sm", hubTab === t.to ? "bg-secondary font-medium text-secondary-foreground" : "text-muted-foreground hover:bg-accent")}>{t.label}</Link>)}
             </nav>
             </div>
           ) : null}
@@ -479,7 +479,7 @@ export function AppShell({
         </main>
       </div>
       <nav aria-label="Accès rapides mobile" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-card px-1 pt-1 shadow-lg md:hidden" style={{ paddingBottom: "max(.5rem, env(safe-area-inset-bottom))" }}>
-        {dock.map(t => <Link key={t.to} to={t.to} aria-current={pathname === t.to ? "page" : undefined} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px]", pathname === t.to ? "bg-secondary font-semibold text-primary" : "text-muted-foreground")}><t.icon className="size-5" aria-hidden />{t.label}</Link>)}
+        {dock.map(t => <Link key={t.to} to={t.to} aria-current={pathname === t.to ? "page" : undefined} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px]", pathname === t.to ? "bg-primary font-semibold text-primary-foreground" : "text-muted-foreground")}><t.icon className="size-5" aria-hidden />{t.label}</Link>)}
         <button onClick={() => setMobileOpen(true)} className="flex min-h-14 flex-col items-center justify-center gap-1 text-[11px]" aria-label="Ouvrir tous les espaces"><Menu className="size-5" aria-hidden />Plus</button>
       </nav>
     </div>
