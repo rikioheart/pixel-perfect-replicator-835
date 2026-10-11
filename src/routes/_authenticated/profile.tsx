@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Dog, Plus, Trash2, UserRound } from "lucide-react";
+import { PawPrint, UserRound } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,14 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { MEMBERSHIP_TYPE_LABEL } from "@/lib/members";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -29,12 +21,12 @@ export const Route = createFileRoute("/_authenticated/profile")({
       {
         name: "description",
         content:
-          "Gérez vos informations personnelles, votre visibilité dans l'annuaire et les fiches de vos chiens.",
+          "Gérez vos informations personnelles, votre visibilité dans l'annuaire.",
       },
       { property: "og:title", content: "Mon profil — La Voix du Chien" },
       {
         property: "og:description",
-        content: "Coordonnées, visibilité et fiches chiens de votre compte adhérent.",
+        content: "Coordonnées et visibilité de votre compte adhérent.",
       },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary" },
@@ -45,7 +37,6 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 function ProfilePage() {
   const { user, profile, refresh } = useAuth();
-  const queryClient = useQueryClient();
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -56,9 +47,6 @@ function ProfilePage() {
     bio: "",
     public_visibility: false,
   });
-  const [dogOpen, setDogOpen] = useState(false);
-  const [dog, setDog] = useState({ name: "", breed: "", birth_date: "", character: "", needs: "" });
-
   useEffect(() => {
     if (!profile) return;
     setForm({
@@ -73,22 +61,9 @@ function ProfilePage() {
     });
   }, [profile]);
 
-  const { data: dogs = [] } = useQuery({
-    queryKey: ["my-dogs", user?.id],
-    enabled: Boolean(user?.id),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("dogs")
-        .select("*")
-        .eq("owner_id", user!.id)
-        .order("created_at");
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const save = useMutation({
     mutationFn: async () => {
+      if (!user) throw new Error("Connexion requise.");
       if (form.first_name.trim().length < 2) throw new Error("Le prénom est obligatoire.");
       if (form.phone && !/^[0-9+\s.-]{6,20}$/.test(form.phone))
         throw new Error("Numéro de téléphone invalide.");
@@ -104,7 +79,7 @@ function ProfilePage() {
           bio: form.bio || null,
           public_visibility: form.public_visibility,
         })
-        .eq("id", user!.id);
+        .eq("id", user.id);
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -114,42 +89,8 @@ function ProfilePage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const addDog = useMutation({
-    mutationFn: async () => {
-      if (dog.name.trim().length < 2) throw new Error("Le nom du chien est obligatoire.");
-      const { error } = await supabase.from("dogs").insert({
-        owner_id: user!.id,
-        name: dog.name.trim(),
-        breed: dog.breed || null,
-        birth_date: dog.birth_date || null,
-        character: dog.character || null,
-        needs: dog.needs || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Chien ajouté.");
-      setDogOpen(false);
-      setDog({ name: "", breed: "", birth_date: "", character: "", needs: "" });
-      void queryClient.invalidateQueries({ queryKey: ["my-dogs"] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  const removeDog = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("dogs").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Fiche supprimée.");
-      void queryClient.invalidateQueries({ queryKey: ["my-dogs"] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
   return (
-    <AppShell title="Mon profil" subtitle="Vos informations et vos chiens">
+    <AppShell title="Mon profil" subtitle="Vos coordonnées et votre visibilité dans le réseau">
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
@@ -248,89 +189,10 @@ function ProfilePage() {
         </Card>
       </div>
 
-      <Card className="mt-4">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Dog className="size-4" /> Mes chiens
-          </CardTitle>
-          <Dialog open={dogOpen} onOpenChange={setDogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-2">
-                <Plus className="size-4" /> Ajouter
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nouvelle fiche chien</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="dg-name">Nom</Label>
-                  <Input id="dg-name" value={dog.name} onChange={(e) => setDog({ ...dog, name: e.target.value })} />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor="dg-breed">Race</Label>
-                    <Input id="dg-breed" value={dog.breed} onChange={(e) => setDog({ ...dog, breed: e.target.value })} />
-                  </div>
-                  <div>
-                    <Label htmlFor="dg-birth">Naissance</Label>
-                    <Input
-                      id="dg-birth"
-                      type="date"
-                      value={dog.birth_date}
-                      onChange={(e) => setDog({ ...dog, birth_date: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="dg-char">Caractère</Label>
-                  <Textarea
-                    id="dg-char"
-                    value={dog.character}
-                    onChange={(e) => setDog({ ...dog, character: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="dg-needs">Besoins particuliers</Label>
-                  <Textarea
-                    id="dg-needs"
-                    value={dog.needs}
-                    onChange={(e) => setDog({ ...dog, needs: e.target.value })}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={() => addDog.mutate()} disabled={addDog.isPending}>
-                  Ajouter
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent className="grid gap-3 text-sm md:grid-cols-3">
-          {dogs.length === 0 ? (
-            <p className="text-muted-foreground">Aucune fiche chien enregistrée.</p>
-          ) : (
-            dogs.map((item) => (
-              <div key={item.id} className="rounded-md border border-border p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium">{item.name}</p>
-                  <Button variant="ghost" size="icon" className="size-7" onClick={() => removeDog.mutate(item.id)}>
-                    <Trash2 className="size-3.5" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {item.breed ?? "Race non précisée"}
-                  {item.birth_date ? ` · né le ${new Date(item.birth_date).toLocaleDateString("fr-FR")}` : ""}
-                </p>
-                {item.character ? <p className="mt-1.5">{item.character}</p> : null}
-                {item.needs ? <p className="mt-1 text-muted-foreground">Besoins : {item.needs}</p> : null}
-              </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
+        <h2 className="flex items-center gap-2 text-base"><PawPrint className="size-4" aria-hidden /> Mon foyer & mes chiens</h2>
+        <Button asChild variant="outline"><Link to="/foyer">Ouvrir les fiches de mes chiens</Link></Button>
+      </section>
     </AppShell>
   );
 }
