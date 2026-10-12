@@ -37,9 +37,11 @@ export function parseWordPressPartners(html: string): PublicPartner[] {
     const name = rawName.replace(/^.*?fondatrice de\s+/i, '').replace(/\s*🎨/g, '').trim();
     const safe = paragraphs.slice(1).filter(value => !privateOffer.test(value));
     const sector = safe.find(value => /^Zone d[’']activité/i.test(value))?.replace(/^Zone d[’']activité\s*:\s*/i, '') ?? '';
-    const hours = safe.filter(value => /^Horaires/i.test(value)).join(' ').replace(/^Horaires\s*:\s*/i, '');
+    const hoursIndex = safe.findIndex(value => /^Horaires/i.test(value));
+    const hourRows = hoursIndex < 0 ? [] : safe.slice(hoursIndex).filter((value,index) => index === 0 || /^(Du |Le |Tous |Lundi|Mardi|Mercredi|Jeudi|Vendredi|Samedi|Dimanche)/i.test(value));
+    const hours = hourRows.join(' ').replace(/^Horaires\s*:\s*/i, '');
     const specialties = elements(editor).filter(node => node.name === 'li').map(text).filter(value => !privateOffer.test(value));
-    const description = safe.filter(value => !/^(Zone d[’']activité|Horaires|Services\s*:)/i.test(value) && !/^(Facebook|Instagram|Internet-explorer|Youtube)$/i.test(value) && !specialties.includes(value)).join('\n\n');
+    const description = safe.filter(value => !/^(Zone d[’']activité|Horaires|Services\s*:)/i.test(value) && !/^(Facebook|Instagram|Internet-explorer|Youtube)$/i.test(value) && !specialties.includes(value) && !hourRows.includes(value)).join('\n\n');
     const links: PublicPartner['links'] = [];
     for (const anchor of nodes.filter(node => node.name === 'a')) {
       const raw = anchor.attribs['href'] ?? '';
