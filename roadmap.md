@@ -1,5 +1,14 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Lot 20 — Annuaire public, prototype et WordPress
+- [x] Vérifier le prototype disponible, les sources WordPress et les annuaires existants
+- [x] Réutiliser la vitrine et les fiches publiques ; recherche et filtres sans répétitions
+- [x] Intégrer les informations publiques vérifiées sans créer de comptes ni modifier les droits
+- [x] Tester les liens, les filtres et l’affichage téléphone/ordinateur ; documenter les limites
+  - 28 partenaires WordPress et visuels officiels, lecture publique serveur sans copie en base ; fusion avec le RPC public existant. Aucune migration ni modification RLS.
+  - 33 tests réussis ; 28 dialogues, liens sûrs, recherche, filtre commercial (7 résultats), absence de résultats et navigation depuis la vitrine vérifiés. Affichage téléphone et ordinateur sans débordement ni erreur JavaScript.
+  - Limites : disponibilité des données WordPress requise, lien officiel de secours ; aucune vérification exhaustive de la disponibilité des sites externes ni des profils authentifiés dans ce lot public. Les réductions et codes privés restent exclus. Les fiches plateforme publiées seront utilisées lorsqu’un professionnel y consent ; le RPC public était vide lors du contrôle.
+
 ## Lot 19 — Nettoyage visuel validé
 - [x] Alléger accueil membre, préférences, profil et gestion des chiens sans retirer les fonctions
 - [x] Épurer espace pro et Bureau ; supprimer les raccourcis et bandeaux redondants

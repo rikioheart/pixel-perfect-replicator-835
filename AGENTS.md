@@ -9,7 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- `people` = personne associative (avec ou sans compte) ; `profiles.person_id` la relie au compte, et les tables de liens (memberships, household_members, project_members, participation_members) portent `person_id` rempli automatiquement depuis `user_id`. Pourquoi : séparer authentification, compte et personne sans casser l'existant.
+- `people` is the associative person, with or without account; profiles and membership/household/project/participation links use person_id filled from user_id, separating identity from authentication.
 - Schéma : uniquement via l'outil de migration (drizzle/migrations) ; supabase/migrations est un historique figé ; ne jamais écrire drizzle/schema.ts, ni rejouer/supprimer une migration sans comparer au schéma réel. Pourquoi : un seul chemin de migration.
 
 ## Sécurité (A10)
@@ -26,7 +26,7 @@
 ## Métier (A11–A13)
 - Responsabilités contextuelles : member_functions.scope_type/scope_id, is_project_coordinator (rôle projet OWNER/COORDINATOR) et has_scoped_permission (rôle global ∪ coordination ∪ délégation active). Pourquoi : un coordinateur n'est jamais admin global.
 - Délégations uniquement via create_delegation/revoke_delegation (droit possédé, périmètre précis, fin ≤ 365 j, pas de re-délégation, audit). Pourquoi : aucune auto-escalade.
-- Réservation terrain : statuts DRAFT/PENDING/CHANGES_REQUESTED/APPROVED/REFUSED/CANCELLED ; triggers a_guard (seul le Bureau décide, demandeur modifie en DRAFT/CHANGES_REQUESTED) puis b_check (conflit sur PENDING/APPROVED) ; access_mode GRATUIT/LOCATION sans aucun calcul de prix. Pourquoi : réservation ≠ tarification ≠ facturation ≠ paiement.
+- Terrain: DRAFT/PENDING/CHANGES_REQUESTED/APPROVED/REFUSED/CANCELLED; a_guard restricts decisions to Bureau and requester edits to draft/changes, b_check prevents pending/approved overlaps. GRATUIT/LOCATION never computes prices, separating booking and billing.
 - Indicateurs chien (dog_indicators) : 4 familles VERT/JAUNE/BLEU/NOIR, libellé obligatoire, jamais une note ; lisibles en vue opérationnelle. Pourquoi : adapter l'environnement, pas juger.
 - Fiches contextuelles via entity_peek(type,id) (champs autorisés + can_open) et le composant EntityPeek. Pourquoi : une seule source filtrée pour toutes les fenêtres.
 - Recherche et notifications : les fonctions de lecture filtrent côté base selon les droits, et les notifications métier sont émises par déclencheur plutôt que par l'interface. Pourquoi : ni fuite ni doublon.
@@ -39,3 +39,5 @@
 
 - Dog profile creation and removal live in the reusable DogProfiles component on the foyer page; the personal profile only edits member details, keeping dog management in one place.
 - Manual stamp entry stays on the loyalty page; the professional home shows device-local pending requests and links there, avoiding duplicate forms and sync effects.
+
+- Public partners reuse /association: read WordPress editorial listings without persistence/accounts, merging only published platform cards via the public RPC; membership consent and private perks stay separate.
