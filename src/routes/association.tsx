@@ -1,10 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { publicPartnersOptions } from "@/lib/public-partners.queries";
 import { PublicPartnerDirectory } from "@/components/PublicPartnerDirectory";
 import { Globe } from "lucide-react";
-import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 import { UpdatesWall } from "@/components/UpdatesWall";
-import { Button } from "@/components/ui/button";
+import { PublicHeader } from "@/components/PublicHeader";
 import { PublicWelcome } from '@/components/PublicWelcome';
 
 export const Route = createFileRoute("/association")({
@@ -33,21 +32,7 @@ export const Route = createFileRoute("/association")({
 function PublicAssociationPage() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="surface-night">
-        <div className="mx-auto flex max-w-6xl items-center flex-wrap justify-between gap-4 px-4 py-4">
-          <div className="flex items-center gap-3">
-            <img
-              src={logoMark.url}
-              alt="Logo de l'association La Voix du Chien"
-              className="size-10 rounded-full bg-navy-foreground/10 object-contain p-1"
-            />
-            <span className="font-display">La Voix du Chien</span>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/">Espace membres</Link>
-          </Button>
-        </div>
-      </header>
+      <PublicHeader />
 
       <main className="mx-auto max-w-6xl space-y-12 px-4 py-6 sm:px-6 sm:py-10">
         <PublicWelcome showPartnerLink={false} />
