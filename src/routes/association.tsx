@@ -31,18 +31,6 @@ export const Route = createFileRoute("/association")({
 });
 
 function PublicAssociationPage() {
-  return ((data ?? []) as unknown as {
-        slug: string;
-        display_name: string;
-        specialties: string[];
-        sector: string | null;
-        public_city: string | null;
-      }[]).slice(0, 24);
-    },
-  });
-
-  useEffect(() => { if(prosLoaded) {try {localStorage.setItem('lvdc.public.pros',JSON.stringify(pros));}catch{ /* device storage unavailable */ }} },[pros,prosLoaded]);
-
   return (
     <div className="min-h-screen bg-background">
       <header className="surface-night">
