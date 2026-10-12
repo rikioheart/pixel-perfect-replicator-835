@@ -58,6 +58,13 @@ export function parseWordPressPartners(html: string): PublicPartner[] {
 export function normalizedPartnerName(value: string) {
   return value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
+export function partnerSectors(value: string): string[] {
+  const departments = [...new Set(value.match(/\b(?:45|77|89|91|93|94)\b/g) ?? [])].map(code => ({'45':'Loiret (45)','77':'Seine-et-Marne (77)','89':'Yonne (89)','91':'Essonne (91)','93':'Seine-Saint-Denis (93)','94':'Val-de-Marne (94)'}[code] as string));
+  const normalized = normalizedPartnerName(value);
+  if (normalized.includes('morvan')) departments.push('Morvan');
+  if (normalized.includes('distance') || normalized.includes('enligne') || normalized.includes('visio')) departments.push('À distance');
+  return departments.length ? departments : value ? [value] : [];
+}
 /** Prefer a published platform card over an identical editorial listing; no account matching. */
 export function mergePublicPartners(editorial: PublicPartner[], published: PublicPartner[]) {
   const names = new Set(published.map(partner => normalizedPartnerName(partner.name)));
@@ -66,6 +73,6 @@ export function mergePublicPartners(editorial: PublicPartner[], published: Publi
 export function filterPublicPartners(partners: PublicPartner[], term: string, kind: string, sector: string) {
   const search = normalizedPartnerName(term);
   return partners.filter(partner => (kind === 'all' || partner.kind === kind)
-    && (sector === 'all' || partner.sector === sector)
+    && (sector === 'all' || partner.sector === sector || partnerSectors(partner.sector).includes(sector))
     && (!search || normalizedPartnerName([partner.name, partner.description, partner.sector, ...partner.specialties].join(' ')).includes(search)));
 }

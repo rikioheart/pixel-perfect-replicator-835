@@ -3,7 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, ExternalLink, HeartHandshake, MapPin, Search, Store, X } from 'lucide-react';
 import { publicPartnersOptions } from '@/lib/public-partners.queries';
-import { filterPublicPartners, type PublicPartner } from '@/lib/public-partners';
+import { filterPublicPartners, partnerSectors, type PublicPartner } from '@/lib/public-partners';
 import { partnerImages } from '@/lib/partner-images';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ export function PublicPartnerDirectory() {
   const [kind, setKind] = useState('all');
   const [sector, setSector] = useState('all');
   const [selected, setSelected] = useState<PublicPartner | null>(null);
-  const sectors = [...new Set(data.partners.map(p => p.sector).filter(Boolean))].sort((a,b) => a.localeCompare(b,'fr'));
+  const sectors = [...new Set(data.partners.flatMap(p => partnerSectors(p.sector)))].sort((a,b) => a.localeCompare(b,'fr'));
   const filtered = filterPublicPartners(data.partners, term, kind, sector);
   return <section id="partenaires" className="scroll-mt-6 border-t border-border pt-10" aria-labelledby="partners-title">
     <div className="mb-7 max-w-2xl">
