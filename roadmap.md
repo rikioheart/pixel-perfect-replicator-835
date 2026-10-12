@@ -1,9 +1,11 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
 ## Lot 19 — Nettoyage visuel validé
-- [ ] Alléger accueil membre, préférences, profil et gestion des chiens sans retirer les fonctions
-- [ ] Épurer espace pro et Bureau ; supprimer les raccourcis et bandeaux redondants
-- [ ] Vérifier liens, tests et affichage ordinateur/téléphone ; documenter les profils non vérifiables
+- [x] Alléger accueil membre, préférences, profil et gestion des chiens sans retirer les fonctions
+- [x] Épurer espace pro et Bureau ; supprimer les raccourcis et bandeaux redondants
+- [x] Vérifier liens, tests et affichage ordinateur/téléphone ; documenter les profils non vérifiables
+  - 28 tests réussis ; pages modifiées vérifiées avec particulier, professionnel et Bureau. Liens statiques contrôlés dans l’audit précédent.
+  - Limite : aucun compte dédié bénévole/référent ou coordinateur identifié pour une vérification exhaustive ; les dossiers et parcours contextuels non vides restent à tester.
 
 ## Harmonisation et hors réseau — demande actuelle
 - [ ] Alléger les onglets personnels sans supprimer les pages, barre mobile et confort de lecture

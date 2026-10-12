@@ -152,7 +152,7 @@ function AdminDashboard() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="panel p-5 lg:col-span-2">
+        <div className="panel min-w-0 p-5 lg:col-span-2">
           <h2 className="text-lg">Progression des projets actifs</h2>
           <p className="mb-4 text-sm text-muted-foreground">
             Avancement moyen : {avgProgress}%
@@ -163,11 +163,11 @@ function AdminDashboard() {
             ) : (
               activeProjects.slice(0, 6).map((project) => (
                 <div key={project.id} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
                     <Link
                       to="/projects/$projectId"
                       params={{ projectId: project.id }}
-                      className="font-medium hover:underline"
+                      className="min-w-0 break-words font-medium hover:underline"
                     >
                       {project.title}
                     </Link>
@@ -182,7 +182,7 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="panel p-5">
+        <div className="panel min-w-0 p-5">
           <div className="mb-4 flex items-center gap-2">
             <Activity className="size-4 text-muted-foreground" />
             <h2 className="text-lg">Activité récente</h2>
