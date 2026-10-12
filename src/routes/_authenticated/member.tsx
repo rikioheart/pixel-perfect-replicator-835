@@ -121,7 +121,7 @@ function MemberDashboard() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+          <div className="min-w-0 space-y-6 lg:col-span-2">
             <div className="panel p-5">
               <h2 className="mb-4 text-lg">Mes prochaines tâches</h2>
               {open.length === 0 ? (
@@ -137,8 +137,8 @@ function MemberDashboard() {
               ) : (
                 <ul className="divide-y divide-border">
                   {open.slice(0, 8).map((task) => (
-                    <li key={task.id} className="flex items-start justify-between gap-3 py-4 text-sm">
-                      <div className="min-w-0">
+                    <li key={task.id} className="flex flex-wrap items-start justify-between gap-3 py-4 text-sm">
+                      <div className="min-w-0 flex-1 basis-40">
                         <p className="truncate font-medium">{task.title}</p>
                         <p className="text-xs text-muted-foreground">
                           {task.projects?.title ?? "Hors projet"} · {formatDate(task.deadline)}
@@ -238,7 +238,7 @@ function MemberDashboard() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <NewsFeed />
             <MemberWall />
 
