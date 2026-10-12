@@ -377,7 +377,7 @@ function Block({
   emptyLabel?: string;
 }) {
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base">
           <Icon className="size-4 text-primary" />
@@ -395,7 +395,7 @@ function Block({
 function Row({ main, sub, right, to }: { main: string; sub?: string | undefined; right?: string | undefined; to?: string }) {
   const content = (
     <>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{main}</p>
         {sub ? <p className="truncate text-xs text-muted-foreground">{sub}</p> : null}
       </div>
