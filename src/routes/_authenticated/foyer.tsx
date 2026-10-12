@@ -193,7 +193,6 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
   const { data: members = [] } = useMemberOptions();
   const [child, setChild] = useState({ first_name: "", birth_year: "" });
   const [adult, setAdult] = useState("");
-  const [sharing, setSharing] = useState<{ id: string; name: string } | null>(null);
   const refresh = () => void qc.invalidateQueries({ queryKey: ["my-households"] });
   const run = (fn: () => PromiseLike<{ error: { message: string } | null }>, ok: string) => async () => {
     const { error } = await fn();
@@ -238,14 +237,11 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
         <div className="space-y-2">
           <h3 className="flex items-center gap-1 font-medium"><Dog className="size-4" aria-hidden /> Chiens</h3>
           {h.dogs.map((d) => (
-            <p key={d.id} className="flex items-center justify-between gap-1">{d.name}
-              <Button size="sm" variant="outline" className="gap-1" onClick={() => setSharing({ id: d.id, name: d.name })}><Share2 className="size-3.5" aria-hidden /> Partage & référents</Button>
-            </p>
+            <p key={d.id}>{d.name}</p>
           ))}
 
         </div>
       </div>
-      {sharing ? <DogSharing dogId={sharing.id} dogName={sharing.name} onClose={() => setSharing(null)} /> : null}
     </section>
   );
 }
