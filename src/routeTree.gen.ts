@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ArticlesRouteImport } from './routes/articles'
 import { Route as AssociationRouteImport } from './routes/association'
 import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authenticated/advantages'
 import { Route as AuthenticatedAvanceesRouteImport } from './routes/_authenticated/avancees'
@@ -47,6 +48,7 @@ import { Route as AuthenticatedTerrainRouteImport } from './routes/_authenticate
 import { Route as FormulaireFormIdRouteImport } from './routes/formulaire.$formId'
 import { Route as PartageTokenRouteImport } from './routes/partage.$token'
 import { Route as ProProIdRouteImport } from './routes/pro.$proId'
+import { Route as ProfessionnelsIndexRouteImport } from './routes/professionnels.index'
 import { Route as ProfessionnelsSlugRouteImport } from './routes/professionnels.$slug'
 import { Route as AuthenticatedActivitiesIndexRouteImport } from './routes/_authenticated/activities.index'
 import { Route as AuthenticatedActivitiesActivityIdRouteImport } from './routes/_authenticated/activities.$activityId'
@@ -86,6 +88,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesRoute = ArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssociationRoute = AssociationRouteImport.update({
@@ -272,6 +279,11 @@ const ProProIdRoute = ProProIdRouteImport.update({
   path: '/pro/$proId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfessionnelsIndexRoute = ProfessionnelsIndexRouteImport.update({
+  id: '/professionnels/',
+  path: '/professionnels/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfessionnelsSlugRoute = ProfessionnelsSlugRouteImport.update({
   id: '/professionnels/$slug',
   path: '/professionnels/$slug',
@@ -454,6 +466,7 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/avancees': typeof AuthenticatedAvanceesRoute
@@ -491,6 +504,7 @@ export interface FileRoutesByFullPath {
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
+  '/professionnels/': typeof ProfessionnelsIndexRoute
   '/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -524,6 +538,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/avancees': typeof AuthenticatedAvanceesRoute
@@ -561,6 +576,7 @@ export interface FileRoutesByTo {
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
+  '/professionnels': typeof ProfessionnelsIndexRoute
   '/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -596,6 +612,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
   '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
   '/_authenticated/avancees': typeof AuthenticatedAvanceesRoute
@@ -633,6 +650,7 @@ export interface FileRoutesById {
   '/partage/$token': typeof PartageTokenRoute
   '/pro/$proId': typeof ProProIdRoute
   '/professionnels/$slug': typeof ProfessionnelsSlugRoute
+  '/professionnels/': typeof ProfessionnelsIndexRoute
   '/_authenticated/activities/$activityId': typeof AuthenticatedActivitiesActivityIdRoute
   '/_authenticated/admin/advisor': typeof AuthenticatedAdminAdvisorRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -668,6 +686,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/articles'
     | '/association'
     | '/advantages'
     | '/avancees'
@@ -705,6 +724,7 @@ export interface FileRouteTypes {
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
+    | '/professionnels/'
     | '/activities/$activityId'
     | '/admin/advisor'
     | '/admin/audit'
@@ -738,6 +758,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/articles'
     | '/association'
     | '/advantages'
     | '/avancees'
@@ -775,6 +796,7 @@ export interface FileRouteTypes {
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
+    | '/professionnels'
     | '/activities/$activityId'
     | '/admin/advisor'
     | '/admin/audit'
@@ -809,6 +831,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/articles'
     | '/association'
     | '/_authenticated/advantages'
     | '/_authenticated/avancees'
@@ -846,6 +869,7 @@ export interface FileRouteTypes {
     | '/partage/$token'
     | '/pro/$proId'
     | '/professionnels/$slug'
+    | '/professionnels/'
     | '/_authenticated/activities/$activityId'
     | '/_authenticated/admin/advisor'
     | '/_authenticated/admin/audit'
@@ -881,11 +905,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ArticlesRoute: typeof ArticlesRoute
   AssociationRoute: typeof AssociationRoute
   FormulaireFormIdRoute: typeof FormulaireFormIdRoute
   PartageTokenRoute: typeof PartageTokenRoute
   ProProIdRoute: typeof ProProIdRoute
   ProfessionnelsSlugRoute: typeof ProfessionnelsSlugRoute
+  ProfessionnelsIndexRoute: typeof ProfessionnelsIndexRoute
   ApiPublicResetDemoRoute: typeof ApiPublicResetDemoRoute
 }
 
@@ -903,6 +929,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles': {
+      id: '/articles'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof ArticlesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/association': {
@@ -1155,6 +1188,13 @@ declare module '@tanstack/react-router' {
       path: '/pro/$proId'
       fullPath: '/pro/$proId'
       preLoaderRoute: typeof ProProIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/professionnels/': {
+      id: '/professionnels/'
+      path: '/professionnels'
+      fullPath: '/professionnels/'
+      preLoaderRoute: typeof ProfessionnelsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/professionnels/$slug': {
@@ -1513,11 +1553,13 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ArticlesRoute: ArticlesRoute,
   AssociationRoute: AssociationRoute,
   FormulaireFormIdRoute: FormulaireFormIdRoute,
   PartageTokenRoute: PartageTokenRoute,
   ProProIdRoute: ProProIdRoute,
   ProfessionnelsSlugRoute: ProfessionnelsSlugRoute,
+  ProfessionnelsIndexRoute: ProfessionnelsIndexRoute,
   ApiPublicResetDemoRoute: ApiPublicResetDemoRoute,
 }
 export const routeTree = rootRouteImport
