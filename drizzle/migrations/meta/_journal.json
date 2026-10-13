@@ -176,6 +176,13 @@
       "when": 1791734241501,
       "tag": "0024_public_home_safe_projection",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791915422674,
+      "tag": "0025_blog_public_articles_and_attachments",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,12 @@
 import { parseDocument } from 'htmlparser2';
 import type { AnyNode } from 'domhandler';
 
-export type WordPressArticle = { id: number; title: string; excerpt: string; date: string; url: string; source: 'site' };
+export type WordPressArticle = { id: number; title: string; excerpt: string; date: string; url: string; image: string | null; source: 'site' };
+
+export type PlatformArticle = {
+  id: string; title: string; excerpt: string; content: string; date: string;
+  image: string | null; attachment: { name: string; url: string } | null; source: 'platform';
+};
 
 function text(nodes: AnyNode[]): string {
   return nodes.map((n) => ('data' in n && n.type === 'text' ? n.data : 'children' in n ? text(n.children as AnyNode[]) : '')).join('');
@@ -12,12 +17,22 @@ export function plainText(html: string) {
   return text(parseDocument(html ?? '').children as AnyNode[]).replace(/\s+/g, ' ').replace(/\[…\]|\[&hellip;\]/g, '…').trim();
 }
 
+/** First image hosted on the association site, used as the card cover. */
+export function firstSiteImage(html: string): string | null {
+  const m = /<img[^>]+src=["'](https:\/\/lavoixduchien\.fr\/wp-content\/uploads\/[^"'\s]+\.(?:jpe?g|png|webp))["']/i.exec(html ?? '');
+  return m?.[1] ?? null;
+}
+
 export function parseWordPressPosts(raw: unknown): WordPressArticle[] {
   if (!Array.isArray(raw)) return [];
   return raw.flatMap((p) => {
     const url = String(p?.link ?? '');
     if (!/^https:\/\/lavoixduchien\.fr\//.test(url)) return [];
-    return [{ id: Number(p.id), title: plainText(p?.title?.rendered ?? ''), excerpt: plainText(p?.excerpt?.rendered ?? '').replace(/^Blog La voix du chien\s+—\s+\S+\s+\d{4}\s*/i, ''), date: String(p.date ?? ''), url, source: 'site' as const }];
+    return [{
+      id: Number(p.id), title: plainText(p?.title?.rendered ?? ''),
+      excerpt: plainText(p?.excerpt?.rendered ?? '').replace(/^Blog La voix du chien\s+—\s+\S+\s+\d{4}\s*/i, ''),
+      date: String(p.date ?? ''), url, image: firstSiteImage(p?.content?.rendered ?? ''), source: 'site' as const,
+    }];
   });
 }
 

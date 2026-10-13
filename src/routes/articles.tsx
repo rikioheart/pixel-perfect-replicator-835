@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
-import { BookOpen, ExternalLink, Newspaper } from 'lucide-react';
+import { BookOpen, ExternalLink, FileText, Newspaper } from 'lucide-react';
 import { PublicHeader } from '@/components/PublicHeader';
-import { getWordPressArticles } from '@/lib/public-articles.functions';
-import { GUIDES } from '@/lib/public-articles';
+import { getPlatformArticles, getWordPressArticles } from '@/lib/public-articles.functions';
+import { GUIDES, type PlatformArticle, type WordPressArticle } from '@/lib/public-articles';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const articlesOptions = queryOptions({ queryKey: ['public-articles'], queryFn: () => getWordPressArticles(), staleTime: 10 * 60 * 1000 });
+const platformOptions = queryOptions({ queryKey: ['public-platform-articles'], queryFn: () => getPlatformArticles(), staleTime: 5 * 60 * 1000 });
 
 export const Route = createFileRoute('/articles')({
-  loader: ({ context }) => context.queryClient.ensureQueryData(articlesOptions),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(articlesOptions), context.queryClient.ensureQueryData(platformOptions)]),
   head: () => ({
     meta: [
       { title: 'Articles et guides — La Voix du Chien' },
@@ -28,12 +29,17 @@ export const Route = createFileRoute('/articles')({
 });
 
 type Filter = 'all' | 'site' | 'guide';
+type Item = WordPressArticle | PlatformArticle;
+const fmt = (d: string) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
 function ArticlesPage() {
   const { data } = useSuspenseQuery(articlesOptions);
+  const { data: own } = useSuspenseQuery(platformOptions);
   const [filter, setFilter] = useState<Filter>('all');
   const [open, setOpen] = useState<string | null>(null);
+  const [reading, setReading] = useState<PlatformArticle | null>(null);
   const guide = GUIDES.find((g) => g.slug === open);
+  const items: Item[] = [...own, ...data.articles].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,23 +75,30 @@ function ArticlesPage() {
         {filter !== 'guide' && (
           <section aria-labelledby="blog" className="space-y-3">
             <h2 id="blog" className="flex items-center gap-2 font-display text-xl"><Newspaper className="size-5 text-primary" /> Le blog de l’association</h2>
-            {data.unavailable ? (
-              <p className="text-sm text-muted-foreground">Le blog est momentanément indisponible. <a className="underline" href="https://lavoixduchien.fr/" target="_blank" rel="noreferrer">Le consulter sur notre site</a>.</p>
-            ) : data.articles.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucun article publié pour le moment.</p>
+            {data.unavailable && <p className="text-sm text-muted-foreground">Une partie du blog est momentanément indisponible. <a className="underline" href="https://lavoixduchien.fr/" target="_blank" rel="noreferrer">Le consulter sur notre site</a>.</p>}
+            {items.length === 0 ? (
+              !data.unavailable && <p className="text-sm text-muted-foreground">Aucun article publié pour le moment.</p>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
-                {data.articles.map((a) => (
-                  <Card key={a.id}>
+                {items.map((a) => (
+                  <Card key={`${a.source}-${a.id}`} className="overflow-hidden">
+                    {a.image && <img src={a.image} alt="" loading="lazy" className="aspect-[16/9] w-full bg-muted object-cover" />}
                     <CardHeader className="pb-2">
-                      <p className="text-xs text-muted-foreground">{new Date(a.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                      <p className="text-xs text-muted-foreground">{fmt(a.date)}</p>
                       <CardTitle className="text-base">{a.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3 text-sm">
-                      <p className="line-clamp-3 text-muted-foreground">{a.excerpt}</p>
-                      <a href={a.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline">
-                        Lire l’article <ExternalLink className="size-3.5" aria-hidden /><span className="sr-only">(ouvre le site de l’association)</span>
-                      </a>
+                      {a.excerpt && <p className="line-clamp-3 text-muted-foreground">{a.excerpt}</p>}
+                      {a.source === 'site' ? (
+                        <a href={a.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline">
+                          Lire l’article <ExternalLink className="size-3.5" aria-hidden /><span className="sr-only">(ouvre le site de l’association)</span>
+                        </a>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {a.content && <Button size="sm" variant="outline" onClick={() => setReading(a)}>Lire l’article</Button>}
+                          {a.attachment && <Button asChild size="sm" variant="ghost"><a href={a.attachment.url} target="_blank" rel="noreferrer"><FileText className="size-4" aria-hidden /> {a.attachment.name}</a></Button>}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -94,6 +107,19 @@ function ArticlesPage() {
           </section>
         )}
       </main>
+
+      <Dialog open={!!reading} onOpenChange={(o) => !o && setReading(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          {reading && (
+            <>
+              <DialogHeader><DialogTitle>{reading.title}</DialogTitle><DialogDescription>{fmt(reading.date)}</DialogDescription></DialogHeader>
+              {reading.image && <img src={reading.image} alt="" className="w-full rounded-md object-cover" />}
+              <div className="space-y-3 whitespace-pre-line text-sm">{reading.content}</div>
+              {reading.attachment && <Button asChild variant="outline"><a href={reading.attachment.url} target="_blank" rel="noreferrer"><FileText className="size-4" aria-hidden /> {reading.attachment.name}</a></Button>}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!guide} onOpenChange={(o) => !o && setOpen(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
