@@ -20,7 +20,7 @@ export function plainText(html: string) {
 /** First image hosted on the association site, used as the card cover. */
 export function firstSiteImage(html: string): string | null {
   const m = /<img[^>]+src=["'](https:\/\/lavoixduchien\.fr\/wp-content\/uploads\/[^"'\s]+\.(?:jpe?g|png|webp))["']/i.exec(html ?? '');
-  return m ? m[1] : null;
+  return m?.[1] ?? null;
 }
 
 export function parseWordPressPosts(raw: unknown): WordPressArticle[] {
