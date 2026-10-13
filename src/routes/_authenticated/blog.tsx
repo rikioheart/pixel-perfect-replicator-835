@@ -56,6 +56,8 @@ function BlogPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: "", excerpt: "", content: "", status: "DRAFT" });
+  const [cover, setCover] = useState<File | null>(null);
+  const [pdf, setPdf] = useState<File | null>(null);
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ["blog-posts"],
@@ -69,9 +71,21 @@ function BlogPage() {
     },
   });
 
+  const upload = async (file: File, kind: string) => {
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+    const path = `${kind}/${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage.from("blog-media").upload(path, file, { contentType: file.type });
+    if (error) throw new Error(`Envoi du fichier impossible : ${error.message}`);
+    return path;
+  };
+
   const create = useMutation({
     mutationFn: async () => {
       if (form.title.trim().length < 3) throw new Error("Le titre doit faire au moins 3 caractères.");
+      if (cover && !cover.type.startsWith("image/")) throw new Error("La couverture doit être une image.");
+      if (pdf && pdf.type !== "application/pdf") throw new Error("Le document joint doit être un PDF.");
+      const cover_url = cover ? await upload(cover, "covers") : null;
+      const attachment_path = pdf ? await upload(pdf, "pdf") : null;
       const { error } = await supabase.from("blog_posts").insert({
         title: form.title.trim(),
         slug: `${slugify(form.title)}-${Date.now().toString(36)}`,
@@ -80,6 +94,9 @@ function BlogPage() {
         status: form.status,
         author_id: user?.id ?? null,
         published_at: form.status === "PUBLISHED" ? new Date().toISOString() : null,
+        cover_url,
+        attachment_path,
+        attachment_name: pdf ? pdf.name.replace(/\.pdf$/i, "") : null,
       });
       if (error) throw error;
     },
