@@ -104,6 +104,9 @@ function BlogPage() {
       toast.success("Article enregistré.");
       setOpen(false);
       setForm({ title: "", excerpt: "", content: "", status: "DRAFT" });
+      setCover(null);
+      setPdf(null);
+      void queryClient.invalidateQueries({ queryKey: ["public-platform-articles"] });
       void queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -165,6 +168,19 @@ function BlogPage() {
                   onChange={(e) => setForm({ ...form, content: e.target.value })}
                 />
               </div>
+              {isBureau ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="bl-cover">Photo de couverture</Label>
+                    <Input id="bl-cover" type="file" accept="image/*" onChange={(e) => setCover(e.target.files?.[0] ?? null)} />
+                  </div>
+                  <div>
+                    <Label htmlFor="bl-pdf">Document PDF à joindre</Label>
+                    <Input id="bl-pdf" type="file" accept="application/pdf" onChange={(e) => setPdf(e.target.files?.[0] ?? null)} />
+                  </div>
+                  <p className="text-xs text-muted-foreground sm:col-span-2">Une fois l’article publié, la photo et le PDF sont visibles par tous sur la page publique Articles.</p>
+                </div>
+              ) : null}
               {isBureau ? (
                 <div>
                   <Label htmlFor="bl-status">Statut</Label>
