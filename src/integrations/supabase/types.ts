@@ -422,6 +422,8 @@ export type Database = {
       }
       blog_posts: {
         Row: {
+          attachment_name: string | null
+          attachment_path: string | null
           author_id: string | null
           content: string | null
           cover_url: string | null
@@ -435,6 +437,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attachment_name?: string | null
+          attachment_path?: string | null
           author_id?: string | null
           content?: string | null
           cover_url?: string | null
@@ -448,6 +452,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attachment_name?: string | null
+          attachment_path?: string | null
           author_id?: string | null
           content?: string | null
           cover_url?: string | null
@@ -4301,6 +4307,7 @@ export type Database = {
       }
       list_bureau_members: { Args: never; Returns: Json }
       list_particuliers: { Args: never; Returns: Json }
+      list_public_blog_posts: { Args: never; Returns: Json }
       list_public_pros: { Args: never; Returns: Json }
       notify_once: {
         Args: {
