@@ -1,12 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
-import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
 import { PublicWelcome } from '@/components/PublicWelcome';
+import { PublicFooter, PublicHeader } from '@/components/PublicHeader';
 import { useOnline } from '@/lib/offline';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,18 +52,8 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-8">
-        <div className="flex items-center gap-3">
-          <img
-            src={logoMark.url}
-            alt="Logo de l'association La Voix du Chien"
-            className="size-12 rounded-full bg-navy-foreground/10 object-contain p-1"
-          />
-          <span className="font-display text-sm sm:text-base">Association La Voix du Chien</span>
-        </div>
-        <a href="#connexion" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm text-primary-foreground">Espace membres · Connexion<ArrowRight className="size-4" aria-hidden /></a>
-      </header>
-      <main className="mx-auto grid max-w-7xl items-start gap-6 px-4 pb-10 sm:px-8 lg:grid-cols-3">
+      <PublicHeader />
+      <main className="mx-auto grid max-w-7xl items-start gap-6 px-4 py-8 sm:px-8 lg:grid-cols-3">
       <section className="min-w-0 lg:col-span-2"><PublicWelcome /></section>
       <section id="connexion" className="scroll-mt-5 lg:sticky lg:top-6">
         <div className="panel w-full p-5 sm:p-6">
@@ -86,7 +75,7 @@ function AuthPage() {
         </div>
       </section>
       </main>
-      <footer className="border-t border-border p-5 text-center text-sm text-muted-foreground">Nargis, Loiret · Une place pour chacun, au rythme de son chien.</footer>
+      <PublicFooter />
     </div>
   );
 }

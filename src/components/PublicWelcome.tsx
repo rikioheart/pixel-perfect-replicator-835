@@ -5,6 +5,7 @@ import { PawPrint, HeartHandshake, Leaf, CalendarDays, MapPin, ArrowUpRight } fr
 import { supabase } from '@/integrations/supabase/client';
 import life from '@/assets/association-life.jpg';
 import { OfflineStatus } from './OfflineStatus';
+import { SERVICES, ZONES } from '@/lib/site-content';
 
 type Home = { activities: {id:string;title:string;date:string;location:string|null;image_url:string|null}[]; website:string|null };
 export function safeWebsite(value: string | null | undefined) {
@@ -34,9 +35,14 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
         {Icon:PawPrint,title:'Ensemble',text:'Coopérer avec des professionnels, dans le respect de chacun.'},
       ].map(({Icon,title,text}) => <article key={title} className="panel p-4"><Icon className="mb-3 size-6 text-primary" aria-hidden /><h3 className="text-base">{title}</h3><p className="mt-2 text-sm text-muted-foreground">{text}</p></article>)}</div>
     </section>
+    <section aria-labelledby="services-title">
+      <h2 id="services-title" className="text-2xl">Nos activités</h2>
+      <p className="mt-2 text-sm text-muted-foreground">Un réseau de professionnels du secteur canin, présent en {ZONES.join(', ')}.</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{SERVICES.map(s => <Link key={s.slug} to="/services" hash={s.slug} className="panel block p-4 transition-colors hover:border-primary"><h3 className="text-base">{s.title}</h3><p className="mt-2 text-sm text-muted-foreground">{s.summary}</p></Link>)}</div>
+    </section>
     <section aria-labelledby="month-title">
       <h2 id="month-title" className="flex items-center gap-2 text-xl"><CalendarDays className="size-5 text-primary" aria-hidden />Les prochaines activités du mois</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Uniquement les activités ouvertes au public ; les inscriptions se font dans l’espace membres.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Uniquement les activités ouvertes au public. <Link to="/agenda" className="underline">Tout l’agenda et les réservations</Link></p>
       {query.isPending ? <p role="status" className="mt-4 text-sm">Chargement des rencontres…</p> : query.isError ? <p className="mt-4 text-sm">Les activités ne sont pas disponibles pour le moment.</p> : !query.data?.activities.length ? <p className="panel mt-4 p-4 text-sm text-muted-foreground">De nouvelles rencontres se préparent. Revenez bientôt découvrir le programme.</p> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{query.data.activities.map(a => <article key={a.id} className="panel p-4"><p className="text-sm font-medium text-primary">{new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',timeZone:'Europe/Paris'})}</p><h3 className="mt-2 text-lg">{a.title}</h3>{a.location && <p className="mt-2 flex gap-2 text-sm text-muted-foreground"><MapPin className="size-4" aria-hidden />{a.location}</p>}</article>)}</div>}
     </section>
     <div className="flex flex-wrap gap-3">

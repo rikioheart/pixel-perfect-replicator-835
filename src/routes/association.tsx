@@ -3,7 +3,7 @@ import { publicPartnersOptions } from "@/lib/public-partners.queries";
 import { PublicPartnerDirectory } from "@/components/PublicPartnerDirectory";
 import { Globe } from "lucide-react";
 import { UpdatesWall } from "@/components/UpdatesWall";
-import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter, PublicHeader } from "@/components/PublicHeader";
 import { PublicWelcome } from '@/components/PublicWelcome';
 
 export const Route = createFileRoute("/association")({
@@ -41,6 +41,7 @@ function PublicAssociationPage() {
         <UpdatesWall publicOnly compact limit={5} />
 
       </main>
+      <PublicFooter />
 
       <footer className="border-t border-border px-6 py-8 text-center text-xs text-muted-foreground">
         <p className="flex items-center justify-center gap-2">

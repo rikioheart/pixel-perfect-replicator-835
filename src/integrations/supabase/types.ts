@@ -4307,6 +4307,7 @@ export type Database = {
       }
       list_bureau_members: { Args: never; Returns: Json }
       list_particuliers: { Args: never; Returns: Json }
+      list_public_activities: { Args: never; Returns: Json }
       list_public_blog_posts: { Args: never; Returns: Json }
       list_public_pros: { Args: never; Returns: Json }
       notify_once: {
