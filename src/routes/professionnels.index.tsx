@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { Briefcase, MapPin } from 'lucide-react';
-import { PublicHeader } from '@/components/PublicHeader';
+import { PublicFooter, PublicHeader } from '@/components/PublicHeader';
+import { ProMap } from '@/components/ProMap';
 import { getPublicPros } from '@/lib/public-articles.functions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +45,7 @@ function ProsPage() {
           <h1 className="font-display text-3xl">Professionnels référencés</h1>
           <p className="max-w-2xl text-muted-foreground">Professionnels membres de l’association, validés par le Bureau, qui ont choisi d’apparaître publiquement.</p>
         </div>
+        <ProMap pros={data.pros} onSelect={setPlace} />
         {data.pros.length > 0 && (
           <div className="grid max-w-xl gap-3 sm:grid-cols-2">
             <div><Label htmlFor="f-job">Métier</Label><select id="f-job" className={sel} value={job} onChange={(e) => setJob(e.target.value)}><option value="">Tous les métiers</option>{jobs.map((j) => <option key={j}>{j}</option>)}</select></div>
@@ -76,6 +78,7 @@ function ProsPage() {
           </div>
         )}
       </main>
+      <PublicFooter />
     </div>
   );
 }

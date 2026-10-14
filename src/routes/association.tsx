@@ -41,6 +41,7 @@ function PublicAssociationPage() {
         <UpdatesWall publicOnly compact limit={5} />
 
       </main>
+      <PublicFooter />
 
       <footer className="border-t border-border px-6 py-8 text-center text-xs text-muted-foreground">
         <p className="flex items-center justify-center gap-2">

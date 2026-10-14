@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { BookOpen, ExternalLink, FileText, Newspaper } from 'lucide-react';
-import { PublicHeader } from '@/components/PublicHeader';
+import { PublicFooter, PublicHeader } from '@/components/PublicHeader';
 import { getPlatformArticles, getWordPressArticles } from '@/lib/public-articles.functions';
 import { GUIDES, type PlatformArticle, type WordPressArticle } from '@/lib/public-articles';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,6 +107,7 @@ function ArticlesPage() {
           </section>
         )}
       </main>
+      <PublicFooter />
 
       <Dialog open={!!reading} onOpenChange={(o) => !o && setReading(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">

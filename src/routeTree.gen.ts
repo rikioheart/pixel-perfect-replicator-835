@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as ArticlesRouteImport } from './routes/articles'
 import { Route as AssociationRouteImport } from './routes/association'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authenticated/advantages'
 import { Route as AuthenticatedAvanceesRouteImport } from './routes/_authenticated/avancees'
 import { Route as AuthenticatedBlogRouteImport } from './routes/_authenticated/blog'
@@ -90,6 +92,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgendaRoute = AgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArticlesRoute = ArticlesRouteImport.update({
   id: '/articles',
   path: '/articles',
@@ -98,6 +105,11 @@ const ArticlesRoute = ArticlesRouteImport.update({
 const AssociationRoute = AssociationRouteImport.update({
   id: '/association',
   path: '/association',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdvantagesRoute = AuthenticatedAdvantagesRouteImport.update({
@@ -466,8 +478,10 @@ const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
   '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
+  '/services': typeof ServicesRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/avancees': typeof AuthenticatedAvanceesRoute
   '/blog': typeof AuthenticatedBlogRoute
@@ -538,8 +552,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
   '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
+  '/services': typeof ServicesRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/avancees': typeof AuthenticatedAvanceesRoute
   '/blog': typeof AuthenticatedBlogRoute
@@ -612,8 +628,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/agenda': typeof AgendaRoute
   '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
+  '/services': typeof ServicesRoute
   '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
   '/_authenticated/avancees': typeof AuthenticatedAvanceesRoute
   '/_authenticated/blog': typeof AuthenticatedBlogRoute
@@ -686,8 +704,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/agenda'
     | '/articles'
     | '/association'
+    | '/services'
     | '/advantages'
     | '/avancees'
     | '/blog'
@@ -758,8 +778,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/agenda'
     | '/articles'
     | '/association'
+    | '/services'
     | '/advantages'
     | '/avancees'
     | '/blog'
@@ -831,8 +853,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/agenda'
     | '/articles'
     | '/association'
+    | '/services'
     | '/_authenticated/advantages'
     | '/_authenticated/avancees'
     | '/_authenticated/blog'
@@ -905,8 +929,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AgendaRoute: typeof AgendaRoute
   ArticlesRoute: typeof ArticlesRoute
   AssociationRoute: typeof AssociationRoute
+  ServicesRoute: typeof ServicesRoute
   FormulaireFormIdRoute: typeof FormulaireFormIdRoute
   PartageTokenRoute: typeof PartageTokenRoute
   ProProIdRoute: typeof ProProIdRoute
@@ -931,6 +957,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agenda': {
+      id: '/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AgendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/articles': {
       id: '/articles'
       path: '/articles'
@@ -943,6 +976,13 @@ declare module '@tanstack/react-router' {
       path: '/association'
       fullPath: '/association'
       preLoaderRoute: typeof AssociationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/advantages': {
@@ -1553,8 +1593,10 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AgendaRoute: AgendaRoute,
   ArticlesRoute: ArticlesRoute,
   AssociationRoute: AssociationRoute,
+  ServicesRoute: ServicesRoute,
   FormulaireFormIdRoute: FormulaireFormIdRoute,
   PartageTokenRoute: PartageTokenRoute,
   ProProIdRoute: ProProIdRoute,
