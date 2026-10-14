@@ -3,7 +3,7 @@ import { publicPartnersOptions } from "@/lib/public-partners.queries";
 import { PublicPartnerDirectory } from "@/components/PublicPartnerDirectory";
 import { Globe } from "lucide-react";
 import { UpdatesWall } from "@/components/UpdatesWall";
-import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter, PublicHeader } from "@/components/PublicHeader";
 import { PublicWelcome } from '@/components/PublicWelcome';
 
 export const Route = createFileRoute("/association")({
