@@ -1,5 +1,13 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Lot 21 — Site internet unifié : vitrine, carte et agenda
+- [x] Page d'accueil transformée en vraie vitrine : en-tête et pied de page communs à toutes les pages publiques, réseau (77/45/89/91), bloc « Nos activités » repris du WordPress
+- [x] Page /services : contenus Bilan, Éducation, Rééducation, Sport, Ateliers, Balades repris du site lavoixduchien.fr (src/lib/site-content.ts) avant sa suppression
+- [x] Carte interactive sur /professionnels (Leaflet, géocodage par ville via Base Adresse Nationale, clic = filtre de localisation, fiches liées dans les repères)
+- [x] Page /agenda : activités publiques des 12 prochains mois via RPC list_public_activities (migration 0026), mois groupés, filtre par catégorie, places restantes, prix ; bouton Réserver connecté, « Se connecter pour réserver » sinon
+- [x] 37 tests réussis, pages publiques vérifiées sans erreur JavaScript
+  - Limites : agenda et carte vides tant qu'aucune activité publique ni professionnel validé n'existe ; réservation non vérifiée (pas de session) ; contenus détaillés par page (Education, Rééducation…) résumés, les longs textes WP restent à reprendre si souhaité.
+
 ## Lot 20 — Annuaire public, prototype et WordPress
 - [x] Vérifier le prototype disponible, les sources WordPress et les annuaires existants
 - [x] Réutiliser la vitrine et les fiches publiques ; recherche et filtres sans répétitions
