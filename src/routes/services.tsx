@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button';
+import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { CalendarDays, Check } from 'lucide-react';
 import { PublicFooter, PublicHeader } from '@/components/PublicHeader';
@@ -19,15 +21,12 @@ export const Route = createFileRoute('/services')({
 
 function ServicesPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="public-site min-h-screen bg-background">
       <PublicHeader />
-      <main className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6">
-        <div className="max-w-3xl space-y-3">
-          <h1 className="font-display text-3xl">Nos activités et accompagnements</h1>
-          <p className="text-muted-foreground">{ABOUT.intro}</p>
-        </div>
+      <main id="contenu" className="public-main space-y-8">
+        <PublicPageIntro eyebrow="Une place pour chaque duo" title="Nos activités et accompagnements">{ABOUT.intro}</PublicPageIntro>
         <nav aria-label="Sommaire" className="flex flex-wrap gap-2">
-          {SERVICES.map((s) => <a key={s.slug} href={`#${s.slug}`} className="rounded-full border border-border bg-card px-3 py-1 text-sm">{s.title}</a>)}
+          {SERVICES.map((s) => <a key={s.slug} href={`#${s.slug}`} className="inline-flex min-h-11 items-center rounded-md border border-border bg-card px-3 py-1 text-sm">{s.title}</a>)}
         </nav>
         <div className="grid gap-4 md:grid-cols-2">
           {SERVICES.map((s) => (
@@ -39,7 +38,7 @@ function ServicesPage() {
             </article>
           ))}
         </div>
-        <Link to="/agenda" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 text-sm text-primary-foreground"><CalendarDays className="size-5" aria-hidden />Voir les prochaines dates</Link>
+        <Button asChild><Link to="/agenda"><CalendarDays className="size-5" aria-hidden />Voir les prochaines dates</Link></Button>
       </main>
       <PublicFooter />
     </div>

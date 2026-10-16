@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { publicPartnersOptions } from "@/lib/public-partners.queries";
 import { PublicPartnerDirectory } from "@/components/PublicPartnerDirectory";
-import { Globe } from "lucide-react";
+
 import { UpdatesWall } from "@/components/UpdatesWall";
 import { PublicFooter, PublicHeader } from "@/components/PublicHeader";
 import { PublicWelcome } from '@/components/PublicWelcome';
@@ -31,10 +31,10 @@ export const Route = createFileRoute("/association")({
 
 function PublicAssociationPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="public-site min-h-screen bg-background">
       <PublicHeader />
 
-      <main className="mx-auto max-w-6xl space-y-12 px-4 py-6 sm:px-6 sm:py-10">
+      <main id="contenu" className="public-main space-y-12 pt-6">
         <PublicWelcome showPartnerLink={false} />
         <PublicPartnerDirectory />
 
@@ -43,11 +43,6 @@ function PublicAssociationPage() {
       </main>
       <PublicFooter />
 
-      <footer className="border-t border-border px-6 py-8 text-center text-xs text-muted-foreground">
-        <p className="flex items-center justify-center gap-2">
-          <Globe className="size-3" /> La Voix du Chien — Nargis, Loiret
-        </p>
-      </footer>
     </div>
   );
 }

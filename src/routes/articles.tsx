@@ -1,3 +1,4 @@
+import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
@@ -42,13 +43,10 @@ function ArticlesPage() {
   const items: Item[] = [...own, ...data.articles].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="public-site min-h-screen bg-background">
       <PublicHeader />
-      <main className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6">
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl">Articles et guides</h1>
-          <p className="max-w-2xl text-muted-foreground">Les articles du blog de l’association et des repères éducatifs pour observer et accompagner son chien avec bienveillance.</p>
-        </div>
+      <main id="contenu" className="public-main space-y-8">
+        <PublicPageIntro eyebrow="Observer et comprendre" title="Articles et guides">Les articles du blog de l’association et des repères éducatifs pour observer et accompagner son chien avec bienveillance.</PublicPageIntro>
         <div role="group" aria-label="Type de contenu" className="flex flex-wrap gap-2">
           {([['all', 'Tout'], ['site', 'Blog'], ['guide', 'Guides éducatifs']] as const).map(([v, l]) => (
             <Button key={v} size="sm" variant={filter === v ? 'default' : 'outline'} aria-pressed={filter === v} onClick={() => setFilter(v)}>{l}</Button>

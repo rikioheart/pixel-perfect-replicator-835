@@ -51,9 +51,9 @@ function AuthPage() {
   }, [session, isBureau, isPro, loading, rolesReady, navigate]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="public-site min-h-screen bg-background">
       <PublicHeader />
-      <main className="mx-auto grid max-w-7xl items-start gap-6 px-4 py-8 sm:px-8 lg:grid-cols-3">
+      <main id="contenu" className="mx-auto grid max-w-7xl items-start gap-8 px-4 py-6 sm:px-8 lg:grid-cols-3">
       <section className="min-w-0 lg:col-span-2"><PublicWelcome /></section>
       <section id="connexion" className="scroll-mt-5 lg:sticky lg:top-6">
         <div className="panel w-full p-5 sm:p-6">

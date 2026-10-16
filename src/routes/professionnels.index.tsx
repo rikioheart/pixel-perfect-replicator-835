@@ -1,3 +1,4 @@
+import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { useMemo, useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
@@ -38,13 +39,10 @@ function ProsPage() {
   const list = data.pros.filter((p) => (!job || p.sector === job || p.specialties.includes(job)) && (!place || p.city === place));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="public-site min-h-screen bg-background">
       <PublicHeader />
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl">Professionnels référencés</h1>
-          <p className="max-w-2xl text-muted-foreground">Professionnels membres de l’association, validés par le Bureau, qui ont choisi d’apparaître publiquement.</p>
-        </div>
+      <main id="contenu" className="public-main space-y-8">
+        <PublicPageIntro eyebrow="Un réseau de confiance" title="Professionnels référencés">Professionnels membres de l’association, validés par le Bureau, qui ont choisi d’apparaître publiquement.</PublicPageIntro>
         <ProMap pros={data.pros} onSelect={setPlace} />
         {data.pros.length > 0 && (
           <div className="grid max-w-xl gap-3 sm:grid-cols-2">
@@ -59,7 +57,7 @@ function ProsPage() {
             Aucun professionnel n’est encore référencé publiquement. En attendant, découvrez <Link to="/association" className="underline">les partenaires de l’association</Link>.
           </div>
         ) : list.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucun professionnel ne correspond à ces critères. <button className="underline" onClick={() => { setJob(''); setPlace(''); }}>Effacer les filtres</button></p>
+          <p className="text-sm text-muted-foreground">Aucun professionnel ne correspond à ces critères. <Button variant="link" onClick={() => { setJob(''); setPlace(''); }}>Effacer les filtres</Button></p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {list.map((p) => (

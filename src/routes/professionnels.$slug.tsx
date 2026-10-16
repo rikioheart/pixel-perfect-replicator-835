@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, CalendarDays, Dog, Gift, Globe, Handshake, Mail, MapPin, Phone } from "lucide-react";
-import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
+import { PublicHeader, PublicFooter } from "@/components/PublicHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +45,7 @@ type ProPage = {
 
 function Section({ title, icon: Icon, children }: { title: string; icon: typeof Gift; children: React.ReactNode }) {
   return (
-    <section className="panel space-y-3 p-6" aria-labelledby={`s-${title}`}>
+    <section className="space-y-3 border-t border-border py-6" aria-labelledby={`s-${title}`}>
       <h2 id={`s-${title}`} className="flex items-center gap-2 font-display text-lg">
         <Icon className="size-4 text-primary" aria-hidden /> {title}
       </h2>
@@ -70,22 +70,11 @@ function PublicProCard() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="surface-night">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <img src={logoMark.url} alt="Logo de La Voix du Chien" className="size-9 rounded-full object-contain p-1" />
-            <span className="font-display text-sm">La Voix du Chien</span>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/association">
-              <ArrowLeft className="mr-2 size-4" aria-hidden /> L'association
-            </Link>
-          </Button>
-        </div>
-      </header>
+    <div className="public-site min-h-screen bg-background">
+      <PublicHeader />
 
       <main id="contenu" className="mx-auto max-w-3xl space-y-5 px-6 py-10">
+        <Button asChild variant="link" className="px-0"><Link to="/professionnels"><ArrowLeft aria-hidden />Tous les professionnels</Link></Button>
         {isLoading ? (
           <LoadingState label="Chargement de la carte…" rows={4} />
         ) : !pro ? (
@@ -204,6 +193,7 @@ function PublicProCard() {
           </>
         )}
       </main>
+      <PublicFooter />
     </div>
   );
 }
