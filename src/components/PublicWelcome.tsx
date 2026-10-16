@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { PawPrint, HeartHandshake, Leaf, CalendarDays, MapPin, ArrowUpRight } from 'lucide-react';
+import { PawPrint, HeartHandshake, Leaf, CalendarDays, MapPin, ArrowUpRight, BookOpen, Compass, Footprints } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import life from '@/assets/association-life.jpg';
+import walk from '@/assets/public/walk.asset.json';
+import companion from '@/assets/public/companion.asset.json';
+import { Button } from '@/components/ui/button';
 import { OfflineStatus } from './OfflineStatus';
-import { SERVICES, ZONES } from '@/lib/site-content';
+import { SERVICES, ZONES, ABOUT } from '@/lib/site-content';
 
 type Home = { activities: {id:string;title:string;date:string;location:string|null;image_url:string|null}[]; website:string|null };
 export function safeWebsite(value: string | null | undefined) {
@@ -15,39 +17,46 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
   const query = useQuery({queryKey:['public-home'], queryFn:async () => { const {data,error} = await supabase.rpc('get_public_home'); if(error) throw error; return data as unknown as Home; }});
   useEffect(() => { if(query.data) {try {localStorage.setItem('lvdc.public.home',JSON.stringify({...query.data,savedAt:new Date().toISOString()}));}catch{/* unavailable device storage */}} },[query.data]);
   const website = safeWebsite(query.data?.website);
-  return <div className="space-y-8">
+  return <div>
     <OfflineStatus />
-    <section className="public-cover relative isolate min-h-[380px] overflow-hidden p-6 sm:p-9">
-      <img src={life} alt="Deux chiens et leurs humains profitent ensemble d’une promenade dans une prairie" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="relative z-10 max-w-xl pt-28 sm:pt-40">
-        <p className="mb-3 flex items-center gap-2 text-sm"><PawPrint className="size-5" aria-hidden />Nargis · Loiret · Ensemble, à leur rythme</p>
-        <h1 className="text-3xl leading-tight sm:text-4xl">La Voix du Chien</h1>
-        <p className="mt-3 text-lg">Le chien au cœur. L’humain à ses côtés.</p>
-        <p className="mt-3 max-w-lg text-base">Des rencontres, des petites étapes et de l’entraide pour mieux vivre ensemble, sans jugement ni compétition.</p>
+    <section className="public-hero">
+      <img src={walk.url} alt="Des chiens et leurs humains se promènent ensemble sur un chemin" width={1920} height={1088} fetchPriority="high" />
+      <div className="public-hero-copy">
+        <p className="hero-label"><PawPrint className="size-4" aria-hidden />Une association · Un réseau · Des liens</p>
+        <h1>La Voix<br />du Chien</h1>
+        <p className="hero-slogan">Le chien au cœur. L’humain à ses côtés.</p>
+        <p className="hero-description">Des rencontres, des petites étapes et de l’entraide pour mieux vivre ensemble, sans jugement ni compétition.</p>
+        <Button asChild variant="secondary" className="mt-6"><Link to="/professionnels"><MapPin aria-hidden />Rencontrer les professionnels<ArrowUpRight aria-hidden /></Link></Button>
       </div>
     </section>
-    <section aria-labelledby="values-title">
-      <h2 id="values-title" className="text-2xl">Une association, des liens qui comptent</h2>
-      <p className="mt-3 text-muted-foreground">Association La Voix du Chien réunit particuliers, bénévoles et professionnels autour du bien-être physique, émotionnel et social du chien, dans une approche respectueuse, éthique et scientifiquement fondée.</p>
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">{[
+    <nav aria-label="Découvrir l’association" className="public-discovery">
+      <Link to="/agenda"><CalendarDays className="size-5" aria-hidden /><span>Les prochaines rencontres</span></Link>
+      {showPartnerLink && <Link to="/association" hash="partenaires"><HeartHandshake className="size-5" aria-hidden /><span>Découverte des partenaires</span></Link>}
+      <Link to="/articles"><BookOpen className="size-5" aria-hidden /><span>Articles et guides</span></Link>
+    </nav>
+    <section className="public-section" aria-labelledby="values-title">
+      <p className="public-eyebrow mb-3">Notre philosophie</p>
+      <h2 id="values-title">Une place pour chaque duo</h2>
+      <p className="mt-4 text-muted-foreground">Association La Voix du Chien réunit particuliers, bénévoles et professionnels autour du bien-être physique, émotionnel et social du chien, dans une approche respectueuse, éthique et scientifiquement fondée.</p>
+      <div className="public-values">{[
         {Icon:Leaf,title:'À son rythme',text:'Écouter les besoins de chaque chien, sans le comparer aux autres.'},
         {Icon:HeartHandshake,title:'Avec bienveillance',text:'Trouver sa place, demander de l’aide et partager ses savoir-faire.'},
         {Icon:PawPrint,title:'Ensemble',text:'Coopérer avec des professionnels, dans le respect de chacun.'},
-      ].map(({Icon,title,text}) => <article key={title} className="panel p-4"><Icon className="mb-3 size-6 text-primary" aria-hidden /><h3 className="text-base">{title}</h3><p className="mt-2 text-sm text-muted-foreground">{text}</p></article>)}</div>
+      ].map(({Icon,title,text}) => <article key={title}><Icon className="mb-3 size-5 text-primary" aria-hidden /><h3>{title}</h3><p className="mt-2 text-sm text-muted-foreground">{text}</p></article>)}</div>
     </section>
-    <section aria-labelledby="services-title">
-      <h2 id="services-title" className="text-2xl">Nos activités</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Un réseau de professionnels du secteur canin, présent en {ZONES.join(', ')}.</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{SERVICES.map(s => <Link key={s.slug} to="/services" hash={s.slug} className="panel block p-4 transition-colors hover:border-primary"><h3 className="text-base">{s.title}</h3><p className="mt-2 text-sm text-muted-foreground">{s.summary}</p></Link>)}</div>
+    <section className="public-section" aria-labelledby="services-title">
+      <p className="public-eyebrow mb-3">Comprendre, accompagner, partager</p>
+      <h2 id="services-title">Nos activités</h2>
+      <p className="mt-3 text-sm text-muted-foreground">Un réseau présent en {ZONES.join(', ')}.</p>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">{SERVICES.map((s,i) => {const Icon = [HeartHandshake,PawPrint,Leaf,Compass,BookOpen,Footprints][i] ?? PawPrint;return <Link key={s.slug} to="/services" hash={s.slug} className="public-service-link"><Icon className="mb-3 size-5 text-primary" aria-hidden /><h3>{s.title}</h3><p className="mt-2 text-sm text-muted-foreground">{s.summary}</p><ArrowUpRight className="mt-3 size-4 text-primary" aria-hidden /></Link>;})}</div>
     </section>
-    <section aria-labelledby="month-title">
-      <h2 id="month-title" className="flex items-center gap-2 text-xl"><CalendarDays className="size-5 text-primary" aria-hidden />Les prochaines activités du mois</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Uniquement les activités ouvertes au public. <Link to="/agenda" className="underline">Tout l’agenda et les réservations</Link></p>
-      {query.isPending ? <p role="status" className="mt-4 text-sm">Chargement des rencontres…</p> : query.isError ? <p className="mt-4 text-sm">Les activités ne sont pas disponibles pour le moment.</p> : !query.data?.activities.length ? <p className="panel mt-4 p-4 text-sm text-muted-foreground">De nouvelles rencontres se préparent. Revenez bientôt découvrir le programme.</p> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{query.data.activities.map(a => <article key={a.id} className="panel p-4"><p className="text-sm font-medium text-primary">{new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',timeZone:'Europe/Paris'})}</p><h3 className="mt-2 text-lg">{a.title}</h3>{a.location && <p className="mt-2 flex gap-2 text-sm text-muted-foreground"><MapPin className="size-4" aria-hidden />{a.location}</p>}</article>)}</div>}
+    <section className="public-section" aria-labelledby="month-title">
+      <div className="flex flex-wrap items-center justify-between gap-3"><h2 id="month-title">À partager ce mois-ci</h2><Button asChild variant="link" className="px-0"><Link to="/agenda">Tout l’agenda<ArrowUpRight aria-hidden /></Link></Button></div>
+      {query.isPending ? <p role="status" className="mt-4 text-sm">Chargement des rencontres…</p> : query.isError ? <p className="mt-4 text-sm">Les activités ne sont pas disponibles pour le moment.</p> : !query.data?.activities.length ? <p className="mt-5 border-l-2 border-sage py-2 pl-4 text-sm text-muted-foreground">De nouvelles rencontres se préparent. Revenez bientôt découvrir le programme.</p> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{query.data.activities.map(a => <article key={a.id} className="panel overflow-hidden">{a.image_url && <img src={a.image_url} alt="" loading="lazy" className="aspect-video w-full object-cover" />}<div className="p-4"><p className="text-sm font-medium text-primary">{new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',timeZone:'Europe/Paris'})}</p><h3 className="mt-2 text-lg">{a.title}</h3>{a.location && <p className="mt-2 flex gap-2 text-sm text-muted-foreground"><MapPin className="size-4" aria-hidden />{a.location}</p>}</div></article>)}</div>}
     </section>
-    <div className="flex flex-wrap gap-3">
-      {showPartnerLink && <Link to="/association" hash="partenaires" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-medium"><HeartHandshake className="size-5" aria-hidden />Découverte des partenaires</Link>}
-      {website && <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-border px-4 text-sm">Notre site internet<ArrowUpRight className="size-4" aria-hidden /></a>}
-    </div>
+    <section className="public-story" aria-labelledby="story-title">
+      <img src={companion.url} alt="Un moment de complicité entre une personne et son chien" width={1200} height={1408} loading="lazy" />
+      <div><p className="public-eyebrow mb-3">Le vivant, au quotidien</p><h2 id="story-title">Des humains au service des chiens.</h2><p className="mt-4 text-sm text-muted-foreground">{ABOUT.intro}</p><p className="mt-3 text-sm text-muted-foreground">{ABOUT.network}</p>{website && <Button asChild variant="link" className="mt-4 px-0"><a href={website} target="_blank" rel="noopener noreferrer">Notre site internet<ArrowUpRight aria-hidden /></a></Button>}</div>
+    </section>
   </div>;
 }

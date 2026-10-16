@@ -1,3 +1,4 @@
+import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { useMemo, useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
@@ -36,13 +37,10 @@ function AgendaPage() {
   const months = [...new Set(list.map((a) => monthLabel(a.date)))];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="public-site min-h-screen bg-background">
       <PublicHeader />
-      <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl">Agenda des activités</h1>
-          <p className="max-w-2xl text-muted-foreground">Les rencontres ouvertes au public. La réservation se fait depuis votre espace membre, pour que nous puissions préparer l’accueil de votre chien.</p>
-        </div>
+      <main id="contenu" className="public-main space-y-8">
+        <PublicPageIntro eyebrow="Se rencontrer, à leur rythme" title="Agenda des activités">Les rencontres ouvertes au public. La réservation se fait depuis votre espace membre, pour que nous puissions préparer l’accueil de votre chien.</PublicPageIntro>
         {cats.length > 1 && (
           <div className="flex flex-wrap gap-2" role="group" aria-label="Type d’activité">
             <Button size="sm" variant={cat ? 'outline' : 'default'} onClick={() => setCat('')}>Toutes</Button>
@@ -61,7 +59,7 @@ function AgendaPage() {
               const d = new Date(a.date);
               return (
                 <article key={a.id} className="panel flex flex-col gap-4 p-4 sm:flex-row">
-                  <div className="flex w-20 shrink-0 flex-col items-center justify-center rounded-xl bg-secondary p-2 text-center">
+                  <div className="flex w-20 shrink-0 flex-col items-center justify-center rounded-lg bg-secondary p-2 text-center text-secondary-foreground">
                     <span className="text-2xl font-display">{d.toLocaleDateString('fr-FR', { day: 'numeric', timeZone: 'Europe/Paris' })}</span>
                     <span className="text-xs">{d.toLocaleDateString('fr-FR', { weekday: 'short', timeZone: 'Europe/Paris' })} · {d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' })}</span>
                   </div>
