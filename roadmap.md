@@ -1,5 +1,11 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Lot 22 — Site public inspiré de paws-places
+- [ ] Comparer le ZIP et le dépôt public, sans importer accès ni données
+- [ ] Harmoniser accueil, association, activités, agenda, articles et annuaire ; préserver intégralement la connexion
+- [ ] Améliorer navigation mobile, référencement et repères interactifs
+- [ ] Vérifier pages, filtres, lecture et connexion sur téléphone et ordinateur
+
 ## Lot 21 — Site internet unifié : vitrine, carte et agenda
 - [x] Page d'accueil transformée en vraie vitrine : en-tête et pied de page communs à toutes les pages publiques, réseau (77/45/89/91), bloc « Nos activités » repris du WordPress
 - [x] Page /services : contenus Bilan, Éducation, Rééducation, Sport, Ateliers, Balades repris du site lavoixduchien.fr (src/lib/site-content.ts) avant sa suppression
