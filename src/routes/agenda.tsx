@@ -1,3 +1,4 @@
+import { publicSeo } from '@/components/PublicSeo';
 import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { useMemo, useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -14,7 +15,9 @@ const agendaOptions = queryOptions({ queryKey: ['public-agenda'], queryFn: () =>
 export const Route = createFileRoute('/agenda')({
   loader: ({ context }) => context.queryClient.ensureQueryData(agendaOptions),
   head: () => ({
+    links: publicSeo('/agenda').links,
     meta: [
+      ...publicSeo('/agenda').meta,
       { title: 'Agenda des activités — La Voix du Chien' },
       { name: 'description', content: 'Balades collectives, ateliers et séances à venir : consultez les dates et réservez votre place.' },
       { property: 'og:title', content: 'Agenda des activités — La Voix du Chien' },

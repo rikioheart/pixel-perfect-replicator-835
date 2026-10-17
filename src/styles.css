@@ -218,7 +218,6 @@
 .reading-space { line-height: 1.8; }
 
 /* Public editorial shell: scoped so member tools and authentication retain their appearance. */
-.public-site { --radius: .5rem; }
 .public-header { position: relative; z-index: 40; background: var(--card); border-bottom: 1px solid var(--border); }
 .public-header-inner { max-width: 80rem; margin: auto; min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 2rem; }
 .public-nav-link { display: flex; align-items: center; min-height: 44px; padding: .5rem .7rem; font-size: .875rem; border-radius: .5rem; transition: background .2s; }
@@ -257,7 +256,7 @@
 .public-story { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); align-items: center; gap: 3rem; padding: 3rem 0; }
 .public-story img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 45% 45% .5rem .5rem; }
 .public-story h2 { font-size: 2rem; line-height: 1.35; }
-.public-site .panel, .public-site [data-slot="card"] { box-shadow: none; border-radius: .5rem; }
+.public-site .panel:not(#connexion .panel), .public-site [data-slot="card"] { box-shadow: none; border-radius: .5rem; }
 .public-site .leaflet-container { font-family: var(--font-sans); }
 .public-site .leaflet-popup-content a { display: block; color: var(--primary); padding: .4rem 0; }
 @media (max-width: 639px) {

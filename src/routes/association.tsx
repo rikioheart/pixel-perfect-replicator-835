@@ -1,3 +1,4 @@
+import { publicSeo } from '@/components/PublicSeo';
 import { createFileRoute } from "@tanstack/react-router";
 import { publicPartnersOptions } from "@/lib/public-partners.queries";
 import { PublicPartnerDirectory } from "@/components/PublicPartnerDirectory";
@@ -9,7 +10,9 @@ import { PublicWelcome } from '@/components/PublicWelcome';
 export const Route = createFileRoute("/association")({
   loader: ({ context }) => context.queryClient.ensureQueryData(publicPartnersOptions),
   head: () => ({
+    links: publicSeo('/association').links,
     meta: [
+      ...publicSeo('/association').meta,
       { title: "La Voix du Chien — Association canine du Loiret" },
       {
         name: "description",

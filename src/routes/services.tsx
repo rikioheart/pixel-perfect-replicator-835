@@ -1,3 +1,4 @@
+import { publicSeo } from '@/components/PublicSeo';
 import { Button } from '@/components/ui/button';
 import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -7,7 +8,9 @@ import { ABOUT, SERVICES } from '@/lib/site-content';
 
 export const Route = createFileRoute('/services')({
   head: () => ({
+    links: publicSeo('/services').links,
     meta: [
+      ...publicSeo('/services').meta,
       { title: 'Nos activités et accompagnements — La Voix du Chien' },
       { name: 'description', content: 'Bilan comportemental, éducation, rééducation, sports canins, ateliers à thème et balades collectives avec des professionnels bienveillants.' },
       { property: 'og:title', content: 'Nos activités et accompagnements — La Voix du Chien' },

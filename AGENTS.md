@@ -29,15 +29,18 @@
 - Terrain: DRAFT/PENDING/CHANGES_REQUESTED/APPROVED/REFUSED/CANCELLED; a_guard restricts decisions to Bureau and requester edits to draft/changes, b_check prevents pending/approved overlaps. GRATUIT/LOCATION never computes prices, separating booking and billing.
 - Indicateurs chien (dog_indicators) : 4 familles VERT/JAUNE/BLEU/NOIR, libellé obligatoire, jamais une note ; lisibles en vue opérationnelle. Pourquoi : adapter l'environnement, pas juger.
 - Fiches contextuelles via entity_peek(type,id) (champs autorisés + can_open) et le composant EntityPeek. Pourquoi : une seule source filtrée pour toutes les fenêtres.
-- Recherche et notifications : les fonctions de lecture filtrent côté base selon les droits, et les notifications métier sont émises par déclencheur plutôt que par l'interface. Pourquoi : ni fuite ni doublon.
+- Recherche et notifications : les fonctions de lecture filtrent côté base selon les droits, et les notifications métier sont émises par déclencheur plutôt que par l'interface.
 - Calendrier : agrège les tables métier (RLS) sans table calendrier. Pourquoi : aucune donnée dupliquée.
 - Réponses aux formulaires uniquement via submit_form_response ; un e-mail identique crée un rapprochement TO_REVIEW, jamais une personne. Pourquoi : pas de doublon ni d'identité présumée.
-- Finances : finance_entries = suivi opérationnel, jamais comptabilité ; écriture Bureau + finance.update, audit par trigger. Pourquoi : préparer la compta sans la remplacer.
-- HelloAsso : uniquement via import_helloasso_membership (idempotent sur source+external_id, ambiguïté ⇒ integration_events TO_REVIEW, journal systématique). Pourquoi : aucun doublon ni fusion automatique.
+- Finances : finance_entries = suivi opérationnel, jamais comptabilité ; écriture Bureau + finance.update, audit par trigger.
+- HelloAsso : uniquement via import_helloasso_membership (idempotent sur source+external_id, ambiguïté ⇒ integration_events TO_REVIEW, journal systématique).
 - IA : les serveurs IA lisent les données avec la session de l'utilisateur (RLS), jamais en admin ; propositions validées tracées dans ai_suggestions. Pourquoi : l'IA ne voit que ce que l'utilisateur voit.
 - External links use documents (URL, context, sensitivity, service) and ExternalLinks; embedded mode in tasks/reservations/formations. can_add_context_resource controls additions; SENSIBLE is Bureau-only. No sync: links work without APIs.
 
-- Dog profile creation and removal live in the reusable DogProfiles component on the foyer page; the personal profile only edits member details, keeping dog management in one place.
-- Manual stamp entry stays on the loyalty page; the professional home shows device-local pending requests and links there, avoiding duplicate forms and sync effects.
+- DogProfiles manages dogs only on foyer; profile edits members, avoiding duplicate management.
+- Manual stamps live only on loyalty; pro home shows local pending requests, avoiding duplicate forms.
 
-- Public partners reuse /association: read WordPress editorial listings without persistence/accounts, merging only published platform cards via the public RPC; membership consent and private perks stay separate.
+- Public partners reuse /association and published RPC cards; WordPress listings create no accounts, keeping consent and private perks separate.
+
+- Public visuals use PublicHeader/Footer, PublicPageIntro and scoped styles; auth and protected layouts stay independent to prevent regressions.
+- PublicSeo emits leaf-only canonicals; the sitemap includes editorial routes only, excluding private and token links.

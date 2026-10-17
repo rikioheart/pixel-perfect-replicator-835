@@ -1,3 +1,4 @@
+import { publicSeo } from '@/components/PublicSeo';
 import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
@@ -17,7 +18,9 @@ const platformOptions = queryOptions({ queryKey: ['public-platform-articles'], q
 export const Route = createFileRoute('/articles')({
   loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(articlesOptions), context.queryClient.ensureQueryData(platformOptions)]),
   head: () => ({
+    links: publicSeo('/articles').links,
     meta: [
+      ...publicSeo('/articles').meta,
       { title: 'Articles et guides — La Voix du Chien' },
       { name: 'description', content: 'Articles du blog de l’association La Voix du Chien et guides éducatifs pour mieux comprendre son chien.' },
       { property: 'og:title', content: 'Articles et guides — La Voix du Chien' },

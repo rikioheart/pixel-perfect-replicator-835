@@ -11,6 +11,7 @@ export function ProMap({ pros, onSelect }: { pros: Pin[]; onSelect?: (city: stri
   useEffect(() => {
     let map: import('leaflet').Map | null = null;
     let cancelled = false;
+    setNote(null);
     (async () => {
       const L = (await import('leaflet')).default;
       if (cancelled || !ref.current) return;
@@ -39,13 +40,13 @@ export function ProMap({ pros, onSelect }: { pros: Pin[]; onSelect?: (city: stri
       if (cancelled || !map) return;
       if (points.length) map.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 11 });
       else setNote(cities.length ? 'Localisation momentanément indisponible.' : 'Les professionnels apparaîtront ici dès leur référencement public.');
-    })();
+    })().catch(() => { if (!cancelled) setNote('La carte est momentanément indisponible. Les fiches restent consultables ci-dessous.'); });
     return () => { cancelled = true; map?.remove(); };
   }, [pros, onSelect]);
 
   return (
     <div className="space-y-2">
-      <div ref={ref} role="region" aria-label="Carte des professionnels référencés" className="relative z-0 h-80 w-full overflow-hidden rounded-xl border border-border sm:h-96" />
+      <div ref={ref} role="region" aria-label="Carte des professionnels référencés" className="relative z-0 h-80 w-full overflow-hidden rounded-lg border border-border sm:h-96" />
       {note && <p className="text-sm text-muted-foreground">{note}</p>}
     </div>
   );
