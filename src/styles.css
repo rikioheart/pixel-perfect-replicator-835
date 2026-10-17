@@ -273,3 +273,19 @@
  .public-story img { max-height: 360px; }
  .public-section h2, .public-story h2 { font-size: 1.6rem; }
 }
+
+/* Full-width public website (fonts from the association prototype, current colours kept). */
+.public-site { --font-display: "Fraunces", Georgia, serif; --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif; font-family: var(--font-sans); }
+.public-site h1, .public-site h2, .public-site h3 { font-family: var(--font-display); }
+.public-site .public-main { --gutter: max(1.25rem, calc((100% - 74rem) / 2)); max-width: none; padding: 0 0 2rem; }
+.public-site .public-main > *:not(.public-hero):not(.public-page-intro):not(.contents),
+.public-site .public-main > .contents > *:not(.public-hero) { margin-inline: var(--gutter); }
+.public-site .public-main > * + * { margin-top: 0; }
+.public-site .public-hero { border-radius: 0 0 50% 50% / 0 0 6% 6%; min-height: min(78vh, 680px); }
+.public-site .public-hero-copy { padding: 3rem var(--gutter); max-width: none; }
+.public-site .public-hero-copy > * { max-width: 40rem; }
+.public-site .public-hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 600; }
+.public-site .public-page-intro { background: var(--secondary); padding: 4rem var(--gutter) 3rem; margin-bottom: 2.5rem; border-radius: 0 0 50% 50% / 0 0 10% 10%; }
+.public-site .public-page-intro h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 600; }
+.public-site .public-section:last-child { border-bottom: 0; }
+.public-site .public-main > section + section, .public-site .public-main > div + section { margin-top: 1.5rem; }
