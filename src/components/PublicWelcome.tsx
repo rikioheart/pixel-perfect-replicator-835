@@ -17,7 +17,7 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
   const query = useQuery({queryKey:['public-home'], queryFn:async () => { const {data,error} = await supabase.rpc('get_public_home'); if(error) throw error; return data as unknown as Home; }});
   useEffect(() => { if(query.data) {try {localStorage.setItem('lvdc.public.home',JSON.stringify({...query.data,savedAt:new Date().toISOString()}));}catch{/* unavailable device storage */}} },[query.data]);
   const website = safeWebsite(query.data?.website);
-  return <div>
+  return <div className="contents">
     <OfflineStatus />
     <section className="public-hero">
       <img src={walk.url} alt="Des chiens et leurs humains se promènent ensemble sur un chemin" width={1920} height={1088} fetchPriority="high" />

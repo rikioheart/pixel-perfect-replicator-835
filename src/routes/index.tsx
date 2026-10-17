@@ -57,7 +57,7 @@ function AuthPage() {
   return (
     <div className="public-site min-h-screen bg-background">
       <PublicHeader />
-      <main id="contenu" className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
+      <main id="contenu" className="public-main">
       <PublicWelcome />
       <section id="connexion" aria-labelledby="member-title" className="public-section scroll-mt-24 grid items-start gap-8 lg:grid-cols-2">
         <div>

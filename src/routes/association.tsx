@@ -37,7 +37,7 @@ function PublicAssociationPage() {
     <div className="public-site min-h-screen bg-background">
       <PublicHeader />
 
-      <main id="contenu" className="public-main space-y-12 pt-6">
+      <main id="contenu" className="public-main">
         <PublicWelcome showPartnerLink={false} />
         <PublicPartnerDirectory />
 
