@@ -1,3 +1,4 @@
+import { publicSeo } from '@/components/PublicSeo';
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -21,7 +22,10 @@ import {
 
 export const Route = createFileRoute("/")({
   head: () => ({
+    scripts: [{ type: 'application/ld+json', children: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'La Voix du Chien', url: 'https://plateforme-la-voix-du-chien.lovable.app/', areaServed: ['Seine-et-Marne', 'Loiret', 'Yonne', 'Essonne'], description: 'Association pour le bien-être du chien, la coopération et l’entraide.' }) }],
+    links: publicSeo('/').links,
     meta: [
+      ...publicSeo('/').meta,
       { title: "La Voix du Chien — Ensemble, à leur rythme" },
       {
         name: "description",

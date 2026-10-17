@@ -1,3 +1,4 @@
+import { publicSeo } from '@/components/PublicSeo';
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, CalendarDays, Dog, Gift, Globe, Handshake, Mail, MapPin, Phone } from "lucide-react";
@@ -8,8 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { LoadingState } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/professionnels/$slug")({
-  head: () => ({
+  head: ({ params }) => ({
+    links: publicSeo(`/professionnels/${encodeURIComponent(params.slug)}`).links,
     meta: [
+      ...publicSeo(`/professionnels/${encodeURIComponent(params.slug)}`).meta,
       { title: "Carte professionnelle — La Voix du Chien" },
       {
         name: "description",

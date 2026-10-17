@@ -1,3 +1,4 @@
+import { publicSeo } from '@/components/PublicSeo';
 import { PublicPageIntro } from '@/components/PublicPageIntro';
 import { useMemo, useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
@@ -16,7 +17,9 @@ const prosOptions = queryOptions({ queryKey: ['public-pros-list'], queryFn: () =
 export const Route = createFileRoute('/professionnels/')({
   loader: ({ context }) => context.queryClient.ensureQueryData(prosOptions),
   head: () => ({
+    links: publicSeo('/professionnels').links,
     meta: [
+      ...publicSeo('/professionnels').meta,
       { title: 'Professionnels référencés — La Voix du Chien' },
       { name: 'description', content: 'Les professionnels du réseau La Voix du Chien validés par le Bureau, filtrables par métier et localisation.' },
       { property: 'og:title', content: 'Professionnels référencés — La Voix du Chien' },
