@@ -57,12 +57,20 @@ function AuthPage() {
   return (
     <div className="public-site min-h-screen bg-background">
       <PublicHeader />
-      <main id="contenu" className="mx-auto grid max-w-7xl items-start gap-8 px-4 py-6 sm:px-8 lg:grid-cols-3">
-      <section className="min-w-0 lg:col-span-2"><PublicWelcome /></section>
-      <section id="connexion" className="scroll-mt-5 lg:sticky lg:top-6">
+      <main id="contenu" className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
+      <PublicWelcome />
+      <section id="connexion" aria-labelledby="member-title" className="public-section scroll-mt-24 grid items-start gap-8 lg:grid-cols-2">
+        <div>
+          <p className="public-eyebrow mb-3">Adhérents et professionnels</p>
+          <h2 id="member-title">Votre espace membre</h2>
+          <p className="mt-4 text-muted-foreground">Un seul accès pour suivre votre chien et participer à la vie de l’association.</p>
+          <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+            <li>• Le carnet de vie de votre chien</li>
+            <li>• Vos sorties, réservations et carte de fidélité</li>
+            <li>• Les projets, tâches et actualités de l’association</li>
+          </ul>
+        </div>
         <div className="panel w-full p-5 sm:p-6">
-          <h2 className="mb-2 text-xl">Votre espace associatif</h2>
-          <p className="mb-5 text-sm text-muted-foreground">Retrouvez votre chien, vos sorties et votre participation à la vie de l’association.</p>
           <GoogleSignInButton />
           <Tabs defaultValue="signin">
             <TabsList className="mb-6 grid w-full grid-cols-2">
