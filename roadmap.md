@@ -1,10 +1,13 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
 ## Lot 22 — Site public inspiré de paws-places
-- [ ] Comparer le ZIP et le dépôt public, sans importer accès ni données
-- [ ] Harmoniser accueil, association, activités, agenda, articles et annuaire ; préserver intégralement la connexion
-- [ ] Améliorer navigation mobile, référencement et repères interactifs
-- [ ] Vérifier pages, filtres, lecture et connexion sur téléphone et ordinateur
+- [x] Comparer le ZIP et le dépôt public, sans importer accès ni données
+- [x] Harmoniser accueil, association, activités, agenda, articles et annuaire ; préserver intégralement la connexion
+- [x] Améliorer navigation mobile, référencement et repères interactifs
+- [x] Vérifier pages, filtres, lecture et connexion sur téléphone et ordinateur
+  - 37 tests réussis, aperçu compilé sans erreur, six pages publiques contrôlées à 1280px et 390px sans débordement ni erreur JavaScript. Menu mobile, fiches partenaires, guides et onglets connexion/inscription vérifiés. Canonicals uniques, sitemap public et présentation structurée de l’association ajoutés.
+  - Connexion, codes, administration, données et permissions inchangés. Aucun import des accès, migrations ou sauvegardes de l’autre projet.
+  - Limites : carte sans professionnels publiés et agenda sans activité publique lors du contrôle ; ni réservation ni nouvelle authentification testées dans ce lot visuel. Aucun ajout Google Business. Mise en ligne et effets SEO publics attendent une publication.
 
 ## Lot 21 — Site internet unifié : vitrine, carte et agenda
 - [x] Page d'accueil transformée en vraie vitrine : en-tête et pied de page communs à toutes les pages publiques, réseau (77/45/89/91), bloc « Nos activités » repris du WordPress
