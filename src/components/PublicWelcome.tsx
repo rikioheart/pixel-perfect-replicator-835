@@ -26,7 +26,7 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
         <h1>La Voix<br />du Chien</h1>
         <p className="hero-slogan">Le chien au cœur. L’humain à ses côtés.</p>
         <p className="hero-description">Des rencontres, des petites étapes et de l’entraide pour mieux vivre ensemble, sans jugement ni compétition.</p>
-        <Button asChild variant="secondary" className="mt-6"><Link to="/professionnels"><MapPin aria-hidden />Rencontrer les professionnels<ArrowUpRight aria-hidden /></Link></Button>
+        <div className="mt-6 flex flex-wrap gap-3"><Button asChild variant="secondary"><Link to="/professionnels"><MapPin aria-hidden />Rencontrer les professionnels<ArrowUpRight aria-hidden /></Link></Button><Button asChild><a href="#connexion">Accès membre</a></Button></div>
       </div>
     </section>
     <nav aria-label="Découvrir l’association" className="public-discovery">
