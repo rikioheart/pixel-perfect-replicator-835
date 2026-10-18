@@ -257,8 +257,6 @@
 .public-story img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 45% 45% .5rem .5rem; }
 .public-story h2 { font-size: 2rem; line-height: 1.35; }
 .public-site .panel:not(#connexion .panel), .public-site [data-slot="card"] { box-shadow: none; border-radius: .5rem; }
-.public-site .leaflet-container { font-family: var(--font-sans); }
-.public-site .leaflet-popup-content a { display: block; color: var(--primary); padding: .4rem 0; }
 @media (max-width: 639px) {
  .public-header-inner { min-height: 80px; padding: .8rem 1rem; gap: .4rem; }
  .public-main { padding: 0 1.25rem 1.5rem; }
