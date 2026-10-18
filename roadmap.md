@@ -188,3 +188,4 @@
 - [ ] URL officielle du site à renseigner dans la configuration existante
 
 Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers chiens privés mis en cache. Sans réseau, aucune adhésion ou attribution n’est certifiée. La synchronisation nécessite de rouvrir l’espace pro avec du réseau le jour même. Après changement de jour, vérifier avec le Bureau (RPC actuel utilise la date serveur). Aucune migration historique supprimée ou rejouée.
+- [x] Lot 23 : site public pleine largeur, polices du prototype (Fraunces/Outfit), 3 activités d'exemple ; pros réels à saisir par le Bureau
