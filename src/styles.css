@@ -285,7 +285,7 @@
 .public-site .public-hero-copy { padding: 3rem var(--gutter); max-width: none; }
 .public-site .public-hero-copy > * { max-width: 40rem; }
 .public-site .public-hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 600; }
-.public-site .public-page-intro { background: var(--secondary); padding: 4rem var(--gutter) 3rem; margin-bottom: 2.5rem; border-radius: 0 0 50% 50% / 0 0 10% 10%; }
+.public-site .public-page-intro { background: color-mix(in oklch, var(--primary) 7%, var(--card)); color: var(--foreground); padding: 4rem var(--gutter) 3rem; margin-bottom: 2.5rem; border-radius: 0 0 50% 50% / 0 0 10% 10%; }
 .public-site .public-page-intro h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 600; }
 .public-site .public-section:last-child { border-bottom: 0; }
 .public-site .public-main > section + section, .public-site .public-main > div + section { margin-top: 1.5rem; }
