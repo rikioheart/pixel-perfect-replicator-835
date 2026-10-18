@@ -5,7 +5,6 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { Briefcase, MapPin } from 'lucide-react';
 import { PublicFooter, PublicHeader } from '@/components/PublicHeader';
-import { ProMap } from '@/components/ProMap';
 import { getPublicPros } from '@/lib/public-articles.functions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,8 +44,7 @@ function ProsPage() {
     <div className="public-site min-h-screen bg-background">
       <PublicHeader />
       <main id="contenu" className="public-main space-y-8">
-        <PublicPageIntro eyebrow="Un réseau de confiance" title="Professionnels référencés">Professionnels membres de l’association, validés par le Bureau, qui ont choisi d’apparaître publiquement.</PublicPageIntro>
-        <ProMap pros={data.pros} onSelect={setPlace} />
+        <PublicPageIntro eyebrow="Un réseau de confiance" title="Professionnels référencés">Des professionnels validés par le Bureau, qui ont choisi les informations qu’ils rendent publiques.</PublicPageIntro>
         {data.pros.length > 0 && (
           <div className="grid max-w-xl gap-3 sm:grid-cols-2">
             <div><Label htmlFor="f-job">Métier</Label><select id="f-job" className={sel} value={job} onChange={(e) => setJob(e.target.value)}><option value="">Tous les métiers</option>{jobs.map((j) => <option key={j}>{j}</option>)}</select></div>
