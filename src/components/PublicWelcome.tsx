@@ -32,7 +32,7 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
     <nav aria-label="Découvrir l’association" className="public-discovery">
       <Link to="/agenda"><CalendarDays className="size-5" aria-hidden /><span>Les prochaines rencontres</span></Link>
       {showPartnerLink && <Link to="/association" hash="partenaires"><HeartHandshake className="size-5" aria-hidden /><span>Découverte des partenaires</span></Link>}
-      <Link to="/articles"><BookOpen className="size-5" aria-hidden /><span>Articles et guides</span></Link>
+      <a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer"><BookOpen className="size-5" aria-hidden /><span>Articles sur notre site officiel</span></a>
     </nav>
     <section className="public-section" aria-labelledby="values-title">
       <p className="public-eyebrow mb-3">Notre philosophie</p>

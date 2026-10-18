@@ -9,7 +9,6 @@ const NAV = [
   { to: '/association', label: 'Association' },
   { to: '/services', label: 'Activités' },
   { to: '/agenda', label: 'Agenda' },
-  { to: '/articles', label: 'Articles' },
   { to: '/professionnels', label: 'Professionnels' },
 ] as const;
 
@@ -45,7 +44,7 @@ export function PublicFooter() {
       <div className="mx-auto grid max-w-7xl gap-9 px-5 py-12 text-sm md:grid-cols-[1.4fr_1fr_1fr] sm:px-8">
         <div><PawPrint className="mb-4 size-7 text-ochre" aria-hidden /><p className="font-display text-xl">La Voix du Chien</p><p className="mt-3 max-w-xs opacity-80">Le chien au cœur, l’humain à ses côtés.</p><p className="mt-5 text-xs opacity-70">Association · Nargis, Loiret</p></div>
         <div><p className="font-medium">Un réseau de proximité</p><ul className="mt-4 space-y-2 opacity-80">{ZONES.map((z) => <li key={z}>{z}</li>)}</ul></div>
-        <div><p className="mb-3 font-medium">Explorer le site</p><nav aria-label="Pied de page" className="grid gap-1">{NAV.map((n) => <Link key={n.to} to={n.to} className="w-fit py-1 hover:underline">{n.label}</Link>)}</nav></div>
+        <div><p className="mb-3 font-medium">Explorer le site</p><nav aria-label="Pied de page" className="grid gap-1">{NAV.map((n) => <Link key={n.to} to={n.to} className="w-fit py-1 hover:underline">{n.label}</Link>)}<a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer" className="w-fit py-1 hover:underline">Site officiel et articles ↗</a></nav></div>
       </div>
       <div className="mx-auto max-w-7xl border-t border-navy-foreground/20 px-5 py-5 text-xs text-navy-foreground/70 sm:px-8">La Voix du Chien · Respect, coopération et entraide</div>
     </footer>
