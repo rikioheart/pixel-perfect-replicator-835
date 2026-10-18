@@ -178,7 +178,7 @@ function BlogPage() {
                     <Label htmlFor="bl-pdf">Document PDF à joindre</Label>
                     <Input id="bl-pdf" type="file" accept="application/pdf" onChange={(e) => setPdf(e.target.files?.[0] ?? null)} />
                   </div>
-                  <p className="text-xs text-muted-foreground sm:col-span-2">Une fois l’article publié, la photo et le PDF sont visibles par tous sur la page publique Articles.</p>
+                  <p className="text-xs text-muted-foreground sm:col-span-2">Une fois l’article publié, la photo et le PDF sont réservés aux membres sur la plateforme ; les articles publics sont sur lavoixduchien.fr.</p>
                 </div>
               ) : null}
               {isBureau ? (
