@@ -9,7 +9,7 @@ const NAV = [
   { to: '/association', label: 'Association' },
   { to: '/services', label: 'Activités' },
   { to: '/agenda', label: 'Agenda' },
-  { to: '/professionnels', label: 'Professionnels' },
+  { to: '/professionnels', label: 'Partenaires' },
 ] as const;
 
 export function PublicHeader() {
