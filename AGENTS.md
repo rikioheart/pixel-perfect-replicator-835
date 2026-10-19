@@ -43,4 +43,4 @@
 - PublicPartnerDirectory shares getPublicPros/list_public_pros on /association and /professionnels, without WordPress merging. Why: respect profile publication choices.
 
 - Public UI uses PublicHeader/Footer, PublicPageIntro and scoped styles. Keep auth/private layouts independent to prevent regressions.
-- PublicSeo emits leaf-only canonicals; the sitemap includes editorial routes only, excluding private and token links.
+- PublicSeo sets leaf canonicals; sitemap lists editorial routes only, never private/token URLs.
