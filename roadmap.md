@@ -1,5 +1,11 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Simplification publique — 19 octobre
+- [ ] Partenaires compacts sans description, depuis les profils publiés uniquement
+- [ ] Page Professionnels renommée Partenaires sans changement d’adresse
+- [ ] Accueil : description des activités sans cartes ; Agenda conservé
+- [ ] Vérification des pages et conseil sur le retrait de l’onglet Activités
+
 ## Lot 22 — Site public inspiré de paws-places
 - [x] Comparer le ZIP et le dépôt public, sans importer accès ni données
 - [x] Harmoniser accueil, association, activités, agenda, articles et annuaire ; préserver intégralement la connexion

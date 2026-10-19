@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { PawPrint, HeartHandshake, Leaf, CalendarDays, MapPin, ArrowUpRight, BookOpen, Compass, Footprints } from 'lucide-react';
+import { PawPrint, HeartHandshake, Leaf, CalendarDays, ArrowUpRight, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import walk from '@/assets/public/walk.asset.json';
 import companion from '@/assets/public/companion.asset.json';
 import { Button } from '@/components/ui/button';
 import { OfflineStatus } from './OfflineStatus';
-import { SERVICES, ZONES, ABOUT } from '@/lib/site-content';
+import { ZONES, ABOUT } from '@/lib/site-content';
 
 type Home = { activities: {id:string;title:string;date:string;location:string|null;image_url:string|null}[]; website:string|null };
 export function safeWebsite(value: string | null | undefined) {
@@ -26,12 +26,12 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
         <h1>La Voix<br />du Chien</h1>
         <p className="hero-slogan">Le chien au cœur. L’humain à ses côtés.</p>
         <p className="hero-description">Des rencontres, des petites étapes et de l’entraide pour mieux vivre ensemble, sans jugement ni compétition.</p>
-        <div className="mt-6 flex flex-wrap gap-3"><Button asChild variant="secondary"><Link to="/professionnels"><MapPin aria-hidden />Rencontrer les professionnels<ArrowUpRight aria-hidden /></Link></Button><Button asChild><a href="#connexion">Accès membre</a></Button></div>
+        <div className="mt-6 flex flex-wrap gap-3"><Button asChild variant="secondary"><Link to="/professionnels"><HeartHandshake aria-hidden />Nos partenaires<ArrowUpRight aria-hidden /></Link></Button><Button asChild><Link to="/" hash="connexion">Accès membre</Link></Button></div>
       </div>
     </section>
     <nav aria-label="Découvrir l’association" className="public-discovery">
       <Link to="/agenda"><CalendarDays className="size-5" aria-hidden /><span>Les prochaines rencontres</span></Link>
-      {showPartnerLink && <Link to="/association" hash="partenaires"><HeartHandshake className="size-5" aria-hidden /><span>Découverte des partenaires</span></Link>}
+      {showPartnerLink && <Link to="/professionnels"><HeartHandshake className="size-5" aria-hidden /><span>Découverte des partenaires</span></Link>}
       <a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer"><BookOpen className="size-5" aria-hidden /><span>Articles sur notre site officiel</span></a>
     </nav>
     <section className="public-section" aria-labelledby="values-title">
@@ -47,12 +47,12 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
     <section className="public-section" aria-labelledby="services-title">
       <p className="public-eyebrow mb-3">Comprendre, accompagner, partager</p>
       <h2 id="services-title">Nos activités</h2>
-      <p className="mt-3 text-sm text-muted-foreground">Un réseau présent en {ZONES.join(', ')}.</p>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">{SERVICES.map((s,i) => {const Icon = [HeartHandshake,PawPrint,Leaf,Compass,BookOpen,Footprints][i] ?? PawPrint;return <Link key={s.slug} to="/services" hash={s.slug} className="public-service-link"><Icon className="mb-3 size-5 text-primary" aria-hidden /><h3>{s.title}</h3><p className="mt-2 text-sm text-muted-foreground">{s.summary}</p><ArrowUpRight className="mt-3 size-4 text-primary" aria-hidden /></Link>;})}</div>
-    </section>
-    <section className="public-section" aria-labelledby="month-title">
-      <div className="flex flex-wrap items-center justify-between gap-3"><h2 id="month-title">À partager ce mois-ci</h2><Button asChild variant="link" className="px-0"><Link to="/agenda">Tout l’agenda<ArrowUpRight aria-hidden /></Link></Button></div>
-      {query.isPending ? <p role="status" className="mt-4 text-sm">Chargement des rencontres…</p> : query.isError ? <p className="mt-4 text-sm">Les activités ne sont pas disponibles pour le moment.</p> : !query.data?.activities.length ? <p className="mt-5 border-l-2 border-sage py-2 pl-4 text-sm text-muted-foreground">De nouvelles rencontres se préparent. Revenez bientôt découvrir le programme.</p> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{query.data.activities.map(a => <article key={a.id} className="panel overflow-hidden">{a.image_url && <img src={a.image_url} alt="" loading="lazy" className="aspect-video w-full object-cover" />}<div className="p-4"><p className="text-sm font-medium text-primary">{new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',timeZone:'Europe/Paris'})}</p><h3 className="mt-2 text-lg">{a.title}</h3>{a.location && <p className="mt-2 flex gap-2 text-sm text-muted-foreground"><MapPin className="size-4" aria-hidden />{a.location}</p>}</div></article>)}</div>}
+      <div className="mt-4 max-w-3xl space-y-3 text-muted-foreground">
+        <p>Balades collectives, ateliers à thème, jeux de flair et activités sportives permettent de partager, d’apprendre et de renforcer la relation avec son chien. L’éducation et l’accompagnement comportemental prennent en compte ses émotions, ses besoins et le rythme de chaque duo.</p>
+        <p>Les professionnels partenaires accompagnent les rencontres dans un cadre bienveillant, sans compétition. Un bilan préalable permet d’orienter chaque chien vers les activités adaptées.</p>
+        <p className="text-sm">Notre réseau intervient en {ZONES.join(', ')}. Les dates ouvertes à la participation sont disponibles dans l’agenda.</p>
+        <a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-primary underline underline-offset-4">En savoir plus sur nos activités<ArrowUpRight className="size-4" aria-hidden /></a>
+      </div>
     </section>
     <section className="public-story" aria-labelledby="story-title">
       <img src={companion.url} alt="Un moment de complicité entre une personne et son chien" width={1200} height={1408} loading="lazy" />

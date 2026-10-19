@@ -38,9 +38,9 @@
 - External links use documents (URL, context, sensitivity, service) and ExternalLinks; embedded mode in tasks/reservations/formations. can_add_context_resource controls additions; SENSIBLE is Bureau-only. No sync: links work without APIs.
 
 - DogProfiles manages dogs only on foyer; profile edits members, avoiding duplicate management.
-- Manual stamps live only on loyalty; pro home shows local pending requests, avoiding duplicate forms.
+- Manual stamps live on loyalty; pro home shows pending requests. Why: avoid duplicate forms.
 
-- Public partners reuse /association and published RPC cards; WordPress listings create no accounts, keeping consent and private perks separate.
+- PublicPartnerDirectory shares getPublicPros/list_public_pros on /association and /professionnels, without WordPress merging. Why: respect profile publication choices.
 
 - Public visuals use PublicHeader/Footer, PublicPageIntro and scoped styles; auth and protected layouts stay independent to prevent regressions.
 - PublicSeo emits leaf-only canonicals; the sitemap includes editorial routes only, excluding private and token links.

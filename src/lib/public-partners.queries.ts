@@ -1,8 +1,8 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getPublicPartners } from './public-partners.functions';
+import { getPublicPros } from './public-articles.functions';
 
 export const publicPartnersOptions = queryOptions({
-  queryKey: ['public-partner-directory'],
-  queryFn: () => getPublicPartners(),
+  queryKey: ['public-pros-list'],
+  queryFn: () => getPublicPros(),
   staleTime: 5 * 60 * 1000,
 });
