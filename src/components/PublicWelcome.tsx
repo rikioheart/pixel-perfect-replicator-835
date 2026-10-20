@@ -58,5 +58,10 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
       <img src={companion.url} alt="Un moment de complicité entre une personne et son chien" width={1200} height={1408} loading="lazy" />
       <div><p className="public-eyebrow mb-3">Le vivant, au quotidien</p><h2 id="story-title">Des humains au service des chiens.</h2><p className="mt-4 text-sm text-muted-foreground">{ABOUT.intro}</p><p className="mt-3 text-sm text-muted-foreground">{ABOUT.network}</p>{website && <Button asChild variant="link" className="mt-4 px-0"><a href={website} target="_blank" rel="noopener noreferrer">Notre site internet<ArrowUpRight aria-hidden /></a></Button>}</div>
     </section>
+    <section className="public-section text-center" aria-labelledby="support-title">
+      <h2 id="support-title">Envie d’en savoir plus ou de soutenir l’association ?</h2>
+      <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">Articles, adhésion et dons sont réunis sur notre site officiel. Déjà adhérent ? Rejoignez l’espace membre pour participer à la vie associative.</p>
+      <div className="mt-6 flex flex-wrap justify-center gap-3"><Button asChild><a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer">Visiter lavoixduchien.fr<ArrowUpRight aria-hidden /></a></Button><Button asChild variant="outline"><Link to="/" hash="connexion">Espace membre</Link></Button></div>
+    </section>
   </div>;
 }
