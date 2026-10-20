@@ -6,9 +6,7 @@ import { useState } from 'react';
 import { Menu, X, LogIn, PawPrint } from 'lucide-react';
 
 const NAV = [
-  { to: '/association', label: 'Association' },
-  { to: '/services', label: 'Activités' },
-  { to: '/agenda', label: 'Agenda' },
+  { to: '/', label: 'Accueil' },
   { to: '/professionnels', label: 'Partenaires' },
 ] as const;
 
