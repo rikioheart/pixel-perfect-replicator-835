@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { ArrowRight, HeartHandshake, MapPin, Search, X } from 'lucide-react';
+import { ArrowRight, ExternalLink, Globe, HeartHandshake, MapPin, Search, X } from 'lucide-react';
 import { publicPartnersOptions } from '@/lib/public-partners.queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,7 @@ export function PublicPartnerDirectory({ showTitle = true }: { showTitle?: boole
       <h3 className="break-words text-base leading-snug">{p.name}</h3>
       {(p.sector || p.specialties.length > 0) && <p className="line-clamp-2 text-sm text-muted-foreground">{[...new Set([p.sector, ...p.specialties].filter(Boolean))].slice(0, 2).join(' · ')}</p>}
       {p.city && <p className="flex items-start gap-2 text-sm text-muted-foreground"><MapPin className="mt-0.5 size-4 shrink-0" aria-hidden /><span>{p.city}</span></p>}
+      {p.links.length > 0 && <div className="flex flex-wrap gap-x-3 gap-y-1">{p.links.map(link => <Button key={link.url} asChild variant="link" size="sm" className="h-auto max-w-full px-0 py-2"><a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={`${link.label} de ${p.name} (nouvel onglet)`}>{link.label === 'Site internet' ? <Globe aria-hidden /> : <ExternalLink aria-hidden />}<span className="break-words whitespace-normal">{link.label}</span></a></Button>)}</div>}
       <Button asChild variant="link" className="mt-auto h-auto justify-start self-start px-0 py-1"><Link to="/professionnels/$slug" params={{ slug: p.slug }}>Voir la fiche<ArrowRight aria-hidden /></Link></Button>
     </article>)}</div>}
   </section>;
