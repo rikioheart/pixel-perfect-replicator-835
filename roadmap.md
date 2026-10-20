@@ -3,7 +3,8 @@
 ## Liens des partenaires — demande actuelle
 - [x] Examiner les profils existants et leurs choix de publication
 - [x] Afficher site et réseaux publiés sur les fiches compactes, sans données privées ni doublons
-- [ ] Vérifier les tests et la page publique ; préciser l’absence de profils disponibles
+- [x] Vérifier les tests et la page publique ; préciser l’absence de profils disponibles
+  - 12 tests réussis, aperçu sans erreur, page réelle vérifiée. Aucune fiche professionnelle enregistrée : liens sur une fiche réelle non vérifiables, aucun profil inventé ni rendu public sans consentement.
 
 ## Simplification publique — 19 octobre
 - [x] Partenaires compacts sans description, depuis les profils publiés uniquement
