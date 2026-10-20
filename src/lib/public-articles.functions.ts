@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { createClient } from '@supabase/supabase-js';
 import { parseWordPressPosts, type PlatformArticle } from './public-articles';
+import { publicProLinks, type PublicProLink } from './public-pro-links';
 
 export const getWordPressArticles = createServerFn({ method: 'GET' }).handler(async () => {
   try {
@@ -43,7 +44,7 @@ export const getPlatformArticles = createServerFn({ method: 'GET' }).handler(asy
   });
 });
 
-export type PublicPro = { slug: string; name: string; specialties: string[]; sector: string | null; city: string | null };
+export type PublicPro = { slug: string; name: string; specialties: string[]; sector: string | null; city: string | null; links: PublicProLink[] };
 
 /** Professionnels publiés et validés par le Bureau (RPC publique existante). */
 export const getPublicPros = createServerFn({ method: 'GET' }).handler(async () => {
@@ -58,5 +59,12 @@ export const getPublicPros = createServerFn({ method: 'GET' }).handler(async () 
   const { data, error } = await client.rpc('list_public_pros');
   if (error) { console.error('list_public_pros failed:', error); return { pros: [] as PublicPro[], unavailable: true }; }
   const rows = (data ?? []) as { slug: string; display_name: string; specialties: string[] | null; sector: string | null; public_city: string | null }[];
-  return { pros: rows.map((r) => ({ slug: r.slug, name: r.display_name, specialties: r.specialties ?? [], sector: r.sector, city: r.public_city })), unavailable: false };
+  const pros = await Promise.all(rows.map(async (r) => {
+    // Recheck publication through the existing public projection, never private details.
+    const { data: page, error: pageError } = await client.rpc('get_public_pro_page', { _slug: r.slug });
+    if (pageError) console.error('Public professional links unavailable:', pageError);
+    const published = page as { website_url?: unknown; social_links?: unknown } | null;
+    return { slug: r.slug, name: r.display_name, specialties: r.specialties ?? [], sector: r.sector, city: r.public_city, links: publicProLinks(published?.website_url, published?.social_links) };
+  }));
+  return { pros, unavailable: false };
 });

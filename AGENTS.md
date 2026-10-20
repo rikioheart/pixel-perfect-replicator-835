@@ -40,7 +40,7 @@
 - DogProfiles manages dogs only on foyer; profile edits members, avoiding duplicate management.
 - Manual stamps live on loyalty; pro home shows pending requests. Why: avoid duplicate forms.
 
-- PublicPartnerDirectory shares getPublicPros/list_public_pros on /association and /professionnels, without WordPress merging. Why: honor publication choices.
+- PublicPartnerDirectory uses list_public_pros/get_public_pro_page with safe HTTP(S) links, no WordPress merge. Why: honor publication choices.
 
 - Public UI uses PublicHeader/Footer, PublicPageIntro and scoped styles. Keep auth/private layouts independent to prevent regressions.
 - PublicSeo sets leaf canonicals; sitemap lists editorial routes only, never private/token URLs.

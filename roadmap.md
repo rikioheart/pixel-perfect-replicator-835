@@ -1,5 +1,10 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Liens des partenaires — demande actuelle
+- [x] Examiner les profils existants et leurs choix de publication
+- [x] Afficher site et réseaux publiés sur les fiches compactes, sans données privées ni doublons
+- [ ] Vérifier les tests et la page publique ; préciser l’absence de profils disponibles
+
 ## Simplification publique — 19 octobre
 - [x] Partenaires compacts sans description, depuis les profils publiés uniquement
 - [x] Page Professionnels renommée Partenaires sans changement d’adresse
