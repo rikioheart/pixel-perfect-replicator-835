@@ -117,15 +117,17 @@ function CalendarPage() {
   const Chip = ({ item, compact }: { item: Item; compact?: boolean }) => {
     const K = KINDS[item.kind];
     const Icon = K.icon;
+    // Inside EntityPeek the trigger is already a button: render a span to avoid nested buttons.
+    const Tag = K.peek ? "span" : "button";
     const body = (
-      <button type="button" className={`flex w-full min-w-0 items-center gap-2 rounded-lg border bg-card text-left ${compact ? "px-1.5 py-1" : "px-4 py-3"} ${item.conflict ? "border-destructive" : "border-border"} hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring`}>
+      <Tag {...(K.peek ? {} : { type: "button" as const })} className={`flex w-full min-w-0 items-center gap-2 rounded-lg border bg-card text-left ${compact ? "px-1.5 py-1" : "px-4 py-3"} ${item.conflict ? "border-destructive" : "border-border"} hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring`}>
         <Icon className="size-3.5 shrink-0 text-primary" aria-hidden />
         <span className="min-w-0">
           <span className={`block truncate font-semibold ${compact ? "text-[11px]" : "text-sm"}`}>{item.title}</span>
           {!compact && <span className="block truncate text-xs text-muted-foreground">{K.label}{item.detail ? ` · ${item.detail}` : ""}</span>}
         </span>
         {item.conflict && <AlertTriangle className="ml-auto size-3.5 shrink-0 text-destructive" aria-label="Chevauchement de créneau" />}
-      </button>
+      </Tag>
     );
     return K.peek ? <EntityPeek type={K.peek} id={item.rawId}>{body}</EntityPeek> : body;
   };
