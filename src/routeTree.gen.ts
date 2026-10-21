@@ -23,6 +23,7 @@ import { Route as AuthenticatedCharterRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedContestsRouteImport } from './routes/_authenticated/contests'
 import { Route as AuthenticatedDirectoryRouteImport } from './routes/_authenticated/directory'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
+import { Route as AuthenticatedEspaceProRouteImport } from './routes/_authenticated/espace-pro'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedFormationsRouteImport } from './routes/_authenticated/formations'
 import { Route as AuthenticatedFormsRouteImport } from './routes/_authenticated/forms'
@@ -149,6 +150,11 @@ const AuthenticatedDirectoryRoute = AuthenticatedDirectoryRouteImport.update({
 const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEspaceProRoute = AuthenticatedEspaceProRouteImport.update({
+  id: '/espace-pro',
+  path: '/espace-pro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
@@ -394,27 +400,27 @@ const AuthenticatedAdminValidationRoute =
   } as any)
 const AuthenticatedEspaceProIndexRoute =
   AuthenticatedEspaceProIndexRouteImport.update({
-    id: '/espace-pro/',
-    path: '/espace-pro/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedEspaceProRoute,
   } as any)
 const AuthenticatedEspaceProCarteRoute =
   AuthenticatedEspaceProCarteRouteImport.update({
-    id: '/espace-pro/carte',
-    path: '/espace-pro/carte',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/carte',
+    path: '/carte',
+    getParentRoute: () => AuthenticatedEspaceProRoute,
   } as any)
 const AuthenticatedEspaceProChiensRoute =
   AuthenticatedEspaceProChiensRouteImport.update({
-    id: '/espace-pro/chiens',
-    path: '/espace-pro/chiens',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/chiens',
+    path: '/chiens',
+    getParentRoute: () => AuthenticatedEspaceProRoute,
   } as any)
 const AuthenticatedEspaceProCollaborationsRoute =
   AuthenticatedEspaceProCollaborationsRouteImport.update({
-    id: '/espace-pro/collaborations',
-    path: '/espace-pro/collaborations',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/collaborations',
+    path: '/collaborations',
+    getParentRoute: () => AuthenticatedEspaceProRoute,
   } as any)
 const AuthenticatedEventsIndexRoute =
   AuthenticatedEventsIndexRouteImport.update({
@@ -484,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/contests': typeof AuthenticatedContestsRoute
   '/directory': typeof AuthenticatedDirectoryRoute
   '/documents': typeof AuthenticatedDocumentsRoute
+  '/espace-pro': typeof AuthenticatedEspaceProRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRoute
   '/formations': typeof AuthenticatedFormationsRoute
   '/forms': typeof AuthenticatedFormsRoute
@@ -632,6 +639,7 @@ export interface FileRoutesById {
   '/_authenticated/contests': typeof AuthenticatedContestsRoute
   '/_authenticated/directory': typeof AuthenticatedDirectoryRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
+  '/_authenticated/espace-pro': typeof AuthenticatedEspaceProRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/formations': typeof AuthenticatedFormationsRoute
   '/_authenticated/forms': typeof AuthenticatedFormsRoute
@@ -707,6 +715,7 @@ export interface FileRouteTypes {
     | '/contests'
     | '/directory'
     | '/documents'
+    | '/espace-pro'
     | '/finance'
     | '/formations'
     | '/forms'
@@ -854,6 +863,7 @@ export interface FileRouteTypes {
     | '/_authenticated/contests'
     | '/_authenticated/directory'
     | '/_authenticated/documents'
+    | '/_authenticated/espace-pro'
     | '/_authenticated/finance'
     | '/_authenticated/formations'
     | '/_authenticated/forms'
@@ -1026,6 +1036,13 @@ declare module '@tanstack/react-router' {
       path: '/documents'
       fullPath: '/documents'
       preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/espace-pro': {
+      id: '/_authenticated/espace-pro'
+      path: '/espace-pro'
+      fullPath: '/espace-pro'
+      preLoaderRoute: typeof AuthenticatedEspaceProRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/finance': {
@@ -1345,31 +1362,31 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/espace-pro/': {
       id: '/_authenticated/espace-pro/'
-      path: '/espace-pro'
+      path: '/'
       fullPath: '/espace-pro/'
       preLoaderRoute: typeof AuthenticatedEspaceProIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedEspaceProRoute
     }
     '/_authenticated/espace-pro/carte': {
       id: '/_authenticated/espace-pro/carte'
-      path: '/espace-pro/carte'
+      path: '/carte'
       fullPath: '/espace-pro/carte'
       preLoaderRoute: typeof AuthenticatedEspaceProCarteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedEspaceProRoute
     }
     '/_authenticated/espace-pro/chiens': {
       id: '/_authenticated/espace-pro/chiens'
-      path: '/espace-pro/chiens'
+      path: '/chiens'
       fullPath: '/espace-pro/chiens'
       preLoaderRoute: typeof AuthenticatedEspaceProChiensRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedEspaceProRoute
     }
     '/_authenticated/espace-pro/collaborations': {
       id: '/_authenticated/espace-pro/collaborations'
-      path: '/espace-pro/collaborations'
+      path: '/collaborations'
       fullPath: '/espace-pro/collaborations'
       preLoaderRoute: typeof AuthenticatedEspaceProCollaborationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedEspaceProRoute
     }
     '/_authenticated/events/': {
       id: '/_authenticated/events/'
@@ -1437,6 +1454,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedEspaceProRouteChildren {
+  AuthenticatedEspaceProCarteRoute: typeof AuthenticatedEspaceProCarteRoute
+  AuthenticatedEspaceProChiensRoute: typeof AuthenticatedEspaceProChiensRoute
+  AuthenticatedEspaceProCollaborationsRoute: typeof AuthenticatedEspaceProCollaborationsRoute
+  AuthenticatedEspaceProIndexRoute: typeof AuthenticatedEspaceProIndexRoute
+}
+
+const AuthenticatedEspaceProRouteChildren: AuthenticatedEspaceProRouteChildren =
+  {
+    AuthenticatedEspaceProCarteRoute: AuthenticatedEspaceProCarteRoute,
+    AuthenticatedEspaceProChiensRoute: AuthenticatedEspaceProChiensRoute,
+    AuthenticatedEspaceProCollaborationsRoute:
+      AuthenticatedEspaceProCollaborationsRoute,
+    AuthenticatedEspaceProIndexRoute: AuthenticatedEspaceProIndexRoute,
+  }
+
+const AuthenticatedEspaceProRouteWithChildren =
+  AuthenticatedEspaceProRoute._addFileChildren(
+    AuthenticatedEspaceProRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdvantagesRoute: typeof AuthenticatedAdvantagesRoute
   AuthenticatedAvanceesRoute: typeof AuthenticatedAvanceesRoute
@@ -1446,6 +1484,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedContestsRoute: typeof AuthenticatedContestsRoute
   AuthenticatedDirectoryRoute: typeof AuthenticatedDirectoryRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
+  AuthenticatedEspaceProRoute: typeof AuthenticatedEspaceProRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedFormationsRoute: typeof AuthenticatedFormationsRoute
   AuthenticatedFormsRoute: typeof AuthenticatedFormsRoute
@@ -1484,9 +1523,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSuiviFinancierRoute: typeof AuthenticatedAdminSuiviFinancierRoute
   AuthenticatedAdminValidationRoute: typeof AuthenticatedAdminValidationRoute
-  AuthenticatedEspaceProCarteRoute: typeof AuthenticatedEspaceProCarteRoute
-  AuthenticatedEspaceProChiensRoute: typeof AuthenticatedEspaceProChiensRoute
-  AuthenticatedEspaceProCollaborationsRoute: typeof AuthenticatedEspaceProCollaborationsRoute
   AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
   AuthenticatedMembersMemberIdRoute: typeof AuthenticatedMembersMemberIdRoute
   AuthenticatedMembersNewRoute: typeof AuthenticatedMembersNewRoute
@@ -1494,7 +1530,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRoute
   AuthenticatedActivitiesIndexRoute: typeof AuthenticatedActivitiesIndexRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
-  AuthenticatedEspaceProIndexRoute: typeof AuthenticatedEspaceProIndexRoute
   AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
   AuthenticatedMembersIndexRoute: typeof AuthenticatedMembersIndexRoute
   AuthenticatedProfessionalsIndexRoute: typeof AuthenticatedProfessionalsIndexRoute
@@ -1510,6 +1545,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContestsRoute: AuthenticatedContestsRoute,
   AuthenticatedDirectoryRoute: AuthenticatedDirectoryRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
+  AuthenticatedEspaceProRoute: AuthenticatedEspaceProRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedFormationsRoute: AuthenticatedFormationsRoute,
   AuthenticatedFormsRoute: AuthenticatedFormsRoute,
@@ -1549,10 +1585,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSuiviFinancierRoute: AuthenticatedAdminSuiviFinancierRoute,
   AuthenticatedAdminValidationRoute: AuthenticatedAdminValidationRoute,
-  AuthenticatedEspaceProCarteRoute: AuthenticatedEspaceProCarteRoute,
-  AuthenticatedEspaceProChiensRoute: AuthenticatedEspaceProChiensRoute,
-  AuthenticatedEspaceProCollaborationsRoute:
-    AuthenticatedEspaceProCollaborationsRoute,
   AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
   AuthenticatedMembersMemberIdRoute: AuthenticatedMembersMemberIdRoute,
   AuthenticatedMembersNewRoute: AuthenticatedMembersNewRoute,
@@ -1560,7 +1592,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProjectsProjectIdRoute: AuthenticatedProjectsProjectIdRoute,
   AuthenticatedActivitiesIndexRoute: AuthenticatedActivitiesIndexRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
-  AuthenticatedEspaceProIndexRoute: AuthenticatedEspaceProIndexRoute,
   AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
   AuthenticatedMembersIndexRoute: AuthenticatedMembersIndexRoute,
   AuthenticatedProfessionalsIndexRoute: AuthenticatedProfessionalsIndexRoute,
