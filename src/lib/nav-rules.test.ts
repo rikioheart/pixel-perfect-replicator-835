@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, memberHubGroupFor, MEMBER_HUB_GROUPS, MEMBER_HUB_TABS } from "./nav-rules";
+import { canOpenProSpace, isNavItemPrimary, isNavItemVisible, memberHubTabFor, memberHubGroupFor, MEMBER_HUB_GROUPS, MEMBER_HUB_TABS } from "./nav-rules";
 
 const particulier = { isBureau: false, isPro: false };
 const pro = { isBureau: false, isPro: true };
@@ -32,5 +32,13 @@ describe("navigation par rôle", () => {
     expect(memberHubTabFor("/foyer")).toBe("/foyer");
     expect(memberHubTabFor("/loyalty")).toBe("/loyalty");
     expect(memberHubTabFor("/projects")).toBeNull();
+  });
+  it("un particulier connecté n'ouvre pas l'espace pro, un pro et le Bureau oui", () => {
+    expect(canOpenProSpace({ ...particulier, rolesReady: true, online: true })).toBe(false);
+    expect(canOpenProSpace({ ...pro, rolesReady: true, online: true })).toBe(true);
+    expect(canOpenProSpace({ ...bureau, rolesReady: true, online: true })).toBe(true);
+  });
+  it("hors réseau, l'espace pro reste ouvert pour le pass local", () => {
+    expect(canOpenProSpace({ ...particulier, rolesReady: true, online: false })).toBe(true);
   });
 });
