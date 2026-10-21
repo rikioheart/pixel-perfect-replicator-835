@@ -205,7 +205,7 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
       <div className="grid gap-4 md:grid-cols-3 text-sm">
         <div className="space-y-2">
           <h3 className="font-medium">Adultes</h3>
-          {h.adults.map((a) => <p key={a.user_id}>{a.name} {a.role === "ADMIN" ? <Badge variant="outline">Gestion</Badge> : null}</p>)}
+          {h.adults.map((a) => <div key={a.user_id}>{a.name} {a.role === "ADMIN" ? <Badge variant="outline">Gestion</Badge> : null}</div>)}
           <div className="flex gap-1">
             <select aria-label="Ajouter un adulte" className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-2" value={adult} onChange={(e) => setAdult(e.target.value)}>
               <option value="">Ajouter un adulte…</option>
