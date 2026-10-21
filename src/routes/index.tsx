@@ -163,7 +163,7 @@ function SignInForm() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) toast.error(error.message);
+    if (error) toast.error(/invalid login credentials/i.test(error.message) ? "E-mail ou mot de passe incorrect." : /email not confirmed/i.test(error.message) ? "Confirmez d’abord votre adresse e-mail (lien reçu par e-mail)." : error.message);
   };
 
   const resetPassword = async () => {
