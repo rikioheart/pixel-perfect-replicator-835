@@ -81,7 +81,6 @@ import { Route as AuthenticatedProfessionalsIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedProfessionalsProIdRouteImport } from './routes/_authenticated/professionals.$proId'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects.index'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
-import { Route as ApiPublicResetDemoRouteImport } from './routes/api/public/reset-demo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -470,11 +469,6 @@ const AuthenticatedProjectsProjectIdRoute =
     path: '/projects/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicResetDemoRoute = ApiPublicResetDemoRouteImport.update({
-  id: '/api/public/reset-demo',
-  path: '/api/public/reset-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -541,7 +535,6 @@ export interface FileRoutesByFullPath {
   '/members/new': typeof AuthenticatedMembersNewRoute
   '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
-  '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/activities/': typeof AuthenticatedActivitiesIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/espace-pro/': typeof AuthenticatedEspaceProIndexRoute
@@ -615,7 +608,6 @@ export interface FileRoutesByTo {
   '/members/new': typeof AuthenticatedMembersNewRoute
   '/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
-  '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/activities': typeof AuthenticatedActivitiesIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/espace-pro': typeof AuthenticatedEspaceProIndexRoute
@@ -691,7 +683,6 @@ export interface FileRoutesById {
   '/_authenticated/members/new': typeof AuthenticatedMembersNewRoute
   '/_authenticated/professionals/$proId': typeof AuthenticatedProfessionalsProIdRoute
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRoute
-  '/api/public/reset-demo': typeof ApiPublicResetDemoRoute
   '/_authenticated/activities/': typeof AuthenticatedActivitiesIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/espace-pro/': typeof AuthenticatedEspaceProIndexRoute
@@ -767,7 +758,6 @@ export interface FileRouteTypes {
     | '/members/new'
     | '/professionals/$proId'
     | '/projects/$projectId'
-    | '/api/public/reset-demo'
     | '/activities/'
     | '/admin/'
     | '/espace-pro/'
@@ -841,7 +831,6 @@ export interface FileRouteTypes {
     | '/members/new'
     | '/professionals/$proId'
     | '/projects/$projectId'
-    | '/api/public/reset-demo'
     | '/activities'
     | '/admin'
     | '/espace-pro'
@@ -916,7 +905,6 @@ export interface FileRouteTypes {
     | '/_authenticated/members/new'
     | '/_authenticated/professionals/$proId'
     | '/_authenticated/projects/$projectId'
-    | '/api/public/reset-demo'
     | '/_authenticated/activities/'
     | '/_authenticated/admin/'
     | '/_authenticated/espace-pro/'
@@ -938,7 +926,6 @@ export interface RootRouteChildren {
   ProProIdRoute: typeof ProProIdRoute
   ProfessionnelsSlugRoute: typeof ProfessionnelsSlugRoute
   ProfessionnelsIndexRoute: typeof ProfessionnelsIndexRoute
-  ApiPublicResetDemoRoute: typeof ApiPublicResetDemoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1447,13 +1434,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/reset-demo': {
-      id: '/api/public/reset-demo'
-      path: '/api/public/reset-demo'
-      fullPath: '/api/public/reset-demo'
-      preLoaderRoute: typeof ApiPublicResetDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -1602,7 +1582,6 @@ const rootRouteChildren: RootRouteChildren = {
   ProProIdRoute: ProProIdRoute,
   ProfessionnelsSlugRoute: ProfessionnelsSlugRoute,
   ProfessionnelsIndexRoute: ProfessionnelsIndexRoute,
-  ApiPublicResetDemoRoute: ApiPublicResetDemoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
