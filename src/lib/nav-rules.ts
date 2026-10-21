@@ -59,3 +59,9 @@ export function memberHubGroupFor(pathname: string) {
 export function fallbackIsPro(membershipType: string | null | undefined): boolean {
   return (membershipType ?? "").toUpperCase().includes("PRO");
 }
+
+/** Espace pro : fermé aux particuliers en ligne ; hors réseau le statut est invérifiable, on laisse l'accès au pass local. */
+export function canOpenProSpace(v: NavViewer & { rolesReady: boolean; online: boolean }): boolean {
+  if (!v.online || !v.rolesReady) return true;
+  return v.isPro || v.isBureau;
+}

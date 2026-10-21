@@ -203,3 +203,9 @@
 
 Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers chiens privés mis en cache. Sans réseau, aucune adhésion ou attribution n’est certifiée. La synchronisation nécessite de rouvrir l’espace pro avec du réseau le jour même. Après changement de jour, vérifier avec le Bureau (RPC actuel utilise la date serveur). Aucune migration historique supprimée ou rejouée.
 - [x] Lot 23 : site public pleine largeur, polices du prototype (Fraunces/Outfit), 3 activités d'exemple ; pros réels à saisir par le Bureau
+
+## Lot 24 — Tests complets par profil (oct. 2026)
+- [x] Vitrine PC/mobile, hors réseau, pages d'erreur, connexion refusée en français
+- [x] 56 pages internes visitées en particulier, pro et Bureau ; contrôles de sécurité directs sur la base
+- [x] Espace pro fermé aux particuliers (sauf hors réseau) ; calendrier et foyer sans erreur d'affichage ; accès technique temporaire de mots de passe supprimé
+- [ ] Décider des regroupements : Finances/Remboursements, Accueil Bureau/Cockpit, entrées d'annuaire (en attente de validation)
