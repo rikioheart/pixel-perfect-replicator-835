@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { PROFILE_COLUMNS, withContacts } from "@/lib/profile-columns";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -51,12 +52,7 @@ function MembersPage() {
   const { data: members, isLoading } = useQuery({
     queryKey: ["members"],
     queryFn: async () =>
-      (
-        await supabase
-          .from("profiles")
-          .select("*")
-          .order("created_at", { ascending: false })
-      ).data ?? [],
+      await withContacts(((await supabase.from("profiles").select(PROFILE_COLUMNS).order("created_at", { ascending: false })).data ?? []) as unknown as { id: string }[]) as any[],
   });
 
   const filtered = useMemo(() => {

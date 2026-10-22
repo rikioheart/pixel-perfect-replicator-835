@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PROFILE_COLUMNS, withContacts } from "@/lib/profile-columns";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +48,7 @@ function MemberDetailPage() {
   const { data: member, isLoading } = useQuery({
     queryKey: ["member", memberId],
     queryFn: async () =>
-      (await supabase.from("profiles").select("*").eq("id", memberId).maybeSingle()).data,
+      { const r = (await supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", memberId).maybeSingle()).data as unknown as { id: string } | null; return r ? ((await withContacts([r]))[0] as any) : null; },
   });
 
   const { data: functions } = useQuery({

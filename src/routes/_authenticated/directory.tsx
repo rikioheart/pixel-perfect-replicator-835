@@ -58,7 +58,7 @@ function DirectoryPage() {
         supabase
           .from("profiles")
           .select(
-            "id, display_name, first_name, last_name, email, city, department, bio, membership_type, membership_status, public_visibility",
+            "id, display_name, first_name, last_name, city, department, bio, membership_type, membership_status, public_visibility",
           )
           .eq("membership_status", "ACTIVE")
           .order("display_name", { ascending: true }),
