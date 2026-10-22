@@ -4310,6 +4310,32 @@ export type Database = {
       list_public_activities: { Args: never; Returns: Json }
       list_public_blog_posts: { Args: never; Returns: Json }
       list_public_pros: { Args: never; Returns: Json }
+      notify_bureau_members: {
+        Args: {
+          _entity_id: string
+          _entity_type: string
+          _kind: string
+          _link: string
+          _message: string
+          _sender: string
+          _title: string
+        }
+        Returns: undefined
+      }
+      notify_member: {
+        Args: {
+          _entity_id: string
+          _entity_type: string
+          _kind: string
+          _link: string
+          _message: string
+          _recipient: string
+          _sender: string
+          _title: string
+          _window?: string
+        }
+        Returns: undefined
+      }
       notify_once: {
         Args: {
           _entity_id: string
