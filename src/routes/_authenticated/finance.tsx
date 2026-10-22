@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { REIMBURSEMENT_LABEL, allowedReimbursementActions, balancesByMember, euro, payoutLabel, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { REIMBURSEMENT_LABEL, allowedReimbursementActions, balancesByMember, euro, financeErrorMessage, payoutLabel, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
 import { useSensitiveRights } from "@/lib/permissions";
 import { PROFILE_COLUMNS } from "@/lib/profile-columns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -108,7 +108,7 @@ function FinancePage() {
   const setPayout = useMutation({
     mutationFn: async ({ id, paid }: { id: string; paid: boolean }) => {
       const { error } = await supabase.from("accounting").update({ professional_paid_at: paid ? new Date().toISOString() : null }).eq("id", id);
-      if (error) throw new Error("Mise à jour refusée. Actualisez la page.");
+      if (error) throw new Error(financeErrorMessage(error.message));
     },
     onSuccess: () => { toast.success("Reversement mis à jour."); void queryClient.invalidateQueries({ queryKey: ["accounting"] }); },
     onError: (e: Error) => toast.error(e.message),

@@ -84,3 +84,20 @@ export function summarizePayouts(rows: { professional_share: number | string | n
   }
   return { paid: paid / 100, due: due / 100 };
 }
+
+/** Messages des contrôles en base (déjà en français) affichés tels quels ; le reste devient un message neutre. */
+const DB_MESSAGES = [
+  /propre (demande|reversement|adhésion)/,
+  /approuvée avant/,
+  /ne peut plus (changer|être modifiée)/,
+  /Droit de (validation|paiement)/,
+  /Transition de statut/,
+  /Seul le demandeur/,
+  /file « Adhésions à valider »/,
+];
+export function financeErrorMessage(raw: string | undefined | null): string {
+  const msg = raw ?? "";
+  if (DB_MESSAGES.some((re) => re.test(msg))) return msg;
+  if (/row-level security|permission denied/i.test(msg)) return "Action refusée : ce droit ne vous est pas attribué.";
+  return "Mise à jour refusée. Actualisez la page.";
+}
