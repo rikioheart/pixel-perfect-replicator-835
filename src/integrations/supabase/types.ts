@@ -4180,6 +4180,10 @@ export type Database = {
       }
       bureau_dog_full: { Args: { _user_id: string }; Returns: boolean }
       bureau_dogs: { Args: never; Returns: Json }
+      bureau_has_permission: {
+        Args: { _code: string; _user_id: string }
+        Returns: boolean
+      }
       can_add_context_resource: {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
@@ -4237,6 +4241,10 @@ export type Database = {
         Returns: string
       }
       current_person_id: { Args: { _user_id: string }; Returns: string }
+      decide_membership: {
+        Args: { _decision: string; _profile_id: string; _reason?: string }
+        Returns: Json
+      }
       dog_section_visible: {
         Args: { _dog_id: string; _section: string; _user_id: string }
         Returns: boolean
