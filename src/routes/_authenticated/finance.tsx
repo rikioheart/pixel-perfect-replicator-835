@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { REIMBURSEMENT_LABEL, canProcessReimbursement, euro, nextReimbursementActions, summarizeReimbursements } from "@/lib/finance-status";
+import { REIMBURSEMENT_LABEL, balancesByMember, canProcessReimbursement, euro, nextReimbursementActions, payoutLabel, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { PROFILE_COLUMNS } from "@/lib/profile-columns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Euro, Plus, Receipt } from "lucide-react";
@@ -81,6 +82,32 @@ function FinancePage() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const personIds = [...new Set([...reimbursements.map((r) => r.person_id), ...rows.map((r) => r.professional_id).filter(Boolean) as string[]])];
+  const { data: names = {} } = useQuery({
+    queryKey: ["finance-names", personIds.join(",")],
+    enabled: isBureau && personIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select(PROFILE_COLUMNS).in("id", personIds);
+      if (error) throw error;
+      const out: Record<string, string> = {};
+      for (const p of (data ?? []) as unknown as { id: string; first_name?: string | null; last_name?: string | null }[]) out[p.id] = [p.first_name, p.last_name].filter(Boolean).join(" ") || "Membre";
+      return out;
+    },
+  });
+  const nameOf = (id: string | null) => (id ? names[id] ?? "Membre" : "—");
+  const balances = balancesByMember(reimbursements);
+  const proRows = rows.filter((r) => r.professional_id && Number(r.professional_share) > 0);
+  const payoutSum = summarizePayouts(proRows);
+
+  const setPayout = useMutation({
+    mutationFn: async ({ id, paid }: { id: string; paid: boolean }) => {
+      const { error } = await supabase.from("accounting").update({ professional_paid_at: paid ? new Date().toISOString() : null }).eq("id", id);
+      if (error) throw new Error("Mise à jour refusée. Actualisez la page.");
+    },
+    onSuccess: () => { toast.success("Reversement mis à jour."); void queryClient.invalidateQueries({ queryKey: ["accounting"] }); },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const addLine = useMutation({
@@ -251,6 +278,58 @@ function FinancePage() {
 
       <Card className="mt-4">
         <CardHeader className="pb-2">
+          <CardTitle className="text-base">Reversements aux professionnels</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[["À payer", payoutSum.due], ["Payé", payoutSum.paid]].map(([l, v]) => (
+              <div key={l as string} className="rounded-lg border border-border p-3">
+                <p className="text-xs text-muted-foreground">{l}</p>
+                <p className="font-semibold">{rowsError ? "—" : euro(v as number)}</p>
+              </div>
+            ))}
+          </div>
+          {proRows.length === 0 ? <p className="text-muted-foreground">Aucune part professionnelle enregistrée.</p> : proRows.map((r) => (
+            <div key={r.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2 last:border-0">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{nameOf(r.professional_id)}</p>
+                <p className="text-xs text-muted-foreground">{r.label ?? "Recette"} · {new Date(r.recorded_on).toLocaleDateString("fr-FR")}</p>
+              </div>
+              <span className="font-semibold">{euro(Number(r.professional_share))}</span>
+              <Badge variant={r.professional_paid_at ? "default" : "outline"}>{payoutLabel(r.professional_paid_at)}</Badge>
+              <Button size="sm" variant={r.professional_paid_at ? "ghost" : "outline"} disabled={setPayout.isPending} onClick={() => setPayout.mutate({ id: r.id, paid: !r.professional_paid_at })}>
+                {r.professional_paid_at ? "Annuler" : "Marquer payé"}
+              </Button>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="mt-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Solde par membre</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          {reimbError ? <p className="text-destructive">Soldes indisponibles.</p> : balances.length === 0 ? <p className="text-muted-foreground">Aucun solde en cours.</p> : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="text-xs text-muted-foreground"><tr><th className="py-1 pr-3 font-normal">Membre</th><th className="py-1 pr-3 font-normal">En attente</th><th className="py-1 pr-3 font-normal">Reste à payer</th><th className="py-1 font-normal">Payé</th></tr></thead>
+                <tbody>{balances.map((b) => (
+                  <tr key={b.personId} className="border-t border-border">
+                    <td className="py-2 pr-3 font-medium">{nameOf(b.personId)}</td>
+                    <td className="py-2 pr-3">{euro(b.pending)}</td>
+                    <td className="py-2 pr-3 font-semibold">{euro(b.toPay)}</td>
+                    <td className="py-2">{euro(b.paid)}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="mt-4">
+        <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Receipt className="size-4" /> Remboursements
           </CardTitle>
@@ -276,7 +355,7 @@ function FinancePage() {
                 className="flex items-center justify-between gap-3 border-b border-border pb-2 last:border-0"
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium">{item.label}</p>
+                  <p className="truncate font-medium">{item.label} <span className="font-normal text-muted-foreground">· {nameOf(item.person_id)}</span></p>
                   <p className="text-xs text-muted-foreground">
                     {Number(item.amount).toFixed(2)} € ·{" "}
                     {new Date(item.created_at).toLocaleDateString("fr-FR")}

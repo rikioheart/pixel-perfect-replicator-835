@@ -30,12 +30,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Découvrez l’association, ses valeurs, les activités du mois et les professionnels partenaires, puis accédez à votre espace.",
+          "Pass Terrain, prochaines activités, annuaire des partenaires et accès à l’espace membre de La Voix du Chien.",
       },
       { property: "og:title", content: "La Voix du Chien — Ensemble, à leur rythme" },
       {
         property: "og:description",
-        content: "L’association, ses valeurs, les activités du mois et les professionnels partenaires.",
+        content: "Pass Terrain, activités à venir et partenaires de l’association.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

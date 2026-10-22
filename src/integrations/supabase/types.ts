@@ -24,6 +24,7 @@ export type Database = {
           id: string
           label: string | null
           professional_id: string | null
+          professional_paid_at: string | null
           professional_share: number
           recorded_on: string
           updated_at: string
@@ -37,6 +38,7 @@ export type Database = {
           id?: string
           label?: string | null
           professional_id?: string | null
+          professional_paid_at?: string | null
           professional_share?: number
           recorded_on?: string
           updated_at?: string
@@ -50,6 +52,7 @@ export type Database = {
           id?: string
           label?: string | null
           professional_id?: string | null
+          professional_paid_at?: string | null
           professional_share?: number
           recorded_on?: string
           updated_at?: string

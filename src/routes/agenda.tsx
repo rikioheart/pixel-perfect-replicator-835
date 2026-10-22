@@ -53,7 +53,7 @@ function AgendaPage() {
         {data.unavailable ? (
           <p className="text-sm text-muted-foreground">L’agenda est momentanément indisponible. Merci de réessayer plus tard.</p>
         ) : list.length === 0 ? (
-          <div className="panel p-6 text-sm text-muted-foreground">De nouvelles rencontres se préparent. Découvrez en attendant <a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer" className="underline">nos activités</a>.</div>
+          <div className="panel p-6 text-sm text-muted-foreground">De nouvelles rencontres se préparent. En attendant, consultez <Link to="/professionnels" className="underline">l’annuaire des partenaires</Link> ou <a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer" className="underline">le site de l’association</a>.</div>
         ) : months.map((m) => (
           <section key={m} aria-label={m} className="space-y-3">
             <h2 className="flex items-center gap-2 text-xl capitalize"><CalendarDays className="size-5 text-primary" aria-hidden />{m}</h2>

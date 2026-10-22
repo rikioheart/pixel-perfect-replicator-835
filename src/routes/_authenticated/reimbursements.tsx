@@ -3,10 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Euro, Plus, Receipt } from "lucide-react";
-import { REIMBURSEMENT_LABEL, summarizeReimbursements, euro } from "@/lib/finance-status";
+import { REIMBURSEMENT_LABEL, summarizeReimbursements, euro, payoutLabel, summarizePayouts } from "@/lib/finance-status";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -73,7 +74,7 @@ function ReimbursementsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("accounting")
-        .select("id, label, professional_share, recorded_on")
+        .select("id, label, professional_share, recorded_on, professional_paid_at")
         .eq("professional_id", user!.id)
         .order("recorded_on", { ascending: false });
       if (error) throw new Error(error.message);
@@ -169,12 +170,25 @@ function ReimbursementsPage() {
           ) : (payouts.data ?? []).length === 0 ? (
             <p className="text-sm text-muted-foreground">Aucun reversement enregistré par le Bureau pour l'instant.</p>
           ) : (
-            (payouts.data ?? []).map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm">
-                <span>{p.label ?? "Prestation"} · {new Date(p.recorded_on).toLocaleDateString("fr-FR")}</span>
-                <span className="font-semibold">{euro(Number(p.professional_share))}</span>
+            <>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[["Reste à recevoir", summarizePayouts(payouts.data ?? []).due], ["Déjà reçu", summarizePayouts(payouts.data ?? []).paid]].map(([l, v]) => (
+                  <div key={l as string} className="rounded-xl border border-border bg-card px-4 py-3 text-sm">
+                    <p className="text-xs text-muted-foreground">{l}</p>
+                    <p className="font-display text-lg font-bold">{euro(v as number)}</p>
+                  </div>
+                ))}
               </div>
-            ))
+              {(payouts.data ?? []).map((p) => (
+                <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3 text-sm">
+                  <span className="min-w-0 flex-1">{p.label ?? "Prestation"} · {new Date(p.recorded_on).toLocaleDateString("fr-FR")}</span>
+                  <span className="font-semibold">{euro(Number(p.professional_share))}</span>
+                  <Badge variant={p.professional_paid_at ? "default" : "outline"}>
+                    {payoutLabel(p.professional_paid_at)}{p.professional_paid_at ? ` le ${new Date(p.professional_paid_at).toLocaleDateString("fr-FR")}` : ""}
+                  </Badge>
+                </div>
+              ))}
+            </>
           )}
           <p className="text-xs text-muted-foreground">Montants calculés par le Bureau à partir des recettes enregistrées ; aucune estimation automatique.</p>
         </section>
