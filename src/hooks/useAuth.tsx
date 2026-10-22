@@ -4,6 +4,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { fallbackIsPro } from "@/lib/nav-rules";
 import { clearPrivateOffline } from '@/lib/offline';
+import { PROFILE_COLUMNS, withContacts } from "@/lib/profile-columns";
 
 export type Profile = {
   id: string;
@@ -57,27 +58,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     const [profileRes, rolesRes] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+      supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("roles(code)").eq("user_id", userId),
     ]);
-    let profile = (profileRes.data as Profile | null) ?? null;
+    let profile = (profileRes.data as unknown as Profile | null) ?? null;
 
-    // First-time OAuth (e.g. Google) sign-in has no profile yet — create a
-    // pending one so the member area works while the Bureau validates it.
+    // Le profil est normalement créé par la base à l'inscription ; repli si absent (ancien compte OAuth).
     if (!profile) {
-      const { data: inserted } = await supabase
-        .from("profiles")
-        .insert({
-          id: userId,
-          email: null,
-          display_name: null,
-          membership_type: "PARTICULIER",
-          membership_status: "PENDING",
-        })
-        .select("*")
-        .maybeSingle();
-      profile = (inserted as Profile | null) ?? null;
+      await supabase.from("profiles").insert({ id: userId, membership_type: "PARTICULIER", membership_status: "PENDING" });
+      const again = await supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", userId).maybeSingle();
+      profile = (again.data as unknown as Profile | null) ?? null;
     }
+    if (profile) profile = (await withContacts([profile]))[0] as Profile;
 
     setProfile(profile);
     const codes = (rolesRes.data ?? [])
