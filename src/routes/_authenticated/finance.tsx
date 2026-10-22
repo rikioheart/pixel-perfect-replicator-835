@@ -140,13 +140,13 @@ function FinancePage() {
         .from("reimbursements")
         .update({ status })
         .eq("id", id);
-      if (error) throw new Error(/propre demande/.test(error.message) ? "Vous ne pouvez pas traiter votre propre demande." : /approuvée avant/.test(error.message) ? "Approuvez la demande avant de la payer." : "Mise à jour refusée. Actualisez la page.");
+      if (error) throw new Error(financeErrorMessage(error.message));
     },
     onSuccess: () => {
       toast.success("Demande mise à jour.");
       void queryClient.invalidateQueries({ queryKey: ["reimbursements"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => { toast.error(error.message); void queryClient.invalidateQueries({ queryKey: ["reimbursements"] }); },
   });
 
   const totals = rows.reduce(
@@ -159,14 +159,14 @@ function FinancePage() {
   );
 
   const rsum = summarizeReimbursements(reimbursements);
-  if (!isBureau) return <AppShell title="Finances"><p className="text-sm text-muted-foreground">Redirection vers votre espace personnel…</p></AppShell>;
+  if (!rights.ready || !allowed) return <AppShell title="Finances"><p className="text-sm text-muted-foreground">{rights.ready ? "Redirection vers votre espace personnel…" : "Vérification de vos droits…"}</p></AppShell>;
 
   return (
     <AppShell
       title="Finances"
-      subtitle="Comptabilité du Bureau : recettes, répartitions et remboursements"
+      subtitle="Comptabilité du Bureau : recettes, répartitions, reversements et remboursements"
       actions={
-        isBureau ? (
+        rights.update ? (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2">
