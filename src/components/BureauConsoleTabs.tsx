@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 const TABS = [
   { to: "/admin", label: "Aperçu & adhésions" },
-  { to: "/admin/cockpit", label: "Pilotage détaillé" },
+  { to: "/admin/cockpit", label: "Pilotage opérationnel" },
   { to: "/finance", label: "Comptabilité" },
   { to: "/admin/validation", label: "Validations" },
 ] as const;

@@ -1,3 +1,4 @@
+import { DirectoryTabs } from "@/components/DirectoryTabs";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -110,6 +111,7 @@ function DirectoryPage() {
         ) : undefined
       }
     >
+      <DirectoryTabs />
       <div role="tablist" aria-label="Listes de l'annuaire" className="mb-4 flex flex-wrap gap-1 rounded-xl border border-border bg-card p-1">
         {CATEGORIES.map(([value, label]) => (
           <button key={value} type="button" role="tab" aria-selected={category === value} onClick={() => setCategory(value)}
