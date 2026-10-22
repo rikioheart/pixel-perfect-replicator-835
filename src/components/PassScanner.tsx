@@ -8,6 +8,8 @@ type Detector = { detect: (src: CanvasImageSource) => Promise<{ rawValue: string
 export function PassScanner({ onResult, onClose }: { onResult: (text: string) => void; onClose: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState("");
+  const onResultRef = useRef(onResult);
+  onResultRef.current = onResult;
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -20,7 +22,7 @@ export function PassScanner({ onResult, onClose }: { onResult: (text: string) =>
       if (stopped) return;
       stopped = true;
       try { navigator.vibrate?.(80); } catch { /* vibration indisponible */ }
-      onResult(text);
+      onResultRef.current(text);
     };
 
     void (async () => {
@@ -71,7 +73,7 @@ export function PassScanner({ onResult, onClose }: { onResult: (text: string) =>
       cancelAnimationFrame(raf);
       stream?.getTracks().forEach((t) => t.stop());
     };
-  }, [onResult]);
+  }, []);
 
   return (
     <div className="space-y-2">
