@@ -226,6 +226,8 @@ function FinancePage() {
       }
     >
       <BureauConsoleTabs />
+      {rights.viewGlobal ? (
+      <>
       <div className="grid gap-4 md:grid-cols-3">
         {[
           { label: "Recettes brutes", value: totals.gross },
@@ -301,13 +303,20 @@ function FinancePage() {
               </div>
               <span className="font-semibold">{euro(Number(r.professional_share))}</span>
               <Badge variant={r.professional_paid_at ? "default" : "outline"}>{payoutLabel(r.professional_paid_at)}</Badge>
-              <Button size="sm" variant={r.professional_paid_at ? "ghost" : "outline"} disabled={setPayout.isPending} onClick={() => setPayout.mutate({ id: r.id, paid: !r.professional_paid_at })}>
-                {r.professional_paid_at ? "Annuler" : "Marquer payé"}
-              </Button>
+              {rights.update && r.professional_id !== user?.id ? (
+                <Button size="sm" variant={r.professional_paid_at ? "ghost" : "outline"} disabled={setPayout.isPending} onClick={() => setPayout.mutate({ id: r.id, paid: !r.professional_paid_at })}>
+                  {r.professional_paid_at ? "Annuler" : "Marquer payé"}
+                </Button>
+              ) : null}
             </div>
           ))}
+          <p className="text-xs text-muted-foreground">Source : lignes comptables (part professionnelle et date de reversement).</p>
         </CardContent>
       </Card>
+      </>
+      ) : (
+        <p className="panel mb-4 p-4 text-sm text-muted-foreground">La comptabilité globale demande le droit « consulter les finances globales ». Seuls les remboursements vous sont affichés.</p>
+      )}
 
       <Card className="mt-4">
         <CardHeader className="pb-2">
@@ -347,7 +356,7 @@ function FinancePage() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">Les nouvelles demandes se font depuis « Paiements & remboursements ».</p>
+          <p className="text-xs text-muted-foreground">Source : demandes de remboursement. Les nouvelles demandes se font depuis « Paiements & remboursements ».</p>
           {reimbError ? (
             <p className="text-destructive">Remboursements indisponibles (chargement ou droits).</p>
           ) : reimbursements.length === 0 ? (
@@ -365,16 +374,15 @@ function FinancePage() {
                     {new Date(item.created_at).toLocaleDateString("fr-FR")}
                   </p>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                   <Badge variant={item.status === "PAID" ? "default" : "outline"}>{REIMBURSEMENT_LABEL[item.status] ?? item.status}</Badge>
-                  {canProcessReimbursement(user?.id, item.person_id, isBureau)
-                    ? nextReimbursementActions(item.status).map((next) => (
-                        <Button key={next} size="sm" variant={next === "REJECTED" ? "ghost" : "outline"} disabled={setStatus.isPending}
-                          onClick={() => setStatus.mutate({ id: item.id, status: next })}>
-                          {next === "APPROVED" ? "Approuver" : next === "PAID" ? "Marquer payé" : "Refuser"}
-                        </Button>
-                      ))
-                    : null}
+                  {item.person_id === user?.id ? <span className="text-xs text-muted-foreground">Votre demande : traitée par un autre membre</span> : null}
+                  {allowedReimbursementActions(item.status, user?.id, item.person_id, { validate: rights.validateReimbursements, markPaid: rights.markPaid }).map((next) => (
+                    <Button key={next} size="sm" variant={next === "REJECTED" ? "ghost" : "outline"} disabled={setStatus.isPending}
+                      onClick={() => setStatus.mutate({ id: item.id, status: next })}>
+                      {next === "APPROVED" ? "Approuver" : next === "PAID" ? "Marquer payé" : "Refuser"}
+                    </Button>
+                  ))}
                 </div>
               </div>
             ))
