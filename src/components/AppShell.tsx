@@ -141,7 +141,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/forms", label: "Formulaires", icon: ClipboardList, audience: "all" },
       { to: "/formations", label: "Formations & lives", icon: GraduationCap, audience: "all" },
       { to: "/contests", label: "Concours & animations", icon: Trophy, audience: "all" },
-      { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
       { to: "/directory", label: "Annuaire du réseau", icon: BookUser, audience: "all", primaryForParticulier: true },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: Trees, audience: "pro" },
