@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { TASK_STATUS_LABEL, PROJECT_STATUS_LABEL, formatDate } from "@/lib/domain";
 import { NewsFeed } from "@/components/NewsFeed";
 import { EmptyState } from "@/components/EmptyState";
+import { PendingMembersQueue } from "@/components/PendingMembersQueue";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -118,6 +119,7 @@ function AdminDashboard() {
       }
     >
       <AgReminder />
+      <PendingMembersQueue />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <div key={stat.label} className="panel p-4">
