@@ -1,0 +1,2 @@
+ALTER TABLE public.accounting ADD COLUMN IF NOT EXISTS professional_paid_at timestamptz;
+COMMENT ON COLUMN public.accounting.professional_paid_at IS 'Date de reversement de la part professionnelle ; NULL = à payer. Modifiable par le Bureau seul (policy accounting_manage).';
