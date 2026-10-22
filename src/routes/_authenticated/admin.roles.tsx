@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { withContacts } from "@/lib/profile-columns";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -71,15 +72,14 @@ function RolesPage() {
     queryKey: ["rbac-members"],
     enabled: isBureau,
     queryFn: async () =>
-      (
-        await supabase
+      withContacts(
+        (await supabase
           .from("profiles")
           .select(
             "id, first_name, last_name, display_name, membership_status, membership_type, access_level, involvement_level, statutory_category",
           )
-
-          .order("created_at", { ascending: true })
-      ).data ?? [],
+          .order("created_at", { ascending: true })).data ?? [],
+      ),
   });
 
   const { data: roles } = useQuery({

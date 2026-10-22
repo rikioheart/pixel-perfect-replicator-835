@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { withContacts } from "@/lib/profile-columns";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/directory")({
@@ -65,7 +66,7 @@ function DirectoryPage() {
         supabase.from("pro_details").select("profile_id, company_name, professional_category, website_url"),
       ]);
       const proMap = new Map((pros.data ?? []).map((p) => [p.profile_id, p]));
-      return (profiles.data ?? []).map((p) => ({
+      return (await withContacts(profiles.data ?? [])).map((p) => ({
         ...p,
         pro: proMap.get(p.id) ?? null,
       }));
