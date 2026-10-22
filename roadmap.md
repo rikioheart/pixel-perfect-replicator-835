@@ -223,3 +223,8 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Indicateur « Projets actifs » basé sur le statut
 - [x] Inscriptions anti-doublon (déjà garanties par la base)
 - [ ] Test de bout en bout avec un compte membre réel (commentaire → notification)
+
+## Lot 27 — Portail d'action et finances (oct. 2026)
+- [x] Accueil public réduit à Pass Terrain, accès membre, activités, partenaires et lien site officiel
+- [x] Finances Bureau : solde par membre (en attente, reste à payer, payé)
+- [x] Reversements pro « Payé / À payer » (date de reversement saisie par le Bureau)
