@@ -147,6 +147,7 @@ function CockpitPage() {
   const toValidate = tasks.filter((t) => t.status === "PENDING_VALIDATION");
   const volunteerTasks = tasks.filter((t) => t.is_volunteer_task && !t.assigned_user_id);
   const activeProjects = projects.filter((p) => p.status === "ACTIVE");
+  const movingProjects = activeProjects.filter((p) => data && p.updated_at >= data.since);
   const upcomingEvents = (data?.events ?? []).filter((e) => !e.start_date || e.start_date >= (data?.today ?? ""));
   const upcomingActivities = (data?.activities ?? []).filter((a) => !a.date || a.date >= (data?.today ?? ""));
   const activePartners = (data?.partners ?? []).filter((p) => p.active);
