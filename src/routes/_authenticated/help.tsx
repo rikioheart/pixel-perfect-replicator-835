@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { notifyBureau } from "@/lib/collab-notify";
 
 export const Route = createFileRoute("/_authenticated/help")({
   head: () => ({
@@ -141,19 +140,8 @@ function HelpCenterPage() {
         if (error) throw error;
         return;
       }
-      const { data, error } = await supabase.from("help_guides").insert(payload).select("id").single();
+      const { error } = await supabase.from("help_guides").insert(payload);
       if (error) throw error;
-      if (!isBureau) {
-        await notifyBureau({
-          senderId: user!.id,
-          kind: "HELP_GUIDE_PROPOSED",
-          title: "Nouveau guide proposé",
-          message: value.title,
-          linkUrl: "/help",
-          entityType: "help_guide",
-          entityId: data.id,
-        });
-      }
     },
     onSuccess: () => {
       toast.success(isBureau ? "Guide publié." : "Guide envoyé au Bureau pour validation.");

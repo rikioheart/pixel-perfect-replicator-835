@@ -217,3 +217,9 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [ ] Tester la caméra sur un vrai téléphone (nécessite l'appareil)
 - [ ] Invitations par le Bureau sans mot de passe (décision d'envoi d'e-mails réels requise)
 - [ ] Justificatifs en fichier privé (aujourd'hui lien) et versements pro payé/à payer : règle métier à confirmer
+
+## Lot 26 — Collaboration (Lot 6 du plan)
+- [x] Notifications de collaboration émises par la base (commentaires, tâches, projets, propositions, guides, aides)
+- [x] Indicateur « Projets actifs » basé sur le statut
+- [x] Inscriptions anti-doublon (déjà garanties par la base)
+- [ ] Test de bout en bout avec un compte membre réel (commentaire → notification)

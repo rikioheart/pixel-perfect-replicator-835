@@ -62,11 +62,6 @@ function AdminContributions() {
     mutationFn: async (status: string) => {
       const { error } = await supabase.from("contributions").update({ status, bureau_reply: reply.trim() || null }).eq("id", sel!.id);
       if (error) throw error;
-      await supabase.from("in_app_notifications").insert({
-        recipient_id: sel!.user_id, sender_id: user!.id, kind: "CONTRIBUTION_UPDATE",
-        title: `Votre proposition : ${CONTRIBUTION_STATUS_LABEL[status]}`, message: reply.trim() || sel!.title,
-        link_url: "/parcours", entity_type: "contribution", entity_id: sel!.id,
-      });
     },
     onSuccess: () => { toast.success("Proposition mise à jour."); setSel(null); void qc.invalidateQueries({ queryKey: ["contributions"] }); },
     onError: (e: Error) => toast.error(e.message),
