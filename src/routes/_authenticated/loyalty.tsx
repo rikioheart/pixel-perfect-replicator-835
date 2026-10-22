@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Stamp, QrCode, RefreshCw, Trophy } from "lucide-react";
+import { Stamp, QrCode, RefreshCw, Trophy, Copy } from "lucide-react";
+import { passShortCode } from "@/lib/pass-code";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
