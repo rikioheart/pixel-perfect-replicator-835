@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { REIMBURSEMENT_LABEL, balancesByMember, canProcessReimbursement, euro, nextReimbursementActions, payoutLabel, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { REIMBURSEMENT_LABEL, allowedReimbursementActions, balancesByMember, euro, payoutLabel, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { useSensitiveRights } from "@/lib/permissions";
 import { PROFILE_COLUMNS } from "@/lib/profile-columns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -45,22 +46,25 @@ export const Route = createFileRoute("/_authenticated/finance")({
 });
 
 function FinancePage() {
-  const { user, isBureau, rolesReady } = useAuth();
+  const { user } = useAuth();
+  const rights = useSensitiveRights();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  // Comptabilité réservée au Bureau : les autres rôles retrouvent leur espace personnel.
+  // Comptabilité : droit explicite requis (Bureau ET permission). Les autres retrouvent leur espace personnel.
+  const canReimb = rights.viewGlobal || rights.validateReimbursements || rights.markPaid;
+  const allowed = rights.viewGlobal || canReimb;
   useEffect(() => {
-    if (rolesReady && !isBureau) {
+    if (rights.ready && !allowed) {
       toast.info("Vos demandes et paiements sont dans « Paiements & remboursements ».");
       void navigate({ to: "/reimbursements", replace: true });
     }
-  }, [rolesReady, isBureau, navigate]);
+  }, [rights.ready, allowed, navigate]);
   const [open, setOpen] = useState(false);
   const [line, setLine] = useState({ label: "", gross_revenue: "0", association_share: "0", professional_share: "0" });
 
   const { data: rows = [], isError: rowsError } = useQuery({
     queryKey: ["accounting"],
-    enabled: isBureau,
+    enabled: rights.viewGlobal,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("accounting")
@@ -73,7 +77,7 @@ function FinancePage() {
 
   const { data: reimbursements = [], isError: reimbError } = useQuery({
     queryKey: ["reimbursements", "all"],
-    enabled: isBureau,
+    enabled: canReimb,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reimbursements")
@@ -87,7 +91,7 @@ function FinancePage() {
   const personIds = [...new Set([...reimbursements.map((r) => r.person_id), ...rows.map((r) => r.professional_id).filter(Boolean) as string[]])];
   const { data: names = {} } = useQuery({
     queryKey: ["finance-names", personIds.join(",")],
-    enabled: isBureau && personIds.length > 0,
+    enabled: allowed && personIds.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles").select(PROFILE_COLUMNS).in("id", personIds);
       if (error) throw error;
