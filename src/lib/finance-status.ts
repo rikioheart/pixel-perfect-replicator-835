@@ -21,6 +21,22 @@ export function canProcessReimbursement(viewerId: string | undefined, personId: 
   return isBureau && !!viewerId && viewerId !== personId;
 }
 
+/**
+ * Actions réellement proposées : approuver/refuser exige le droit de validation,
+ * payer exige le droit de paiement, jamais sur sa propre demande (miroir de guard_reimbursement).
+ */
+export function allowedReimbursementActions(
+  status: string,
+  viewerId: string | undefined,
+  personId: string,
+  rights: { validate: boolean; markPaid: boolean },
+): ReimbursementStatus[] {
+  if (!viewerId || viewerId === personId) return [];
+  return nextReimbursementActions(status).filter((next) =>
+    next === "PAID" ? rights.markPaid : rights.validate,
+  );
+}
+
 export type ReimbursementSummary = { pending: number; approved: number; paid: number; rejected: number };
 
 /** Totaux distincts par statut : les montants en attente ne sont jamais additionnés aux montants payés. */
