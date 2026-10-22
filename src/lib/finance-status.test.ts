@@ -45,3 +45,25 @@ describe("soldes et reversements", () => {
     expect(summarizePayouts([{ professional_share: 20, professional_paid_at: null }, { professional_share: 12.5, professional_paid_at: "2026-10-01" }])).toEqual({ paid: 12.5, due: 20 });
   });
 });
+
+import { allowedReimbursementActions } from "./finance-status";
+describe("droits de traitement des remboursements", () => {
+  const all = { validate: true, markPaid: true };
+  it("personne ne traite sa propre demande, même avec tous les droits", () => {
+    expect(allowedReimbursementActions("PENDING", "a", "a", all)).toEqual([]);
+    expect(allowedReimbursementActions("APPROVED", "a", "a", all)).toEqual([]);
+  });
+  it("approuver ou refuser exige le droit de validation", () => {
+    expect(allowedReimbursementActions("PENDING", "a", "b", { validate: false, markPaid: true })).toEqual([]);
+    expect(allowedReimbursementActions("PENDING", "a", "b", { validate: true, markPaid: false })).toEqual(["APPROVED", "REJECTED"]);
+  });
+  it("payer exige le droit de paiement et une demande approuvée", () => {
+    expect(allowedReimbursementActions("APPROVED", "a", "b", { validate: false, markPaid: true })).toEqual(["PAID"]);
+    expect(allowedReimbursementActions("APPROVED", "a", "b", { validate: true, markPaid: false })).toEqual(["REJECTED"]);
+    expect(allowedReimbursementActions("PENDING", "a", "b", { validate: false, markPaid: true })).toEqual([]);
+  });
+  it("une demande refusée ou payée est figée", () => {
+    expect(allowedReimbursementActions("REJECTED", "a", "b", all)).toEqual([]);
+    expect(allowedReimbursementActions("PAID", "a", "b", all)).toEqual([]);
+  });
+});
