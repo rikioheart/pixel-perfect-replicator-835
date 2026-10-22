@@ -228,3 +228,13 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Accueil public réduit à Pass Terrain, accès membre, activités, partenaires et lien site officiel
 - [x] Finances Bureau : solde par membre (en attente, reste à payer, payé)
 - [x] Reversements pro « Payé / À payer » (date de reversement saisie par le Bureau)
+
+## Lot A — Finances, cockpit Bureau, validation des adhésions (oct. 2026)
+- [x] Cartographie des 3 circuits financiers et des droits (accounting, reimbursements, finance_entries)
+- [x] Droits financiers explicites en base (Bureau ET permission) et à l'écran
+- [x] Transitions de remboursement verrouillées et journalisées ; reversement pro jamais marqué payé par soi-même
+- [x] Décision d'adhésion par fonction dédiée (verrou, journal, notification), file unique conservée
+- [x] /admin console unique, /admin/cockpit redirigé
+- [x] Tests d'accès réels par rôle (46/46) et tests unitaires
+- [ ] Nettoyer les comptes et demandes d'essai anciens (« Essai … », « TEST-RLS ») avant mise en ligne — attend l'accord du Bureau
+- [ ] Justificatifs en fichiers privés (aujourd'hui simples liens) — décision métier à prendre
