@@ -79,7 +79,7 @@ export function PassScanner({ onResult, onClose }: { onResult: (text: string) =>
         <video ref={videoRef} className="aspect-square w-full object-cover" muted playsInline aria-label="Aperçu de la caméra" />
         {!error && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
-            <div className="size-3/5 rounded-2xl border-4 border-primary/80 shadow-[0_0_0_9999px_hsl(0_0%_0%/0.35)]" />
+            <div className="size-3/5 rounded-2xl border-4 border-primary/80" />
           </div>
         )}
       </div>
