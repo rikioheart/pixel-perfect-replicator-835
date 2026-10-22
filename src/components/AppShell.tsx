@@ -26,7 +26,6 @@ import {
   FileText,
   Bell,
   HeartHandshake,
-  Gauge,
   BarChart3,
   CalendarCheck,
   UploadCloud,
@@ -105,8 +104,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Gouvernance",
     items: [
-      { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
-      { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau", primary: true },
+      { to: "/admin", label: "Console du Bureau", icon: LayoutDashboard, audience: "bureau", primary: true },
       { to: "/admin/suivi-financier", label: "Suivi financier", icon: Euro, audience: "bureau" },
       { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all", hideForParticulier: true },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "bureau", primary: true },
@@ -143,7 +141,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/forms", label: "Formulaires", icon: ClipboardList, audience: "all" },
       { to: "/formations", label: "Formations & lives", icon: GraduationCap, audience: "all" },
       { to: "/contests", label: "Concours & animations", icon: Trophy, audience: "all" },
-      { to: "/professionals", label: "Professionnels", icon: Briefcase, audience: "all" },
       { to: "/directory", label: "Annuaire du réseau", icon: BookUser, audience: "all", primaryForParticulier: true },
       { to: "/partners", label: "Partenaires & avantages", icon: Handshake, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: Trees, audience: "pro" },
@@ -160,7 +157,7 @@ const NAV_GROUPS: NavGroup[] = [
         icon: Stamp,
         audience: "all",
       },
-      { to: "/finance", label: "Mes finances", icon: Euro, audience: "all", hideForParticulier: true },
+      { to: "/finance", label: "Comptabilité", icon: Euro, audience: "bureau" },
       { to: "/participations", label: "Mes participations", icon: CalendarCheck, audience: "all" },
       { to: "/advantages", label: "Mes avantages", icon: Gift, audience: "all" },
       { to: "/reimbursements", label: "Paiements & remboursements", icon: ReceiptText, audience: "all" },
@@ -460,6 +457,15 @@ export function AppShell({
               {MEMBER_HUB_TABS.filter(t => hubGroup?.paths.some(p => p === t.to)).map(t => <Link key={t.to} to={t.to} aria-current={hubTab === t.to ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-lg px-3 text-sm", hubTab === t.to ? "bg-secondary font-medium text-secondary-foreground" : "text-muted-foreground hover:bg-accent")}>{t.label}</Link>)}
             </nav>
             </div>
+          ) : null}
+          {profile?.membership_status === "PENDING" ? (
+            <p role="status" className="mb-4 rounded-xl border border-border bg-secondary/40 p-3 text-sm">
+              Bienvenue ! Votre adhésion est en attente de validation par le Bureau. Vous pouvez déjà découvrir votre espace ; vous serez prévenu dès qu'elle sera validée.
+            </p>
+          ) : profile?.membership_status === "REFUSED" ? (
+            <p role="status" className="mb-4 rounded-xl border border-border bg-muted p-3 text-sm">
+              Votre demande d'adhésion n'a pas été retenue pour le moment. Pour en parler, écrivez au Bureau depuis le site officiel lavoixduchien.fr.
+            </p>
           ) : null}
           {children}
         </main>

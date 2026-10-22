@@ -208,4 +208,12 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Vitrine PC/mobile, hors réseau, pages d'erreur, connexion refusée en français
 - [x] 56 pages internes visitées en particulier, pro et Bureau ; contrôles de sécurité directs sur la base
 - [x] Espace pro fermé aux particuliers (sauf hors réseau) ; calendrier et foyer sans erreur d'affichage ; accès technique temporaire de mots de passe supprimé
-- [ ] Décider des regroupements : Finances/Remboursements, Accueil Bureau/Cockpit, entrées d'annuaire (en attente de validation)
+- [x] Regroupements faits : console Bureau à onglets, comptabilité Bureau vs remboursements personnels, annuaire en onglets
+
+## Lot 25 — Finalisation lots 2-4 et ergonomie (oct. 2026)
+- [x] Refus d'adhésion + protection double traitement ; message membre en attente/refusé
+- [x] Circuit remboursement approuver → payer, totaux séparés, reversements pro
+- [x] /association et /services redirigés vers le site officiel
+- [ ] Tester la caméra sur un vrai téléphone (nécessite l'appareil)
+- [ ] Invitations par le Bureau sans mot de passe (décision d'envoi d'e-mails réels requise)
+- [ ] Justificatifs en fichier privé (aujourd'hui lien) et versements pro payé/à payer : règle métier à confirmer

@@ -98,7 +98,7 @@ function DirectoryPage() {
 
   return (
     <AppShell
-      title="Annuaire du réseau"
+      title="Annuaire du réseau — guichet unique"
       subtitle="Les personnes et les compétences de l'association, filtrables par catégorie et territoire."
       actions={
         isBureau ? (
@@ -110,7 +110,15 @@ function DirectoryPage() {
         ) : undefined
       }
     >
-      <div className="mb-6 grid gap-3 sm:grid-cols-3">
+      <div role="tablist" aria-label="Listes de l'annuaire" className="mb-4 flex flex-wrap gap-1 rounded-xl border border-border bg-card p-1">
+        {CATEGORIES.map(([value, label]) => (
+          <button key={value} type="button" role="tab" aria-selected={category === value} onClick={() => setCategory(value)}
+            className={category === value ? "rounded-lg bg-primary px-3 py-1.5 text-sm text-primary-foreground" : "rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted"}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="mb-6 grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
           <Label className="text-xs">Recherche</Label>
           <div className="relative">
@@ -122,21 +130,6 @@ function DirectoryPage() {
               placeholder="Nom, structure, spécialité, ville"
             />
           </div>
-        </div>
-        <div className="space-y-1">
-          <Label className="text-xs">Catégorie</Label>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
         <div className="space-y-1">
           <Label className="text-xs">Département</Label>

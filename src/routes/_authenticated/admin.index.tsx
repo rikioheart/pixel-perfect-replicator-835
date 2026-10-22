@@ -17,6 +17,7 @@ import { TASK_STATUS_LABEL, PROJECT_STATUS_LABEL, formatDate } from "@/lib/domai
 import { NewsFeed } from "@/components/NewsFeed";
 import { EmptyState } from "@/components/EmptyState";
 import { PendingMembersQueue } from "@/components/PendingMembersQueue";
+import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -110,7 +111,7 @@ function AdminDashboard() {
 
   return (
     <AppShell
-      title="Tableau de bord du Bureau"
+      title="Console du Bureau"
       subtitle="Petits progrès, preuves et validations"
       actions={
         <Button asChild variant="secondary">
@@ -118,6 +119,7 @@ function AdminDashboard() {
         </Button>
       }
     >
+      <BureauConsoleTabs />
       <AgReminder />
       <PendingMembersQueue />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">

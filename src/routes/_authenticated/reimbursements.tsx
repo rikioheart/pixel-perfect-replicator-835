@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Euro, Plus, Receipt, Check, X } from "lucide-react";
+import { Euro, Plus, Receipt } from "lucide-react";
+import { REIMBURSEMENT_LABEL, summarizeReimbursements, euro } from "@/lib/finance-status";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -42,34 +43,42 @@ export const Route = createFileRoute("/_authenticated/reimbursements")({
   component: ReimbursementsPage,
 });
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "En attente",
-  APPROVED: "Validé",
-  PAID: "Remboursé",
-  REFUSED: "Refusé",
-};
-
 const EMPTY = { label: "", amount: "", receipt_url: "" };
 
 function ReimbursementsPage() {
-  const { user, isBureau } = useAuth();
+  const { user, isPro } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["reimbursements", isBureau],
+  // Espace personnel : uniquement mes propres demandes, même pour un membre du Bureau.
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["reimbursements", "mine", user?.id],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from("reimbursements")
         .select("*")
+        .eq("person_id", user!.id)
         .order("created_at", { ascending: false });
-      if (!isBureau) query = query.eq("person_id", user!.id);
-      const { data, error } = await query;
       if (error) throw new Error(error.message);
       return data ?? [];
     },
     enabled: !!user,
+  });
+
+  // Reversements professionnels : lignes qui me concernent (lecture autorisée par la base).
+  const payouts = useQuery({
+    queryKey: ["my-payouts", user?.id],
+    enabled: !!user && isPro,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("accounting")
+        .select("id, label, professional_share, recorded_on")
+        .eq("professional_id", user!.id)
+        .order("recorded_on", { ascending: false });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
   });
 
   const create = useMutation({
@@ -77,13 +86,15 @@ function ReimbursementsPage() {
       if (!form.label.trim()) throw new Error("Décrivez la dépense.");
       const amount = Number(form.amount.replace(",", "."));
       if (!amount || amount <= 0) throw new Error("Indiquez un montant valide.");
+      const receipt = form.receipt_url.trim();
+      if (receipt && !/^https?:\/\//i.test(receipt)) throw new Error("Le justificatif doit être un lien https://");
       const { error } = await supabase.from("reimbursements").insert({
         person_id: user!.id,
         label: form.label.trim(),
         amount,
-        receipt_url: form.receipt_url.trim() || null,
+        receipt_url: receipt || null,
       });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error("La demande n'a pas pu être envoyée. Réessayez.");
     },
     onSuccess: () => {
       toast.success("Demande envoyée au Bureau.");
@@ -94,110 +105,80 @@ function ReimbursementsPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const setStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("reimbursements")
-        .update({ status, processed_by: user!.id })
-        .eq("id", id);
-      if (error) throw new Error(error.message);
-    },
-    onSuccess: () => {
-      toast.success("Demande mise à jour.");
-      queryClient.invalidateQueries({ queryKey: ["reimbursements"] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
   const rows = data ?? [];
-  const total = rows
-    .filter((r) => r.status !== "REFUSED")
-    .reduce((sum, r) => sum + Number(r.amount ?? 0), 0);
+  const sum = summarizeReimbursements(rows);
 
   return (
     <AppShell
       title="Paiements & remboursements"
-      subtitle={
-        isBureau
-          ? "Traitez les notes de frais des bénévoles et suivez les montants engagés."
-          : "Demandez le remboursement des frais que vous avancez pour l'association."
-      }
+      subtitle="Vos demandes de remboursement et, pour les professionnels, vos reversements. Vous seul les voyez, avec le Bureau."
       actions={
         <Button className="rounded-full" onClick={() => setOpen(true)}>
           <Plus className="mr-2 size-4" /> Nouvelle demande
         </Button>
       }
     >
-      <div className="mb-5 inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm">
-        <Euro className="size-4 text-primary" />
-        <span className="font-semibold">
-          {total.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-        </span>
-        <span className="text-muted-foreground">de frais suivis</span>
-      </div>
-
-      {isLoading ? (
+      {isError ? (
+        <p className="panel p-4 text-sm text-destructive">Impossible de charger vos demandes pour le moment. Réessayez plus tard.</p>
+      ) : isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement des demandes…</p>
-      ) : rows.length === 0 ? (
-        <EmptyState
-          title="Aucune demande"
-          message="Vos demandes de remboursement apparaîtront ici une fois créées."
-        />
       ) : (
-        <div className="space-y-3">
-          {rows.map((item) => (
-            <article
-              key={item.id}
-              className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4"
-            >
-              <div className="min-w-[200px] flex-1">
-                <p className="font-semibold">{item.label}</p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(item.created_at).toLocaleDateString("fr-FR")} ·{" "}
-                  {STATUS_LABEL[item.status] ?? item.status}
-                </p>
+        <>
+          <div className="mb-5 grid gap-3 sm:grid-cols-3">
+            {[
+              { label: "En attente", value: sum.pending },
+              { label: "Approuvé, à recevoir", value: sum.approved },
+              { label: "Déjà remboursé", value: sum.paid },
+            ].map((s) => (
+              <div key={s.label} className="rounded-xl border border-border bg-card px-4 py-3 text-sm">
+                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <p className="flex items-center gap-1.5 font-display text-lg font-bold"><Euro className="size-4 text-primary" />{euro(s.value)}</p>
               </div>
-              <span className="font-display text-base font-bold">
-                {Number(item.amount).toLocaleString("fr-FR", {
-                  style: "currency",
-                  currency: "EUR",
-                })}
-              </span>
-              {item.receipt_url ? (
-                <a
-                  href={item.receipt_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary"
-                >
-                  <Receipt className="size-3.5" /> Justificatif
-                </a>
-              ) : null}
-              {isBureau && item.status === "PENDING" ? (
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    className="rounded-full"
-                    disabled={setStatus.isPending}
-                    onClick={() => setStatus.mutate({ id: item.id, status: "PAID" })}
-                  >
-                    <Check className="mr-1 size-3.5" /> Rembourser
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="rounded-full"
-                    disabled={setStatus.isPending}
-                    onClick={() => setStatus.mutate({ id: item.id, status: "REFUSED" })}
-                  >
-                    <X className="mr-1 size-3.5" /> Refuser
-                  </Button>
-                </div>
-              ) : null}
-            </article>
-          ))}
-        </div>
+            ))}
+          </div>
+          {rows.length === 0 ? (
+            <EmptyState title="Aucune demande" message="Vos demandes de remboursement apparaîtront ici une fois créées." />
+          ) : (
+            <div className="space-y-3">
+              {rows.map((item) => (
+                <article key={item.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4">
+                  <div className="min-w-[200px] flex-1">
+                    <p className="font-semibold">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(item.created_at).toLocaleDateString("fr-FR")} · {REIMBURSEMENT_LABEL[item.status] ?? item.status}
+                    </p>
+                  </div>
+                  <span className="font-display text-base font-bold">{euro(Number(item.amount))}</span>
+                  {item.receipt_url ? (
+                    <a href={item.receipt_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                      <Receipt className="size-3.5" /> Justificatif
+                    </a>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          )}
+        </>
       )}
+
+      {isPro ? (
+        <section className="mt-8 space-y-3" aria-labelledby="payouts-title">
+          <h2 id="payouts-title" className="font-display text-lg">Mes reversements</h2>
+          {payouts.isError ? (
+            <p className="text-sm text-destructive">Reversements indisponibles pour le moment.</p>
+          ) : (payouts.data ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucun reversement enregistré par le Bureau pour l'instant.</p>
+          ) : (
+            (payouts.data ?? []).map((p) => (
+              <div key={p.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm">
+                <span>{p.label ?? "Prestation"} · {new Date(p.recorded_on).toLocaleDateString("fr-FR")}</span>
+                <span className="font-semibold">{euro(Number(p.professional_share))}</span>
+              </div>
+            ))
+          )}
+          <p className="text-xs text-muted-foreground">Montants calculés par le Bureau à partir des recettes enregistrées ; aucune estimation automatique.</p>
+        </section>
+      ) : null}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

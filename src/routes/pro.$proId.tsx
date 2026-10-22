@@ -42,7 +42,7 @@ function LegacyProRedirect() {
         <div className="panel p-6">
           <h1 className="font-display text-xl">Fiche introuvable</h1>
           <p className="mt-2 text-sm text-muted-foreground">Ce professionnel n'a pas de carte publiée.</p>
-          <Link to="/association" className="mt-3 inline-block text-sm underline">Découvrir l'association</Link>
+          <a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm underline">Découvrir l'association</a>
         </div>
       )}
     </main>
