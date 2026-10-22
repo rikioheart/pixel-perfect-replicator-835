@@ -228,30 +228,31 @@ function SignUpForm() {
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setBusy(true);
+    const firstName = form.firstName.trim();
+    const lastName = form.lastName.trim();
     const { data, error } = await supabase.auth.signUp({
-      email: form.email,
+      email: form.email.trim(),
       password: form.password,
-      options: { emailRedirectTo: window.location.origin },
+      options: {
+        emailRedirectTo: window.location.origin,
+        // La base crée le profil (statut PENDING imposé) à partir de ces informations.
+        data: { first_name: firstName, last_name: lastName, membership_type: form.type === "PROFESSIONNEL" ? "PROFESSIONNEL" : "PARTICULIER" },
+      },
     });
+    setBusy(false);
     if (error) {
-      setBusy(false);
-      toast.error(error.message);
+      toast.error(/already registered|already exists/i.test(error.message) ? "Un compte existe déjà avec cet e-mail. Connectez-vous ou réinitialisez votre mot de passe." : error.message);
       return;
     }
-    const userId = data.user?.id;
-    if (userId && data.session) {
-      await supabase.from("profiles").insert({
-        id: userId,
-        first_name: form.firstName,
-        last_name: form.lastName,
-        display_name: `${form.firstName} ${form.lastName}`.trim(),
-        email: form.email,
-        membership_type: form.type,
-        membership_status: "PENDING",
-      });
+    if (!data.user) {
+      toast.error("Le compte n'a pas pu être créé. Réessayez dans un instant.");
+      return;
     }
-    setBusy(false);
-    toast.success("Compte créé. Votre adhésion est en attente de validation du Bureau.");
+    toast.success(
+      data.session
+        ? "Compte créé. Votre adhésion est en attente de validation du Bureau."
+        : "Compte créé. Confirmez votre e-mail avec le lien reçu, puis connectez-vous. Le Bureau validera ensuite votre adhésion.",
+    );
   };
 
   return (
