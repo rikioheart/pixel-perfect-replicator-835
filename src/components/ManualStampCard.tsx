@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Stamp } from "lucide-react";
+import { Camera, ClipboardPaste, Stamp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/hooks/useAuth';
 import { useOnline, readQueue, saveQueue, parisDay, canAutoSync, type PendingStamp } from '@/lib/offline';
+import { normalizePassInput } from "@/lib/pass-code";
+import { PassScanner } from "@/components/PassScanner";
 
 type Opt = { id: string; name: string };
+type Identified = { id: string; name: string; total: number; type: string; status: string };
 
-/** Attribution manuelle d'un tampon par un professionnel, avec information d'un membre du Bureau. */
+/** Validation d'un Pass Terrain par un professionnel : caméra, collage ou saisie, puis tampon serveur. */
 export function ManualStampCard() {
   const { user } = useAuth();
   const online = useOnline();
@@ -20,6 +23,10 @@ export function ManualStampCard() {
   const [member, setMember] = useState("");
   const [bureau, setBureau] = useState("");
   const [reason, setReason] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const [codeInput, setCodeInput] = useState("");
+  const [resolving, setResolving] = useState(false);
+  const [identified, setIdentified] = useState<Identified | null>(null);
   const { data } = useQuery({
     queryKey: ["manual-stamp-options", user?.id],
     enabled: !!user && online,
@@ -84,13 +91,64 @@ export function ManualStampCard() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const resolve = async (raw: string) => {
+    setScanning(false);
+    const code = normalizePassInput(raw);
+    if (!code) { toast.error("Ce code ne ressemble pas à un Pass Terrain."); return; }
+    if (!navigator.onLine) { toast.info("Sans réseau, le pass ne peut pas être vérifié : choisissez la personne dans la liste."); return; }
+    setResolving(true);
+    const { data: res, error } = await supabase.rpc("resolve_member_from_qr", { _scanned_code: code });
+    setResolving(false);
+    if (error) { toast.error(error.message); return; }
+    const r = res as { found: boolean; reason?: string; member_id?: string; display_name?: string; total_stamps?: number; membership_type?: string; membership_status?: string };
+    if (!r.found) {
+      toast.error(r.reason === "AMBIGUOUS" ? "Plusieurs pass correspondent : scannez le QR ou saisissez le code complet." : "Aucun pass ne correspond à ce code.");
+      return;
+    }
+    setIdentified({ id: r.member_id!, name: r.display_name ?? "Adhérent", total: r.total_stamps ?? 0, type: r.membership_type ?? "", status: r.membership_status ?? "" });
+    setMember(r.member_id!);
+    setCodeInput("");
+  };
+  const paste = async () => {
+    try { const text = await navigator.clipboard.readText(); if (text) { setCodeInput(text); void resolve(text); } else toast.info("Le presse-papier est vide."); }
+    catch { toast.info("Collage automatique refusé : collez le code dans le champ."); }
+  };
+
   return (
-    <section className="panel space-y-3 p-4 text-sm">
-      <h2 className="flex items-center gap-2 font-display text-lg"><Stamp className="size-4" aria-hidden /> Attribuer un tampon</h2>
-      <p className="text-xs text-muted-foreground">Pour un membre particulier. Le membre du Bureau choisi reçoit une notification.</p>
-      <Label htmlFor="ms-member">Membre</Label>
-      <select id="ms-member" className="h-10 w-full rounded-md border border-input bg-background px-2" value={member} onChange={(e) => setMember(e.target.value)}>
+    <section className="panel space-y-3 p-4 text-sm" aria-labelledby="ms-title">
+      <h2 id="ms-title" className="flex items-center gap-2 font-display text-lg"><Stamp className="size-4" aria-hidden /> Valider un Pass Terrain</h2>
+      <p className="text-xs text-muted-foreground">Scannez le pass d'un membre particulier, collez ou saisissez son code. Le membre du Bureau choisi est informé.</p>
+
+      <div className="space-y-2 rounded-xl border border-border bg-card p-3">
+        {scanning ? (
+          <PassScanner onResult={(t) => void resolve(t)} onClose={() => setScanning(false)} />
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button type="button" onClick={() => setScanning(true)} disabled={!online}><Camera className="size-4" aria-hidden /> Scanner le QR code</Button>
+            <Button type="button" variant="outline" onClick={() => void paste()} disabled={!online}><ClipboardPaste className="size-4" aria-hidden /> Coller le code</Button>
+          </div>
+        )}
+        <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); void resolve(codeInput); }}>
+          <Label htmlFor="ms-code" className="sr-only">Code du pass</Label>
+          <Input id="ms-code" value={codeInput} onChange={(e) => setCodeInput(e.target.value)} placeholder="Code du pass, ex. 7B29-C4E1" autoComplete="off" inputMode="text" />
+          <Button type="submit" variant="secondary" disabled={!codeInput.trim() || resolving}>{resolving ? "…" : "Vérifier"}</Button>
+        </form>
+        {identified && identified.id === member && (
+          <div role="status" className="rounded-lg bg-muted p-3">
+            <p className="font-medium">{identified.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {identified.total % 10}/10 tampons sur la carte en cours
+              {identified.status !== "ACTIVE" ? " · adhésion en attente de validation" : ""}
+              {identified.type !== "PARTICULIER" ? " · les tampons manuels sont réservés aux particuliers" : ""}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <Label htmlFor="ms-member">Ou choisir dans la liste</Label>
+      <select id="ms-member" className="h-10 w-full rounded-md border border-input bg-background px-2" value={member} onChange={(e) => { setMember(e.target.value); setIdentified(null); }}>
         <option value="">Choisir…</option>
+        {identified && !(data ?? cached)?.members.some((m) => m.id === identified.id) && <option value={identified.id}>{identified.name}</option>}
         {(data ?? cached)?.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
       </select>
       <Label htmlFor="ms-bureau">Membre du Bureau à informer</Label>

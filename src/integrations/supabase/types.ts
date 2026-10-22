@@ -4331,6 +4331,14 @@ export type Database = {
         Returns: boolean
       }
       pro_slug_for: { Args: { _profile_id: string }; Returns: string }
+      profile_contacts: {
+        Args: { _ids: string[] }
+        Returns: {
+          email: string
+          id: string
+          phone: string
+        }[]
+      }
       recompute_loyalty_all: { Args: never; Returns: number }
       recompute_loyalty_for_member: {
         Args: { _user_id: string }
@@ -4348,6 +4356,7 @@ export type Database = {
         }
         Returns: Json
       }
+      resolve_member_from_qr: { Args: { _scanned_code: string }; Returns: Json }
       revoke_delegation: { Args: { _id: string }; Returns: undefined }
       revoke_dog_access: { Args: { _access_id: string }; Returns: undefined }
       run_daily_reminders: { Args: never; Returns: undefined }

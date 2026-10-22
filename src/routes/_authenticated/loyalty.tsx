@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Stamp, QrCode, RefreshCw, Trophy } from "lucide-react";
+import { Stamp, QrCode, RefreshCw, Trophy, Copy } from "lucide-react";
+import { passShortCode } from "@/lib/pass-code";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -169,7 +170,7 @@ function LoyaltyPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
-              <QrCode className="size-4" /> Mon code
+              <QrCode className="size-4" /> Mon Pass Terrain
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
@@ -177,13 +178,26 @@ function LoyaltyPage() {
               <>
                 <img
                   src={qrImage || undefined}
-                  alt="QR code de la carte de fidélité"
-                  className="mx-auto rounded-md border border-border bg-white p-2"
-                  loading="lazy"
-                  width={220}
-                  height={220}
+                  alt="QR code du Pass Terrain à présenter au professionnel"
+                  className="mx-auto w-full max-w-[280px] rounded-md border border-border bg-white p-2"
+                  width={280}
+                  height={280}
                 />
-                <p className="break-all text-center text-xs text-muted-foreground">{card.qr_code}</p>
+                <p className="text-center font-mono text-2xl tracking-widest" aria-label="Code court du pass">{passShortCode(card.qr_code)}</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mx-auto flex"
+                  onClick={() => {
+                    void navigator.clipboard?.writeText(passShortCode(card.qr_code)).then(
+                      () => toast.success("Code copié."),
+                      () => toast.info("Copie impossible : lisez le code à voix haute."),
+                    );
+                  }}
+                >
+                  <Copy className="size-4" aria-hidden /> Copier mon code
+                </Button>
                 <p className="text-center text-xs text-muted-foreground">Pass sauvegardé sur ce téléphone pour le présenter sans réseau. Le QR identifie votre carte ; il ne confirme pas votre adhésion.</p>
               </>
             ) : (

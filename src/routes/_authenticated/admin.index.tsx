@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { TASK_STATUS_LABEL, PROJECT_STATUS_LABEL, formatDate } from "@/lib/domain";
 import { NewsFeed } from "@/components/NewsFeed";
 import { EmptyState } from "@/components/EmptyState";
+import { PendingMembersQueue } from "@/components/PendingMembersQueue";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -71,32 +72,11 @@ function AdminDashboard() {
   if (!loading && !isBureau) {
     return (
       <AppShell title="Espace Bureau" subtitle="Accès réservé aux membres du Bureau">
-        <div className="panel max-w-xl space-y-4 p-6">
+        <div className="panel max-w-xl space-y-2 p-6">
           <p className="text-sm text-muted-foreground">
-            Votre compte ne dispose pas encore du rôle Bureau. Si vous initialisez la plateforme,
-            vous pouvez revendiquer le premier compte administrateur.
+            Cet espace est réservé aux membres du Bureau. Un membre du Bureau peut vous confier ce rôle si besoin.
           </p>
-          <Button
-            onClick={async () => {
-              const { data: claimed, error } = await supabase.rpc("claim_bureau_bootstrap");
-              if (error) {
-                toast.error(error.message);
-                return;
-              }
-              if (claimed) {
-                toast.success("Vous êtes désormais membre du Bureau.");
-                await refresh();
-                await queryClient.invalidateQueries();
-              } else {
-                toast.error("Un membre du Bureau existe déjà. Demandez-lui de vous ajouter.");
-              }
-            }}
-          >
-            Devenir le premier membre du Bureau
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            Rôles actuels : {roles.length ? roles.join(", ") : "aucun"}
-          </p>
+          <p className="text-xs text-muted-foreground">Rôles actuels : {roles.length ? roles.join(", ") : "aucun"}</p>
         </div>
       </AppShell>
     );
@@ -139,6 +119,7 @@ function AdminDashboard() {
       }
     >
       <AgReminder />
+      <PendingMembersQueue />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <div key={stat.label} className="panel p-4">

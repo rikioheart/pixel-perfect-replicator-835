@@ -18,7 +18,7 @@
   const authKey=Object.keys(localStorage).find(k=>/^sb-.*-auth-token$/.test(k));
   const session=read(authKey);const owner=session?.user?.id;
   const pass=read('lvdc.offline.pass');
-  if(owner&&pass?.owner===owner){el('pass-section').hidden=false;el('show-pass').onclick=()=>{el('pass').replaceChildren();const qr=document.createElement('img');qr.src=pass.qr;qr.alt='QR code de mon pass';qr.width=220;qr.height=220;el('pass').append(text('p',pass.name),qr,text('p',`${pass.total} tampon(s) confirmés lors de la sauvegarde`),text('p','Dernière mise à jour : '+new Date(pass.savedAt).toLocaleString('fr-FR')));el('pass').hidden=false}}
+  if(owner&&pass?.owner===owner){el('pass-section').hidden=false;el('show-pass').onclick=()=>{el('pass').replaceChildren();const qr=document.createElement('img');qr.src=pass.qr;qr.alt='QR code de mon pass';qr.width=260;qr.height=260;qr.style.background='#fff';qr.style.padding='8px';el('pass').append(text('p',pass.name),qr,...(pass.code?[text('p','Code : '+pass.code)]:[]),text('p',`${pass.total} tampon(s) confirmés lors de la sauvegarde`),text('p','Dernière mise à jour : '+new Date(pass.savedAt).toLocaleString('fr-FR')));el('pass').hidden=false}}
   const options=owner&&read(`lvdc.offline.options.${owner}`);const queueKey=`lvdc.offline.stamps.${owner}`;
   const day=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   if(options){el('stamp-section').hidden=false;el('sync-link').hidden=false;

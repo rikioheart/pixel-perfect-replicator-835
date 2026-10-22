@@ -130,7 +130,7 @@ function AuditPage() {
     queryKey: ["audit-actors"],
     enabled: isBureau,
     queryFn: async () =>
-      (await supabase.from("profiles").select("id, display_name, first_name, last_name, email"))
+      (await supabase.from("profiles").select("id, display_name, first_name, last_name"))
         .data ?? [],
   });
 

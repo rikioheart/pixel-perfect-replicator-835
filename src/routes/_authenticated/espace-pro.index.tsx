@@ -10,6 +10,7 @@ import { PRO_STATUS_LABEL, completion } from "@/lib/pro-card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { readQueue } from "@/lib/offline";
+import { ManualStampCard } from "@/components/ManualStampCard";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/")({
   head: () => ({
@@ -81,8 +82,11 @@ function ProDashboard() {
         <div className="panel p-4">
           <p className="text-xs text-muted-foreground">Demandes de tampons sur cet appareil</p>
           <p className="font-display text-3xl">{pendingCount}</p>
-          <Button asChild variant="outline" size="sm" className="mt-3"><Link to="/loyalty"><Stamp className="size-4" aria-hidden /> {pendingCount ? "Vérifier les demandes" : "Attribuer un tampon"}</Link></Button>
+          <Button asChild variant="outline" size="sm" className="mt-3"><a href="#pass-terrain"><Stamp className="size-4" aria-hidden /> {pendingCount ? "Vérifier les demandes" : "Valider un pass"}</a></Button>
         </div>
+      </div>
+      <div id="pass-terrain" className="mt-6 max-w-2xl scroll-mt-20">
+        <ManualStampCard />
       </div>
     </AppShell>
   );
