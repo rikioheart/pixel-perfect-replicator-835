@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useSensitiveRights } from "@/lib/permissions";
+import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { buildRows, toCsv, toTsv, parseHelloAssoCsv, EXPORT_COLUMNS } from "@/lib/finance-export";
 
 export const Route = createFileRoute("/_authenticated/admin/suivi-financier")({
@@ -33,13 +34,16 @@ const OUT_FR: Record<string, string> = { CREATED: "Créé", UPDATED: "Mis à jou
 const EMPTY = { entry_date: new Date().toISOString().slice(0, 10), direction: "RECETTE", category: "CONTRIBUTION", amount: "", description: "", status: "A_RECEVOIR", receipt_url: "", payment_method: "", external_ref: "", internal_note: "" };
 
 function Page() {
-  const { isBureau } = useAuth();
+  // Requêtes lancées seulement si le droit est effectif ; la base refuse de toute façon (RLS).
+  const rights = useSensitiveRights();
+  const canJournal = rights.viewGlobal || rights.validateMembers;
   const qc = useQueryClient();
   const [f, setF] = useState(EMPTY);
   const [filter, setFilter] = useState("");
 
   const entries = useQuery({
     queryKey: ["finance-entries"],
+    enabled: rights.viewGlobal,
     queryFn: async () => {
       const { data, error } = await supabase.from("finance_entries")
         .select("*, people(display_name, first_name, last_name), projects(title), activities(title)")
@@ -50,6 +54,7 @@ function Page() {
   });
   const rentals = useQuery({
     queryKey: ["rentals-untracked"],
+    enabled: rights.viewGlobal,
     queryFn: async () => {
       const { data } = await supabase.from("terrain_reservations").select("id, date, purpose, status, rental_terms")
         .eq("access_mode", "LOCATION").in("status", ["APPROVED", "PENDING"]).order("date", { ascending: false }).limit(100);
@@ -58,8 +63,10 @@ function Page() {
   });
   const journal = useQuery({
     queryKey: ["integration-events"],
+    enabled: canJournal,
     queryFn: async () => {
-      const { data } = await supabase.from("integration_events").select("*").order("created_at", { ascending: false }).limit(100);
+      const { data, error } = await supabase.from("integration_events").select("*").order("created_at", { ascending: false }).limit(100);
+      if (error) throw error;
       return data ?? [];
     },
   });
@@ -125,19 +132,23 @@ function Page() {
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `suivi-financier-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
   };
 
-  if (!isBureau) return <AppShell title="Suivi financier"><EmptyState title="Réservé au Bureau" message="Le suivi financier est accessible au Bureau disposant du droit finances." /></AppShell>;
+  if (!rights.ready) return <AppShell title="Suivi financier"><p role="status" className="text-sm text-muted-foreground">Vérification de vos droits…</p></AppShell>;
+  if (!rights.viewGlobal) return <AppShell title="Suivi financier"><EmptyState title="Droit finances requis" message="Le suivi des opérations est réservé aux membres du Bureau disposant du droit « consulter les finances globales »." /></AppShell>;
+  const money = (n: number) => (entries.isError ? "—" : `${n.toFixed(2)} €`);
 
   return (
     <AppShell title="Suivi financier" subtitle="Suivi opérationnel et préparation des exports. La comptabilité officielle reste tenue dans l'outil comptable de l'association.">
+      <BureauConsoleTabs />
       <section className="mb-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Recettes suivies</p><p className="text-xl font-bold">{totals.in.toFixed(2)} €</p></div>
-        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Dépenses suivies</p><p className="text-xl font-bold">{totals.out.toFixed(2)} €</p></div>
+        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Recettes suivies</p><p className="text-xl font-bold">{money(totals.in)}</p><p className="text-xs text-muted-foreground">Source : opérations suivies, hors annulées</p></div>
+        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Dépenses suivies</p><p className="text-xl font-bold">{money(totals.out)}</p><p className="text-xs text-muted-foreground">Remboursements et reversements : voir Comptabilité</p></div>
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-4">
           <Button size="sm" onClick={download}><Download className="mr-1 size-3.5" />CSV</Button>
           <Button size="sm" variant="outline" onClick={() => { void navigator.clipboard.writeText(toTsv(rows)); toast.success("Copié : collez directement dans Google Sheets ou un tableur."); }}><Copy className="mr-1 size-3.5" />Copier pour tableur</Button>
         </div>
       </section>
 
+      {rights.create ? (
       <details className="mb-6 rounded-xl border border-border bg-card p-4">
         <summary className="cursor-pointer font-semibold">Ajouter une opération</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -161,8 +172,9 @@ function Page() {
         </div>
         <Button className="mt-3" onClick={() => add.mutate({})} disabled={add.isPending}>Enregistrer</Button>
       </details>
+      ) : null}
 
-      {(rentals.data ?? []).filter((r) => !tracked.has(r.id)).length > 0 && (
+      {rights.create && (rentals.data ?? []).filter((r) => !tracked.has(r.id)).length > 0 && (
         <section className="mb-6 rounded-xl border border-border bg-card p-4">
           <h2 className="mb-2 font-semibold">Locations de terrain sans suivi</h2>
           <p className="mb-2 text-xs text-muted-foreground">Une réservation ne devient jamais une opération automatiquement : à vous de décider.</p>
@@ -184,7 +196,7 @@ function Page() {
             {k === "" ? "Tout" : k === "RECETTE" ? "Recettes" : k === "DEPENSE" ? "Dépenses" : STATUS_FR[k]}</Button>
         ))}
       </div>
-      {entries.isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
+      {entries.isError ? <p className="text-sm text-destructive">Opérations indisponibles (chargement ou droits).</p> : entries.isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
         <EmptyState title="Aucune opération" message="Ajoutez une opération ou importez des adhésions HelloAsso." />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border">
@@ -199,7 +211,7 @@ function Page() {
                   <td className="px-3 py-2 font-semibold">{Number(e.amount).toFixed(2)} €</td>
                   <td className="px-3 py-2">{rows[i]?.personne || rows[i]?.projet || rows[i]?.activite || e.description || "—"}</td>
                   <td className="px-3 py-2">
-                    <select aria-label="Statut" className="h-9 rounded-md border border-input bg-background px-2" value={e.status} onChange={(ev) => setStatus.mutate({ id: e.id, status: ev.target.value })}>
+                    <select aria-label="Statut" disabled={!rights.update} className="h-9 rounded-md border border-input bg-background px-2" value={e.status} onChange={(ev) => setStatus.mutate({ id: e.id, status: ev.target.value })}>
                       {Object.entries(STATUS_FR).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
                   </td>
                   <td className="px-3 py-2">{e.receipt_url ? <a className="underline" href={e.receipt_url} target="_blank" rel="noreferrer">Justificatif</a> : <span className="text-xs text-muted-foreground">sans justificatif</span>}</td>
