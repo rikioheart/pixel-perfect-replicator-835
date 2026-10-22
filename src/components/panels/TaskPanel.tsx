@@ -106,14 +106,6 @@ export function TaskPanel({
         taskId = data.id;
       }
 
-      const recipients = [...assignees];
-      if (payload.project_id) {
-        const { data: projectMembers } = await supabase
-          .from("project_members")
-          .select("user_id")
-          .eq("project_id", payload.project_id);
-        recipients.push(...(projectMembers ?? []).map((row) => row.user_id));
-      }
 
       toast.success(editing ? "Tâche mise à jour." : "Tâche créée.");
       void queryClient.invalidateQueries({ queryKey: ["tasks"] });

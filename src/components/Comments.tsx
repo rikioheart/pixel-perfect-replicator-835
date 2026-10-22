@@ -27,7 +27,7 @@ const ENTITY_LABEL: Record<CommentEntity, string> = {
 
 /**
  * Fil de discussion partagé par les personnes concernées (projet, tâche,
- * événement, document). Les participants sont notifiés à chaque message.
+ * événement, document). Les personnes concernées sont notifiées par la base (droits de lecture vérifiés).
  */
 export function Comments({
   entityType,

@@ -53,6 +53,14 @@ const LABELS: Record<string, string> = {
   CONTRACT_UPDATED: "Contrat mis à jour",
   REIMBURSEMENT_REQUESTED: "Remboursement demandé",
   REIMBURSEMENT_VALIDATED: "Remboursement validé",
+  TASK_ASSIGNED: "Tâche confiée",
+  TASK_CREATED: "Nouvelle tâche",
+  PROJECT_CREATED: "Nouveau projet",
+  PROJECT_MEMBER_ADDED: "Ajout à un projet",
+  HELP_GUIDE_PROPOSED: "Guide proposé",
+  HELP_OFFER: "Proposition d’aide",
+  CONTRIBUTION_UPDATE: "Réponse à votre proposition",
+  MEMBER_PENDING: "Adhésion à valider",
   SYSTEM: "Système",
 };
 

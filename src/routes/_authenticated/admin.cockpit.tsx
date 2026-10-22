@@ -146,7 +146,7 @@ function CockpitPage() {
   const doneTasks = tasks.filter((t) => t.status === "COMPLETED");
   const toValidate = tasks.filter((t) => t.status === "PENDING_VALIDATION");
   const volunteerTasks = tasks.filter((t) => t.is_volunteer_task && !t.assigned_user_id);
-  const movingProjects = projects.filter((p) => data && p.updated_at >= data.since);
+  const activeProjects = projects.filter((p) => p.status === "ACTIVE");
   const upcomingEvents = (data?.events ?? []).filter((e) => !e.start_date || e.start_date >= (data?.today ?? ""));
   const upcomingActivities = (data?.activities ?? []).filter((a) => !a.date || a.date >= (data?.today ?? ""));
   const activePartners = (data?.partners ?? []).filter((p) => p.active);
@@ -163,11 +163,11 @@ function CockpitPage() {
   const privateParticipants = [...participantIds].filter((id) => !proIds.has(id));
 
   const kpis = [
-    { label: "Tâches en cours", value: inProgress.length, icon: ListChecks, to: "/tasks" },
+    { label: "À faire ou en cours", value: inProgress.length, icon: ListChecks, to: "/tasks" },
     { label: "Besoins d'aide", value: blocked.length, icon: HelpCircle, to: "/help-requests" },
     { label: "À valider", value: toValidate.length, icon: ShieldCheck, to: "/admin/validation" },
     { label: "Terminées", value: doneTasks.length, icon: Sparkles, to: "/tasks" },
-    { label: "Projets actifs cette semaine", value: movingProjects.length, icon: FolderKanban, to: "/projects" },
+    { label: "Projets actifs", value: activeProjects.length, icon: FolderKanban, to: "/projects" },
   ];
 
   return (

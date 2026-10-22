@@ -140,10 +140,8 @@ function HelpCenterPage() {
         if (error) throw error;
         return;
       }
-      const { data, error } = await supabase.from("help_guides").insert(payload).select("id").single();
+      const { error } = await supabase.from("help_guides").insert(payload);
       if (error) throw error;
-      if (!isBureau) {
-      }
     },
     onSuccess: () => {
       toast.success(isBureau ? "Guide publié." : "Guide envoyé au Bureau pour validation.");
