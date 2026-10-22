@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Stamp } from "lucide-react";
+import { Camera, ClipboardPaste, Stamp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/hooks/useAuth';
 import { useOnline, readQueue, saveQueue, parisDay, canAutoSync, type PendingStamp } from '@/lib/offline';
+import { normalizePassInput } from "@/lib/pass-code";
+import { PassScanner } from "@/components/PassScanner";
 
 type Opt = { id: string; name: string };
+type Identified = { id: string; name: string; total: number; type: string; status: string };
 
-/** Attribution manuelle d'un tampon par un professionnel, avec information d'un membre du Bureau. */
+/** Validation d'un Pass Terrain par un professionnel : caméra, collage ou saisie, puis tampon serveur. */
 export function ManualStampCard() {
   const { user } = useAuth();
   const online = useOnline();
@@ -20,6 +23,10 @@ export function ManualStampCard() {
   const [member, setMember] = useState("");
   const [bureau, setBureau] = useState("");
   const [reason, setReason] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const [codeInput, setCodeInput] = useState("");
+  const [resolving, setResolving] = useState(false);
+  const [identified, setIdentified] = useState<Identified | null>(null);
   const { data } = useQuery({
     queryKey: ["manual-stamp-options", user?.id],
     enabled: !!user && online,
