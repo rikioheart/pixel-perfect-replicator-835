@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PROJECT_STATUS_LABEL, TASK_STATUS_LABEL, formatDate } from "@/lib/domain";
 import { QuickValidationRow } from "@/components/QuickValidation";
+import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 
 
 export const Route = createFileRoute("/_authenticated/admin/cockpit")({
@@ -172,6 +173,7 @@ function CockpitPage() {
       title="Cockpit de pilotage"
       subtitle="Les réponses du Bureau, en un coup d'œil"
     >
+      <BureauConsoleTabs />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {kpis.map((kpi) => (
           <Link key={kpi.label} to={kpi.to} className="panel block p-4 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">

@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Euro, Plus, Receipt } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -193,6 +194,7 @@ function FinancePage() {
         ) : null
       }
     >
+      <BureauConsoleTabs />
       <div className="grid gap-4 md:grid-cols-3">
         {[
           { label: "Recettes brutes", value: totals.gross },
