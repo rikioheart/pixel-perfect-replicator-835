@@ -105,8 +105,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Gouvernance",
     items: [
-      { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, audience: "bureau", primary: true },
-      { to: "/admin/cockpit", label: "Cockpit de pilotage", icon: Gauge, audience: "bureau", primary: true },
+      { to: "/admin", label: "Console du Bureau", icon: LayoutDashboard, audience: "bureau", primary: true },
       { to: "/admin/suivi-financier", label: "Suivi financier", icon: Euro, audience: "bureau" },
       { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all", hideForParticulier: true },
       { to: "/notifications", label: "Notifications", icon: Bell, audience: "bureau", primary: true },
@@ -160,7 +159,7 @@ const NAV_GROUPS: NavGroup[] = [
         icon: Stamp,
         audience: "all",
       },
-      { to: "/finance", label: "Mes finances", icon: Euro, audience: "all", hideForParticulier: true },
+      { to: "/finance", label: "Comptabilité", icon: Euro, audience: "bureau" },
       { to: "/participations", label: "Mes participations", icon: CalendarCheck, audience: "all" },
       { to: "/advantages", label: "Mes avantages", icon: Gift, audience: "all" },
       { to: "/reimbursements", label: "Paiements & remboursements", icon: ReceiptText, audience: "all" },
