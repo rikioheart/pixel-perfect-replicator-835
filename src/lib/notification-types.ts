@@ -61,6 +61,7 @@ const LABELS: Record<string, string> = {
   HELP_OFFER: "Proposition d’aide",
   CONTRIBUTION_UPDATE: "Réponse à votre proposition",
   MEMBER_PENDING: "Adhésion à valider",
+  MEMBERSHIP_DECISION: "Décision d’adhésion",
   SYSTEM: "Système",
 };
 

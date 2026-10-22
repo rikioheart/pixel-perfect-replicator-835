@@ -21,6 +21,22 @@ export function canProcessReimbursement(viewerId: string | undefined, personId: 
   return isBureau && !!viewerId && viewerId !== personId;
 }
 
+/**
+ * Actions réellement proposées : approuver/refuser exige le droit de validation,
+ * payer exige le droit de paiement, jamais sur sa propre demande (miroir de guard_reimbursement).
+ */
+export function allowedReimbursementActions(
+  status: string,
+  viewerId: string | undefined,
+  personId: string,
+  rights: { validate: boolean; markPaid: boolean },
+): ReimbursementStatus[] {
+  if (!viewerId || viewerId === personId) return [];
+  return nextReimbursementActions(status).filter((next) =>
+    next === "PAID" ? rights.markPaid : rights.validate,
+  );
+}
+
 export type ReimbursementSummary = { pending: number; approved: number; paid: number; rejected: number };
 
 /** Totaux distincts par statut : les montants en attente ne sont jamais additionnés aux montants payés. */
@@ -67,4 +83,21 @@ export function summarizePayouts(rows: { professional_share: number | string | n
     if (r.professional_paid_at) paid += c; else due += c;
   }
   return { paid: paid / 100, due: due / 100 };
+}
+
+/** Messages des contrôles en base (déjà en français) affichés tels quels ; le reste devient un message neutre. */
+const DB_MESSAGES = [
+  /propre (demande|reversement|adhésion)/,
+  /approuvée avant/,
+  /ne peut plus (changer|être modifiée)/,
+  /Droit de (validation|paiement)/,
+  /Transition de statut/,
+  /Seul le demandeur/,
+  /file « Adhésions à valider »/,
+];
+export function financeErrorMessage(raw: string | undefined | null): string {
+  const msg = raw ?? "";
+  if (DB_MESSAGES.some((re) => re.test(msg))) return msg;
+  if (/row-level security|permission denied/i.test(msg)) return "Action refusée : ce droit ne vous est pas attribué.";
+  return "Mise à jour refusée. Actualisez la page.";
 }

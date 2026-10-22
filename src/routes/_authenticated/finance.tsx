@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { REIMBURSEMENT_LABEL, balancesByMember, canProcessReimbursement, euro, nextReimbursementActions, payoutLabel, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { REIMBURSEMENT_LABEL, allowedReimbursementActions, balancesByMember, euro, financeErrorMessage, payoutLabel, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { useSensitiveRights } from "@/lib/permissions";
 import { PROFILE_COLUMNS } from "@/lib/profile-columns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -45,22 +46,25 @@ export const Route = createFileRoute("/_authenticated/finance")({
 });
 
 function FinancePage() {
-  const { user, isBureau, rolesReady } = useAuth();
+  const { user } = useAuth();
+  const rights = useSensitiveRights();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  // Comptabilité réservée au Bureau : les autres rôles retrouvent leur espace personnel.
+  // Comptabilité : droit explicite requis (Bureau ET permission). Les autres retrouvent leur espace personnel.
+  const canReimb = rights.viewGlobal || rights.validateReimbursements || rights.markPaid;
+  const allowed = rights.viewGlobal || canReimb;
   useEffect(() => {
-    if (rolesReady && !isBureau) {
+    if (rights.ready && !allowed) {
       toast.info("Vos demandes et paiements sont dans « Paiements & remboursements ».");
       void navigate({ to: "/reimbursements", replace: true });
     }
-  }, [rolesReady, isBureau, navigate]);
+  }, [rights.ready, allowed, navigate]);
   const [open, setOpen] = useState(false);
   const [line, setLine] = useState({ label: "", gross_revenue: "0", association_share: "0", professional_share: "0" });
 
   const { data: rows = [], isError: rowsError } = useQuery({
     queryKey: ["accounting"],
-    enabled: isBureau,
+    enabled: rights.viewGlobal,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("accounting")
@@ -73,7 +77,7 @@ function FinancePage() {
 
   const { data: reimbursements = [], isError: reimbError } = useQuery({
     queryKey: ["reimbursements", "all"],
-    enabled: isBureau,
+    enabled: canReimb,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reimbursements")
@@ -87,7 +91,7 @@ function FinancePage() {
   const personIds = [...new Set([...reimbursements.map((r) => r.person_id), ...rows.map((r) => r.professional_id).filter(Boolean) as string[]])];
   const { data: names = {} } = useQuery({
     queryKey: ["finance-names", personIds.join(",")],
-    enabled: isBureau && personIds.length > 0,
+    enabled: allowed && personIds.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles").select(PROFILE_COLUMNS).in("id", personIds);
       if (error) throw error;
@@ -104,7 +108,7 @@ function FinancePage() {
   const setPayout = useMutation({
     mutationFn: async ({ id, paid }: { id: string; paid: boolean }) => {
       const { error } = await supabase.from("accounting").update({ professional_paid_at: paid ? new Date().toISOString() : null }).eq("id", id);
-      if (error) throw new Error("Mise à jour refusée. Actualisez la page.");
+      if (error) throw new Error(financeErrorMessage(error.message));
     },
     onSuccess: () => { toast.success("Reversement mis à jour."); void queryClient.invalidateQueries({ queryKey: ["accounting"] }); },
     onError: (e: Error) => toast.error(e.message),
@@ -136,13 +140,13 @@ function FinancePage() {
         .from("reimbursements")
         .update({ status })
         .eq("id", id);
-      if (error) throw new Error(/propre demande/.test(error.message) ? "Vous ne pouvez pas traiter votre propre demande." : /approuvée avant/.test(error.message) ? "Approuvez la demande avant de la payer." : "Mise à jour refusée. Actualisez la page.");
+      if (error) throw new Error(financeErrorMessage(error.message));
     },
     onSuccess: () => {
       toast.success("Demande mise à jour.");
       void queryClient.invalidateQueries({ queryKey: ["reimbursements"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => { toast.error(error.message); void queryClient.invalidateQueries({ queryKey: ["reimbursements"] }); },
   });
 
   const totals = rows.reduce(
@@ -155,14 +159,14 @@ function FinancePage() {
   );
 
   const rsum = summarizeReimbursements(reimbursements);
-  if (!isBureau) return <AppShell title="Finances"><p className="text-sm text-muted-foreground">Redirection vers votre espace personnel…</p></AppShell>;
+  if (!rights.ready || !allowed) return <AppShell title="Finances"><p className="text-sm text-muted-foreground">{rights.ready ? "Redirection vers votre espace personnel…" : "Vérification de vos droits…"}</p></AppShell>;
 
   return (
     <AppShell
       title="Finances"
-      subtitle="Comptabilité du Bureau : recettes, répartitions et remboursements"
+      subtitle="Comptabilité du Bureau : recettes, répartitions, reversements et remboursements"
       actions={
-        isBureau ? (
+        rights.update ? (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2">
@@ -222,6 +226,8 @@ function FinancePage() {
       }
     >
       <BureauConsoleTabs />
+      {rights.viewGlobal ? (
+      <>
       <div className="grid gap-4 md:grid-cols-3">
         {[
           { label: "Recettes brutes", value: totals.gross },
@@ -297,13 +303,20 @@ function FinancePage() {
               </div>
               <span className="font-semibold">{euro(Number(r.professional_share))}</span>
               <Badge variant={r.professional_paid_at ? "default" : "outline"}>{payoutLabel(r.professional_paid_at)}</Badge>
-              <Button size="sm" variant={r.professional_paid_at ? "ghost" : "outline"} disabled={setPayout.isPending} onClick={() => setPayout.mutate({ id: r.id, paid: !r.professional_paid_at })}>
-                {r.professional_paid_at ? "Annuler" : "Marquer payé"}
-              </Button>
+              {rights.update && r.professional_id !== user?.id ? (
+                <Button size="sm" variant={r.professional_paid_at ? "ghost" : "outline"} disabled={setPayout.isPending} onClick={() => setPayout.mutate({ id: r.id, paid: !r.professional_paid_at })}>
+                  {r.professional_paid_at ? "Annuler" : "Marquer payé"}
+                </Button>
+              ) : null}
             </div>
           ))}
+          <p className="text-xs text-muted-foreground">Source : lignes comptables (part professionnelle et date de reversement).</p>
         </CardContent>
       </Card>
+      </>
+      ) : (
+        <p className="panel mb-4 p-4 text-sm text-muted-foreground">La comptabilité globale demande le droit « consulter les finances globales ». Seuls les remboursements vous sont affichés.</p>
+      )}
 
       <Card className="mt-4">
         <CardHeader className="pb-2">
@@ -343,7 +356,7 @@ function FinancePage() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">Les nouvelles demandes se font depuis « Paiements & remboursements ».</p>
+          <p className="text-xs text-muted-foreground">Source : demandes de remboursement. Les nouvelles demandes se font depuis « Paiements & remboursements ».</p>
           {reimbError ? (
             <p className="text-destructive">Remboursements indisponibles (chargement ou droits).</p>
           ) : reimbursements.length === 0 ? (
@@ -361,16 +374,15 @@ function FinancePage() {
                     {new Date(item.created_at).toLocaleDateString("fr-FR")}
                   </p>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                   <Badge variant={item.status === "PAID" ? "default" : "outline"}>{REIMBURSEMENT_LABEL[item.status] ?? item.status}</Badge>
-                  {canProcessReimbursement(user?.id, item.person_id, isBureau)
-                    ? nextReimbursementActions(item.status).map((next) => (
-                        <Button key={next} size="sm" variant={next === "REJECTED" ? "ghost" : "outline"} disabled={setStatus.isPending}
-                          onClick={() => setStatus.mutate({ id: item.id, status: next })}>
-                          {next === "APPROVED" ? "Approuver" : next === "PAID" ? "Marquer payé" : "Refuser"}
-                        </Button>
-                      ))
-                    : null}
+                  {item.person_id === user?.id ? <span className="text-xs text-muted-foreground">Votre demande : traitée par un autre membre</span> : null}
+                  {allowedReimbursementActions(item.status, user?.id, item.person_id, { validate: rights.validateReimbursements, markPaid: rights.markPaid }).map((next) => (
+                    <Button key={next} size="sm" variant={next === "REJECTED" ? "ghost" : "outline"} disabled={setStatus.isPending}
+                      onClick={() => setStatus.mutate({ id: item.id, status: next })}>
+                      {next === "APPROVED" ? "Approuver" : next === "PAID" ? "Marquer payé" : "Refuser"}
+                    </Button>
+                  ))}
                 </div>
               </div>
             ))

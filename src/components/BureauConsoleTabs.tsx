@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 
 const TABS = [
-  { to: "/admin", label: "Aperçu & adhésions" },
-  { to: "/admin/cockpit", label: "Pilotage opérationnel" },
-  { to: "/finance", label: "Comptabilité" },
+  { to: "/admin", label: "Console" },
   { to: "/admin/validation", label: "Validations" },
+  { to: "/finance", label: "Comptabilité & remboursements" },
+  { to: "/admin/suivi-financier", label: "Suivi des opérations" },
 ] as const;
 
-/** Une seule console Bureau : les écrans existants deviennent des onglets d'un même espace. */
+/** Une seule console Bureau : /admin est l'entrée canonique, les écrans spécialisés sont des onglets. */
 export function BureauConsoleTabs() {
   return (
     <nav aria-label="Console du Bureau" className="mb-5 flex flex-wrap gap-1 rounded-xl border border-border bg-card p-1">

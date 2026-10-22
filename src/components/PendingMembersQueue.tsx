@@ -6,36 +6,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/domain";
+import { useSensitiveRights } from "@/lib/permissions";
+import { membershipDecisionMessage, type MembershipDecisionResult } from "@/lib/membership-decision";
 
-/** File des adhésions en attente : validation explicite par le Bureau (la base refuse les autres). */
+/**
+ * File unique des adhésions en attente. La décision passe par decide_membership :
+ * droit members.validate vérifié en base, transition PENDING -> ACTIVE/REFUSED verrouillée, acteur et date journalisés.
+ */
 export function PendingMembersQueue() {
   const qc = useQueryClient();
-  const { data = [] } = useQuery({
+  const rights = useSensitiveRights();
+  const { data = [], isError } = useQuery({
     queryKey: ["pending-members"],
-    queryFn: async () =>
-      (
-        await supabase
-          .from("profiles")
-          .select("id, display_name, first_name, last_name, membership_type, created_at")
-          .eq("membership_status", "PENDING")
-          .order("created_at", { ascending: true })
-      ).data ?? [],
-  });
-  const validate = useMutation({
-    // Décision appliquée seulement si la demande est encore en attente : pas de double traitement.
-    mutationFn: async ({ id, status }: { id: string; status: "ACTIVE" | "REFUSED" }) => {
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .update({ membership_status: status })
-        .eq("id", id)
+        .select("id, display_name, first_name, last_name, membership_type, created_at")
         .eq("membership_status", "PENDING")
-        .select("id");
-      if (error) throw new Error("Décision refusée. Vérifiez vos droits Bureau.");
-      if (!data?.length) throw new Error("Cette demande a déjà été traitée.");
-      return status;
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
     },
-    onSuccess: (status) => {
-      toast.success(status === "ACTIVE" ? "Adhésion validée." : "Demande refusée.");
+  });
+  const validate = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: "ACTIVE" | "REFUSED" }) => {
+      const { data, error } = await supabase.rpc("decide_membership", { _profile_id: id, _decision: status });
+      const result = membershipDecisionMessage(error?.message ?? null, (data ?? null) as MembershipDecisionResult | null, status);
+      if (!result.ok) throw new Error(result.message);
+      return result.message;
+    },
+    onSuccess: (message) => {
+      toast.success(message);
       void qc.invalidateQueries({ queryKey: ["pending-members"] });
       void qc.invalidateQueries({ queryKey: ["admin-dashboard"] });
     },
@@ -51,9 +52,11 @@ export function PendingMembersQueue() {
         <h2 id="pending-members-title" className="flex items-center gap-2 font-display text-lg">
           <UserCheck className="size-4" aria-hidden /> Adhésions à valider
         </h2>
-        <Badge variant={data.length ? "default" : "secondary"}>{data.length}</Badge>
+        <Badge variant={data.length ? "default" : "secondary"}>{isError ? "—" : data.length}</Badge>
       </div>
-      {data.length === 0 ? (
+      {isError ? (
+        <p className="text-sm text-destructive">Demandes indisponibles pour le moment. Réessayez plus tard.</p>
+      ) : data.length === 0 ? (
         <p className="text-sm text-muted-foreground">Aucune demande en attente. Merci pour l'accueil des nouveaux membres.</p>
       ) : (
         <ul className="divide-y divide-border">
@@ -67,19 +70,23 @@ export function PendingMembersQueue() {
                     {m.membership_type === "PROFESSIONNEL" ? "Professionnel" : "Particulier"} · demande du {formatDate(m.created_at)}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={() => validate.mutate({ id: m.id, status: "ACTIVE" })} disabled={validate.isPending}>Valider l'adhésion</Button>
-                  <Button size="sm" variant="outline" disabled={validate.isPending}
-                    onClick={() => { if (window.confirm(`Refuser la demande de ${name} ?`)) validate.mutate({ id: m.id, status: "REFUSED" }); }}>
-                    Refuser
-                  </Button>
-                </div>
+                {rights.validateMembers ? (
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => validate.mutate({ id: m.id, status: "ACTIVE" })} disabled={validate.isPending}>Valider l'adhésion</Button>
+                    <Button size="sm" variant="outline" disabled={validate.isPending}
+                      onClick={() => { if (window.confirm(`Refuser la demande de ${name} ?`)) validate.mutate({ id: m.id, status: "REFUSED" }); }}>
+                      Refuser
+                    </Button>
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Droit « valider les adhésions » requis</span>
+                )}
               </li>
             );
           })}
         </ul>
       )}
-      <p className="text-xs text-muted-foreground">Pour demander des compléments, ouvrez la fiche et contactez la personne. Pour un professionnel, vérifiez aussi sa carte dans « Professionnels ». Un paiement HelloAsso n'active jamais un compte seul.</p>
+      <p className="text-xs text-muted-foreground">Chaque décision est enregistrée dans le journal d'activité et la personne est prévenue. Pour demander des compléments, ouvrez la fiche et contactez la personne. Pour un professionnel, vérifiez aussi sa carte dans « Fiches professionnelles ». Un paiement HelloAsso n'active jamais un compte seul.</p>
     </section>
   );
 }

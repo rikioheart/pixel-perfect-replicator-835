@@ -91,5 +91,33 @@ export function useMyPermissions() {
 
   const codes = query.data ?? [];
   const can = (code: string) => isBureau || codes.includes(code);
-  return { ...query, codes, can };
+  /** Droit sensible : Bureau ET permission explicite, comme bureau_has_permission en base. */
+  const has = (code: string) => isBureau && codes.includes(code);
+  return { ...query, codes, can, has };
+}
+
+export type FinanceRights = {
+  ready: boolean;
+  viewGlobal: boolean;
+  create: boolean;
+  update: boolean;
+  validateReimbursements: boolean;
+  markPaid: boolean;
+  validateMembers: boolean;
+};
+
+/** Droits financiers et d'adhésion effectifs ; la base reste la frontière réelle (RLS + déclencheurs). */
+export function useSensitiveRights(): FinanceRights {
+  const { rolesReady, isBureau } = useAuth();
+  const { has, isSuccess, isError } = useMyPermissions();
+  const ready = rolesReady && (!isBureau || isSuccess || isError);
+  return {
+    ready,
+    viewGlobal: has("finance.view_global"),
+    create: has("finance.create"),
+    update: has("finance.update"),
+    validateReimbursements: has("reimbursements.validate"),
+    markPaid: has("reimbursements.mark_paid"),
+    validateMembers: has("members.validate"),
+  };
 }
