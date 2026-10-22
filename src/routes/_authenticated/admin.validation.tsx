@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
+import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,6 +85,7 @@ function ValidationPage() {
       title="File de validation"
       subtitle="Aucune tâche n'est terminée sans preuve validée"
     >
+      <BureauConsoleTabs />
       {(tasks ?? []).length === 0 ? (
         <p className="text-sm text-muted-foreground">Aucune tâche en attente de validation.</p>
       ) : (
