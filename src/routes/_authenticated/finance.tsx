@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { REIMBURSEMENT_LABEL, canProcessReimbursement, euro, nextReimbursementActions, summarizeReimbursements } from "@/lib/finance-status";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Euro, Plus, Receipt } from "lucide-react";
@@ -42,14 +44,22 @@ export const Route = createFileRoute("/_authenticated/finance")({
 });
 
 function FinancePage() {
-  const { user, isBureau } = useAuth();
+  const { user, isBureau, rolesReady } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  // Comptabilité réservée au Bureau : les autres rôles retrouvent leur espace personnel.
+  useEffect(() => {
+    if (rolesReady && !isBureau) {
+      toast.info("Vos demandes et paiements sont dans « Paiements & remboursements ».");
+      void navigate({ to: "/reimbursements", replace: true });
+    }
+  }, [rolesReady, isBureau, navigate]);
   const [open, setOpen] = useState(false);
   const [line, setLine] = useState({ label: "", gross_revenue: "0", association_share: "0", professional_share: "0" });
-  const [claim, setClaim] = useState({ label: "", amount: "0" });
 
-  const { data: rows = [] } = useQuery({
+  const { data: rows = [], isError: rowsError } = useQuery({
     queryKey: ["accounting"],
+    enabled: isBureau,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("accounting")
@@ -60,8 +70,9 @@ function FinancePage() {
     },
   });
 
-  const { data: reimbursements = [] } = useQuery({
-    queryKey: ["reimbursements"],
+  const { data: reimbursements = [], isError: reimbError } = useQuery({
+    queryKey: ["reimbursements", "all"],
+    enabled: isBureau,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reimbursements")
@@ -92,32 +103,13 @@ function FinancePage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const askReimbursement = useMutation({
-    mutationFn: async () => {
-      if (!claim.label.trim()) throw new Error("Précisez l'objet de la demande.");
-      if (Number(claim.amount) <= 0) throw new Error("Le montant doit être supérieur à zéro.");
-      const { error } = await supabase.from("reimbursements").insert({
-        person_id: user!.id,
-        label: claim.label.trim(),
-        amount: Number(claim.amount),
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Demande de remboursement envoyée.");
-      setClaim({ label: "", amount: "0" });
-      void queryClient.invalidateQueries({ queryKey: ["reimbursements"] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { error } = await supabase
         .from("reimbursements")
-        .update({ status, processed_by: user?.id ?? null })
+        .update({ status })
         .eq("id", id);
-      if (error) throw error;
+      if (error) throw new Error(/propre demande/.test(error.message) ? "Vous ne pouvez pas traiter votre propre demande." : /approuvée avant/.test(error.message) ? "Approuvez la demande avant de la payer." : "Mise à jour refusée. Actualisez la page.");
     },
     onSuccess: () => {
       toast.success("Demande mise à jour.");
@@ -135,10 +127,13 @@ function FinancePage() {
     { gross: 0, association: 0, professional: 0 },
   );
 
+  const rsum = summarizeReimbursements(reimbursements);
+  if (!isBureau) return <AppShell title="Finances"><p className="text-sm text-muted-foreground">Redirection vers votre espace personnel…</p></AppShell>;
+
   return (
     <AppShell
       title="Finances"
-      subtitle={isBureau ? "Recettes, répartitions et remboursements" : "Mes données financières"}
+      subtitle="Comptabilité du Bureau : recettes, répartitions et remboursements"
       actions={
         isBureau ? (
           <Dialog open={open} onOpenChange={setOpen}>
@@ -212,7 +207,7 @@ function FinancePage() {
             <CardContent>
               <p className="flex items-center gap-2 text-2xl font-semibold">
                 <Euro className="size-5 text-primary" />
-                {stat.value.toFixed(2)}
+                {rowsError ? "—" : stat.value.toFixed(2)}
               </p>
             </CardContent>
           </Card>
@@ -224,7 +219,9 @@ function FinancePage() {
           <CardTitle className="text-base">Lignes comptables</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          {rows.length === 0 ? (
+          {rowsError ? (
+            <p className="text-destructive">Lignes comptables indisponibles (chargement ou droits).</p>
+          ) : rows.length === 0 ? (
             <p className="text-muted-foreground">Aucune ligne enregistrée.</p>
           ) : (
             rows.map((row) => (
@@ -258,27 +255,18 @@ function FinancePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
-          <div className="grid gap-3 sm:grid-cols-[1fr_140px_auto] sm:items-end">
-            <div>
-              <Label htmlFor="rb-label">Objet de la demande</Label>
-              <Input id="rb-label" value={claim.label} onChange={(e) => setClaim({ ...claim, label: e.target.value })} />
-            </div>
-            <div>
-              <Label htmlFor="rb-amount">Montant (€)</Label>
-              <Input
-                id="rb-amount"
-                type="number"
-                step="0.01"
-                value={claim.amount}
-                onChange={(e) => setClaim({ ...claim, amount: e.target.value })}
-              />
-            </div>
-            <Button onClick={() => askReimbursement.mutate()} disabled={askReimbursement.isPending}>
-              Demander
-            </Button>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {[["En attente", rsum.pending], ["Approuvé, à payer", rsum.approved], ["Payé", rsum.paid]].map(([l, v]) => (
+              <div key={l as string} className="rounded-lg border border-border p-3">
+                <p className="text-xs text-muted-foreground">{l}</p>
+                <p className="font-semibold">{reimbError ? "—" : euro(v as number)}</p>
+              </div>
+            ))}
           </div>
-
-          {reimbursements.length === 0 ? (
+          <p className="text-xs text-muted-foreground">Les nouvelles demandes se font depuis « Paiements & remboursements ».</p>
+          {reimbError ? (
+            <p className="text-destructive">Remboursements indisponibles (chargement ou droits).</p>
+          ) : reimbursements.length === 0 ? (
             <p className="text-muted-foreground">Aucune demande enregistrée.</p>
           ) : (
             reimbursements.map((item) => (
@@ -294,21 +282,15 @@ function FinancePage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <Badge variant={item.status === "PAID" ? "default" : "outline"}>{item.status}</Badge>
-                  {isBureau && item.status === "PENDING" ? (
-                    <>
-                      <Button size="sm" variant="outline" onClick={() => setStatus.mutate({ id: item.id, status: "PAID" })}>
-                        Rembourser
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setStatus.mutate({ id: item.id, status: "REJECTED" })}
-                      >
-                        Refuser
-                      </Button>
-                    </>
-                  ) : null}
+                  <Badge variant={item.status === "PAID" ? "default" : "outline"}>{REIMBURSEMENT_LABEL[item.status] ?? item.status}</Badge>
+                  {canProcessReimbursement(user?.id, item.person_id, isBureau)
+                    ? nextReimbursementActions(item.status).map((next) => (
+                        <Button key={next} size="sm" variant={next === "REJECTED" ? "ghost" : "outline"} disabled={setStatus.isPending}
+                          onClick={() => setStatus.mutate({ id: item.id, status: next })}>
+                          {next === "APPROVED" ? "Approuver" : next === "PAID" ? "Marquer payé" : "Refuser"}
+                        </Button>
+                      ))
+                    : null}
                 </div>
               </div>
             ))
