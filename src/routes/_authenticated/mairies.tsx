@@ -1,3 +1,4 @@
+import { DirectoryTabs } from "@/components/DirectoryTabs";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -138,6 +139,7 @@ function MairiesPage() {
         </Button>
       }
     >
+      <DirectoryTabs />
       <div className="mb-5 flex flex-wrap gap-2">
         {[{ code: "ALL", label: "Tous" }, ...STATUSES].map((status) => (
           <Button

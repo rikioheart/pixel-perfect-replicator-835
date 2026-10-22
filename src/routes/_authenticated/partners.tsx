@@ -1,3 +1,4 @@
+import { DirectoryTabs } from "@/components/DirectoryTabs";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -166,6 +167,7 @@ function PartnersPage() {
         ) : null
       }
     >
+      <DirectoryTabs />
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement des partenaires…</p>
       ) : partners.length === 0 ? (

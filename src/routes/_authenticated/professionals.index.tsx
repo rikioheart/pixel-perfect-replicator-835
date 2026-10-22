@@ -1,3 +1,4 @@
+import { DirectoryTabs } from "@/components/DirectoryTabs";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -60,6 +61,7 @@ function ProfessionalsPage() {
 
   return (
     <AppShell title="Professionnels" subtitle="Annuaire des professionnels partenaires">
+      <DirectoryTabs />
       <div className="relative mb-4 max-w-sm">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input

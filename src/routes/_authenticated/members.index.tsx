@@ -1,3 +1,4 @@
+import { DirectoryTabs } from "@/components/DirectoryTabs";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -85,6 +86,7 @@ function MembersPage() {
         </Button>
       }
     >
+      <DirectoryTabs />
       <div className="space-y-5">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-64 flex-1">
