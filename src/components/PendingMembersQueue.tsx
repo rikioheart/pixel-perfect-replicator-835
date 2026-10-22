@@ -22,16 +22,27 @@ export function PendingMembersQueue() {
       ).data ?? [],
   });
   const validate = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("profiles").update({ membership_status: "ACTIVE" }).eq("id", id);
-      if (error) throw error;
+    // Décision appliquée seulement si la demande est encore en attente : pas de double traitement.
+    mutationFn: async ({ id, status }: { id: string; status: "ACTIVE" | "REFUSED" }) => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ membership_status: status })
+        .eq("id", id)
+        .eq("membership_status", "PENDING")
+        .select("id");
+      if (error) throw new Error("Décision refusée. Vérifiez vos droits Bureau.");
+      if (!data?.length) throw new Error("Cette demande a déjà été traitée.");
+      return status;
     },
-    onSuccess: () => {
-      toast.success("Adhésion validée.");
+    onSuccess: (status) => {
+      toast.success(status === "ACTIVE" ? "Adhésion validée." : "Demande refusée.");
       void qc.invalidateQueries({ queryKey: ["pending-members"] });
       void qc.invalidateQueries({ queryKey: ["admin-dashboard"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      toast.error(e.message);
+      void qc.invalidateQueries({ queryKey: ["pending-members"] });
+    },
   });
 
   return (
@@ -56,13 +67,19 @@ export function PendingMembersQueue() {
                     {m.membership_type === "PROFESSIONNEL" ? "Professionnel" : "Particulier"} · demande du {formatDate(m.created_at)}
                   </p>
                 </div>
-                <Button size="sm" onClick={() => validate.mutate(m.id)} disabled={validate.isPending}>Valider l'adhésion</Button>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => validate.mutate({ id: m.id, status: "ACTIVE" })} disabled={validate.isPending}>Valider l'adhésion</Button>
+                  <Button size="sm" variant="outline" disabled={validate.isPending}
+                    onClick={() => { if (window.confirm(`Refuser la demande de ${name} ?`)) validate.mutate({ id: m.id, status: "REFUSED" }); }}>
+                    Refuser
+                  </Button>
+                </div>
               </li>
             );
           })}
         </ul>
       )}
-      <p className="text-xs text-muted-foreground">Pour un professionnel, vérifiez aussi sa carte dans « Professionnels ». Un paiement HelloAsso n'active jamais un compte seul.</p>
+      <p className="text-xs text-muted-foreground">Pour demander des compléments, ouvrez la fiche et contactez la personne. Pour un professionnel, vérifiez aussi sa carte dans « Professionnels ». Un paiement HelloAsso n'active jamais un compte seul.</p>
     </section>
   );
 }
