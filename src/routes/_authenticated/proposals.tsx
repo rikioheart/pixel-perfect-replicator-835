@@ -6,7 +6,6 @@ import { Lightbulb, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { notifyBureau, notifyMembers } from "@/lib/collab-notify";
 import { EmptyState } from "@/components/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,14 +92,6 @@ function ProposalsPage() {
         status: "PENDING",
       });
       if (error) throw error;
-      await notifyBureau({
-        senderId: user?.id,
-        kind: "PROPOSAL_SUBMITTED",
-        title: "Nouvelle proposition",
-        message: form.title.trim(),
-        linkUrl: "/proposals",
-        entityType: "proposal",
-      });
     },
     onSuccess: () => {
       toast.success("Proposition envoyée au Bureau.");
@@ -120,16 +111,6 @@ function ProposalsPage() {
         .update({ status, review_comment: comment.trim(), reviewed_by: user?.id ?? null })
         .eq("id", reviewing.id);
       if (error) throw error;
-      await notifyMembers({
-        recipients: [reviewing.submitted_by],
-        senderId: user?.id,
-        kind: status === "ACCEPTED" ? "PROPOSAL_ACCEPTED" : "PROPOSAL_REFUSED",
-        title: status === "ACCEPTED" ? "Proposition acceptée" : "Proposition refusée",
-        message: `${reviewing.title} — ${comment.trim()}`,
-        linkUrl: "/proposals",
-        entityType: "proposal",
-        entityId: reviewing.id,
-      });
     },
     onSuccess: () => {
       toast.success("Décision enregistrée.");

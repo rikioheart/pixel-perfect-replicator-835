@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { SidePanel } from "@/components/SidePanel";
 import { MemberPicker } from "@/components/MemberPicker";
-import { notifyBureau, notifyMembers } from "@/lib/collab-notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,29 +113,6 @@ export function TaskPanel({
           .select("user_id")
           .eq("project_id", payload.project_id);
         recipients.push(...(projectMembers ?? []).map((row) => row.user_id));
-      }
-      await notifyMembers({
-        recipients,
-        senderId: user?.id,
-        kind: "SYSTEM",
-        title: editing ? `Tâche mise à jour : ${payload.title}` : `Nouvelle tâche : ${payload.title}`,
-        message: editing
-          ? "Cette tâche vient d'être modifiée."
-          : "Une nouvelle tâche a été créée sur votre projet.",
-        linkUrl: "/tasks",
-        entityType: "task",
-        entityId: taskId,
-      });
-      if (!editing) {
-        await notifyBureau({
-          senderId: user?.id,
-          kind: "SYSTEM",
-          title: `Nouvelle tâche : ${payload.title}`,
-          message: "Une tâche a été ajoutée et apparaît sur la mindmap.",
-          linkUrl: "/tasks",
-          entityType: "task",
-          entityId: taskId,
-        });
       }
 
       toast.success(editing ? "Tâche mise à jour." : "Tâche créée.");

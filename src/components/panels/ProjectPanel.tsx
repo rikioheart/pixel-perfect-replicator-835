@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { SidePanel } from "@/components/SidePanel";
 import { MemberPicker } from "@/components/MemberPicker";
-import { notifyBureau, notifyMembers } from "@/lib/collab-notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -154,29 +153,6 @@ export function ProjectPanel({
             .in("user_id", toRemove);
         }
 
-        await notifyMembers({
-          recipients: members,
-          senderId: user?.id,
-          kind: "SYSTEM",
-          title: editing ? `Projet mis à jour : ${payload.title}` : `Nouveau projet : ${payload.title}`,
-          message: editing
-            ? "Les informations du projet viennent d'être modifiées."
-            : "Vous avez été ajouté·e à ce projet.",
-          linkUrl: `/projects/${projectId}`,
-          entityType: "project",
-          entityId: projectId,
-        });
-        if (!editing) {
-          await notifyBureau({
-            senderId: user?.id,
-            kind: "SYSTEM",
-            title: `Nouveau projet créé : ${payload.title}`,
-            message: "Un nouveau projet a été ajouté à la cartographie.",
-            linkUrl: `/projects/${projectId}`,
-            entityType: "project",
-            entityId: projectId,
-          });
-        }
       }
 
       toast.success(editing ? "Projet mis à jour." : "Projet créé.");

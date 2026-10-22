@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { MessageSquare, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { notifyMembers } from "@/lib/collab-notify";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -74,16 +73,6 @@ export function Comments({
         body: text,
       });
       if (error) throw error;
-      await notifyMembers({
-        recipients: [...participants, ...comments.map((c) => c.author_id)],
-        senderId: user.id,
-        kind: "COMMENT_ADDED",
-        title: `Nouveau commentaire sur ${ENTITY_LABEL[entityType]}`,
-        message: entityTitle ? `${entityTitle} — ${text.slice(0, 120)}` : text.slice(0, 120),
-        linkUrl: linkUrl ?? null,
-        entityType,
-        entityId,
-      });
     },
     onSuccess: () => {
       setBody("");
