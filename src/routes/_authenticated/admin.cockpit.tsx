@@ -26,6 +26,7 @@ import { Progress } from "@/components/ui/progress";
 import { PROJECT_STATUS_LABEL, TASK_STATUS_LABEL, formatDate } from "@/lib/domain";
 import { QuickValidationRow } from "@/components/QuickValidation";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
+import { euro, summarizeReimbursements } from "@/lib/finance-status";
 
 
 export const Route = createFileRoute("/_authenticated/admin/cockpit")({
@@ -153,6 +154,7 @@ function CockpitPage() {
   const draftPosts = (data?.posts ?? []).filter((p) => p.status !== "PUBLISHED");
   const newProposals = (data?.proposals ?? []).filter((p) => p.status === "PENDING");
   const lowStock = (data?.inventory ?? []).filter((i) => i.quantity <= i.alert_threshold);
+  const refunds = summarizeReimbursements(data?.reimbursements ?? []);
   const pendingRefunds = (data?.reimbursements ?? []).filter((r) => r.status === "PENDING");
   const dueToPros = (data?.accounting ?? []).reduce((sum, a) => sum + Number(a.professional_share ?? 0), 0);
   const proIds = new Set((data?.pros ?? []).map((p) => p.profile_id));
@@ -332,12 +334,10 @@ function CockpitPage() {
         </Block>
 
         <Block icon={Euro} title="Quelles sommes doivent être versées ?" empty={false}>
-          <Row main="Part professionnels cumulée" right={`${dueToPros.toFixed(2)} €`} />
-          <Row
-            main="Remboursements à effectuer"
-            sub={`${pendingRefunds.length} demande(s) en attente`}
-            right={`${pendingRefunds.reduce((s, r) => s + Number(r.amount), 0).toFixed(2)} €`}
-          />
+          <Row main="Part professionnels calculée (cumul)" sub="Montant calculé sur les recettes ; le suivi des versements se fait en comptabilité" right={`${dueToPros.toFixed(2)} €`} to="/finance" />
+          <Row main="Remboursements en attente de décision" sub={`${pendingRefunds.length} demande(s)`} right={euro(refunds.pending)} to="/finance" />
+          <Row main="Remboursements approuvés, à payer" right={euro(refunds.approved)} to="/finance" />
+          <Row main="Remboursements déjà payés" right={euro(refunds.paid)} />
           {pendingRefunds.map((r) => (
             <Row key={r.id} main={r.label} sub={nameOf(r.person_id)} right={`${Number(r.amount).toFixed(2)} €`} />
           ))}
