@@ -26,7 +26,6 @@ import {
   FileText,
   Bell,
   HeartHandshake,
-  Gauge,
   BarChart3,
   CalendarCheck,
   UploadCloud,
