@@ -3,7 +3,8 @@ import { AiAssist } from "@/components/AiAssist";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ClipboardList, Copy } from "lucide-react";
+import { ClipboardList, Copy, ExternalLink } from "lucide-react";
+import { isSafeExternalFormUrl } from "@/lib/calendar-export";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ type Field = { label: string; required: boolean; long: boolean };
 const KINDS = ["INSCRIPTION", "DEMANDE", "RESERVATION", "MATERIEL", "COLLECTE", "PARTICIPATION", "QUESTIONNAIRE"] as const;
 const KIND_FR: Record<string, string> = { INSCRIPTION: "Inscription", DEMANDE: "Demande", RESERVATION: "Réservation",
   MATERIEL: "Demande de matériel", COLLECTE: "Collecte d'informations", PARTICIPATION: "Participation", QUESTIONNAIRE: "Questionnaire" };
-const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", fields: "Nom\nMessage*" };
+const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", fields: "Nom\nMessage*", external_url: "" };
 
 function FormsPage() {
   const { user, isBureau } = useAuth();
