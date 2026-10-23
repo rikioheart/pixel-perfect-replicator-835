@@ -3,7 +3,8 @@ import logoMark from '@/assets/logo-lvdc-mark.png.asset.json';
 import { Button } from '@/components/ui/button';
 import { ZONES } from '@/lib/site-content';
 import { useState } from 'react';
-import { Menu, X, LogIn, PawPrint } from 'lucide-react';
+import { Menu, X, LogIn } from 'lucide-react';
+import { CONTACT_EMAIL, SOCIAL_LINKS } from '@/lib/contact';
 
 const NAV = [
   { to: '/', label: 'Accueil' },
@@ -38,11 +39,12 @@ export function PublicHeader() {
 
 export function PublicFooter() {
   return (
-    <footer className="public-footer">
-      <div className="mx-auto grid max-w-7xl gap-9 px-5 py-12 text-sm md:grid-cols-[1.4fr_1fr_1fr] sm:px-8">
-        <div><PawPrint className="mb-4 size-7 text-ochre" aria-hidden /><p className="font-display text-xl">La Voix du Chien</p><p className="mt-3 max-w-xs opacity-80">Le chien au cœur, l’humain à ses côtés.</p><p className="mt-5 text-xs opacity-70">Association · Nargis, Loiret</p></div>
+    <footer className="public-footer" id="contact">
+      <div className="mx-auto grid max-w-7xl gap-9 px-5 py-12 text-sm md:grid-cols-[1.4fr_1fr_1fr_1fr] sm:px-8">
+        <div><img src={logoMark.url} alt="" aria-hidden className="mb-4 size-12 rounded-full bg-background object-contain p-1" /><p className="font-display text-xl">La Voix du Chien</p><p className="mt-3 max-w-xs opacity-80">Le chien au cœur, l’humain à ses côtés.</p><p className="mt-5 text-xs opacity-70">Association · Nargis, Loiret</p></div>
         <div><p className="font-medium">Un réseau de proximité</p><ul className="mt-4 space-y-2 opacity-80">{ZONES.map((z) => <li key={z}>{z}</li>)}</ul></div>
-        <div><p className="mb-3 font-medium">Explorer le site</p><nav aria-label="Pied de page" className="grid gap-1">{NAV.map((n) => <Link key={n.to} to={n.to} className="w-fit py-1 hover:underline">{n.label}</Link>)}<a href="https://lavoixduchien.fr/" target="_blank" rel="noopener noreferrer" className="w-fit py-1 hover:underline">Site officiel et articles ↗</a></nav></div>
+        <div><p className="mb-3 font-medium">Nous écrire</p><a href={`mailto:${CONTACT_EMAIL}`} className="break-all hover:underline">{CONTACT_EMAIL}</a><nav aria-label="Réseaux sociaux" className="mt-3 grid gap-1">{SOCIAL_LINKS.map((s) => <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" className="w-fit py-1 hover:underline">{s.label} ↗</a>)}</nav></div>
+        <div><p className="mb-3 font-medium">Explorer le site</p><nav aria-label="Pied de page" className="grid gap-1">{NAV.map((n) => <Link key={n.to} to={n.to} className="w-fit py-1 hover:underline">{n.label}</Link>)}</nav></div>
       </div>
       <div className="mx-auto max-w-7xl border-t border-navy-foreground/20 px-5 py-5 text-xs text-navy-foreground/70 sm:px-8">La Voix du Chien · Respect, coopération et entraide</div>
     </footer>
