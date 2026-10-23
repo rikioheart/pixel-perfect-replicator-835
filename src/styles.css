@@ -208,6 +208,9 @@
   input, select, textarea { font-size: 1rem; }
   h1, h2, h3, p { overflow-wrap: break-word; }
 }
+.prefs-comfortable main { line-height: 1.75; }
+.prefs-comfortable main .panel, .prefs-comfortable main article { padding: 1.25rem; }
+.prefs-comfortable main .space-y-3 > * + * { margin-top: 1.1rem; }
 .prefs-reduced-motion *, .prefs-reduced-motion *::before, .prefs-reduced-motion *::after {
   animation: none !important; transition: none !important; scroll-behavior: auto !important;
 }
