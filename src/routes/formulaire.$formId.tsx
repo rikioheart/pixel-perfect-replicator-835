@@ -36,7 +36,7 @@ function PublicForm() {
   const { data: form, isLoading } = useQuery({
     queryKey: ["public-form", formId],
     queryFn: async () => {
-      const { data } = await supabase.from("forms").select("id, title, purpose, data_usage, contact, fields, consent_required, audience").eq("id", formId).maybeSingle();
+      const { data } = await supabase.from("forms").select("id, title, purpose, data_usage, contact, fields, consent_required, audience, external_url").eq("id", formId).maybeSingle();
       return data;
     },
   });
@@ -51,6 +51,18 @@ function PublicForm() {
   );
   const fields = (form.fields ?? []) as Field[];
   const anon = !session;
+  if (form.external_url && isSafeExternalFormUrl(form.external_url)) return (
+    <main className="mx-auto max-w-xl p-4 sm:p-6">
+      <h1 className="font-display text-2xl font-bold">{form.title}</h1>
+      <section className="mt-4 space-y-2 rounded-xl border border-border bg-card p-4 text-sm">
+        <p><strong>Objectif :</strong> {form.purpose}</p>
+        <p><strong>Utilisation des réponses :</strong> {form.data_usage}</p>
+        {form.contact && <p><strong>Contact :</strong> {form.contact}</p>}
+        <p className="text-muted-foreground">Ce formulaire est hébergé sur un service externe ({new URL(form.external_url).hostname}). Vos réponses y seront enregistrées, selon ses propres conditions.</p>
+      </section>
+      <Button asChild className="mt-4"><a href={form.external_url} target="_blank" rel="noopener noreferrer">Ouvrir le formulaire</a></Button>
+    </main>
+  );
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setErr("");
