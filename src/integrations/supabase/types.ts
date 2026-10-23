@@ -1537,6 +1537,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           data_usage: string
+          external_url: string | null
           fields: Json
           id: string
           kind: string
@@ -1554,6 +1555,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data_usage: string
+          external_url?: string | null
           fields?: Json
           id?: string
           kind?: string
@@ -1571,6 +1573,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data_usage?: string
+          external_url?: string | null
           fields?: Json
           id?: string
           kind?: string
