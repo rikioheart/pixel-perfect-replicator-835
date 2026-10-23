@@ -4303,6 +4303,10 @@ export type Database = {
         Args: { _entity_id: string; _entity_type: string; _user_id: string }
         Returns: boolean
       }
+      can_view_activity: {
+        Args: { _activity_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_comment_target: {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
