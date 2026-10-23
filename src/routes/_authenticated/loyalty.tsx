@@ -79,11 +79,10 @@ function LoyaltyPage() {
     return () => { active = false; };
   }, [card?.qr_code,card?.total_stamps,user?.id,profile?.display_name]);
 
-  // Sans réponse du serveur (hors réseau ou erreur), on affiche la copie locale de CE compte.
+  // Tant que le serveur n'a pas répondu (chargement, hors réseau ou erreur), on affiche la copie locale de CE compte.
   useEffect(() => {
-    if (!user?.id || card || (online && !isError)) { setOfflinePass(null); return; }
-    setOfflinePass(readOfflinePass(user.id));
-  }, [user?.id, card, online, isError]);
+    setOfflinePass(!user?.id || card ? null : readOfflinePass(user.id));
+  }, [user?.id, card]);
 
   // Crée la carte à la première visite (jamais si la lecture a échoué : l'absence n'est pas certaine).
   useEffect(() => {
