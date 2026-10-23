@@ -132,20 +132,23 @@ export function ManualStampCard() {
       <h2 id="ms-title" className="flex items-center gap-2 font-display text-lg"><Stamp className="size-4" aria-hidden /> Valider un Pass Terrain</h2>
       <p className="text-xs text-muted-foreground">Scannez le pass d'un membre particulier, collez ou saisissez son code. Le membre du Bureau choisi est informé.</p>
 
-      <div className="space-y-2 rounded-xl border border-border bg-card p-3">
+      <div className="space-y-3 rounded-xl border border-border bg-card p-3">
+        <div role="tablist" aria-label="Mode de lecture du pass" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+          <button type="button" role="tab" aria-selected={!scanning} onClick={() => setScanning(false)} className={`rounded-md px-3 py-2 text-sm font-medium ${!scanning ? "bg-background shadow-sm" : "text-muted-foreground"}`}>Saisir le code</button>
+          <button type="button" role="tab" aria-selected={scanning} disabled={!online} onClick={() => setScanning(true)} className={`flex items-center justify-center gap-1 rounded-md px-3 py-2 text-sm font-medium disabled:opacity-50 ${scanning ? "bg-background shadow-sm" : "text-muted-foreground"}`}><Camera className="size-4" aria-hidden /> Scanner</button>
+        </div>
         {scanning ? (
-          <PassScanner onResult={(t) => void resolve(t)} onClose={() => setScanning(false)} />
+          <PassScanner onResult={(t) => { setScanning(false); void resolve(t); }} onClose={() => setScanning(false)} onUnavailable={() => { setScanning(false); toast.info("Caméra indisponible : saisissez ou collez le code."); }} />
         ) : (
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Button type="button" onClick={() => setScanning(true)} disabled={!online}><Camera className="size-4" aria-hidden /> Scanner le QR code</Button>
-            <Button type="button" variant="outline" onClick={() => void paste()} disabled={!online}><ClipboardPaste className="size-4" aria-hidden /> Coller le code</Button>
-          </div>
+          <form className="space-y-2" onSubmit={(e) => { e.preventDefault(); void resolve(codeInput); }}>
+            <Label htmlFor="ms-code">Code du pass</Label>
+            <div className="flex gap-2">
+              <Input id="ms-code" autoFocus value={codeInput} onChange={(e) => setCodeInput(e.target.value)} placeholder="ex. 7B29-C4E1" autoComplete="off" autoCapitalize="characters" inputMode="text" className="font-mono tracking-wider" />
+              <Button type="button" variant="outline" onClick={() => void paste()} disabled={!online} aria-label="Coller le code"><ClipboardPaste className="size-4" aria-hidden /><span className="hidden sm:inline">Coller</span></Button>
+            </div>
+            <Button type="submit" className="w-full" disabled={!codeInput.trim() || resolving || !online}>{resolving ? "Vérification…" : "Vérifier le pass"}</Button>
+          </form>
         )}
-        <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); void resolve(codeInput); }}>
-          <Label htmlFor="ms-code" className="sr-only">Code du pass</Label>
-          <Input id="ms-code" value={codeInput} onChange={(e) => setCodeInput(e.target.value)} placeholder="Code du pass, ex. 7B29-C4E1" autoComplete="off" inputMode="text" />
-          <Button type="submit" variant="secondary" disabled={!codeInput.trim() || resolving}>{resolving ? "…" : "Vérifier"}</Button>
-        </form>
         {identified && identified.id === member && (
           <div role="status" className="rounded-lg bg-muted p-3">
             <p className="font-medium">{identified.name}</p>
