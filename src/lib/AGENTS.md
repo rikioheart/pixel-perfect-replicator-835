@@ -14,3 +14,9 @@
 - Fonctions SECURITY DEFINER : EXECUTE retiré à anon sauf list_public_pros, get_public_pro_page, get_public_home, list_public_activities, list_public_blog_posts, submit_form_response ; toute nouvelle fonction doit révoquer anon. Pourquoi : aucun oracle anonyme.
 - Formulaires : audience PUBLIC (libre) / INTERNE (adhésion ACTIVE via is_active_member), appliquée à la RLS et à submit_form_response. Pourquoi : un compte en attente ne lit ni ne soumet un formulaire réservé.
 - Lieux : champ lieu libre + adresse facultative ; Maps/copie/météo Open-Meteo via src/components/PlaceInfo.tsx (côté navigateur, sans clé). Mairies identifiées via entity_mairies (écriture Bureau) et linked_mairies. Dates de gouvernance en heure de Paris (src/lib/places.ts).
+- Activités : lecture via can_view_activity (Bureau, créateur/référent/pro lié, participant, ou activité non brouillon/annulée pour adhésion ACTIVE) ; même fonction dans la RLS, global_search et entity_peek ; le public passe uniquement par list_public_activities. Pourquoi : aucune fuite aux comptes en attente.
+- Formulaires externes : forms.external_url (https, ex. Google Forms) remplace les questions natives ; les réponses restent chez le service externe, aucune synchronisation. Pourquoi : liens simples sans API.
+- Agenda personnel : src/lib/calendar-export.ts (.ics et lien Google Agenda en UTC) ; copie ponctuelle, jamais de notes internes ni participants.
+- Décision → tâche : tâche créée dans tasks avec le marqueur decisionTaskMarker dans la description (anti-doublon, retour au registre), sans colonne dédiée.
+- Thème/confort : user_preferences.theme (SYSTEM/LIGHT/DARK) et comfortable_spacing appliqués par useApplyPreferences dans AppShell, retirés au démontage pour que la page publique garde son rendu.
+- TanStack Start 1.168 : .inputValidator() est l'API actuelle de createServerFn ; ne pas la remplacer par .validator().
