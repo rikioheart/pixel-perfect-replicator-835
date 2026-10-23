@@ -120,7 +120,7 @@ function FormsPage() {
           <div><Label htmlFor="fm-contact">Contact</Label><Input id="fm-contact" value={f.contact} onChange={(e) => setF({ ...f, contact: e.target.value })} /></div>
           <div><Label htmlFor="fm-aud">Public visé</Label>
             <select id="fm-aud" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.audience} onChange={(e) => setF({ ...f, audience: e.target.value })}>
-              <option value="INTERNE">Membres connectés</option><option value="PUBLIC">Public (lien ouvert)</option>
+              <option value="INTERNE">Réservé aux adhésions validées</option><option value="TOUS">Libre à tout profil connecté</option><option value="PUBLIC">Public (lien ouvert)</option>
             </select></div>
           <div className="sm:col-span-2"><Label htmlFor="fm-ctx">Rattaché à</Label>
             <select id="fm-ctx" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.context} onChange={(e) => setF({ ...f, context: e.target.value })}>
@@ -144,7 +144,7 @@ function FormsPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <ClipboardList className="size-4 text-primary" aria-hidden />
                   <h3 className="font-semibold">{fm.title}</h3>
-                  <span className="text-xs text-muted-foreground">{KIND_FR[fm.kind]} · {fm.audience === "PUBLIC" ? "public" : "membres"} · {fm.status === "PUBLISHED" ? "publié" : fm.status === "CLOSED" ? "clos" : "brouillon"}</span>
+                  <span className="text-xs text-muted-foreground">{KIND_FR[fm.kind]} · {fm.audience === "PUBLIC" ? "public" : fm.audience === "TOUS" ? "tout profil" : "adhésions validées"} · {fm.status === "PUBLISHED" ? "publié" : fm.status === "CLOSED" ? "clos" : "brouillon"}</span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">{fm.purpose}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
