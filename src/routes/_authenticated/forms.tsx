@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ClipboardList, Copy, ExternalLink } from "lucide-react";
-import { isSafeExternalFormUrl } from "@/lib/calendar-export";
+import { isSafeExternalFormUrl } from "@/lib/form-links";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
