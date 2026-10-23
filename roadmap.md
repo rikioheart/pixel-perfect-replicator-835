@@ -261,7 +261,7 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 
 ## Niveau 1 (octobre 2026)
 - [x] Fonctions internes fermées aux visiteurs non connectés
-- [x] Formulaires réservés (adhésion validée) vs libres (tout profil)
+- [x] Formulaires : réservé aux adhésions validées ou public, vérifié avec un compte en attente
 - [x] Adresse + Ouvrir dans Google Maps / Copier ; météo Open-Meteo sur activités et événements
 - [x] E-mail de contact facultatif et mairies/établissements identifiés sur projets, activités, événements
 - [x] Pro : adresse + lien fiche Google Business
