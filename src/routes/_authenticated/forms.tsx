@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { canCreateForm } from "@/lib/nav-rules";
 
 export const Route = createFileRoute("/_authenticated/forms")({
   head: () => ({
@@ -35,7 +36,8 @@ const KIND_FR: Record<string, string> = { INSCRIPTION: "Inscription", DEMANDE: "
 const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", fields: "Nom\nMessage*", external_url: "" };
 
 function FormsPage() {
-  const { user, isBureau } = useAuth();
+  const { user, isBureau, isPro } = useAuth();
+  const canCreate = canCreateForm({ isBureau, isPro });
   const qc = useQueryClient();
   const [f, setF] = useState(EMPTY);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -50,6 +52,7 @@ function FormsPage() {
   });
   const { data: contexts = [] } = useQuery({
     queryKey: ["form-contexts"],
+    enabled: canCreate,
     queryFn: async () => {
       const [a, e, p] = await Promise.all([
         supabase.from("activities").select("id, title").limit(100),
@@ -111,6 +114,7 @@ function FormsPage() {
 
   return (
     <AppShell title="Formulaires" subtitle="Inscriptions, demandes, matériel, questionnaires — toujours reliés à leur contexte.">
+      {canCreate && (
       <section className="mb-8 rounded-2xl border border-border bg-card p-4 sm:p-6">
         <h2 className="mb-4 font-display text-lg font-bold">Nouveau formulaire</h2>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -141,9 +145,10 @@ function FormsPage() {
         </div>
         <Button className="mt-4" onClick={() => create.mutate()} disabled={create.isPending}>Créer</Button>
       </section>
+      )}
 
       {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : forms.length === 0 ? (
-        <EmptyState title="Aucun formulaire" message="Créez un premier formulaire ci-dessus." />
+        <EmptyState title="Aucun formulaire" message={canCreate ? "Créez un premier formulaire ci-dessus." : "Aucun formulaire ouvert pour le moment."} />
       ) : (
         <div className="space-y-3">
           {forms.map((fm) => {
