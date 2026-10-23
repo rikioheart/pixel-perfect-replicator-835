@@ -246,6 +246,13 @@
       "when": 1792768247490,
       "tag": "0034_lot_c_fix_global_search_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1792771300388,
+      "tag": "0035_governance_records",
+      "breakpoints": true
     }
   ]
 }
