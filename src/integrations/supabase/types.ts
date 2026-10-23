@@ -4170,41 +4170,50 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          comfortable_spacing: boolean
           created_at: string
           default_view: string
           high_contrast: boolean
+          notification_sound: boolean
           notify_email: boolean
           notify_in_app: boolean
           notify_reminders: boolean
           reduced_motion: boolean
           show_association_updates: boolean
           text_size: string
+          theme: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          comfortable_spacing?: boolean
           created_at?: string
           default_view?: string
           high_contrast?: boolean
+          notification_sound?: boolean
           notify_email?: boolean
           notify_in_app?: boolean
           notify_reminders?: boolean
           reduced_motion?: boolean
           show_association_updates?: boolean
           text_size?: string
+          theme?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          comfortable_spacing?: boolean
           created_at?: string
           default_view?: string
           high_contrast?: boolean
+          notification_sound?: boolean
           notify_email?: boolean
           notify_in_app?: boolean
           notify_reminders?: boolean
           reduced_motion?: boolean
           show_association_updates?: boolean
           text_size?: string
+          theme?: string
           updated_at?: string
           user_id?: string
         }
