@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 type Detector = { detect: (src: CanvasImageSource) => Promise<{ rawValue: string }[]> };
 
 /** Lecteur caméra (caméra arrière). Utilise le détecteur natif si présent, sinon jsQR. S'arrête dès la lecture. */
-export function PassScanner({ onResult, onClose }: { onResult: (text: string) => void; onClose: () => void }) {
+export function PassScanner({ onResult, onClose, onUnavailable }: { onResult: (text: string) => void; onClose: () => void; onUnavailable?: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState("");
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
+  const onUnavailableRef = useRef(onUnavailable);
+  onUnavailableRef.current = onUnavailable;
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -24,16 +26,20 @@ export function PassScanner({ onResult, onClose }: { onResult: (text: string) =>
       try { navigator.vibrate?.(80); } catch { /* vibration indisponible */ }
       onResultRef.current(text);
     };
+    const unavailable = (msg: string) => {
+      if (onUnavailableRef.current) onUnavailableRef.current();
+      else setError(msg);
+    };
 
     void (async () => {
       if (!navigator.mediaDevices?.getUserMedia) {
-        setError("Ce navigateur ne permet pas d'utiliser la caméra. Collez ou saisissez le code.");
+        unavailable("Ce navigateur ne permet pas d'utiliser la caméra. Collez ou saisissez le code.");
         return;
       }
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
       } catch {
-        setError("Caméra refusée ou indisponible. Autorisez la caméra, ou collez/saisissez le code.");
+        unavailable("Caméra refusée ou indisponible. Autorisez la caméra, ou collez/saisissez le code.");
         return;
       }
       const video = videoRef.current;
