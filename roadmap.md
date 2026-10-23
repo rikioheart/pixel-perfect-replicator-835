@@ -154,7 +154,7 @@
 - [x] Responsabilités contextuelles, délégations, coordinateur limité
 - [x] Indicateurs chien, fiche contextuelle (entity_peek)
 - [x] Réservation terrain : catégories, gratuit/location, matériel, cycle de validation
-- [ ] Écran Bureau « Gouvernance » et « Besoins de décision » (A14)
+- [x] Écran Bureau « Besoins de décision » (A14) : /admin/gouvernance, vue agrégée sans table, renvoi vers les files existantes
 - [x] Action contextuelle unique « Créer » selon rôle et permissions (A14)
 - [x] Navigation par intentions, recherche sécurisée, notifications et fiches contextuelles (A15–A16)
 
@@ -250,3 +250,11 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] B8 Code de pass unique
 - [x] B9 Demandes hors ligne d'un jour passé : « Transmettre au Bureau pour médiation » (aucun tampon automatique)
 - [ ] B10 Scanner caméra à essayer sur iPhone et Android réels (bloqué : appareil physique requis)
+
+## Lot C — Gouvernance du Bureau et recherche globale
+- [x] Écran « Besoins de décision » (décisions à prendre, arbitrages, suivi) ; adhésions, tâches et remboursements seulement signalés vers leur file
+- [x] Recherche : catégorie Formulaires (titre/objectif/type/état, jamais champs ni réponses) ; documents par titre, catégorie, service, type et contexte
+- [x] Recherche réparée (elle échouait pour tous les comptes) ; appel anonyme refusé
+- [x] Essais réels compte membre et anonyme (données d'essai supprimées)
+- [ ] Essais réels compte Bureau et pro sans Bureau (session d'essai à autoriser)
+- [ ] Registre des décisions stratégiques (AG, réunions) : décision métier à prendre
