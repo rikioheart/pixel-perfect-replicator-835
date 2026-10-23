@@ -4537,6 +4537,20 @@ export type Database = {
         }
         Returns: string
       }
+      share_dog_access_many: {
+        Args: {
+          _activities: boolean
+          _context: string
+          _dog_id: string
+          _expires_at: string
+          _goals: boolean
+          _identity: boolean
+          _info: boolean
+          _observations: boolean
+          _professional_ids: string[]
+        }
+        Returns: Json
+      }
       spots_info: {
         Args: { _activity_id: string; _event_id: string }
         Returns: Json
@@ -4569,6 +4583,18 @@ export type Database = {
           resource_id: string
           start_time: string
         }[]
+      }
+      update_dog_access: {
+        Args: {
+          _access_id: string
+          _activities: boolean
+          _expires_at: string
+          _goals: boolean
+          _identity: boolean
+          _info: boolean
+          _observations: boolean
+        }
+        Returns: undefined
       }
     }
     Enums: {
