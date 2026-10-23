@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { formatParisDateTime, fromParisInput, toParisInput } from "@/lib/places";
+import { DecisionToTask } from "@/components/DecisionToTask";
 
 const KINDS = [
   { code: "AG", label: "Assemblée générale" },
@@ -28,7 +29,7 @@ export function GovernanceRegister() {
   const [form, setForm] = useState(EMPTY);
   const [filter, setFilter] = useState("ALL");
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["governance-records"],
     queryFn: async () => {
       const { data, error } = await supabase.from("governance_records").select("*").order("meeting_date", { ascending: false }).order("meeting_at", { ascending: false });
@@ -84,8 +85,13 @@ export function GovernanceRegister() {
         </form>
       ) : null}
 
-      {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
-        <p className="panel p-4 text-sm text-muted-foreground">Aucun compte rendu pour l'instant.</p>
+      {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : isError ? (
+        <div role="alert" className="panel flex flex-wrap items-center gap-3 p-4 text-sm">
+          <span>Le registre n'a pas pu être chargé. Vérifiez votre connexion ou vos droits Bureau.</span>
+          <Button size="sm" variant="outline" onClick={() => void refetch()}>Réessayer</Button>
+        </div>
+      ) : list.length === 0 ? (
+        <p className="panel p-4 text-sm text-muted-foreground">{data.length === 0 ? "Aucun compte rendu pour l'instant." : "Aucun compte rendu de ce type."}</p>
       ) : (
         <div className="space-y-2">
           {list.map((r) => (
@@ -99,7 +105,10 @@ export function GovernanceRegister() {
                 {r.summary ? <p>{r.summary}</p> : null}
                 {r.decisions ? <p><span className="font-medium">Décisions : </span>{r.decisions}</p> : null}
                 {r.follow_up ? <p><span className="font-medium">Suivi : </span>{r.follow_up}</p> : null}
-                <Button size="sm" variant="outline" onClick={() => { setEditId(r.id); setForm({ kind: r.kind, title: r.title, meeting_at: toParisInput(r.meeting_at ?? `${r.meeting_date}T10:00:00Z`), summary: r.summary ?? "", decisions: r.decisions ?? "", follow_up: r.follow_up ?? "" }); setOpen(true); }}>Modifier</Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={() => { setEditId(r.id); setForm({ kind: r.kind, title: r.title, meeting_at: toParisInput(r.meeting_at ?? `${r.meeting_date}T10:00:00Z`), summary: r.summary ?? "", decisions: r.decisions ?? "", follow_up: r.follow_up ?? "" }); setOpen(true); }}>Modifier</Button>
+                  <DecisionToTask record={r} />
+                </div>
               </div>
             </details>
           ))}
