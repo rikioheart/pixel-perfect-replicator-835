@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ExternalLinks } from "@/components/ExternalLinks";
 import { PlaceInfo, WeatherHint } from "@/components/PlaceInfo";
 import { LinkedMairies } from "@/components/LinkedMairies";
+import { AddToAgenda } from "@/components/AddToAgenda";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -93,6 +94,7 @@ function ActivityDetail() {
             </p>
             <PlaceInfo location={a.location} address={a.address} />
             <WeatherHint place={a.address || a.location} date={a.date} />
+            {a.date ? <AddToAgenda item={{ uid: `activity-${a.id}`, title: a.title, start: a.date, location: [a.location, a.address].filter(Boolean).join(", ") || null, description: a.description, url: `${window.location.origin}/activities/${a.id}` }} /> : null}
             <p className="flex items-center gap-2"><Dog className="size-4 text-muted-foreground" aria-hidden /> {DOG_POLICY_LABEL[a.dog_policy]}{a.max_dogs ? ` (${a.max_dogs} max.)` : ""}</p>
             <p><span className="font-medium">{Number(a.price_member).toFixed(2)} €</span> adhérent · {Number(a.price_public).toFixed(2)} € public</p>
             {people?.pro ? (
