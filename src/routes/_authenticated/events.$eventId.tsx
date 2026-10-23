@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLinks } from "@/components/ExternalLinks";
 import { PlaceInfo, WeatherHint } from "@/components/PlaceInfo";
 import { LinkedMairies } from "@/components/LinkedMairies";
+import { AddToAgenda } from "@/components/AddToAgenda";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, CalendarRange, MapPin, Users } from "lucide-react";
@@ -155,6 +156,7 @@ function EventDetailPage() {
             </p>
             <PlaceInfo location={event.location} address={event.address} />
             <WeatherHint place={event.address || event.location} date={event.start_date} />
+            {event.start_date ? <AddToAgenda item={{ uid: `event-${event.id}`, title: event.title, start: event.start_date, end: event.end_date, location: [event.location, event.address].filter(Boolean).join(", ") || null, description: event.description, url: `${window.location.origin}/events/${event.id}` }} /> : null}
             <Badge variant="secondary">{event.status}</Badge>
             <SpotsBadge spots={spots} />
             <div className="pt-2">
