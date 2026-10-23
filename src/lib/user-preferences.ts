@@ -13,6 +13,9 @@ export type UserPreferences = {
   notify_in_app: boolean;
   notify_reminders: boolean;
   show_association_updates: boolean;
+  theme: string;
+  comfortable_spacing: boolean;
+  notification_sound: boolean;
 };
 
 const DEFAULTS: Omit<UserPreferences, "user_id"> = {
@@ -24,12 +27,21 @@ const DEFAULTS: Omit<UserPreferences, "user_id"> = {
   notify_in_app: true,
   notify_reminders: true,
   show_association_updates: true,
+  theme: "SYSTEM",
+  comfortable_spacing: false,
+  notification_sound: false,
 };
 
 export const TEXT_SIZES: [string, string][] = [
   ["NORMAL", "Normale"],
   ["LARGE", "Confortable"],
   ["XLARGE", "Très grande"],
+];
+
+export const THEMES: [string, string][] = [
+  ["SYSTEM", "Automatique (selon l'appareil)"],
+  ["LIGHT", "Clair"],
+  ["DARK", "Sombre"],
 ];
 
 export const DEFAULT_VIEWS: [string, string][] = [
@@ -71,12 +83,28 @@ export function useUserPreferences() {
 /** Applique les préférences d'accessibilité sur le document (taille, contraste, animations). */
 export function useApplyPreferences() {
   const { preferences } = useUserPreferences();
-  const { text_size, high_contrast, reduced_motion } = preferences;
+  const { text_size, high_contrast, reduced_motion, theme, comfortable_spacing } = preferences;
 
   useEffect(() => {
     const root = document.documentElement;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = () => root.classList.toggle("dark", resolveDark(theme, media.matches));
     root.style.fontSize = text_size === "XLARGE" ? "19px" : text_size === "LARGE" ? "17px" : "";
     root.classList.toggle("prefs-high-contrast", high_contrast);
     root.classList.toggle("prefs-reduced-motion", reduced_motion);
-  }, [text_size, high_contrast, reduced_motion]);
+    root.classList.toggle("prefs-comfortable", comfortable_spacing);
+    apply();
+    media.addEventListener("change", apply);
+    // Les réglages ne valent que pour l'espace membre : la page publique garde son rendu.
+    return () => {
+      media.removeEventListener("change", apply);
+      root.classList.remove("dark", "prefs-high-contrast", "prefs-reduced-motion", "prefs-comfortable");
+      root.style.fontSize = "";
+    };
+  }, [text_size, high_contrast, reduced_motion, theme, comfortable_spacing]);
+}
+
+/** Thème effectif : choix explicite, sinon réglage de l'appareil. */
+export function resolveDark(theme: string, systemDark: boolean): boolean {
+  return theme === "DARK" || (theme === "SYSTEM" && systemDark);
 }
