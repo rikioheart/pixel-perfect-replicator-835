@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { savePublicPros } from '@/lib/offline';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, ExternalLink, Globe, HeartHandshake, MapPin, Search, X } from 'lucide-react';
@@ -10,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export function PublicPartnerDirectory({ showTitle = true }: { showTitle?: boolean }) {
   const { data } = useSuspenseQuery(publicPartnersOptions);
+  useEffect(() => { savePublicPros(data.pros); }, [data.pros]);
   const [term, setTerm] = useState('');
   const [job, setJob] = useState('all');
   const [place, setPlace] = useState('all');

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/hooks/useAuth';
-import { useOnline, readQueue, saveQueue, parisDay, canAutoSync, type PendingStamp } from '@/lib/offline';
+import { useOnline, readQueue, saveQueue, parisDay, canAutoSync, needsMediation, type PendingStamp } from '@/lib/offline';
 import { normalizePassInput } from "@/lib/pass-code";
 import { PassScanner } from "@/components/PassScanner";
 
@@ -91,6 +91,19 @@ export function ManualStampCard() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const [mediating, setMediating] = useState<string | null>(null);
+  /** Demande d'un jour passé ou refusée : transmise au Bureau, jamais transformée en tampon automatiquement. */
+  const mediate = async (item: PendingStamp) => {
+    if (!user) return;
+    if (!navigator.onLine) { toast.info('Reconnectez-vous pour transmettre la demande au Bureau.'); return; }
+    setMediating(item.id);
+    const { data: res, error } = await supabase.rpc('submit_offline_stamp_mediation', { _local_id: item.id, _member_id: item.member, _bureau_id: item.bureau, _reason: item.reason, _offline_day: item.day });
+    setMediating(null);
+    if (error) { toast.error(error.message); return; }
+    saveQueue(user.id, readQueue(user.id).filter(i => i.id !== item.id));
+    toast.success((res as { submitted?: boolean })?.submitted ? 'Demande transmise au Bureau pour médiation. Aucun tampon n’est ajouté avant sa décision.' : 'Cette demande avait déjà été transmise au Bureau.');
+  };
+  const blocked = identified && identified.id === member && (identified.status !== 'ACTIVE' || identified.type !== 'PARTICULIER');
   const resolve = async (raw: string) => {
     setScanning(false);
     const code = normalizePassInput(raw);
@@ -138,7 +151,7 @@ export function ManualStampCard() {
             <p className="font-medium">{identified.name}</p>
             <p className="text-xs text-muted-foreground">
               {identified.total % 10}/10 tampons sur la carte en cours
-              {identified.status !== "ACTIVE" ? " · adhésion en attente de validation" : ""}
+              {identified.status !== "ACTIVE" ? " · adhésion pas encore validée par le Bureau : tampon possible après validation" : ""}
               {identified.type !== "PARTICULIER" ? " · les tampons manuels sont réservés aux particuliers" : ""}
             </p>
           </div>
@@ -158,9 +171,25 @@ export function ManualStampCard() {
       </select>
       <Label htmlFor="ms-reason">Motif</Label>
       <Input id="ms-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Ex. séance de suivi du 4 octobre" />
-      <Button onClick={() => award.mutate()} disabled={award.isPending || (!data && !cached)}>{online ? 'Attribuer le tampon' : 'Garder la demande en attente'}</Button>
-      {!online && <p className="text-sm text-muted-foreground">Le total ne change pas avant confirmation serveur. Reconnectez-vous le jour même ; sinon le Bureau devra vérifier la demande.</p>}
-      {pending.length > 0 && <div role="status" className="space-y-2 rounded-xl border border-border bg-card p-3"><h3 className="font-medium">{pending.length} demande(s) en attente</h3>{pending.map(i => <div key={i.id} className="flex flex-wrap items-center justify-between gap-2"><p>{(data ?? cached)?.members.find(m => m.id === i.member)?.name ?? 'Adhérent'} · {i.day}<br /><span className="text-xs">{i.state === 'review' || i.day !== parisDay() ? 'À vérifier avec le Bureau : pas de nouvelle attribution automatique.' : 'En attente du retour du réseau.'}</span></p><Button variant="outline" size="sm" onClick={() => {if(user && window.confirm('Retirer cette demande locale ? Aucun tampon confirmé ne sera supprimé.')) saveQueue(user.id,readQueue(user.id).filter(x => x.id !== i.id));}}>Retirer</Button></div>)}</div>}
+      <Button onClick={() => award.mutate()} disabled={award.isPending || (!data && !cached) || Boolean(blocked)}>{online ? 'Attribuer le tampon' : 'Garder la demande en attente'}</Button>
+      {!online && <p className="text-sm text-muted-foreground">Le total ne change pas avant confirmation serveur. Reconnectez-vous le jour même ; sinon vous pourrez transmettre la demande au Bureau pour médiation.</p>}
+      {pending.length > 0 && (
+        <div role="status" className="space-y-2 rounded-xl border border-border bg-card p-3">
+          <h3 className="font-medium">{pending.length} demande(s) en attente</h3>
+          {pending.map(i => {
+            const toBureau = user ? needsMediation(i, user.id, parisDay()) : false;
+            return (
+              <div key={i.id} className="space-y-2 border-t border-border pt-2 first:border-0 first:pt-0">
+                <p>{(data ?? cached)?.members.find(m => m.id === i.member)?.name ?? 'Adhérent'} · {i.day}<br /><span className="text-xs text-muted-foreground">{toBureau ? 'Pas d’attribution automatique : le Bureau peut examiner cette demande.' : 'En attente du retour du réseau.'}</span></p>
+                <div className="flex flex-wrap gap-2">
+                  {toBureau && <Button size="sm" onClick={() => void mediate(i)} disabled={!online || mediating === i.id}>{mediating === i.id ? 'Envoi…' : 'Transmettre au Bureau pour médiation'}</Button>}
+                  <Button variant="outline" size="sm" onClick={() => {if(user && window.confirm('Retirer cette demande locale ? Aucun tampon confirmé ne sera supprimé.')) saveQueue(user.id,readQueue(user.id).filter(x => x.id !== i.id));}}>Retirer</Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
