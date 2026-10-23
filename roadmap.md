@@ -269,3 +269,16 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Pastille de notifications sur l'icône de l'application
 - [ ] Retirer .env du suivi du dépôt (géré par la plateforme, hors de portée)
 - [ ] Plus tard : n8n, import CSV HelloAsso
+
+## Lot F2 — Corrections et finalisation
+- [x] P0 Activités : comptes en attente ne lisent plus les activités internes (testé visiteur + compte en attente réels)
+- [x] Formulaires : lien Google Forms possible à la place des questions
+- [x] Registre : état d'erreur avec « Réessayer » ; « Créer une tâche liée » depuis une décision
+- [x] « Ajouter à mon agenda » (Google Agenda / fichier .ics) sur activités et événements
+- [x] Menu en 5 catégories, entrées en double retirées
+- [x] Thème clair/sombre/automatique + espacement confortable dans Mes préférences
+- [x] Import HelloAsso : guillemets, retours à la ligne, accents, dates et montants fiabilisés
+- [ ] Essais réels compte actif, pro validé et Bureau (comptes d'essai à autoriser)
+- [ ] Essai « Ajouter à mon agenda » sur iPhone et Android (appareil physique requis)
+- [ ] Parcours « Mon chien » unifié et partage multi-pros : lot suivant
+- [ ] Revue visuelle complète du mode sombre écran par écran
