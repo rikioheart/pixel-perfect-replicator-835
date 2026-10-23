@@ -238,3 +238,15 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Tests d'accès réels par rôle (46/46) et tests unitaires
 - [ ] Nettoyer les comptes et demandes d'essai anciens (« Essai … », « TEST-RLS ») avant mise en ligne — attend l'accord du Bureau
 - [ ] Justificatifs en fichiers privés (aujourd'hui simples liens) — décision métier à prendre
+
+## Lot B — Pass Terrain (B1–B10)
+- [x] B1 Statut pro refusé par défaut si la vérification serveur échoue (repli sur le libellé supprimé)
+- [x] B2 Espace pro hors ligne : seulement si ce compte a été vérifié pro/Bureau sur cet appareil (7 jours max)
+- [x] B3 Pass affiché depuis la copie locale quand le serveur ne répond pas
+- [x] B4 Code court inclus dans la copie locale du pass
+- [x] B5 Partenaires publics (nom, métiers, ville) gardés pour la page hors ligne
+- [x] B6 Absence volontaire de cache des pages documentée
+- [x] B7 Option A : tampon uniquement pour un particulier à l'adhésion validée
+- [x] B8 Code de pass unique
+- [x] B9 Demandes hors ligne d'un jour passé : « Transmettre au Bureau pour médiation » (aucun tampon automatique)
+- [ ] B10 Scanner caméra à essayer sur iPhone et Android réels (bloqué : appareil physique requis)
