@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canOpenProSpace, isNavItemPrimary, isNavItemVisible, memberHubTabFor, memberHubGroupFor, MEMBER_HUB_GROUPS, MEMBER_HUB_TABS } from "./nav-rules";
+import { canCreateForm, canOpenProSpace, isNavItemPrimary, isNavItemVisible, memberHubTabFor, memberHubGroupFor, MEMBER_HUB_GROUPS, MEMBER_HUB_TABS } from "./nav-rules";
 
 const particulier = { isBureau: false, isPro: false };
 const pro = { isBureau: false, isPro: true };
@@ -41,5 +41,10 @@ describe("navigation par rôle", () => {
   it("refus par défaut tant que le statut n'est pas vérifié", () => {
     expect(canOpenProSpace({ ...pro, rolesReady: false })).toBe(false);
     expect(canOpenProSpace({ ...particulier, rolesReady: false })).toBe(false);
+  });
+  it("un particulier ne peut pas créer de formulaire, un pro et le Bureau oui", () => {
+    expect(canCreateForm(particulier)).toBe(false);
+    expect(canCreateForm(pro)).toBe(true);
+    expect(canCreateForm(bureau)).toBe(true);
   });
 });

@@ -62,3 +62,8 @@ export function memberHubGroupFor(pathname: string) {
 export function canOpenProSpace(v: NavViewer & { rolesReady: boolean }): boolean {
   return v.rolesReady && (v.isPro || v.isBureau);
 }
+
+/** Création de formulaires : Bureau ou professionnel actif seulement, jamais un particulier (doublé par la base). */
+export function canCreateForm(v: NavViewer): boolean {
+  return v.isBureau || v.isPro;
+}
