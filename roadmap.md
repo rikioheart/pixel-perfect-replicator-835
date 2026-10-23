@@ -258,3 +258,14 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Essais réels compte membre et anonyme (données d'essai supprimées)
 - [ ] Essais réels compte Bureau et pro sans Bureau (session d'essai à autoriser)
 - [ ] Registre des décisions stratégiques (AG, réunions) : décision métier à prendre
+
+## Niveau 1 (octobre 2026)
+- [x] Fonctions internes fermées aux visiteurs non connectés
+- [x] Formulaires réservés (adhésion validée) vs libres (tout profil)
+- [x] Adresse + Ouvrir dans Google Maps / Copier ; météo Open-Meteo sur activités et événements
+- [x] E-mail de contact facultatif et mairies/établissements identifiés sur projets, activités, événements
+- [x] Pro : adresse + lien fiche Google Business
+- [x] Registre de gouvernance en date/heure de Paris
+- [x] Pastille de notifications sur l'icône de l'application
+- [ ] Retirer .env du suivi du dépôt (géré par la plateforme, hors de portée)
+- [ ] Plus tard : n8n, import CSV HelloAsso
