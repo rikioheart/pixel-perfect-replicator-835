@@ -72,7 +72,7 @@ export function WeatherHint({ place, date }: { place?: string | null; date?: str
     })();
     return () => { alive = false; };
   }, [place, day]);
-  if (state === "none" || state === "loading") return null;
+  if (!state || state === "none" || state === "loading") return null;
   return (
     <p className="rounded-md bg-muted/60 px-3 py-2 text-xs text-muted-foreground" aria-live="polite">
       Météo prévue : <span className="font-medium text-foreground">{state.label}</span>, {state.tmin}° à {state.tmax}°
