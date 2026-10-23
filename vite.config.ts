@@ -15,6 +15,8 @@ export default defineConfig({
       globPatterns: ['**/*.{js,css,png,jpg,woff2}'],
       additionalManifestEntries: [{url:'/offline.html', revision:'1'}, {url:'/offline.js',revision:'1'}, {url:'/offline.css',revision:'1'}],
       navigateFallback: null,
+      // Intentionnel : aucune page n'émet X-LVDC-Public-Cache, donc aucune page HTML (privée ou non) n'est mise en cache.
+      // Hors réseau, la navigation retombe sur /offline.html, qui lit seulement le pass et les partenaires publics en stockage local.
       runtimeCaching: [{ urlPattern: ({request, url}) => request.mode === 'navigate' && !url.pathname.startsWith('/~oauth') && !url.pathname.startsWith('/api'), handler: 'NetworkFirst', options: {cacheName:'lvdc-navigation', networkTimeoutSeconds:4, precacheFallback:{fallbackURL:'/offline.html'}, cacheableResponse:{statuses:[200],headers:{'X-LVDC-Public-Cache':'yes'}}, expiration:{maxEntries:2,maxAgeSeconds:86400}} }],
       cleanupOutdatedCaches: true,
     },

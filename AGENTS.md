@@ -21,7 +21,7 @@
 - Commentaires lisibles selon l'objet parent (can_view_comment_target) ; réservations terrain lisibles par les seules personnes concernées, créneaux libres/occupés via terrain_busy_slots, chevauchement refusé par la base.
 - Tests RLS : script API réel avec comptes d'essai, jamais seulement l'interface.
 - Chiens : la table dogs n'est lue en direct que par le propriétaire/foyer ; Bureau via bureau_dogs() (rubriques privées masquées, retrait personnel via profiles.hide_sensitive_dogs), pros via get_pro_dogs() (accès partagé + vue opérationnelle can_view_dog_operational).
-- Tampons manuels uniquement via award_manual_stamp (pro validé, particulier, Bureau notifié, clé manual_key unique). Pourquoi : traçabilité et anti-doublon.
+- Tampons manuels uniquement via award_manual_stamp (pro validé, particulier à l'adhésion ACTIVE, Bureau notifié, clé manual_key unique ; qr_code unique). Pourquoi : traçabilité et anti-doublon.
 
 ## Métier (A11–A13)
 - Responsabilités contextuelles : member_functions.scope_type/scope_id, is_project_coordinator (rôle projet OWNER/COORDINATOR) et has_scoped_permission (rôle global ∪ coordination ∪ délégation active). Pourquoi : un coordinateur n'est jamais admin global.

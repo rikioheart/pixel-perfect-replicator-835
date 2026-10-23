@@ -4426,6 +4426,16 @@ export type Database = {
         }
         Returns: string
       }
+      submit_offline_stamp_mediation: {
+        Args: {
+          _bureau_id: string
+          _local_id: string
+          _member_id: string
+          _offline_day: string
+          _reason: string
+        }
+        Returns: Json
+      }
       terrain_busy_slots: {
         Args: { _from: string; _to: string }
         Returns: {

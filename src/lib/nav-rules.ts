@@ -55,13 +55,10 @@ export function memberHubGroupFor(pathname: string) {
   return MEMBER_HUB_GROUPS.find((g) => g.paths.some((p) => pathname === p || pathname.startsWith(`${p}/`)));
 }
 
-/** Repli si la vérification serveur du statut pro est indisponible. */
-export function fallbackIsPro(membershipType: string | null | undefined): boolean {
-  return (membershipType ?? "").toUpperCase().includes("PRO");
-}
-
-/** Espace pro : fermé aux particuliers en ligne ; hors réseau le statut est invérifiable, on laisse l'accès au pass local. */
-export function canOpenProSpace(v: NavViewer & { rolesReady: boolean; online: boolean }): boolean {
-  if (!v.online || !v.rolesReady) return true;
-  return v.isPro || v.isBureau;
+/**
+ * Espace pro : refus par défaut. Ouvert seulement quand les rôles sont connus et que le compte est
+ * pro validé ou Bureau (hors réseau : dernière vérification serveur de ce compte, voir pro-status.ts).
+ */
+export function canOpenProSpace(v: NavViewer & { rolesReady: boolean }): boolean {
+  return v.rolesReady && (v.isPro || v.isBureau);
 }
