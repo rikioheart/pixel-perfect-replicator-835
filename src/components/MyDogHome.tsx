@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, Eye, Flag, PawPrint, Share2, Sprout } from "lucide-react";
+import { CalendarDays, Eye, Flag, HeartHandshake, Share2, Sprout } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +62,7 @@ export function MyDogHome({ userId }: { userId: string }) {
     return (
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-start gap-3 p-5 sm:flex-row sm:items-center">
-          <PawPrint className="size-8 text-primary" aria-hidden="true" />
+          <HeartHandshake className="size-8 text-primary" aria-hidden="true" />
           <div className="flex-1">
             <p className="font-display text-lg">Accompagnez-vous un chien ?</p>
             <p className="text-sm text-muted-foreground">
@@ -88,7 +88,7 @@ export function MyDogHome({ userId }: { userId: string }) {
                 <img src={dog.photo_url} alt={`Photo de ${dog.name}`} className="size-20 rounded-full object-cover" />
               ) : (
                 <div className="flex size-20 items-center justify-center rounded-full bg-secondary" aria-hidden="true">
-                  <PawPrint className="size-9 text-primary" />
+                  <HeartHandshake className="size-9 text-primary" />
                 </div>
               )}
               <div className="min-w-0 flex-1">

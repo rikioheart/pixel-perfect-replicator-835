@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { PawPrint, UserRound } from "lucide-react";
+import { HeartHandshake, UserRound } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -190,7 +190,7 @@ function ProfilePage() {
       </div>
 
       <section className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5">
-        <h2 className="flex items-center gap-2 text-base"><PawPrint className="size-4" aria-hidden /> Mon foyer & mes chiens</h2>
+        <h2 className="flex items-center gap-2 text-base"><HeartHandshake className="size-4" aria-hidden /> Mon foyer & mes chiens</h2>
         <Button asChild variant="outline"><Link to="/foyer">Ouvrir les fiches de mes chiens</Link></Button>
       </section>
     </AppShell>

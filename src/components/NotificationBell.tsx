@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, CheckCheck, PawPrint } from "lucide-react";
+import { Bell, CheckCheck, HeartHandshake } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -77,7 +77,7 @@ export function NotificationBell() {
           <div className="space-y-2 px-4 pb-6">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-16 text-center text-sm text-muted-foreground">
-                <PawPrint className="size-8 opacity-40" />
+                <HeartHandshake className="size-8 opacity-40" />
                 Aucune notification pour le moment.
               </div>
             ) : (

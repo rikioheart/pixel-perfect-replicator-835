@@ -41,8 +41,8 @@ import {
   Building2,
   Lightbulb,
   Menu,
-  PawPrint,
-  Dog,
+  Heart,
+
   House,
   ClipboardList,
   Trees,
@@ -97,7 +97,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/espace-pro", label: "Tableau de bord pro", icon: LayoutDashboard, audience: "pro" },
       { to: "/espace-pro/carte", label: "Ma carte professionnelle", icon: Briefcase, audience: "pro" },
-      { to: "/espace-pro/chiens", label: "Chiens accompagnés", icon: Dog, audience: "pro" },
+      { to: "/espace-pro/chiens", label: "Chiens accompagnés", icon: Heart, audience: "pro" },
       { to: "/espace-pro/collaborations", label: "Collaborations", icon: Handshake, audience: "pro" },
     ],
   },
@@ -116,13 +116,13 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/advisor", label: "Conseiller d'équipe", icon: Sparkles, audience: "bureau" },
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
       { to: "/admin/pros", label: "Fiches professionnelles", icon: Briefcase, audience: "bureau" },
-      { to: "/admin/chiens", label: "Chiens de l'association", icon: Dog, audience: "bureau" },
+      { to: "/admin/chiens", label: "Chiens de l'association", icon: Heart, audience: "bureau" },
     ],
   },
   {
     title: "Aujourd’hui et contribuer",
     items: [
-      { to: "/member", label: "Mon Compagnon & Moi", icon: PawPrint, audience: "all", primary: true, primaryForParticulier: true },
+      { to: "/member", label: "Mon Compagnon & Moi", icon: Heart, audience: "all", primary: true, primaryForParticulier: true },
       { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all", primary: true },
       { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all", primary: true },
       { to: "/avancees", label: "Ce que nous construisons", icon: Sparkles, audience: "all" },
@@ -219,8 +219,8 @@ export function AppShell({
   const dock = isBureau
     ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/calendar", label: "Calendrier", icon: CalendarDays }, { to: "/member", label: "Mon espace", icon: UserRound }]
     : isPro
-      ? [{ to: "/espace-pro", label: "Espace pro", icon: Briefcase }, { to: "/espace-pro/chiens", label: "Chiens", icon: PawPrint }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }]
-      : [{ to: "/member", label: "Mon chien", icon: PawPrint }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }, { to: "/blog", label: "Actualités", icon: Newspaper }];
+      ? [{ to: "/espace-pro", label: "Espace pro", icon: Briefcase }, { to: "/espace-pro/chiens", label: "Chiens", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }]
+      : [{ to: "/member", label: "Mon chien", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }, { to: "/blog", label: "Actualités", icon: Newspaper }];
   const primaryPaths = new Set(primary.map((item) => item.to));
   const seen = new Set(primaryPaths);
   const secondary = visible.filter((item) => {
@@ -435,7 +435,7 @@ export function AppShell({
             <div className="mb-5 space-y-2">
             <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
               {MEMBER_HUB_GROUPS.map((t, i) => {
-                const Icon = [PawPrint, CalendarDays, Stamp, UserRound][i] ?? UserRound;
+                const Icon = [Heart, CalendarDays, Stamp, UserRound][i] ?? UserRound;
                 return (
                 <Link
                   key={t.to}

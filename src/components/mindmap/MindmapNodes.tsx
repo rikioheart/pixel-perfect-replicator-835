@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
-import { PawPrint, FolderKanban, ListChecks, CircleUser } from "lucide-react";
+import { HeartHandshake, FolderKanban, ListChecks, CircleUser } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PRIORITY_LABEL, PROJECT_STATUS_LABEL, TASK_STATUS_LABEL } from "@/lib/domain";
 
@@ -48,7 +48,7 @@ function Tag({ children, tone }: { children: React.ReactNode; tone?: string | un
 export function RootNode({ data }: NodeProps<Node<RootNodeData, "root">>) {
   return (
     <div className="surface-night flex w-64 items-center gap-3 rounded-xl px-4 py-3 shadow-lg">
-      <PawPrint className="size-6 shrink-0" />
+      <HeartHandshake className="size-6 shrink-0" />
       <div className="min-w-0">
         <p className="font-display truncate text-sm">{data.label}</p>
         {data.subtitle ? <p className="truncate text-xs opacity-70">{data.subtitle}</p> : null}
