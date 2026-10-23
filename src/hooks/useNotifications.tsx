@@ -80,6 +80,15 @@ export function useNotifications() {
       .eq("is_read", false);
   }, [userId]);
 
+  const unread = items.filter((n) => !n.is_read).length;
+  useEffect(() => {
+    // Pastille sur l'icône de l'application installée (si le téléphone le permet).
+    const nav = navigator as Navigator & { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> };
+    if (!userId || loading) return;
+    if (unread > 0) nav.setAppBadge?.(unread).catch(() => {});
+    else nav.clearAppBadge?.().catch(() => {});
+  }, [unread, userId, loading]);
+
   return {
     notifications: items,
     unreadCount: items.filter((n) => !n.is_read).length,
