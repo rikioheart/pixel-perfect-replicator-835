@@ -253,6 +253,20 @@
       "when": 1792771300388,
       "tag": "0035_governance_records",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1792780635294,
+      "tag": "0036_niveau1_securite_lieux_mairies",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1792780744813,
+      "tag": "0037_governance_meeting_at",
+      "breakpoints": true
     }
   ]
 }

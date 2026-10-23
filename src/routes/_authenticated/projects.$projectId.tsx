@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLinks } from "@/components/ExternalLinks";
+import { PlaceInfo } from "@/components/PlaceInfo";
+import { LinkedMairies } from "@/components/LinkedMairies";
 import { AiAssist } from "@/components/AiAssist";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -238,6 +240,18 @@ function ProjectDetail() {
                     <Textarea id={`pj-${k}`} rows={2} defaultValue={project[k] ?? ""} onBlur={(e) => { if (e.target.value !== (project[k] ?? "")) updateProject({ [k]: e.target.value.trim() || null }); }} />
                   </div>
                 ))}
+                <div>
+                  <Label htmlFor="pj-address" className="text-xs">Lieu ou adresse (facultatif)</Label>
+                  <Input id="pj-address" defaultValue={project.address ?? ""} onBlur={(e) => { if (e.target.value !== (project.address ?? "")) updateProject({ address: e.target.value.trim() || null }); }} />
+                </div>
+                <div>
+                  <Label htmlFor="pj-email" className="text-xs">E-mail de contact (facultatif)</Label>
+                  <Input id="pj-email" type="email" placeholder="ex. référent ou association" defaultValue={project.contact_email ?? ""} onBlur={(e) => {
+                    const v = e.target.value.trim();
+                    if (v && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast.error("E-mail invalide"); return; }
+                    if (v !== (project.contact_email ?? "")) updateProject({ contact_email: v || null });
+                  }} />
+                </div>
               </div>
             </details>
           ) : null}
@@ -295,6 +309,13 @@ function ProjectDetail() {
         )}
       </div>
 
+      {project.address || project.contact_email ? (
+        <div className="panel mt-6 space-y-3 p-4 text-sm">
+          <PlaceInfo address={project.address} />
+          {project.contact_email ? <p>Contact : <a className="underline" href={`mailto:${project.contact_email}`}>{project.contact_email}</a></p> : null}
+        </div>
+      ) : null}
+      <div className="panel mt-6 p-4"><LinkedMairies type="project" id={projectId} /></div>
       <div className="mt-6"><ExternalLinks contextType="PROJECT" contextId={projectId} /></div>
       <div className="mt-6">
         <Comments

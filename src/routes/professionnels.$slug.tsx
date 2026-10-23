@@ -1,3 +1,5 @@
+import { safeGoogleBusinessUrl } from "@/lib/places";
+import { PlaceInfo } from "@/components/PlaceInfo";
 import { publicSeo } from '@/components/PublicSeo';
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -40,6 +42,8 @@ type ProPage = {
   public_email: string | null;
   public_phone: string | null;
   public_city: string | null;
+  public_address?: string | null;
+  google_business_url?: string | null;
   activities: { id: string; title: string; type: string; date: string | null; location: string | null; price_public: number; price_member: number }[];
   advantages: { id: string; title: string; description: string | null; conditions: string | null; valid_until: string | null }[];
   collaborations: { id: string; title: string; description: string | null; happened_on: string | null }[];
@@ -134,7 +138,13 @@ function PublicProCard() {
                     <Phone className="size-3.5" aria-hidden /> {pro.public_phone}
                   </a>
                 ) : null}
+                {safeGoogleBusinessUrl(pro.google_business_url) ? (
+                  <a href={safeGoogleBusinessUrl(pro.google_business_url)!} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center rounded-md border border-border px-3 hover:bg-accent">
+                    Fiche Google
+                  </a>
+                ) : null}
               </div>
+              {pro.public_address ? <div className="mt-4 text-sm"><PlaceInfo address={pro.public_address} /></div> : null}
             </article>
 
             <Section title="Activités proposées" icon={CalendarDays}>

@@ -76,6 +76,7 @@ export type Database = {
       }
       activities: {
         Row: {
+          address: string | null
           before_coming: string | null
           capacity: number | null
           category: string
@@ -107,6 +108,7 @@ export type Database = {
           with_your_dog: string | null
         }
         Insert: {
+          address?: string | null
           before_coming?: string | null
           capacity?: number | null
           category?: string
@@ -138,6 +140,7 @@ export type Database = {
           with_your_dog?: string | null
         }
         Update: {
+          address?: string | null
           before_coming?: string | null
           capacity?: number | null
           category?: string
@@ -1109,8 +1112,44 @@ export type Database = {
           },
         ]
       }
+      entity_mairies: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          mairie_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          mairie_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          mairie_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_mairies_mairie_id_fkey"
+            columns: ["mairie_id"]
+            isOneToOne: false
+            referencedRelation: "mairies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
+          address: string | null
           before_coming: string | null
           capacity: number | null
           created_at: string
@@ -1140,6 +1179,7 @@ export type Database = {
           with_your_dog: string | null
         }
         Insert: {
+          address?: string | null
           before_coming?: string | null
           capacity?: number | null
           created_at?: string
@@ -1169,6 +1209,7 @@ export type Database = {
           with_your_dog?: string | null
         }
         Update: {
+          address?: string | null
           before_coming?: string | null
           capacity?: number | null
           created_at?: string
@@ -1548,6 +1589,7 @@ export type Database = {
           follow_up: string | null
           id: string
           kind: string
+          meeting_at: string | null
           meeting_date: string
           summary: string | null
           title: string
@@ -1560,6 +1602,7 @@ export type Database = {
           follow_up?: string | null
           id?: string
           kind?: string
+          meeting_at?: string | null
           meeting_date?: string
           summary?: string | null
           title: string
@@ -1572,6 +1615,7 @@ export type Database = {
           follow_up?: string | null
           id?: string
           kind?: string
+          meeting_at?: string | null
           meeting_date?: string
           summary?: string | null
           title?: string
@@ -2883,9 +2927,11 @@ export type Database = {
           created_at: string
           description: string | null
           display_name: string
+          google_business_url: string | null
           id: string
           logo_url: string | null
           profile_id: string
+          public_address: string | null
           public_city: string | null
           public_email: string | null
           public_listing: boolean
@@ -2905,9 +2951,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_name: string
+          google_business_url?: string | null
           id?: string
           logo_url?: string | null
           profile_id: string
+          public_address?: string | null
           public_city?: string | null
           public_email?: string | null
           public_listing?: boolean
@@ -2927,9 +2975,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_name?: string
+          google_business_url?: string | null
           id?: string
           logo_url?: string | null
           profile_id?: string
+          public_address?: string | null
           public_city?: string | null
           public_email?: string | null
           public_listing?: boolean
@@ -3189,8 +3239,10 @@ export type Database = {
       }
       projects: {
         Row: {
+          address: string | null
           archived_at: string | null
           category_id: string | null
+          contact_email: string | null
           created_at: string
           created_by: string | null
           current_needs: string | null
@@ -3216,8 +3268,10 @@ export type Database = {
           why: string | null
         }
         Insert: {
+          address?: string | null
           archived_at?: string | null
           category_id?: string | null
+          contact_email?: string | null
           created_at?: string
           created_by?: string | null
           current_needs?: string | null
@@ -3243,8 +3297,10 @@ export type Database = {
           why?: string | null
         }
         Update: {
+          address?: string | null
           archived_at?: string | null
           category_id?: string | null
+          contact_email?: string | null
           created_at?: string
           created_by?: string | null
           current_needs?: string | null
@@ -4333,6 +4389,7 @@ export type Database = {
         }
         Returns: Json
       }
+      is_active_member: { Args: { _user_id: string }; Returns: boolean }
       is_bureau: { Args: { _user_id: string }; Returns: boolean }
       is_dog_keeper: {
         Args: { _dog_id: string; _user_id: string }
@@ -4354,6 +4411,15 @@ export type Database = {
       is_project_member: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
+      }
+      linked_mairies: {
+        Args: { _id: string; _type: string }
+        Returns: {
+          city: string
+          link_id: string
+          mairie_id: string
+          name: string
+        }[]
       }
       list_bureau_members: { Args: never; Returns: Json }
       list_particuliers: { Args: never; Returns: Json }

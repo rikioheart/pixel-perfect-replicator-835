@@ -57,6 +57,7 @@ function ActivitiesPage() {
     type: "ATELIER",
     date: "",
     location: "",
+    address: "",
     price_public: "0",
     price_member: "0",
     image_url: "",
@@ -134,6 +135,7 @@ function ActivitiesPage() {
         type: form.type,
         date: form.date ? new Date(form.date).toISOString() : null,
         location: form.location || null,
+        address: form.address.trim() || null,
         price_public: Number(form.price_public) || 0,
         price_member: Number(form.price_member) || 0,
         image_url: form.image_url.trim() || null,
@@ -158,6 +160,7 @@ function ActivitiesPage() {
         type: "ATELIER",
         date: "",
         location: "",
+    address: "",
         price_public: "0",
         price_member: "0",
         image_url: "",
@@ -240,6 +243,15 @@ function ActivitiesPage() {
                     id="act-loc"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="act-addr">Adresse complète (facultatif)</Label>
+                  <Input
+                    id="act-addr"
+                    placeholder="Rue, code postal, ville"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
                   />
                 </div>
                 <div>

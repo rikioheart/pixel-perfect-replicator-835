@@ -54,6 +54,7 @@ function EventsPage() {
     start_date: "",
     end_date: "",
     location: "",
+    address: "",
     image_url: "",
     visibility: "ASSOCIATION",
   });
@@ -82,6 +83,7 @@ function EventsPage() {
         start_date: form.start_date ? new Date(form.start_date).toISOString() : null,
         end_date: form.end_date ? new Date(form.end_date).toISOString() : null,
         location: form.location || null,
+        address: form.address.trim() || null,
         image_url: form.image_url.trim() || null,
         visibility: form.visibility,
         created_by: user?.id ?? null,
@@ -184,6 +186,15 @@ function EventsPage() {
                     id="ev-loc"
                     value={form.location}
                     onChange={(e) => setForm({ ...form, location: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ev-addr">Adresse complète (facultatif)</Label>
+                  <Input
+                    id="ev-addr"
+                    placeholder="Rue, code postal, ville"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
                   />
                 </div>
                 <div>

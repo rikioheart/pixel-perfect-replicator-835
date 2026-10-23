@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ExternalLinks } from "@/components/ExternalLinks";
+import { PlaceInfo, WeatherHint } from "@/components/PlaceInfo";
+import { LinkedMairies } from "@/components/LinkedMairies";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -89,7 +91,8 @@ function ActivityDetail() {
             <p className="flex items-center gap-2"><CalendarDays className="size-4 text-muted-foreground" aria-hidden />
               {date ? `${date.toLocaleDateString("fr-FR", { dateStyle: "full" })} à ${date.toLocaleTimeString("fr-FR", { timeStyle: "short" })}` : "Date à définir"}
             </p>
-            {a.location ? <p className="flex items-center gap-2"><MapPin className="size-4 text-muted-foreground" aria-hidden /> {a.location}</p> : null}
+            <PlaceInfo location={a.location} address={a.address} />
+            <WeatherHint place={a.address || a.location} date={a.date} />
             <p className="flex items-center gap-2"><Dog className="size-4 text-muted-foreground" aria-hidden /> {DOG_POLICY_LABEL[a.dog_policy]}{a.max_dogs ? ` (${a.max_dogs} max.)` : ""}</p>
             <p><span className="font-medium">{Number(a.price_member).toFixed(2)} €</span> adhérent · {Number(a.price_public).toFixed(2)} € public</p>
             {people?.pro ? (
@@ -117,6 +120,7 @@ function ActivityDetail() {
         </aside>
       </div>
       <RegistrationWizard open={open} onOpenChange={setOpen} target={{ activityId, title: a.title, dogPolicy: a.dog_policy, maxDogs: a.max_dogs, full: Boolean(spots?.full), waitlist: Boolean(spots?.waitlist) }} />
+      <div className="panel mt-6 p-4"><LinkedMairies type="activity" id={activityId} /></div>
       <div className="mt-6"><ExternalLinks contextType="ACTIVITY" contextId={activityId} /></div>
     </AppShell>
   );

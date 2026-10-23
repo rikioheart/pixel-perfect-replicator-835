@@ -1,3 +1,4 @@
+import { safeGoogleBusinessUrl } from "@/lib/places";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -44,11 +45,13 @@ type Form = {
   public_email: string;
   public_phone: string;
   public_city: string;
+  public_address: string;
+  google_business_url: string;
 };
 
 const EMPTY: Form = {
   display_name: "", slug: "", logo_url: "", specialties: "", sector: "", description: "",
-  website_url: "", instagram: "", facebook: "", linkedin: "", public_email: "", public_phone: "", public_city: "",
+  website_url: "", instagram: "", facebook: "", linkedin: "", public_email: "", public_phone: "", public_city: "", public_address: "", google_business_url: "",
 };
 
 const STEPS = ["Identité", "Activité", "Présentation & contact"] as const;
@@ -80,7 +83,7 @@ function ProCardPage() {
         display_name: card.display_name, slug: card.slug, logo_url: card.logo_url ?? "",
         specialties: card.specialties.join(", "), sector: card.sector ?? "", description: card.description ?? "",
         website_url: card.website_url ?? "", instagram: s["instagram"] ?? "", facebook: s["facebook"] ?? "", linkedin: s["linkedin"] ?? "",
-        public_email: card.public_email ?? "", public_phone: card.public_phone ?? "", public_city: card.public_city ?? "",
+        public_email: card.public_email ?? "", public_phone: card.public_phone ?? "", public_city: card.public_city ?? "", public_address: card.public_address ?? "", google_business_url: card.google_business_url ?? "",
       });
     } else if (profile) {
       const name = profile.display_name || [profile.first_name, profile.last_name].filter(Boolean).join(" ");
@@ -107,6 +110,8 @@ function ProCardPage() {
       public_email: form.public_email.trim() || null,
       public_phone: form.public_phone.trim() || null,
       public_city: form.public_city.trim() || null,
+      public_address: form.public_address.trim() || null,
+      google_business_url: safeGoogleBusinessUrl(form.google_business_url),
     };
   };
 
@@ -231,6 +236,8 @@ function ProCardPage() {
                 {field("specialties", "Spécialités (séparées par des virgules)", { placeholder: "Éducation, Comportement" })}
                 {field("sector", "Secteur d'intervention", { placeholder: "Nord-Isère" })}
                 {field("public_city", "Ville affichée")}
+                {field("public_address", "Adresse de l'entreprise (facultatif)")}
+                {field("google_business_url", "Lien fiche Google Business (facultatif)")}
               </>
             ) : (
               <>
