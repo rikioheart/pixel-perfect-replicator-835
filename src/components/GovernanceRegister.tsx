@@ -43,7 +43,7 @@ export function GovernanceRegister() {
       const payload = { kind: form.kind, title: form.title.trim(), meeting_date: form.meeting_date, summary: form.summary || null, decisions: form.decisions || null, follow_up: form.follow_up || null };
       const { error } = editId
         ? await supabase.from("governance_records").update(payload).eq("id", editId)
-        : await supabase.from("governance_records").insert({ ...payload, created_by: user?.id });
+        : await supabase.from("governance_records").insert({ ...payload, created_by: user?.id ?? null });
       if (error) throw error;
     },
     onSuccess: () => {
