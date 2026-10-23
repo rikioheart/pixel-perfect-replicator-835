@@ -4412,6 +4412,10 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      is_validated_professional: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       linked_mairies: {
         Args: { _id: string; _type: string }
         Returns: {
