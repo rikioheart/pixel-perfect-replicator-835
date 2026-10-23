@@ -19,6 +19,7 @@ type Filter =
   | "professional"
   | "dog"
   | "document"
+  | "form"
   | "project"
   | "task"
   | "activity"
@@ -41,6 +42,7 @@ const FILTERS: { code: Filter; label: string }[] = [
   { code: "professional", label: "Professionnels" },
   { code: "dog", label: "Chiens" },
   { code: "document", label: "Documents" },
+  { code: "form", label: "Formulaires" },
   { code: "project", label: "Projets" },
   { code: "task", label: "Tâches" },
   { code: "activity", label: "Activités" },
@@ -54,6 +56,7 @@ const KIND_LABEL: Record<string, string> = {
   professional: "Professionnel",
   dog: "Chien",
   document: "Document",
+  form: "Formulaire",
   project: "Projet",
   task: "Tâche",
   activity: "Activité",
@@ -89,7 +92,7 @@ export function GlobalSearch() {
 
   const search = debouncedTerm;
 
-  const { data: hits = [], isFetching } = useQuery({
+  const { data: hits = [], isFetching, isError } = useQuery({
     queryKey: ["global-search", search, filter, since],
     enabled: open && search.length >= 2,
     queryFn: async () => {
@@ -122,7 +125,7 @@ export function GlobalSearch() {
           <DialogHeader>
             <DialogTitle>Rechercher</DialogTitle>
             <DialogDescription>
-              Uniquement les personnes, chiens et objets que vous êtes autorisé à ouvrir.
+              Uniquement ce que vous êtes autorisé à ouvrir. Documents et formulaires : titres et descriptions, jamais les fichiers ni les réponses.
             </DialogDescription>
           </DialogHeader>
 
@@ -168,14 +171,16 @@ export function GlobalSearch() {
                 <p className="text-sm text-muted-foreground">
                   Commencez à écrire pour lancer la recherche.
                 </p>
+              ) : isError ? (
+                <p className="text-sm text-destructive">La recherche est indisponible pour le moment. Réessayez dans un instant.</p>
               ) : isFetching ? (
                 <p className="text-sm text-muted-foreground">Recherche…</p>
               ) : hits.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun résultat.</p>
+                <p className="text-sm text-muted-foreground">Aucun contenu accessible ne correspond à cette recherche.</p>
               ) : (
                 hits.map((hit) => (
                   <Button
-                    key={hit.id}
+                    key={`${hit.kind}-${hit.id}`}
                     type="button"
                     variant="ghost"
                     onClick={() => {

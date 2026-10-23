@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 const TABS = [
   { to: "/admin", label: "Console" },
+  { to: "/admin/gouvernance", label: "Besoins de décision" },
   { to: "/admin/validation", label: "Validations" },
   { to: "/finance", label: "Comptabilité & remboursements" },
   { to: "/admin/suivi-financier", label: "Suivi des opérations" },

@@ -232,6 +232,20 @@
       "when": 1792746388501,
       "tag": "0032_lot_b_pass_terrain_fiabilisation",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792768018131,
+      "tag": "0033_lot_c_search_forms_documents",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792768247490,
+      "tag": "0034_lot_c_fix_global_search_columns",
+      "breakpoints": true
     }
   ]
 }
