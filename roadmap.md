@@ -236,7 +236,7 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Décision d'adhésion par fonction dédiée (verrou, journal, notification), file unique conservée
 - [x] /admin console unique, /admin/cockpit redirigé
 - [x] Tests d'accès réels par rôle (46/46) et tests unitaires
-- [ ] Nettoyer les comptes et demandes d'essai anciens (« Essai … », « TEST-RLS ») avant mise en ligne — attend l'accord du Bureau
+- [x] Comptes « Essai » et demandes « TEST-RLS » supprimés ; registre des réunions et décisions ajouté (Besoins de décision)
 - [ ] Justificatifs en fichiers privés (aujourd'hui simples liens) — décision métier à prendre
 
 ## Lot B — Pass Terrain (B1–B10)
