@@ -34,11 +34,12 @@ describe("navigation par rôle", () => {
     expect(memberHubTabFor("/projects")).toBeNull();
   });
   it("un particulier connecté n'ouvre pas l'espace pro, un pro et le Bureau oui", () => {
-    expect(canOpenProSpace({ ...particulier, rolesReady: true, online: true })).toBe(false);
-    expect(canOpenProSpace({ ...pro, rolesReady: true, online: true })).toBe(true);
-    expect(canOpenProSpace({ ...bureau, rolesReady: true, online: true })).toBe(true);
+    expect(canOpenProSpace({ ...particulier, rolesReady: true })).toBe(false);
+    expect(canOpenProSpace({ ...pro, rolesReady: true })).toBe(true);
+    expect(canOpenProSpace({ ...bureau, rolesReady: true })).toBe(true);
   });
-  it("hors réseau, l'espace pro reste ouvert pour le pass local", () => {
-    expect(canOpenProSpace({ ...particulier, rolesReady: true, online: false })).toBe(true);
+  it("refus par défaut tant que le statut n'est pas vérifié", () => {
+    expect(canOpenProSpace({ ...pro, rolesReady: false })).toBe(false);
+    expect(canOpenProSpace({ ...particulier, rolesReady: false })).toBe(false);
   });
 });
