@@ -1,0 +1,2 @@
+ALTER TABLE public.governance_records ADD COLUMN IF NOT EXISTS meeting_at timestamptz;
+UPDATE public.governance_records SET meeting_at = (meeting_date::timestamp + time '12:00') AT TIME ZONE 'Europe/Paris' WHERE meeting_at IS NULL;

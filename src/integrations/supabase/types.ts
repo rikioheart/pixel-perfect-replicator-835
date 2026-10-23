@@ -1589,6 +1589,7 @@ export type Database = {
           follow_up: string | null
           id: string
           kind: string
+          meeting_at: string | null
           meeting_date: string
           summary: string | null
           title: string
@@ -1601,6 +1602,7 @@ export type Database = {
           follow_up?: string | null
           id?: string
           kind?: string
+          meeting_at?: string | null
           meeting_date?: string
           summary?: string | null
           title: string
@@ -1613,6 +1615,7 @@ export type Database = {
           follow_up?: string | null
           id?: string
           kind?: string
+          meeting_at?: string | null
           meeting_date?: string
           summary?: string | null
           title?: string
