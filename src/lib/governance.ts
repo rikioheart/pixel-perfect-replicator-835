@@ -62,3 +62,8 @@ export function sortGov(items: GovItem[], today: string): GovItem[] {
     || (a.due ?? "9999").localeCompare(b.due ?? "9999")
     || a.since.localeCompare(b.since));
 }
+
+/** Marqueur stable inscrit dans la tâche créée depuis une décision du registre (anti-doublon, retour au contexte). */
+export function decisionTaskMarker(recordId: string): string {
+  return `[registre:${recordId}]`;
+}

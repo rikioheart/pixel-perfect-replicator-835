@@ -3,7 +3,8 @@ import { AiAssist } from "@/components/AiAssist";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ClipboardList, Copy } from "lucide-react";
+import { ClipboardList, Copy, ExternalLink } from "lucide-react";
+import { isSafeExternalFormUrl } from "@/lib/form-links";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ type Field = { label: string; required: boolean; long: boolean };
 const KINDS = ["INSCRIPTION", "DEMANDE", "RESERVATION", "MATERIEL", "COLLECTE", "PARTICIPATION", "QUESTIONNAIRE"] as const;
 const KIND_FR: Record<string, string> = { INSCRIPTION: "Inscription", DEMANDE: "Demande", RESERVATION: "Réservation",
   MATERIEL: "Demande de matériel", COLLECTE: "Collecte d'informations", PARTICIPATION: "Participation", QUESTIONNAIRE: "Questionnaire" };
-const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", fields: "Nom\nMessage*" };
+const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", fields: "Nom\nMessage*", external_url: "" };
 
 function FormsPage() {
   const { user, isBureau } = useAuth();
@@ -76,12 +77,15 @@ function FormsPage() {
     mutationFn: async () => {
       if (f.title.trim().length < 3 || f.purpose.trim().length < 5 || f.data_usage.trim().length < 5)
         throw new Error("Titre, objectif et utilisation des données sont obligatoires.");
-      const fields: Field[] = f.fields.split("\n").map((s) => s.trim()).filter(Boolean).slice(0, 20)
+      const ext = f.external_url.trim();
+      if (ext && !isSafeExternalFormUrl(ext)) throw new Error("Le lien doit être une adresse https:// valide (ex. https://forms.gle/…).");
+      const fields: Field[] = ext ? [] : f.fields.split("\n").map((s) => s.trim()).filter(Boolean).slice(0, 20)
         .map((s) => ({ label: s.replace(/\*$/, "").replace(/^\+/, ""), required: s.endsWith("*"), long: s.startsWith("+") }));
       const [ct, cid] = f.context ? f.context.split(":") : [null, null];
       const { error } = await supabase.from("forms").insert({
         title: f.title.trim(), purpose: f.purpose.trim(), data_usage: f.data_usage.trim(), contact: f.contact || null,
         audience: f.audience, kind: f.kind, context_type: ct, context_id: cid, fields: fields as never, created_by: user?.id ?? null,
+        external_url: ext || null,
       });
       if (error) throw error;
     },
@@ -127,8 +131,13 @@ function FormsPage() {
               <option value="">L'association</option>
               {contexts.map((c) => <option key={c.v} value={c.v}>{c.l}</option>)}
             </select></div>
+          <div className="sm:col-span-2"><Label htmlFor="fm-ext">Lien Google Forms (facultatif)</Label>
+            <Input id="fm-ext" type="url" inputMode="url" placeholder="https://forms.gle/…" value={f.external_url} onChange={(e) => setF({ ...f, external_url: e.target.value })} />
+            <p className="mt-1 text-xs text-muted-foreground">Si vous indiquez un lien, le bouton « Répondre » ouvrira votre Google Form. Les réponses n'arrivent pas dans la plateforme.</p></div>
+          {!f.external_url.trim() && (
           <div className="sm:col-span-2"><Label htmlFor="fm-fields">Questions (une par ligne, * = obligatoire, + = réponse longue)</Label>
             <Textarea id="fm-fields" rows={4} value={f.fields} onChange={(e) => setF({ ...f, fields: e.target.value })} /></div>
+          )}
         </div>
         <Button className="mt-4" onClick={() => create.mutate()} disabled={create.isPending}>Créer</Button>
       </section>
@@ -149,16 +158,24 @@ function FormsPage() {
                 <p className="mt-1 text-sm text-muted-foreground">{fm.purpose}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(mine || isBureau) && <AiAssist type="form" id={fm.id} actions={["SUMMARY", "INCONSISTENCIES"]} />}
-                  {fm.status === "PUBLISHED" && (
-                    <>
-                      <Button size="sm" asChild><a href={`/formulaire/${fm.id}`}>Répondre</a></Button>
-                      <Button size="sm" variant="outline" onClick={() => { void navigator.clipboard.writeText(`${window.location.origin}/formulaire/${fm.id}`); toast.success("Lien copié."); }}>
-                        <Copy className="mr-1 size-3.5" />Copier le lien</Button>
-                    </>
-                  )}
+                  {fm.status === "PUBLISHED" && (() => {
+                    const link = fm.external_url || `${window.location.origin}/formulaire/${fm.id}`;
+                    return (
+                      <>
+                        <Button size="sm" asChild>
+                          {fm.external_url
+                            ? <a href={fm.external_url} target="_blank" rel="noopener noreferrer">Répondre (Google Forms)<ExternalLink className="ml-1 size-3.5" aria-hidden /></a>
+                            : <a href={`/formulaire/${fm.id}`}>Répondre</a>}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => { void navigator.clipboard.writeText(link); toast.success("Lien copié."); }}>
+                          <Copy className="mr-1 size-3.5" />Copier le lien</Button>
+                      </>
+                    );
+                  })()}
                   {mine && fm.status !== "PUBLISHED" && <Button size="sm" variant="secondary" onClick={() => setStatus.mutate({ id: fm.id, status: "PUBLISHED" })}>Publier</Button>}
                   {mine && fm.status === "PUBLISHED" && <Button size="sm" variant="secondary" onClick={() => setStatus.mutate({ id: fm.id, status: "CLOSED" })}>Clore</Button>}
-                  <Button size="sm" variant="ghost" onClick={() => setOpenId(openId === fm.id ? null : fm.id)}>Réponses</Button>
+                  {!fm.external_url && <Button size="sm" variant="ghost" onClick={() => setOpenId(openId === fm.id ? null : fm.id)}>Réponses</Button>}
+                  {fm.external_url && <span className="self-center text-xs text-muted-foreground">Formulaire externe : les réponses restent dans Google Forms, avec ses propres droits d'accès.</span>}
                 </div>
                 {openId === fm.id && (
                   <div className="mt-3 space-y-2 border-t border-border pt-3">

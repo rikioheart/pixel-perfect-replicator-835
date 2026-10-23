@@ -281,6 +281,27 @@
       "when": 1792782601510,
       "tag": "0039_forms_pro_audience",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1792785566712,
+      "tag": "0040_fix_activities_visibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1792785598983,
+      "tag": "0041_forms_external_url",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792785788376,
+      "tag": "0042_user_preferences_theme_comfort",
+      "breakpoints": true
     }
   ]
 }

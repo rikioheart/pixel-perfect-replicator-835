@@ -1537,6 +1537,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           data_usage: string
+          external_url: string | null
           fields: Json
           id: string
           kind: string
@@ -1554,6 +1555,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data_usage: string
+          external_url?: string | null
           fields?: Json
           id?: string
           kind?: string
@@ -1571,6 +1573,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           data_usage?: string
+          external_url?: string | null
           fields?: Json
           id?: string
           kind?: string
@@ -4167,41 +4170,50 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          comfortable_spacing: boolean
           created_at: string
           default_view: string
           high_contrast: boolean
+          notification_sound: boolean
           notify_email: boolean
           notify_in_app: boolean
           notify_reminders: boolean
           reduced_motion: boolean
           show_association_updates: boolean
           text_size: string
+          theme: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          comfortable_spacing?: boolean
           created_at?: string
           default_view?: string
           high_contrast?: boolean
+          notification_sound?: boolean
           notify_email?: boolean
           notify_in_app?: boolean
           notify_reminders?: boolean
           reduced_motion?: boolean
           show_association_updates?: boolean
           text_size?: string
+          theme?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          comfortable_spacing?: boolean
           created_at?: string
           default_view?: string
           high_contrast?: boolean
+          notification_sound?: boolean
           notify_email?: boolean
           notify_in_app?: boolean
           notify_reminders?: boolean
           reduced_motion?: boolean
           show_association_updates?: boolean
           text_size?: string
+          theme?: string
           updated_at?: string
           user_id?: string
         }
@@ -4301,6 +4313,10 @@ export type Database = {
       }
       can_share_entity: {
         Args: { _entity_id: string; _entity_type: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_activity: {
+        Args: { _activity_id: string; _user_id: string }
         Returns: boolean
       }
       can_view_comment_target: {

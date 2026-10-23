@@ -40,18 +40,53 @@ export function toTsv(rows: ExportRow[]): string {
 export type HelloAssoRow = { id: string; email: string; prenom: string; nom: string; debut: string; fin: string; montant: number };
 
 /** Lit un CSV (séparateur ; ou ,) avec en-têtes id, email, prenom, nom, debut, fin, montant. */
+/** Découpe un CSV en respectant guillemets, séparateurs et retours à la ligne entre guillemets. */
+export function splitCsv(text: string, sep: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]!;
+    if (quoted) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') quoted = false;
+      else cell += ch;
+    } else if (ch === '"' && cell === "") quoted = true;
+    else if (ch === sep) { row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); cell = "";
+      if (row.some((c) => c.trim())) rows.push(row);
+      row = [];
+    } else cell += ch;
+  }
+  row.push(cell);
+  if (row.some((c) => c.trim())) rows.push(row);
+  return rows;
+}
+
 export function parseHelloAssoCsv(text: string): HelloAssoRow[] {
-  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim());
-  if (lines.length < 2) return [];
-  const sep = lines[0]!.includes(";") ? ";" : ",";
-  const norm = (s: string) => s.trim().replace(/^"|"$/g, "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const head = lines[0]!.split(sep).map(norm);
+  const clean = text.replace(/^\uFEFF/, "");
+  const firstLine = clean.split(/\r?\n/, 1)[0] ?? "";
+  const sep = firstLine.includes(";") ? ";" : firstLine.includes("\t") ? "\t" : ",";
+  const rows = splitCsv(clean, sep);
+  if (rows.length < 2) return [];
+  const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const head = rows[0]!.map(norm);
   const idx = (k: string) => head.indexOf(k);
-  const toIso = (d: string) => { const m = d.match(/^(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : d.slice(0, 10); };
-  return lines.slice(1).map((l) => {
-    const c = l.split(sep).map((x) => x.trim().replace(/^"|"$/g, ""));
-    const g = (k: string) => (idx(k) >= 0 ? c[idx(k)] ?? "" : "");
-    return { id: g("id"), email: g("email"), prenom: g("prenom"), nom: g("nom"), debut: toIso(g("debut")), fin: toIso(g("fin")),
-      montant: Number(g("montant").replace(",", ".")) || 0 };
+  const toIso = (d: string) => {
+    const m = d.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (m) return `${m[3]}-${m[2]!.padStart(2, "0")}-${m[1]!.padStart(2, "0")}`;
+    return /^\d{4}-\d{2}-\d{2}/.test(d.trim()) ? d.trim().slice(0, 10) : "";
+  };
+  const toAmount = (s: string) => {
+    const n = Number(s.replace(/[\s\u00a0€]/g, "").replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", "."));
+    return Number.isFinite(n) ? n : 0;
+  };
+  return rows.slice(1).map((c) => {
+    const g = (k: string) => (idx(k) >= 0 ? (c[idx(k)] ?? "").trim() : "");
+    return { id: g("id"), email: g("email").toLowerCase(), prenom: g("prenom"), nom: g("nom"), debut: toIso(g("debut")), fin: toIso(g("fin")),
+      montant: toAmount(g("montant")) };
   }).filter((r) => r.email || r.id);
 }

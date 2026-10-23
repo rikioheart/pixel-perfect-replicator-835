@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUserPreferences, TEXT_SIZES, DEFAULT_VIEWS } from "@/lib/user-preferences";
+import { useUserPreferences, TEXT_SIZES, DEFAULT_VIEWS, THEMES } from "@/lib/user-preferences";
 
 export const Route = createFileRoute("/_authenticated/my-space")({
   head: () => ({
@@ -64,6 +64,15 @@ function MySpacePage() {
 
       {tab === "PREFERENCES" && (
         <div className="max-w-xl space-y-5">
+          <div className="space-y-2">
+            <Label>Thème</Label>
+            <Select value={preferences.theme} onValueChange={(value) => save.mutate({ theme: value })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {THEMES.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label>Taille du texte</Label>
             <Select
@@ -118,6 +127,15 @@ function MySpacePage() {
               onCheckedChange={(checked) => save.mutate({ reduced_motion: checked })}
             />
           </div>
+          <div className="flex items-center justify-between gap-4">
+            <Label htmlFor="spacing">Espacement confortable</Label>
+            <Switch
+              id="spacing"
+              checked={preferences.comfortable_spacing}
+              onCheckedChange={(checked) => save.mutate({ comfortable_spacing: checked })}
+            />
+          </div>
+
 
 
         </div>
