@@ -31,7 +31,7 @@ type Field = { label: string; required: boolean; long: boolean };
 const KINDS = ["INSCRIPTION", "DEMANDE", "RESERVATION", "MATERIEL", "COLLECTE", "PARTICIPATION", "QUESTIONNAIRE"] as const;
 const KIND_FR: Record<string, string> = { INSCRIPTION: "Inscription", DEMANDE: "Demande", RESERVATION: "Réservation",
   MATERIEL: "Demande de matériel", COLLECTE: "Collecte d'informations", PARTICIPATION: "Participation", QUESTIONNAIRE: "Questionnaire" };
-const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "INTERNE", kind: "COLLECTE", context: "", fields: "Nom\nMessage*" };
+const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", fields: "Nom\nMessage*" };
 
 function FormsPage() {
   const { user, isBureau } = useAuth();
@@ -120,7 +120,7 @@ function FormsPage() {
           <div><Label htmlFor="fm-contact">Contact</Label><Input id="fm-contact" value={f.contact} onChange={(e) => setF({ ...f, contact: e.target.value })} /></div>
           <div><Label htmlFor="fm-aud">Public visé</Label>
             <select id="fm-aud" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.audience} onChange={(e) => setF({ ...f, audience: e.target.value })}>
-              <option value="INTERNE">Réservé aux adhésions validées</option><option value="PUBLIC">Public (libre à tous)</option>
+              <option value="PRO">Réservé aux professionnels validés par le Bureau</option><option value="PUBLIC">Public (tous les membres et visiteurs)</option>
             </select></div>
           <div className="sm:col-span-2"><Label htmlFor="fm-ctx">Rattaché à</Label>
             <select id="fm-ctx" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.context} onChange={(e) => setF({ ...f, context: e.target.value })}>
@@ -144,7 +144,7 @@ function FormsPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <ClipboardList className="size-4 text-primary" aria-hidden />
                   <h3 className="font-semibold">{fm.title}</h3>
-                  <span className="text-xs text-muted-foreground">{KIND_FR[fm.kind]} · {fm.audience === "PUBLIC" ? "public" : "adhésions validées"} · {fm.status === "PUBLISHED" ? "publié" : fm.status === "CLOSED" ? "clos" : "brouillon"}</span>
+                  <span className="text-xs text-muted-foreground">{KIND_FR[fm.kind]} · {fm.audience === "PUBLIC" ? "public" : "professionnels validés"} · {fm.status === "PUBLISHED" ? "publié" : fm.status === "CLOSED" ? "clos" : "brouillon"}</span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">{fm.purpose}</p>
                 <div className="mt-3 flex flex-wrap gap-2">

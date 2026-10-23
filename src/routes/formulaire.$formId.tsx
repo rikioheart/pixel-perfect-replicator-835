@@ -45,7 +45,7 @@ function PublicForm() {
   if (!form) return (
     <main className="mx-auto max-w-xl p-6">
       <h1 className="font-display text-2xl font-bold">Formulaire indisponible</h1>
-      <p className="mt-2 text-muted-foreground">Ce formulaire est clos, réservé aux membres, ou n'existe pas.</p>
+      <p className="mt-2 text-muted-foreground">Ce formulaire est clos, réservé aux professionnels validés par le Bureau, ou n'existe pas.</p>
       <Link to="/" className="mt-4 inline-block underline">Retour à l'accueil</Link>
     </main>
   );
