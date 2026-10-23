@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLinks } from "@/components/ExternalLinks";
+import { PlaceInfo, WeatherHint } from "@/components/PlaceInfo";
+import { LinkedMairies } from "@/components/LinkedMairies";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, CalendarRange, MapPin, Users } from "lucide-react";
@@ -151,11 +153,8 @@ function EventDetailPage() {
               <CalendarRange className="size-4 text-muted-foreground" /> Du {formatDate(event.start_date)} au{" "}
               {formatDate(event.end_date)}
             </p>
-            {event.location ? (
-              <p className="flex items-center gap-2">
-                <MapPin className="size-4 text-muted-foreground" /> {event.location}
-              </p>
-            ) : null}
+            <PlaceInfo location={event.location} address={event.address} />
+            <WeatherHint place={event.address || event.location} date={event.start_date} />
             <Badge variant="secondary">{event.status}</Badge>
             <SpotsBadge spots={spots} />
             <div className="pt-2">
@@ -213,6 +212,7 @@ function EventDetailPage() {
 
       <div className="mt-4"><ExperienceSections item={event} /></div>
       <RegistrationWizard open={wizard} onOpenChange={setWizard} target={{ eventId, title: event.title, dogPolicy: event.dog_policy, maxDogs: event.max_dogs, full: Boolean(spots?.full), waitlist: Boolean(spots?.waitlist) }} />
+      <div className="panel mt-6 p-4"><LinkedMairies type="event" id={eventId} /></div>
       <div className="mt-6"><ExternalLinks contextType="EVENT" contextId={eventId} /></div>
       <div className="mt-6">
         <Comments
