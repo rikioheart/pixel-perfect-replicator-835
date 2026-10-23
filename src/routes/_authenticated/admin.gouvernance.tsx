@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSensitiveRights } from "@/lib/permissions";
 import { AppShell } from "@/components/AppShell";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
+import { GovernanceRegister } from "@/components/GovernanceRegister";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/domain";
 import { contributionBucket, priorityOf, sortGov, terrainBucket, type GovBucket, type GovItem } from "@/lib/governance";
@@ -177,6 +178,7 @@ function GovernancePage() {
         </div>
       )}
       <p className="mt-6 text-xs text-muted-foreground">Priorité calculée : échéance dans 7 jours ou moins, ou sujet en attente depuis 14 jours. Aucune donnée n'est copiée : chaque lien ouvre le dossier d'origine.</p>
+      <GovernanceRegister />
     </AppShell>
   );
 }

@@ -1540,6 +1540,45 @@ export type Database = {
         }
         Relationships: []
       }
+      governance_records: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          decisions: string | null
+          follow_up: string | null
+          id: string
+          kind: string
+          meeting_date: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          decisions?: string | null
+          follow_up?: string | null
+          id?: string
+          kind?: string
+          meeting_date?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          decisions?: string | null
+          follow_up?: string | null
+          id?: string
+          kind?: string
+          meeting_date?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       help_guides: {
         Row: {
           author_id: string | null
