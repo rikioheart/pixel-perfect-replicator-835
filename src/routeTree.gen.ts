@@ -61,6 +61,7 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminChiensRouteImport } from './routes/_authenticated/admin.chiens'
 import { Route as AuthenticatedAdminCockpitRouteImport } from './routes/_authenticated/admin.cockpit'
 import { Route as AuthenticatedAdminContributionsRouteImport } from './routes/_authenticated/admin.contributions'
+import { Route as AuthenticatedAdminGouvernanceRouteImport } from './routes/_authenticated/admin.gouvernance'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin.import'
 import { Route as AuthenticatedAdminLoyaltyRulesRouteImport } from './routes/_authenticated/admin.loyalty-rules'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
@@ -352,6 +353,12 @@ const AuthenticatedAdminContributionsRoute =
     path: '/admin/contributions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminGouvernanceRoute =
+  AuthenticatedAdminGouvernanceRouteImport.update({
+    id: '/admin/gouvernance',
+    path: '/admin/gouvernance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminImportRoute =
   AuthenticatedAdminImportRouteImport.update({
     id: '/admin/import',
@@ -526,6 +533,7 @@ export interface FileRoutesByFullPath {
   '/admin/chiens': typeof AuthenticatedAdminChiensRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
+  '/admin/gouvernance': typeof AuthenticatedAdminGouvernanceRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
@@ -599,6 +607,7 @@ export interface FileRoutesByTo {
   '/admin/chiens': typeof AuthenticatedAdminChiensRoute
   '/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/admin/contributions': typeof AuthenticatedAdminContributionsRoute
+  '/admin/gouvernance': typeof AuthenticatedAdminGouvernanceRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
@@ -675,6 +684,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/chiens': typeof AuthenticatedAdminChiensRoute
   '/_authenticated/admin/cockpit': typeof AuthenticatedAdminCockpitRoute
   '/_authenticated/admin/contributions': typeof AuthenticatedAdminContributionsRoute
+  '/_authenticated/admin/gouvernance': typeof AuthenticatedAdminGouvernanceRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/loyalty-rules': typeof AuthenticatedAdminLoyaltyRulesRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
@@ -751,6 +761,7 @@ export interface FileRouteTypes {
     | '/admin/chiens'
     | '/admin/cockpit'
     | '/admin/contributions'
+    | '/admin/gouvernance'
     | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
@@ -824,6 +835,7 @@ export interface FileRouteTypes {
     | '/admin/chiens'
     | '/admin/cockpit'
     | '/admin/contributions'
+    | '/admin/gouvernance'
     | '/admin/import'
     | '/admin/loyalty-rules'
     | '/admin/permissions'
@@ -899,6 +911,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/chiens'
     | '/_authenticated/admin/cockpit'
     | '/_authenticated/admin/contributions'
+    | '/_authenticated/admin/gouvernance'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/loyalty-rules'
     | '/_authenticated/admin/permissions'
@@ -1304,6 +1317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminContributionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/gouvernance': {
+      id: '/_authenticated/admin/gouvernance'
+      path: '/admin/gouvernance'
+      fullPath: '/admin/gouvernance'
+      preLoaderRoute: typeof AuthenticatedAdminGouvernanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/import': {
       id: '/_authenticated/admin/import'
       path: '/admin/import'
@@ -1515,6 +1535,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminChiensRoute: typeof AuthenticatedAdminChiensRoute
   AuthenticatedAdminCockpitRoute: typeof AuthenticatedAdminCockpitRoute
   AuthenticatedAdminContributionsRoute: typeof AuthenticatedAdminContributionsRoute
+  AuthenticatedAdminGouvernanceRoute: typeof AuthenticatedAdminGouvernanceRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminLoyaltyRulesRoute: typeof AuthenticatedAdminLoyaltyRulesRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
@@ -1577,6 +1598,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminChiensRoute: AuthenticatedAdminChiensRoute,
   AuthenticatedAdminCockpitRoute: AuthenticatedAdminCockpitRoute,
   AuthenticatedAdminContributionsRoute: AuthenticatedAdminContributionsRoute,
+  AuthenticatedAdminGouvernanceRoute: AuthenticatedAdminGouvernanceRoute,
   AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
   AuthenticatedAdminLoyaltyRulesRoute: AuthenticatedAdminLoyaltyRulesRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
