@@ -2,7 +2,7 @@ import type React from "react";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { fallbackIsPro } from "@/lib/nav-rules";
+import { readCachedRole, resolveProStatus, saveCachedRole } from "@/lib/pro-status";
 import { clearPrivateOffline } from '@/lib/offline';
 import { PROFILE_COLUMNS, withContacts } from "@/lib/profile-columns";
 
@@ -64,7 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let profile = (profileRes.data as unknown as Profile | null) ?? null;
 
     // Le profil est normalement créé par la base à l'inscription ; repli si absent (ancien compte OAuth).
-    if (!profile) {
+    // Jamais en cas d'erreur de lecture (réseau coupé) : l'absence n'est alors pas certaine.
+    if (!profile && !profileRes.error) {
       await supabase.from("profiles").insert({ id: userId, membership_type: "PARTICULIER", membership_status: "PENDING" });
       const again = await supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", userId).maybeSingle();
       profile = (again.data as unknown as Profile | null) ?? null;
@@ -72,13 +73,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (profile) profile = (await withContacts([profile]))[0] as Profile;
 
     setProfile(profile);
-    const codes = (rolesRes.data ?? [])
-      .map((row) => (row as { roles: { code: string } | null }).roles?.code)
-      .filter((code): code is string => Boolean(code));
-    setRoles(codes);
-    // Statut pro décidé par la base (is_professional) ; repli sur le libellé si indisponible.
+    // Statut pro décidé par la base (is_professional) ; refus par défaut si la réponse n'est pas certaine.
     const proRes = await supabase.rpc("is_professional", { _user_id: userId });
-    setIsPro(proRes.error ? fallbackIsPro(profile?.membership_type) : Boolean(proRes.data));
+    const offline = typeof navigator !== "undefined" && !navigator.onLine;
+    const cached = readCachedRole(userId);
+    const codes = rolesRes.error
+      ? offline && cached ? cached.roles : []
+      : (rolesRes.data ?? [])
+          .map((row) => (row as { roles: { code: string } | null }).roles?.code)
+          .filter((code): code is string => Boolean(code));
+    const pro = resolveProStatus({ rpcOk: !proRes.error, rpcValue: proRes.data, offline, cached });
+    if (!proRes.error && !rolesRes.error) {
+      saveCachedRole({ owner: userId, isPro: pro, roles: codes, verifiedAt: new Date().toISOString() });
+    }
+    setRoles(codes);
+    setIsPro(pro);
     setRolesReady(true);
   };
 
