@@ -6,7 +6,7 @@ describe("questions de formulaire", () => {
     expect(fieldType({ label: "Message", required: true, long: true })).toBe("long");
   });
   it("le mot « test » n'est jamais bloqué", () => {
-    expect(normalizeFields([{ label: "test", required: false, type: "short" }])[0].label).toBe("test");
+    expect(normalizeFields([{ label: "test", required: false, type: "short" }])[0]?.label).toBe("test");
   });
   it("une question vide est retirée avant enregistrement", () => {
     expect(normalizeFields([{ label: "  ", required: true }, { label: "Nom", required: true }])).toHaveLength(1);

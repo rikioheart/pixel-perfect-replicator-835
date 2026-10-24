@@ -231,7 +231,7 @@ export function AppShell({
 
   const renderPillar = (group: (typeof pillars)[number], mobile = false) => {
     const active = activePillar?.title === group.title;
-    const hub = group.items[0];
+    const hub = group.items[0]!;
     const link = (
       <Link
         key={group.title}
