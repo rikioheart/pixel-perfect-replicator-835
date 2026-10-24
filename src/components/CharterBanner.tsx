@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export function CharterBanner() {
   return (
-    <div className="mb-4 flex flex-col gap-3 rounded-lg border border-border bg-secondary/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-4 flex flex-col gap-3 rounded-lg border border-border bg-muted p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-start gap-3">
         <HeartHandshake className="mt-0.5 size-5 shrink-0 text-primary" />
         <div>

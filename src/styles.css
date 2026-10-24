@@ -315,3 +315,17 @@
 .public-site .public-page-intro h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 600; }
 .public-site .public-section:last-child { border-bottom: 0; }
 .public-site .public-main > section + section, .public-site .public-main > div + section { margin-top: 1.5rem; }
+
+/* Messages éphémères colorés : textes assombris (clair) / éclaircis (sombre) pour atteindre 4,5:1. */
+:root [data-sonner-toaster][data-theme="light"] {
+  --info-text: hsl(212 100% 34%);
+  --success-text: hsl(140 100% 24%);
+  --error-text: hsl(0 85% 38%);
+  --warning-text: hsl(28 95% 30%);
+}
+:root [data-sonner-toaster][data-theme="dark"] {
+  --info-text: hsl(210 100% 82%);
+  --success-text: hsl(140 70% 78%);
+  --error-text: hsl(0 100% 86%);
+  --warning-text: hsl(45 100% 78%);
+}

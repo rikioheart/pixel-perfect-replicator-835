@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/charter")({
 function CharterPage() {
   return (
     <AppShell title="Notre manière de travailler" subtitle={CHARTER_TAGLINE}>
-      <div className="mb-4 flex items-start gap-3 rounded-lg border border-border bg-secondary/40 p-4">
+      <div className="mb-4 flex items-start gap-3 rounded-lg border border-border bg-muted p-4">
         <HeartHandshake className="mt-0.5 size-5 shrink-0 text-primary" />
         <p className="text-sm text-muted-foreground">
           Cette plateforme est un outil de coopération, pas une couche administrative
