@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canCreateForm, canOpenProSpace, isNavItemPrimary, isNavItemVisible, memberHubTabFor, memberHubGroupFor, MEMBER_HUB_GROUPS, MEMBER_HUB_TABS } from "./nav-rules";
+import { isParticulierView } from "./nav-rules";
 
 const particulier = { isBureau: false, isPro: false };
 const pro = { isBureau: false, isPro: true };
@@ -46,5 +47,13 @@ describe("navigation par rôle", () => {
     expect(canCreateForm(particulier)).toBe(false);
     expect(canCreateForm(pro)).toBe(true);
     expect(canCreateForm(bureau)).toBe(true);
+  });
+});
+
+describe("rôles cumulés", () => {
+  it("un membre du Bureau n'est pas traité comme simple particulier mais garde l'accès au Pass", () => {
+    expect(isParticulierView({ isBureau: true, isPro: false })).toBe(false);
+    expect(isParticulierView({ isBureau: false, isPro: false })).toBe(true);
+    expect(canOpenProSpace({ isBureau: false, isPro: false, rolesReady: true })).toBe(false);
   });
 });

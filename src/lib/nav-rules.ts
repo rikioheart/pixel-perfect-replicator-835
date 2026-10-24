@@ -67,3 +67,11 @@ export function canOpenProSpace(v: NavViewer & { rolesReady: boolean }): boolean
 export function canCreateForm(v: NavViewer): boolean {
   return v.isBureau || v.isPro;
 }
+
+/**
+ * Rôles cumulés : un compte Bureau ou pro garde son contexte personnel (chien, Pass) ;
+ * l'invitation à présenter un chien n'est proposée d'office qu'au particulier.
+ */
+export function isParticulierView(v: NavViewer): boolean {
+  return !v.isBureau && !v.isPro;
+}

@@ -1,3 +1,4 @@
+import { isParticulierView } from "@/lib/nav-rules";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { HandHeart, ListChecks, FolderKanban } from "lucide-react";
@@ -106,7 +107,7 @@ function MemberDashboard() {
           message={welcome}
         />
 
-        {!isBureau && user ? <MyDogHome userId={user.id} /> : null}
+        {user ? <MyDogHome userId={user.id} hideWhenEmpty={!isParticulierView({ isBureau, isPro })} /> : null}
 
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm" variant="outline"><Link to="/directory">Annuaire du réseau</Link></Button>
