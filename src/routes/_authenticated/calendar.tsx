@@ -123,13 +123,13 @@ function CalendarPage() {
       <Tag {...(K.peek ? {} : { type: "button" as const })} className={`flex w-full min-w-0 items-center gap-2 rounded-lg border bg-card text-left ${compact ? "px-1.5 py-1" : "px-4 py-3"} ${item.conflict ? "border-destructive" : "border-border"} hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring`}>
         <Icon className="size-3.5 shrink-0 text-primary" aria-hidden />
         <span className="min-w-0">
-          <span className={`block truncate font-semibold ${compact ? "text-xs" : "text-sm"}`}>{item.title}</span>
+          <span title={item.title} className={`block truncate font-semibold ${compact ? "text-xs" : "text-sm"}`}>{item.title}</span>
           {!compact && <span className="block truncate text-xs text-muted-foreground">{K.label}{item.detail ? ` · ${item.detail}` : ""}</span>}
         </span>
         {item.conflict && <AlertTriangle className="ml-auto size-3.5 shrink-0 text-destructive" aria-label="Chevauchement de créneau" />}
       </Tag>
     );
-    return K.peek ? <EntityPeek type={K.peek} id={item.rawId}>{body}</EntityPeek> : body;
+    return K.peek ? <EntityPeek type={K.peek} id={item.rawId} block>{body}</EntityPeek> : body;
   };
 
   return (
@@ -192,7 +192,7 @@ function CalendarPage() {
             const list = byDay.get(k) ?? [];
             const out = view === "month" && d.getMonth() !== cursor.getMonth();
             return (
-              <div key={k} className={`min-h-20 rounded-lg border border-border p-1 ${out ? "bg-muted/40" : ""} ${k === today ? "ring-2 ring-primary" : ""}`}>
+              <div key={k} className={`min-h-20 min-w-0 overflow-hidden rounded-lg border border-border p-1 ${out ? "bg-muted/40" : ""} ${k === today ? "ring-2 ring-primary" : ""}`}>
                 <p className={`mb-1 text-xs font-semibold ${out ? "text-muted-foreground" : ""}`} aria-current={k === today ? "date" : undefined}>{view === "week" ? d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric" }) : d.getDate()}</p>
                 <div className="space-y-1">
                   {list.slice(0, view === "month" ? 3 : 20).map((i) => <Chip key={i.id} item={i} compact />)}

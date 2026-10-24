@@ -445,7 +445,7 @@ export function AppShell({
             </div>
           ) : null}
           {profile?.membership_status === "PENDING" ? (
-            <p role="status" className="mb-4 rounded-xl border border-border bg-secondary/40 p-3 text-sm">
+            <p role="status" className="mb-4 rounded-xl border border-border bg-muted p-3 text-sm">
               Bienvenue ! Votre adhésion est en attente de validation par le Bureau. Vous pouvez déjà découvrir votre espace ; vous serez prévenu dès qu'elle sera validée.
             </p>
           ) : profile?.membership_status === "REFUSED" ? (
