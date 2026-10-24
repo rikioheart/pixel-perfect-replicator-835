@@ -426,7 +426,7 @@ function ProjectDetail() {
 
       <div className="mt-6 space-y-4">
         <ProjectStorySections project={project} />
-        <ProjectContribute projectId={projectId} />
+        <ProjectContribute projectId={projectId} canModerate={canValidate} />
       </div>
 
       <div className="mt-6">
@@ -441,6 +441,7 @@ function ProjectDetail() {
                 task={task}
                 currentUserId={user?.id ?? ""}
                 isBureau={isBureau}
+                canValidate={canValidate}
                 showProject={false}
                 onChanged={() =>
                   queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })
