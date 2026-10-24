@@ -1,5 +1,13 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Lot 3 optimisé — Tâches, projets et progression (24 oct.)
+- [x] Sauvegarde fiable (dates/affectation vides, refus visibles, actualisation)
+- [x] Soumettre pour validation / Valider / Renvoyer / Rouvrir, règle imposée par la base
+- [x] Propositions d'aide : compétences préremplies, coordinateur prévenu, accepte ou décline
+- [x] Avancement opérationnel vs estimation, alerte avant clôture
+- [x] 138 tests + essai réel en base annulé (17 contrôles)
+- [ ] Compte démo membre@ porte le rôle Bureau depuis le 24/10 : à confirmer par l'utilisateur
+
 ## Liens des partenaires — demande actuelle
 - [x] Examiner les profils existants et leurs choix de publication
 - [x] Afficher site et réseaux publiés sur les fiches compactes, sans données privées ni doublons

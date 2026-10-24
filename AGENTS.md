@@ -25,6 +25,7 @@
 
 ## Métier (A11–A13)
 - Responsabilités contextuelles : member_functions.scope_type/scope_id, is_project_coordinator (rôle projet OWNER/COORDINATOR) et has_scoped_permission (rôle global ∪ coordination ∪ délégation active). Pourquoi : un coordinateur n'est jamais admin global.
+- Tâches : valider, rouvrir ou archiver = task_validator (Bureau, coordinateur du projet, ou créateur d'une tâche hors projet confiée à autrui), imposé par le déclencheur guard_task_lifecycle ; le contributeur soumet (PENDING_VALIDATION). Propositions d'aide (contributions) acceptées par le Bureau ou le coordinateur, jamais auto-affectées. Pourquoi : la validation reste humaine et cloisonnée au projet.
 - Délégations uniquement via create_delegation/revoke_delegation (droit possédé, périmètre précis, fin ≤ 365 j, pas de re-délégation, audit). Pourquoi : aucune auto-escalade.
 - Terrain: DRAFT/PENDING/CHANGES_REQUESTED/APPROVED/REFUSED/CANCELLED; a_guard restricts decisions to Bureau and requester edits to draft/changes, b_check prevents pending/approved overlaps. GRATUIT/LOCATION never computes prices, separating booking and billing.
 - Indicateurs chien (dog_indicators) : 4 familles VERT/JAUNE/BLEU/NOIR, libellé obligatoire, jamais une note ; lisibles en vue opérationnelle. Pourquoi : adapter l'environnement, pas juger.
