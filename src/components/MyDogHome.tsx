@@ -68,6 +68,7 @@ export function MyDogHome({ userId }: { userId: string }) {
   const dogs = data?.dogs ?? [];
 
   if (!dogs.length) {
+    if (hideWhenEmpty) return null;
     return (
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-start gap-3 p-5 sm:flex-row sm:items-center">
