@@ -18,6 +18,8 @@ export type Profile = {
   department: string | null;
   bio: string | null;
   public_visibility: boolean;
+  account_choice_at?: string | null;
+  deleted_at?: string | null;
 };
 
 type AuthState = {
