@@ -16,7 +16,7 @@
 - Fonctions internes (fidélité, notifications, rappels) : EXECUTE retiré à anon/authenticated ; seuls déclencheurs et service_role les appellent. Pourquoi : empêcher l'attribution forgée de tampons ou notifications.
 - Type et statut d'adhésion modifiables uniquement par le Bureau (trigger guard_profile_membership) ; is_professional exige ACTIVE. Pourquoi : aucune auto-escalade de rôle.
 - Accès Bureau aux dossiers chiens = is_bureau ET permission dogs.read_sensitive. Pourquoi : Bureau ≠ accès illimité.
-- Partage de dossier chien uniquement via share_dog_access/revoke_dog_access (sous-ensemble des droits du donneur, contexte obligatoire, expiration bornée, révocation en cascade via source_access_id, journal audit_logs). Pourquoi : partage traçable sans escalade.
+- Partage de dossier chien uniquement via share_dog_access(_many)/update_dog_access/revoke_dog_access (droit vérifié avant tout, sous-ensemble des droits du donneur, contexte obligatoire, réduction et révocation en cascade via source_access_id, retrait de l'accord référent ⇒ suivi retiré des accès dérivés, alerte DOG_SHARED par déclencheur, journal audit_logs). Pourquoi : partage multi-pros traçable sans escalade.
 - Sensibilité à 3 niveaux PUBLIC/INTERNE/SENSIBLE (colonne sensitivity) ; jamais de lien public sur un document BUREAU ou SENSIBLE. Pourquoi : modèle unique de confidentialité.
 - Commentaires lisibles selon l'objet parent (can_view_comment_target) ; réservations terrain lisibles par les seules personnes concernées, créneaux libres/occupés via terrain_busy_slots, chevauchement refusé par la base.
 - Tests RLS : script API réel avec comptes d'essai, jamais seulement l'interface.
@@ -37,7 +37,7 @@
 - IA : les serveurs IA lisent les données avec la session de l'utilisateur (RLS), jamais en admin ; propositions validées tracées dans ai_suggestions. Pourquoi : l'IA ne voit que ce que l'utilisateur voit.
 - External links use documents (URL, context, sensitivity, service) and ExternalLinks; embedded mode in tasks/reservations/formations. can_add_context_resource controls additions; SENSIBLE is Bureau-only. No sync: links work without APIs.
 
-- DogProfiles manages dogs only on foyer; profile edits members, avoiding duplicate management.
+- One dog file (DogFilePanel: profile, indicators, journal, pros) opened from home and foyer; DogProfiles lists/creates dogs on foyer only. Why: a single place per dog, no duplicate management.
 - Manual stamps live on loyalty; pro home shows pending requests. Why: avoid duplicate forms.
 
 - PublicPartnerDirectory uses list_public_pros/get_public_pro_page with safe HTTP(S) links, no WordPress merge. Why: honor publication choices.
