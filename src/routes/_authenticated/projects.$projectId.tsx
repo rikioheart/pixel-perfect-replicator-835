@@ -43,6 +43,8 @@ import { Comments } from "@/components/Comments";
 import { ProjectContribute, ProjectStorySections } from "@/components/ProjectContribute";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 import { EntityPeek } from "@/components/EntityPeek";
+import { Link } from "@tanstack/react-router";
+import { isPast, operationalProgress } from "@/lib/archives";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -65,7 +67,7 @@ export const Route = createFileRoute("/_authenticated/projects/$projectId")({
 
 function ProjectDetail() {
   const { projectId } = Route.useParams();
-  const { user, isBureau } = useAuth();
+  const { user, isBureau, profile } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: project } = useQuery({
@@ -122,6 +124,26 @@ function ProjectDetail() {
       ).data ?? []) as TaskRow[],
   });
 
+  const { data: related } = useQuery({
+    queryKey: ["project-related", projectId, project?.parent_project_id ?? null],
+    enabled: !!project,
+    queryFn: async () => {
+      const [acts, evts, children, siblings] = await Promise.all([
+        supabase.from("activities").select("id, title, date, status").eq("project_id", projectId).order("date", { ascending: false }),
+        supabase.from("events").select("id, title, start_date, end_date, status").eq("project_id", projectId).order("start_date", { ascending: false }),
+        supabase.from("projects").select("id, title, status, start_date").eq("parent_project_id", projectId).order("start_date", { ascending: false }),
+        project?.parent_project_id
+          ? supabase.from("projects").select("id, title, status, start_date").eq("parent_project_id", project.parent_project_id).neq("id", projectId).order("start_date", { ascending: false })
+          : Promise.resolve({ data: [] as { id: string; title: string; status: string; start_date: string | null }[] }),
+      ]);
+      return {
+        activities: acts.data ?? [],
+        events: evts.data ?? [],
+        editions: [...(children.data ?? []), ...(siblings.data ?? [])],
+      };
+    },
+  });
+
   if (!project) {
     return (
       <AppShell title="Projet" subtitle="Chargement…">
@@ -147,7 +169,7 @@ function ProjectDetail() {
         <>
           <AiAssist type="project" id={projectId} actions={["SUMMARY", "INCONSISTENCIES", "MINUTES"]} />
           <ShareLinkButton entityType="project" entityId={projectId} defaultLabel={project.title} />
-          {isBureau ? (
+          {isBureau || profile?.membership_status === "ACTIVE" ? (
             <NewTaskDialog
               projectId={projectId}
               members={members ?? []}
@@ -174,13 +196,58 @@ function ProjectDetail() {
             </Badge>
             <Badge variant="outline">Échéance {formatDate(project.deadline)}</Badge>
           </div>
-          <div>
-            <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-              <span>Avancement</span>
-              <span>{project.progress_percent ?? 0}%</span>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                <span>Avancement des tâches (calculé)</span>
+                <span>{operationalProgress(tasks ?? []) === null ? "—" : `${operationalProgress(tasks ?? [])}%`}</span>
+              </div>
+              <Progress value={operationalProgress(tasks ?? []) ?? 0} />
             </div>
-            <Progress value={project.progress_percent ?? 0} />
+            <div>
+              <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                <span>Avancement global déclaré</span>
+                <span>{project.progress_percent ?? 0}%</span>
+              </div>
+              <Progress value={project.progress_percent ?? 0} />
+            </div>
           </div>
+          {related && (related.activities.length > 0 || related.events.length > 0 || related.editions.length > 0) ? (
+            <div className="space-y-3 border-t border-border pt-4 text-sm">
+              {related.activities.length + related.events.length > 0 ? (
+                <div>
+                  <h3 className="mb-1 font-medium">Activités et événements rattachés</h3>
+                  <ul className="space-y-1">
+                    {related.activities.map((a) => (
+                      <li key={a.id}>
+                        <Link to="/activities/$activityId" params={{ activityId: a.id }} className="hover:underline">{a.title}</Link>
+                        <span className="text-muted-foreground"> · activité · {formatDate(a.date)}{isPast(a) ? " · terminée" : ""}</span>
+                      </li>
+                    ))}
+                    {related.events.map((e) => (
+                      <li key={e.id}>
+                        <Link to="/events/$eventId" params={{ eventId: e.id }} className="hover:underline">{e.title}</Link>
+                        <span className="text-muted-foreground"> · événement · {formatDate(e.start_date)}{isPast(e) ? " · passé" : ""}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {related.editions.length > 0 ? (
+                <details>
+                  <summary className="cursor-pointer font-medium">Éditions précédentes et associées ({related.editions.length})</summary>
+                  <ul className="mt-2 space-y-1">
+                    {related.editions.map((ed) => (
+                      <li key={ed.id}>
+                        <Link to="/projects/$projectId" params={{ projectId: ed.id }} className="hover:underline">{ed.title}</Link>
+                        <span className="text-muted-foreground"> · {PROJECT_STATUS_LABEL[ed.status] ?? ed.status}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
+            </div>
+          ) : null}
 
           {isBureau ? (
             <div className="flex flex-wrap items-end gap-3 border-t border-border pt-4">
