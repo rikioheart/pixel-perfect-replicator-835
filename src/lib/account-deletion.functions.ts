@@ -12,7 +12,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: result, error } = await context.supabase.rpc("request_account_deletion", { _confirm: data.confirm });
     if (error) throw new Error(error.message);
-    const res = result as { status: string; blockers?: unknown };
+    const res = { status: String((result as { status?: string } | null)?.status ?? "") };
     if (res.status === "DELETED") {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.auth.admin.updateUserById(context.userId, { ban_duration: "876000h" });

@@ -16,24 +16,24 @@ export function AccountChoiceStep({ onDone }: { onDone: () => Promise<void> }) {
   const [saving, setSaving] = useState(false);
 
   const submit = async () => {
-    if (!type) return;
+    if (!type) return undefined;
     if (type === "PROFESSIONNEL") {
       if (pro.company.trim().length < 2) return toast.error("Indiquez le nom de votre structure.");
       if (pro.activity.trim().length < 2) return toast.error("Indiquez votre activité canine.");
       if (!isValidSiret(pro.siret)) return toast.error("Le SIRET doit comporter 14 chiffres.");
     }
     setSaving(true);
-    const { error } = await supabase.rpc("choose_account_type", {
-      _type: type,
-      _company: type === "PROFESSIONNEL" ? pro.company : undefined,
-      _siret: type === "PROFESSIONNEL" ? pro.siret : undefined,
-      _activity: type === "PROFESSIONNEL" ? pro.activity : undefined,
-      _description: type === "PROFESSIONNEL" ? pro.description : undefined,
-    });
+    const { error } = await supabase.rpc(
+      "choose_account_type",
+      type === "PROFESSIONNEL"
+        ? { _type: type, _company: pro.company, _siret: pro.siret, _activity: pro.activity, _description: pro.description }
+        : { _type: type },
+    );
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Merci ! Votre demande est transmise au Bureau.");
     await onDone();
+    return undefined;
   };
 
   const option = (value: "PARTICULIER" | "PROFESSIONNEL", Icon: typeof Heart, title: string, text: string) => (
