@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { canCreateForm } from "@/lib/nav-rules";
+import { FIELD_TYPES, FIELD_TYPE_LABEL, needsOptions, normalizeFields, type FieldType, type FormField } from "@/lib/form-fields";
+import { Plus, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/forms")({
   head: () => ({
@@ -29,17 +31,19 @@ export const Route = createFileRoute("/_authenticated/forms")({
   component: FormsPage,
 });
 
-type Field = { label: string; required: boolean; long: boolean };
 const KINDS = ["INSCRIPTION", "DEMANDE", "RESERVATION", "MATERIEL", "COLLECTE", "PARTICIPATION", "QUESTIONNAIRE"] as const;
 const KIND_FR: Record<string, string> = { INSCRIPTION: "Inscription", DEMANDE: "Demande", RESERVATION: "Réservation",
   MATERIEL: "Demande de matériel", COLLECTE: "Collecte d'informations", PARTICIPATION: "Participation", QUESTIONNAIRE: "Questionnaire" };
-const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", fields: "Nom\nMessage*", external_url: "" };
+const EMPTY = { title: "", purpose: "", data_usage: "", contact: "", audience: "PRO", kind: "COLLECTE", context: "", external_url: "" };
+const START: FormField[] = [{ label: "Nom", required: true, type: "short" }, { label: "Message", required: false, type: "long" }];
 
 function FormsPage() {
   const { user, isBureau, isPro } = useAuth();
   const canCreate = canCreateForm({ isBureau, isPro });
   const qc = useQueryClient();
   const [f, setF] = useState(EMPTY);
+  const [qs, setQs] = useState<FormField[]>(START);
+  const setQ = (i: number, patch: Partial<FormField>) => setQs((l) => l.map((q, j) => (j === i ? { ...q, ...patch } : q)));
   const [openId, setOpenId] = useState<string | null>(null);
 
   const { data: forms = [], isLoading } = useQuery({
@@ -82,8 +86,8 @@ function FormsPage() {
         throw new Error("Titre, objectif et utilisation des données sont obligatoires.");
       const ext = f.external_url.trim();
       if (ext && !isSafeExternalFormUrl(ext)) throw new Error("Le lien doit être une adresse https:// valide (ex. https://forms.gle/…).");
-      const fields: Field[] = ext ? [] : f.fields.split("\n").map((s) => s.trim()).filter(Boolean).slice(0, 20)
-        .map((s) => ({ label: s.replace(/\*$/, "").replace(/^\+/, ""), required: s.endsWith("*"), long: s.startsWith("+") }));
+      const fields = ext ? [] : normalizeFields(qs);
+      if (!ext && fields.length === 0) throw new Error("Ajoutez au moins une question.");
       const [ct, cid] = f.context ? f.context.split(":") : [null, null];
       const { error } = await supabase.from("forms").insert({
         title: f.title.trim(), purpose: f.purpose.trim(), data_usage: f.data_usage.trim(), contact: f.contact || null,
@@ -92,7 +96,7 @@ function FormsPage() {
       });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Formulaire créé (brouillon)."); setF(EMPTY); void qc.invalidateQueries({ queryKey: ["forms"] }); },
+    onSuccess: () => { toast.success("Formulaire créé (brouillon)."); setF(EMPTY); setQs(START); void qc.invalidateQueries({ queryKey: ["forms"] }); },
     onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous n'avez pas le droit de créer ce formulaire." : e.message),
   });
   const setStatus = useMutation({
@@ -139,8 +143,31 @@ function FormsPage() {
             <Input id="fm-ext" type="url" inputMode="url" placeholder="https://forms.gle/…" value={f.external_url} onChange={(e) => setF({ ...f, external_url: e.target.value })} />
             <p className="mt-1 text-xs text-muted-foreground">Si vous indiquez un lien, le bouton « Répondre » ouvrira votre Google Form. Les réponses n'arrivent pas dans la plateforme.</p></div>
           {!f.external_url.trim() && (
-          <div className="sm:col-span-2"><Label htmlFor="fm-fields">Questions (une par ligne, * = obligatoire, + = réponse longue)</Label>
-            <Textarea id="fm-fields" rows={4} value={f.fields} onChange={(e) => setF({ ...f, fields: e.target.value })} /></div>
+          <fieldset className="space-y-3 sm:col-span-2">
+            <legend className="text-sm font-medium">Questions</legend>
+            {qs.map((q, i) => {
+              const t = q.type ?? "short";
+              return (
+                <div key={i} className="space-y-2 rounded-xl border border-border p-3">
+                  <div className="flex flex-wrap items-end gap-2">
+                    <div className="min-w-48 flex-1"><Label htmlFor={`fq-${i}`}>Question {i + 1}</Label>
+                      <Input id={`fq-${i}`} value={q.label} onChange={(e) => setQ(i, { label: e.target.value })} /></div>
+                    <div><Label htmlFor={`ft-${i}`}>Type</Label>
+                      <select id={`ft-${i}`} className="h-10 rounded-md border border-input bg-background px-3 text-sm" value={t} onChange={(e) => setQ(i, { type: e.target.value as FieldType })}>
+                        {FIELD_TYPES.map((k) => <option key={k} value={k}>{FIELD_TYPE_LABEL[k]}</option>)}
+                      </select></div>
+                    <label className="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" className="size-4" checked={q.required} onChange={(e) => setQ(i, { required: e.target.checked })} />Obligatoire</label>
+                    <Button type="button" variant="ghost" size="icon" aria-label={`Retirer la question ${i + 1}`} onClick={() => setQs((l) => l.filter((_, j) => j !== i))}><Trash2 className="size-4" aria-hidden /></Button>
+                  </div>
+                  {needsOptions(t) && (
+                    <div><Label htmlFor={`fo-${i}`}>Choix (un par ligne)</Label>
+                      <Textarea id={`fo-${i}`} rows={3} value={(q.options ?? []).join("\n")} onChange={(e) => setQ(i, { options: e.target.value.split("\n") })} /></div>
+                  )}
+                </div>
+              );
+            })}
+            <Button type="button" variant="outline" size="sm" onClick={() => setQs((l) => [...l, { label: "", required: false, type: "short" }])} disabled={qs.length >= 30}><Plus className="mr-1 size-4" aria-hidden />Ajouter une question</Button>
+          </fieldset>
           )}
         </div>
         <Button className="mt-4" onClick={() => create.mutate()} disabled={create.isPending}>Créer</Button>
