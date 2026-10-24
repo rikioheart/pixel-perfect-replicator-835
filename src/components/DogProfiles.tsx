@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Dog, Plus, Trash2, Share2 } from "lucide-react";
+import { Dog, Plus, Trash2, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const emptyDog = { name: "", breed: "", birth_date: "", character: "", needs: "", household_id: "" };
-export function DogProfiles({ households, onShare }: { households: { id: string; name: string }[]; onShare: (id: string, name: string) => void }) {
+export function DogProfiles({ households, onOpen }: { households: { id: string; name: string }[]; onOpen: (id: string) => void }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [dogOpen, setDogOpen] = useState(false);
@@ -124,7 +124,7 @@ export function DogProfiles({ households, onShare }: { households: { id: string;
                 </p>
                 {item.character ? <p className="mt-1.5">{item.character}</p> : null}
                 {item.needs ? <p className="mt-1 text-muted-foreground">Besoins : {item.needs}</p> : null}
-                <Button size="sm" variant="outline" className="mt-3" onClick={() => onShare(item.id, item.name)}><Share2 className="size-4" aria-hidden /> Partage & référents</Button>
+                <Button size="sm" variant="outline" className="mt-3" onClick={() => onOpen(item.id)}><FileText className="size-4" aria-hidden /> Ouvrir sa fiche</Button>
               </div>
             ))
           )}

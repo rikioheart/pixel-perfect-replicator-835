@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useProOptions } from "@/lib/pro-card";
 import { buildDogTimeline, GOAL_STATUS, INDICATOR_FAMILY_LABEL } from "@/lib/dog-timeline";
 import {
-  activeAccesses, availablePros, hasAnySection, INDICATOR_CATEGORY_LABEL, NO_PERMS, sectionsSummary,
+  activeAccesses, availablePros, hasAnySection, INDICATOR_CATEGORY_LABEL, sectionsSummary,
   SHARE_PRESETS, SHARE_SECTIONS, shareResultMessage, type AccessRow, type SharePerms,
 } from "@/lib/dog-sharing";
 
@@ -491,4 +491,3 @@ function ProsTab({ dogId }: { dogId: string }) {
   );
 }
 
-export { NO_PERMS };
