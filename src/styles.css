@@ -144,8 +144,9 @@
   --card-foreground: oklch(0.96 0.006 260);
   --popover: oklch(0.225 0.05 265);
   --popover-foreground: oklch(0.96 0.006 260);
-  --primary: oklch(0.52 0.15 14);
-  --primary-foreground: oklch(0.98 0.004 260);
+  /* Bordeaux éclairci : lisible en texte sur fond nuit (≥ 5:1), texte nuit sur les boutons. */
+  --primary: oklch(0.72 0.12 12);
+  --primary-foreground: oklch(0.18 0.04 265);
   --wine: oklch(0.55 0.16 14);
   --wine-foreground: oklch(0.98 0.004 260);
   --navy: oklch(0.16 0.04 265);
@@ -153,12 +154,25 @@
   --secondary: oklch(0.3 0.06 258);
   --secondary-foreground: oklch(0.96 0.006 260);
   --muted: oklch(0.27 0.045 264);
-  --muted-foreground: oklch(0.72 0.02 262);
+  --muted-foreground: oklch(0.76 0.02 262);
   --accent: oklch(0.31 0.07 12);
   --accent-foreground: oklch(0.96 0.006 260);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.55 0.16 14);
+  --destructive: oklch(0.7 0.16 25);
+  --destructive-foreground: oklch(0.18 0.04 265);
+  --success: oklch(0.72 0.1 145);
+  --success-foreground: oklch(0.18 0.04 265);
+  --warning: oklch(0.74 0.12 80);
+  --warning-foreground: oklch(0.18 0.04 265);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 22%);
+  --ring: oklch(0.72 0.12 12);
+  --chart-1: oklch(0.72 0.12 12);
+  --chart-2: oklch(0.72 0.09 240);
+  --chart-3: oklch(0.74 0.1 145);
+  --chart-4: oklch(0.8 0.11 80);
+  --chart-5: oklch(0.7 0.08 300);
+  --shadow-panel: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 32px -18px oklch(0 0 0 / 0.6);
+  color-scheme: dark;
 }
 
 @layer base {
@@ -204,13 +218,24 @@
 @layer base {
   body { line-height: 1.6; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
-  button, input, select { min-height: 44px; }
+  :where(button:not([role="switch"]):not([role="checkbox"]):not([role="radio"])),
+  :where(input:not([type="checkbox"]):not([type="radio"])), select { min-height: 44px; }
   input, select, textarea { font-size: 1rem; }
   h1, h2, h3, p { overflow-wrap: break-word; }
 }
-.prefs-comfortable main { line-height: 1.75; }
+/* Mode confort : plus d'air et de lisibilité dans l'espace membre (menus compris), sans changer la mise en page. */
+.prefs-comfortable main { line-height: 1.75; letter-spacing: 0.005em; }
 .prefs-comfortable main .panel, .prefs-comfortable main article { padding: 1.25rem; }
 .prefs-comfortable main .space-y-3 > * + * { margin-top: 1.1rem; }
+.prefs-comfortable main .space-y-2 > * + * { margin-top: 0.75rem; }
+.prefs-comfortable main .gap-2 { gap: 0.75rem; }
+.prefs-comfortable main .gap-3 { gap: 1rem; }
+.prefs-comfortable main .gap-4 { gap: 1.25rem; }
+.prefs-comfortable main .text-xs { font-size: 0.8125rem; line-height: 1.55; }
+.prefs-comfortable main .divide-y > * { padding-block: 1.1rem; }
+.prefs-comfortable main [role="tab"], .prefs-comfortable main :where(button:not([role="switch"]):not([role="checkbox"]):not([role="radio"])) { min-height: 2.75rem; }
+.prefs-comfortable aside nav a, .prefs-comfortable [role="dialog"] nav a { min-height: 2.875rem; }
+.prefs-comfortable [role="menu"] [role="menuitem"] { min-height: 2.75rem; }
 .prefs-reduced-motion *, .prefs-reduced-motion *::before, .prefs-reduced-motion *::after {
   animation: none !important; transition: none !important; scroll-behavior: auto !important;
 }
