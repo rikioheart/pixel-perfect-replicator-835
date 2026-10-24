@@ -66,10 +66,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useExternalLinks } from "@/lib/home-config";
-import { isNavItemPrimary, isNavItemVisible, memberHubTabFor, MEMBER_HUB_TABS, MEMBER_HUB_GROUPS, memberHubGroupFor } from "@/lib/nav-rules";
+import { isNavItemVisible } from "@/lib/nav-rules";
+import { FloatingHelpButton } from "@/components/FloatingHelpButton";
 import { useApplyPreferences } from "@/lib/user-preferences";
 import { OfflineStatus } from "@/components/OfflineStatus";
-import { setNavSectionOpen, useNavSectionsOpen } from "@/lib/nav-state";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 
@@ -89,79 +89,91 @@ type NavItem = {
   bureauLabel?: string;
 };
 
-type NavGroup = { title: string; items: NavItem[] };
+type NavGroup = { title: string; icon: typeof LayoutDashboard; items: NavItem[] };
+
+const CONSOLE_PATHS = new Set(["/admin", "/admin/gouvernance", "/admin/validation", "/finance", "/admin/suivi-financier"]);
 
 /** Cinq catégories lisibles ; les permissions restent appliquées par la base. */
 const NAV_GROUPS: NavGroup[] = [
   {
-    title: "Mon quotidien",
+    title: "Mon foyer & moi",
+    icon: Heart,
     items: [
-      { to: "/member", label: "Mon profil", icon: Heart, audience: "all", primary: true, primaryForParticulier: true },
-      { to: "/foyer", label: "Mon chien & mon foyer", icon: House, audience: "all" },
-      { to: "/loyalty", label: "Mon Pass Terrain", bureauLabel: "Engagement", icon: Stamp, audience: "all" },
-      { to: "/participations", label: "Mes participations", icon: CalendarCheck, audience: "all" },
-      { to: "/reimbursements", label: "Paiements & remboursements", icon: ReceiptText, audience: "all" },
-      { to: "/advantages", label: "Mes avantages", icon: Gift, audience: "all" },
-      { to: "/notifications", label: "Notifications", icon: Bell, audience: "all", primary: true },
-      { to: "/profile", label: "Mon profil & mes données", icon: UserRound, audience: "all" },
-      { to: "/my-space", label: "Mes préférences", icon: Settings2, audience: "all" },
-      { to: "/my-history", label: "Mon historique", icon: History, audience: "all" },
-      { to: "/parcours", label: "Mon parcours", icon: RouteIcon, audience: "all" },
+      { to: "/member", label: "Accueil", icon: Heart, audience: "all" },
+      { to: "/foyer", label: "Mes chiens & foyer", icon: House, audience: "all" },
+      { to: "/loyalty", label: "Mon pass", bureauLabel: "Engagement", icon: Stamp, audience: "all" },
+      { to: "/participations", label: "Mes inscriptions", icon: CalendarCheck, audience: "all" },
+      { to: "/reimbursements", label: "Paiements", icon: ReceiptText, audience: "all" },
+      { to: "/advantages", label: "Avantages", icon: Gift, audience: "all" },
+      { to: "/profile", label: "Profil & données", icon: UserRound, audience: "all" },
+      { to: "/my-space", label: "Préférences", icon: Settings2, audience: "all" },
+      { to: "/my-history", label: "Historique", icon: History, audience: "all" },
+      { to: "/parcours", label: "Parcours", icon: RouteIcon, audience: "all" },
     ],
   },
   {
-    title: "Participer & sortir",
+    title: "Sorties & agenda",
+    icon: CalendarDays,
     items: [
-      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all", primary: true, primaryForParticulier: true },
-      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all", primary: true, primaryForParticulier: true },
-      { to: "/calendar", label: "Calendrier partagé", icon: CalendarDays, audience: "all" },
-      { to: "/formations", label: "Formations & lives", icon: GraduationCap, audience: "all" },
+      { to: "/activities", label: "Activités", icon: CalendarDays, audience: "all" },
+      { to: "/events", label: "Événements", icon: CalendarRange, audience: "all" },
+      { to: "/calendar", label: "Calendrier", icon: CalendarDays, audience: "all" },
+      { to: "/formations", label: "Formations", icon: GraduationCap, audience: "all" },
       { to: "/contests", label: "Animations", icon: Trophy, audience: "all" },
       { to: "/terrain", label: "Terrain", icon: Trees, audience: "pro" },
     ],
   },
   {
-    title: "Coopérer & projets",
+    title: "Projets & entraide",
+    icon: FolderKanban,
     items: [
-      { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all", primary: true },
-      { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all", primary: true },
-      { to: "/proposals", label: "Propositions", icon: Lightbulb, audience: "all" },
+      { to: "/projects", label: "Projets", icon: FolderKanban, audience: "all" },
+      { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all" },
+      { to: "/proposals", label: "Idées", icon: Lightbulb, audience: "all" },
       { to: "/help-requests", label: "Entraide", icon: HandHeart, audience: "all" },
-      { to: "/avancees", label: "Ce que nous construisons", icon: Sparkles, audience: "all" },
-      { to: "/blog", label: "Journal interne", icon: Newspaper, audience: "all" },
-      { to: "/mindmap", label: "Mindmap", icon: Network, audience: "all", hideForParticulier: true },
+      { to: "/avancees", label: "Nos avancées", icon: Sparkles, audience: "all" },
+      { to: "/blog", label: "Journal", icon: Newspaper, audience: "all" },
+      { to: "/mindmap", label: "Carte des projets", icon: Network, audience: "all", hideForParticulier: true },
     ],
   },
   {
-    title: "Ressources & réseau",
+    title: "Réseau & ressources",
+    icon: BookUser,
     items: [
-      { to: "/directory", label: "Annuaire & Réseau", icon: BookUser, audience: "all", primary: true, primaryForParticulier: true },
+      { to: "/directory", label: "Annuaire", icon: BookUser, audience: "all" },
       { to: "/documents", label: "Documents", icon: FileText, audience: "all", hideForParticulier: true },
       { to: "/forms", label: "Formulaires", icon: ClipboardList, audience: "all" },
-      { to: "/help", label: "Centre d'aide", icon: LifeBuoy, audience: "all", primaryForParticulier: true },
+      { to: "/help", label: "Guides", icon: LifeBuoy, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
     ],
   },
   {
-    title: "Espaces dédiés",
+    title: "Espace pro",
+    icon: Briefcase,
     items: [
-      { to: "/espace-pro", label: "Tableau de bord pro", icon: LayoutDashboard, audience: "pro" },
-      { to: "/espace-pro/carte", label: "Ma carte professionnelle", icon: Briefcase, audience: "pro" },
+      { to: "/espace-pro", label: "Tableau de bord", icon: LayoutDashboard, audience: "pro" },
+      { to: "/espace-pro/carte", label: "Ma carte", icon: Briefcase, audience: "pro" },
       { to: "/espace-pro/chiens", label: "Chiens accompagnés", icon: Heart, audience: "pro" },
       { to: "/espace-pro/collaborations", label: "Collaborations", icon: Handshake, audience: "pro" },
-      { to: "/admin", label: "Console du Bureau", icon: LayoutDashboard, audience: "bureau", primary: true },
-      { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau", primary: true },
+    ],
+  },
+  {
+    title: "Console du Bureau",
+    icon: ShieldCheck,
+    items: [
+      { to: "/admin", label: "Console", icon: LayoutDashboard, audience: "bureau" },
+      { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau" },
       { to: "/admin/suivi-financier", label: "Suivi financier", icon: Euro, audience: "bureau" },
       { to: "/finance", label: "Comptabilité", icon: Euro, audience: "bureau" },
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
-      { to: "/admin/pros", label: "Fiches professionnelles", icon: Briefcase, audience: "bureau" },
-      { to: "/admin/chiens", label: "Chiens de l'association", icon: Heart, audience: "bureau" },
-      { to: "/inventory", label: "Ressources", icon: Package, audience: "bureau" },
+      { to: "/admin/pros", label: "Fiches pros", icon: Briefcase, audience: "bureau" },
+      { to: "/admin/chiens", label: "Chiens", icon: Heart, audience: "bureau" },
+      { to: "/inventory", label: "Matériel", icon: Package, audience: "bureau" },
       { to: "/statistics", label: "Statistiques", icon: BarChart3, audience: "bureau" },
-      { to: "/admin/import", label: "Import d'adhérents", icon: UploadCloud, audience: "bureau" },
-      { to: "/admin/advisor", label: "Conseiller d'équipe", icon: Sparkles, audience: "bureau" },
-      { to: "/admin/audit", label: "Journal d'activité", icon: ScrollText, audience: "bureau" },
-      { to: "/admin/loyalty-rules", label: "Règles de fidélité", icon: Stamp, audience: "bureau" },
+      { to: "/admin/import", label: "Import", icon: UploadCloud, audience: "bureau" },
+      { to: "/admin/advisor", label: "Conseiller", icon: Sparkles, audience: "bureau" },
+      { to: "/admin/audit", label: "Journal", icon: ScrollText, audience: "bureau" },
+      { to: "/admin/loyalty-rules", label: "Fidélité", icon: Stamp, audience: "bureau" },
       { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
       { to: "/admin/permissions", label: "Permissions", icon: ShieldCheck, audience: "bureau" },
       { to: "/admin/settings", label: "Paramétrage", icon: Settings2, audience: "bureau" },
@@ -238,25 +250,6 @@ export function AppShell({
     return mobile ? <SheetClose key={group.title} asChild>{link}</SheetClose> : link;
   };
 
-  const renderLink = (item: NavItem, mobile = false) => {
-    const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-    const link = (
-      <Link
-        key={`${item.to}-${item.label}`}
-        to={item.to}
-        aria-current={active ? "page" : undefined}
-        className={cn(
-          "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
-          active ? "surface-wine" : "hover:bg-sidebar-accent",
-        )}
-      >
-        <item.icon className="size-4" aria-hidden="true" />
-        {isBureau && item.bureauLabel ? item.bureauLabel : item.label}
-      </Link>
-    );
-    return mobile ? <SheetClose key={`${item.to}-${item.label}`} asChild>{link}</SheetClose> : link;
-  };
 
 
   return (
@@ -414,6 +407,7 @@ export function AppShell({
           {children}
         </main>
       </div>
+      <FloatingHelpButton />
       <nav aria-label="Accès rapides mobile" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-card px-1 pt-1 shadow-lg md:hidden" style={{ paddingBottom: "max(.5rem, env(safe-area-inset-bottom))" }}>
         {dock.map(t => <Link key={t.to} to={t.to} aria-current={pathname === t.to ? "page" : undefined} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px]", pathname === t.to ? "bg-primary font-semibold text-primary-foreground" : "text-muted-foreground")}><t.icon className="size-5" aria-hidden />{t.label}</Link>)}
         <Button variant="ghost" onClick={() => setMobileOpen(true)} className="h-auto min-h-14 flex-col gap-1 px-1 text-[11px]" aria-label="Ouvrir tous les espaces"><Menu className="size-5" aria-hidden />Plus</Button>
