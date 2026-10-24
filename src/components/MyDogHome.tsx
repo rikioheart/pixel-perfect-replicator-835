@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { dogAge, buildDogTimeline, INDICATOR_FAMILY_LABEL, type TimelineItem } from "@/lib/dog-timeline";
 
 /** Accueil centré sur le chien. Lectures directes soumises aux règles d'accès de la base. */
-export function MyDogHome({ userId }: { userId: string }) {
+export function MyDogHome({ userId, hideWhenEmpty = false }: { userId: string; hideWhenEmpty?: boolean }) {
   const [open, setOpen] = useState<{ id: string; tab: DogFileTab } | null>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["my-dog-home", userId],
