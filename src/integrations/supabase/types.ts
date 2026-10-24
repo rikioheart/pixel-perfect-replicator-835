@@ -4360,6 +4360,10 @@ export type Database = {
         Args: { _entity_id: string; _entity_type: string; _user_id: string }
         Returns: boolean
       }
+      can_validate_task: {
+        Args: { _task_id: string; _user: string }
+        Returns: boolean
+      }
       can_view_activity: {
         Args: { _activity_id: string; _user_id: string }
         Returns: boolean
@@ -4631,6 +4635,15 @@ export type Database = {
           _reason: string
         }
         Returns: Json
+      }
+      task_validator: {
+        Args: {
+          _assigned: string
+          _created_by: string
+          _project_id: string
+          _user: string
+        }
+        Returns: boolean
       }
       terrain_busy_slots: {
         Args: { _from: string; _to: string }
