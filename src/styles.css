@@ -144,8 +144,9 @@
   --card-foreground: oklch(0.96 0.006 260);
   --popover: oklch(0.225 0.05 265);
   --popover-foreground: oklch(0.96 0.006 260);
-  --primary: oklch(0.52 0.15 14);
-  --primary-foreground: oklch(0.98 0.004 260);
+  /* Bordeaux éclairci : lisible en texte sur fond nuit (≥ 5:1), texte nuit sur les boutons. */
+  --primary: oklch(0.72 0.12 12);
+  --primary-foreground: oklch(0.18 0.04 265);
   --wine: oklch(0.55 0.16 14);
   --wine-foreground: oklch(0.98 0.004 260);
   --navy: oklch(0.16 0.04 265);
@@ -153,12 +154,25 @@
   --secondary: oklch(0.3 0.06 258);
   --secondary-foreground: oklch(0.96 0.006 260);
   --muted: oklch(0.27 0.045 264);
-  --muted-foreground: oklch(0.72 0.02 262);
+  --muted-foreground: oklch(0.76 0.02 262);
   --accent: oklch(0.31 0.07 12);
   --accent-foreground: oklch(0.96 0.006 260);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.55 0.16 14);
+  --destructive: oklch(0.7 0.16 25);
+  --destructive-foreground: oklch(0.18 0.04 265);
+  --success: oklch(0.72 0.1 145);
+  --success-foreground: oklch(0.18 0.04 265);
+  --warning: oklch(0.74 0.12 80);
+  --warning-foreground: oklch(0.18 0.04 265);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 22%);
+  --ring: oklch(0.72 0.12 12);
+  --chart-1: oklch(0.72 0.12 12);
+  --chart-2: oklch(0.72 0.09 240);
+  --chart-3: oklch(0.74 0.1 145);
+  --chart-4: oklch(0.8 0.11 80);
+  --chart-5: oklch(0.7 0.08 300);
+  --shadow-panel: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 32px -18px oklch(0 0 0 / 0.6);
+  color-scheme: dark;
 }
 
 @layer base {
