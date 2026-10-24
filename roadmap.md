@@ -282,4 +282,5 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [ ] Essai « Ajouter à mon agenda » sur iPhone et Android (appareil physique requis)
 - [x] Parcours « Mon chien » unifié (fiche unique : profil, repères, carnet, pros) et partage multi-pros (formules, modification, alerte pro)
 - [ ] Essai réel de la fiche chien sur téléphone par un propriétaire et un pro
+- [x] Thème sombre + mode confort contrôlés écran par écran (membre, pro, Bureau, onglets, calendrier) : 0 défaut de contraste mesuré
 - [ ] Revue visuelle complète du mode sombre écran par écran

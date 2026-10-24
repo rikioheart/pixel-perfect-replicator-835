@@ -20,3 +20,4 @@
 - Décision → tâche : tâche créée dans tasks avec le marqueur decisionTaskMarker dans la description (anti-doublon, retour au registre), sans colonne dédiée.
 - Thème/confort : user_preferences.theme (SYSTEM/LIGHT/DARK) et comfortable_spacing appliqués par useApplyPreferences dans AppShell, retirés au démontage pour que la page publique garde son rendu.
 - TanStack Start 1.168 : .inputValidator() est l'API actuelle de createServerFn ; ne pas la remplacer par .validator().
+- Dark theme: primary is lightened with navy foreground so text-primary stays ≥ 4.5:1; never hardcode colors (charts use var(--chart-N), never hsl(var(--x)) since tokens are oklch). Why: one token set readable in both themes.
