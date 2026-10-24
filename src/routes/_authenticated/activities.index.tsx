@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
 import { splitArchive } from "@/lib/archives";
+import { ArchiveToggle } from "@/components/ArchiveToggle";
 
 export const Route = createFileRoute("/_authenticated/activities/")({
   head: () => ({
@@ -411,6 +412,8 @@ function ActivitiesPage() {
             );
           })}
         </div>
+      )}
+        </>
       )}
     </AppShell>
   );
