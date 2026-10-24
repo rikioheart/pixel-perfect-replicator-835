@@ -42,7 +42,7 @@ export function EntityPeek({ type, id, children }: { type: PeekType; id: string;
         <Button
           type="button"
           variant="link"
-          className="min-h-11 rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-11 max-w-full rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="Afficher les informations autorisées"
         >
           {children}

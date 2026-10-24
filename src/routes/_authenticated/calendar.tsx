@@ -192,7 +192,7 @@ function CalendarPage() {
             const list = byDay.get(k) ?? [];
             const out = view === "month" && d.getMonth() !== cursor.getMonth();
             return (
-              <div key={k} className={`min-h-20 rounded-lg border border-border p-1 ${out ? "bg-muted/40" : ""} ${k === today ? "ring-2 ring-primary" : ""}`}>
+              <div key={k} className={`min-h-20 min-w-0 overflow-hidden rounded-lg border border-border p-1 ${out ? "bg-muted/40" : ""} ${k === today ? "ring-2 ring-primary" : ""}`}>
                 <p className={`mb-1 text-xs font-semibold ${out ? "text-muted-foreground" : ""}`} aria-current={k === today ? "date" : undefined}>{view === "week" ? d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric" }) : d.getDate()}</p>
                 <div className="space-y-1">
                   {list.slice(0, view === "month" ? 3 : 20).map((i) => <Chip key={i.id} item={i} compact />)}
