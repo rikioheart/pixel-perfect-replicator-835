@@ -280,5 +280,6 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Import HelloAsso : guillemets, retours à la ligne, accents, dates et montants fiabilisés
 - [ ] Essais réels compte actif, pro validé et Bureau (comptes d'essai à autoriser)
 - [ ] Essai « Ajouter à mon agenda » sur iPhone et Android (appareil physique requis)
-- [ ] Parcours « Mon chien » unifié et partage multi-pros : lot suivant
+- [x] Parcours « Mon chien » unifié (fiche unique : profil, repères, carnet, pros) et partage multi-pros (formules, modification, alerte pro)
+- [ ] Essai réel de la fiche chien sur téléphone par un propriétaire et un pro
 - [ ] Revue visuelle complète du mode sombre écran par écran

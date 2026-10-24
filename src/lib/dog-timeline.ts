@@ -15,7 +15,10 @@ export const INDICATOR_FAMILY_LABEL: Record<string, string> = {
   NOIR: "⚫ À éviter",
 };
 
-const GOAL_STATUS: Record<string, string> = { DONE: "atteint", COMPLETED: "atteint", IN_PROGRESS: "en cours", TODO: "à venir" };
+export const GOAL_STATUS: Record<string, string> = {
+  EN_COURS: "en cours", ATTEINT: "atteint", ABANDONNE: "mis de côté",
+  DONE: "atteint", COMPLETED: "atteint", IN_PROGRESS: "en cours", TODO: "à venir",
+};
 
 export function buildDogTimeline(
   input: {

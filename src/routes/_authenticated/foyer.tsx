@@ -2,27 +2,25 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Baby, Dog, Home, Plus, Share2, Star, Trash2, UserPlus } from "lucide-react";
+import { Baby, Home, Plus, Trash2, UserPlus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { SidePanel } from "@/components/SidePanel";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { useMemberOptions } from "@/components/MemberPicker";
 import { useMyHouseholds, type HouseholdBundle } from "@/lib/households";
 import { DogProfiles } from "@/components/DogProfiles";
-import { useProOptions } from "@/lib/pro-card";
+import { DogFilePanel } from "@/components/DogFile";
 
 export const Route = createFileRoute("/_authenticated/foyer")({
   head: () => ({
     meta: [
       { title: "Mon foyer — La Voix du Chien" },
-      { name: "description", content: "Adultes, enfants et chiens de votre foyer, partages avec les professionnels et référents." },
+      { name: "description", content: "Adultes, enfants et chiens de votre foyer, fiche de chaque chien et partage avec les professionnels." },
       { property: "og:title", content: "Mon foyer — La Voix du Chien" },
       { property: "og:description", content: "Gérez votre foyer et le partage des fiches de vos chiens." },
       { property: "og:type", content: "website" },
@@ -31,162 +29,6 @@ export const Route = createFileRoute("/_authenticated/foyer")({
   }),
   component: FoyerPage,
 });
-
-const PERMS = [
-  ["can_identity", "Identité"],
-  ["can_info", "Informations"],
-  ["can_goals", "Objectifs"],
-  ["can_activities", "Activités"],
-  ["can_observations", "Observations"],
-] as const;
-type PermKey = (typeof PERMS)[number][0];
-
-const PRIVATE_SECTIONS = [
-  ["info", "Informations"],
-  ["goals", "Objectifs"],
-  ["observations", "Observations et suivis"],
-] as const;
-
-function DogSharing({ dogId, dogName, onClose }: { dogId: string; dogName: string; onClose: () => void }) {
-  const qc = useQueryClient();
-  const { data: pros = [] } = useProOptions();
-  const [pro, setPro] = useState("");
-  const [perms, setPerms] = useState<Record<PermKey, boolean>>({ can_identity: true, can_info: false, can_goals: false, can_activities: false, can_observations: false });
-  const [until, setUntil] = useState("");
-  const [context, setContext] = useState("");
-
-  const { data } = useQuery({
-    queryKey: ["dog-sharing", dogId],
-    queryFn: async () => {
-      const [acc, refs, dog] = await Promise.all([
-        supabase.from("dog_professional_access").select("*").eq("dog_id", dogId),
-        supabase.from("dog_referents").select("*").eq("dog_id", dogId),
-        supabase.from("dogs").select("private_sections, referent_can_share_followup").eq("id", dogId).maybeSingle(),
-      ]);
-      return { access: acc.data ?? [], refs: refs.data ?? [], dog: dog.data };
-    },
-  });
-  const nameOf = (id: string | null) => pros.find((p) => p.id === id)?.name ?? "Professionnel";
-  const refresh = () => void qc.invalidateQueries({ queryKey: ["dog-sharing", dogId] });
-
-  const grant = useMutation({
-    mutationFn: async () => {
-      if (!pro) throw new Error("Choisissez un professionnel.");
-      if (context.trim().length < 3) throw new Error("Indiquez le contexte du partage.");
-      const { error } = await supabase.rpc("share_dog_access", {
-        _dog_id: dogId, _professional_id: pro,
-        _identity: perms.can_identity, _info: perms.can_info, _goals: perms.can_goals,
-        _activities: perms.can_activities, _observations: perms.can_observations,
-        _context: context.trim(),
-        _expires_at: until ? new Date(until).toISOString() : (null as unknown as string),
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Accès partagé."); setContext(""); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
-  });
-  const revoke = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.rpc("revoke_dog_access", { _access_id: id });
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Accès retiré (et les partages qui en découlent)."); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
-  });
-  const updateDog = useMutation({
-    mutationFn: async (patch: { private_sections?: string[]; referent_can_share_followup?: boolean }) => {
-      const { error } = await supabase.from("dogs").update(patch).eq("id", dogId);
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Préférence enregistrée."); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
-  });
-  const toggleRef = useMutation({
-    mutationFn: async (proId: string) => {
-      const existing = data?.refs.find((r) => r.professional_id === proId);
-      const { error } = existing
-        ? await supabase.from("dog_referents").delete().eq("id", existing.id)
-        : await supabase.from("dog_referents").insert({ dog_id: dogId, professional_id: proId });
-      if (error) throw error;
-    },
-    onSuccess: refresh,
-    onError: (e: Error) => toast.error(e.message),
-  });
-  const privateSections = data?.dog?.private_sections ?? [];
-
-  return (
-    <SidePanel open onOpenChange={(o) => !o && onClose()} title={`Partage — ${dogName}`} description="Vous choisissez ce que chaque professionnel peut voir. Retirable à tout moment.">
-      <div className="space-y-5 text-sm">
-        <section className="space-y-2">
-          <h3 className="font-medium">Accès en cours</h3>
-          {(data?.access ?? []).filter((a) => !a.revoked).length === 0 ? <p className="text-muted-foreground">Aucun partage.</p> : null}
-          {(data?.access ?? []).filter((a) => !a.revoked).map((a) => (
-            <div key={a.id} className="flex items-start justify-between gap-2 rounded-md border border-border p-2">
-              <div>
-                <p className="font-medium">{nameOf(a.professional_id)}</p>
-                <p className="text-xs text-muted-foreground">
-                  {PERMS.filter(([k]) => a[k]).map(([, l]) => l).join(", ") || "Aucune rubrique"}
-                  {a.expires_at ? ` · jusqu'au ${new Date(a.expires_at).toLocaleDateString("fr-FR")}` : ""}
-                </p>
-                {a.context ? <p className="text-xs text-muted-foreground">Contexte : {a.context}</p> : null}
-                {a.source_access_id ? <p className="text-xs text-muted-foreground">Partagé par le référent {nameOf(a.granted_by)}</p> : null}
-              </div>
-              <Button size="sm" variant="ghost" onClick={() => revoke.mutate(a.id)}>Retirer</Button>
-            </div>
-          ))}
-        </section>
-        <section className="space-y-2 border-t border-border pt-4">
-          <h3 className="font-medium">Partager avec un professionnel</h3>
-          <Label htmlFor="sh-pro">Professionnel</Label>
-          <select id="sh-pro" className="h-10 w-full rounded-md border border-input bg-background px-2" value={pro} onChange={(e) => setPro(e.target.value)}>
-            <option value="">Choisir…</option>
-            {pros.map((p) => <option key={p.id} value={p.id}>{p.name}{p.sector ? ` — ${p.sector}` : ""}</option>)}
-          </select>
-          <fieldset className="grid grid-cols-2 gap-1">
-            <legend className="mb-1 text-xs text-muted-foreground">Rubriques visibles</legend>
-            {PERMS.map(([k, l]) => (
-              <label key={k} className="flex min-h-9 items-center gap-2">
-                <input type="checkbox" checked={perms[k]} onChange={(e) => setPerms({ ...perms, [k]: e.target.checked })} /> {l}
-              </label>
-            ))}
-          </fieldset>
-          <Label htmlFor="sh-ctx">Contexte (obligatoire)</Label>
-          <Input id="sh-ctx" placeholder="Ex. suivi éducatif printemps" value={context} onChange={(e) => setContext(e.target.value)} />
-          <Label htmlFor="sh-until">Jusqu'au (facultatif)</Label>
-          <Input id="sh-until" type="date" value={until} onChange={(e) => setUntil(e.target.value)} />
-          <Button className="gap-2" onClick={() => grant.mutate()} disabled={grant.isPending}><Share2 className="size-4" aria-hidden /> Partager</Button>
-        </section>
-        <section className="space-y-2 border-t border-border pt-4">
-          <h3 className="font-medium">Confidentialité</h3>
-          <label className="flex min-h-9 items-center gap-2">
-            <input type="checkbox" checked={Boolean(data?.dog?.referent_can_share_followup)}
-              onChange={(e) => updateDog.mutate({ referent_can_share_followup: e.target.checked })} />
-            J'autorise mon référent à partager le suivi (objectifs, observations) avec d'autres professionnels
-          </label>
-          <p className="text-xs text-muted-foreground">Rubriques privées, cachées au Bureau :</p>
-          {PRIVATE_SECTIONS.map(([k, l]) => (
-            <label key={k} className="flex min-h-9 items-center gap-2">
-              <input type="checkbox" checked={privateSections.includes(k)}
-                onChange={(e) => updateDog.mutate({ private_sections: e.target.checked ? [...privateSections, k] : privateSections.filter((s) => s !== k) })} /> {l}
-            </label>
-          ))}
-        </section>
-        <section className="space-y-2 border-t border-border pt-4">
-          <h3 className="font-medium">Professionnels référents</h3>
-          <p className="text-xs text-muted-foreground">Vous pouvez en choisir plusieurs.</p>
-          {pros.map((p) => {
-            const on = Boolean(data?.refs.some((r) => r.professional_id === p.id));
-            return (
-              <label key={p.id} className="flex min-h-9 items-center gap-2">
-                <input type="checkbox" checked={on} onChange={() => toggleRef.mutate(p.id)} /> {p.name} {on ? <Star className="size-3 text-primary" aria-hidden /> : null}
-              </label>
-            );
-          })}
-        </section>
-      </div>
-    </SidePanel>
-  );
-}
 
 function HouseholdCard({ h }: { h: HouseholdBundle }) {
   const qc = useQueryClient();
@@ -202,7 +44,7 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
   return (
     <section className="panel space-y-4 p-5" aria-labelledby={`hh-${h.id}`}>
       <h2 id={`hh-${h.id}`} className="flex items-center gap-2 font-display text-xl"><Home className="size-5 text-primary" aria-hidden /> {h.name}</h2>
-      <div className="grid gap-4 md:grid-cols-3 text-sm">
+      <div className="grid gap-4 md:grid-cols-2 text-sm">
         <div className="space-y-2">
           <h3 className="font-medium">Adultes</h3>
           {h.adults.map((a) => <div key={a.user_id}>{a.name} {a.role === "ADMIN" ? <Badge variant="outline">Gestion</Badge> : null}</div>)}
@@ -234,13 +76,6 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
           </div>
           <p className="text-xs text-muted-foreground">Prénom seulement, jamais visible des autres participants.</p>
         </div>
-        <div className="space-y-2">
-          <h3 className="flex items-center gap-1 font-medium"><Dog className="size-4" aria-hidden /> Chiens</h3>
-          {h.dogs.map((d) => (
-            <p key={d.id}>{d.name}</p>
-          ))}
-
-        </div>
       </div>
     </section>
   );
@@ -248,7 +83,7 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
 
 function FoyerPage() {
   const { user, profile } = useAuth();
-  const [sharing, setSharing] = useState<{ id: string; name: string } | null>(null);
+  const [sharing, setSharing] = useState<string | null>(null);
   const qc = useQueryClient();
   const { data: households = [], isLoading } = useMyHouseholds(user?.id);
   const { data: orphanDogs = [] } = useQuery({
@@ -276,8 +111,8 @@ function FoyerPage() {
       ) : (
         <div className="space-y-4">{households.map((h) => <HouseholdCard key={h.id} h={h} />)}</div>
       )}
-      <DogProfiles households={households} onShare={(id, name) => setSharing({ id, name })} />
-      {sharing ? <DogSharing dogId={sharing.id} dogName={sharing.name} onClose={() => setSharing(null)} /> : null}
+      <DogProfiles households={households} onOpen={(id) => setSharing(id)} />
+      {sharing ? <DogFilePanel dogId={sharing} onClose={() => setSharing(null)} /> : null}
     </AppShell>
   );
 }
