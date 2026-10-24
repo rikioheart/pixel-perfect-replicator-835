@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, Eye, Flag, HeartHandshake, Share2, Sprout } from "lucide-react";
+import { CalendarDays, Eye, FileText, Flag, HeartHandshake, Share2, Sprout } from "lucide-react";
+import { DogFilePanel, type DogFileTab } from "@/components/DogFile";
+import { activeAccesses } from "@/lib/dog-sharing";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +12,7 @@ import { dogAge, buildDogTimeline, INDICATOR_FAMILY_LABEL, type TimelineItem } f
 
 /** Accueil centré sur le chien. Lectures directes soumises aux règles d'accès de la base. */
 export function MyDogHome({ userId }: { userId: string }) {
+  const [open, setOpen] = useState<{ id: string; tab: DogFileTab } | null>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["my-dog-home", userId],
     queryFn: async () => {
@@ -18,8 +22,8 @@ export function MyDogHome({ userId }: { userId: string }) {
         .order("created_at");
       if (error) throw error;
       const ids = (dogs ?? []).map((d) => d.id);
-      if (!ids.length) return { dogs: [], indicators: [], timeline: {} as Record<string, TimelineItem[]> };
-      const [ind, obs, goals, parts] = await Promise.all([
+      if (!ids.length) return { dogs: [], indicators: [], timeline: {} as Record<string, TimelineItem[]>, shares: {} as Record<string, number> };
+      const [ind, obs, goals, parts, acc] = await Promise.all([
         supabase.from("dog_indicators").select("dog_id, family, label").in("dog_id", ids),
         supabase.from("dog_observations").select("id, dog_id, body, created_at").in("dog_id", ids).order("created_at", { ascending: false }).limit(30),
         supabase.from("dog_goals").select("id, dog_id, title, status, created_at").in("dog_id", ids),
@@ -28,7 +32,12 @@ export function MyDogHome({ userId }: { userId: string }) {
           .select("dog_id, participations(id, registration_status, registered_at, activities(title, date), events(title, start_date))")
           .in("dog_id", ids)
           .limit(60),
+        supabase.from("dog_professional_access").select("dog_id, professional_id, revoked, expires_at").in("dog_id", ids),
       ]);
+      const shares: Record<string, number> = {};
+      for (const a of activeAccesses((acc.data ?? []).map((r) => ({ ...r, id: r.dog_id, can_identity: false, can_info: false, can_goals: false, can_activities: false, can_observations: false })))) {
+        shares[a.dog_id] = (shares[a.dog_id] ?? 0) + 1;
+      }
       const timeline: Record<string, TimelineItem[]> = {};
       for (const id of ids) {
         timeline[id] = buildDogTimeline({
@@ -51,7 +60,7 @@ export function MyDogHome({ userId }: { userId: string }) {
             }),
         });
       }
-      return { dogs: dogs ?? [], indicators: ind.data ?? [], timeline };
+      return { dogs: dogs ?? [], indicators: ind.data ?? [], timeline, shares };
     },
   });
 
@@ -111,7 +120,11 @@ export function MyDogHome({ userId }: { userId: string }) {
               ) : null}
               <div className="flex flex-wrap gap-2">
                 <Button asChild size="sm"><Link to="/activities"><CalendarDays className="mr-1 size-4" />Inscrire {dog.name} à une sortie</Link></Button>
-                <Button asChild size="sm" variant="outline"><Link to="/foyer"><Share2 className="mr-1 size-4" />Gérer ses professionnels</Link></Button>
+                <Button size="sm" variant="outline" onClick={() => setOpen({ id: dog.id, tab: "fiche" })}><FileText className="mr-1 size-4" aria-hidden />Ouvrir sa fiche</Button>
+                <Button size="sm" variant="outline" onClick={() => setOpen({ id: dog.id, tab: "pros" })}>
+                  <Share2 className="mr-1 size-4" aria-hidden />
+                  {data?.shares[dog.id] ? `Ses professionnels (${data.shares[dog.id]})` : "Partager avec ses professionnels"}
+                </Button>
               </div>
               <section aria-label={`Carnet de vie de ${dog.name}`}>
                 <h3 className="mb-2 text-sm font-semibold">Carnet de vie</h3>
@@ -144,6 +157,7 @@ export function MyDogHome({ userId }: { userId: string }) {
           </Card>
         );
       })}
+      {open ? <DogFilePanel dogId={open.id} initialTab={open.tab} onClose={() => setOpen(null)} /> : null}
     </div>
   );
 }
