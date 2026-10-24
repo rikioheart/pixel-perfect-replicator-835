@@ -96,7 +96,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Mon quotidien",
     items: [
-      { to: "/member", label: "Mon Compagnon & Moi", icon: Heart, audience: "all", primary: true, primaryForParticulier: true },
+      { to: "/member", label: "Mon profil", icon: Heart, audience: "all", primary: true, primaryForParticulier: true },
       { to: "/foyer", label: "Mon chien & mon foyer", icon: House, audience: "all" },
       { to: "/loyalty", label: "Mon Pass Terrain", bureauLabel: "Engagement", icon: Stamp, audience: "all" },
       { to: "/participations", label: "Mes participations", icon: CalendarCheck, audience: "all" },
@@ -422,7 +422,7 @@ export function AppShell({
           <OfflineStatus />
           {hubTab && !isBureau ? (
             <div className="mb-5 space-y-2">
-            <nav aria-label="Mon Compagnon & Moi" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
+            <nav aria-label="Mon profil" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
               {MEMBER_HUB_GROUPS.map((t, i) => {
                 const Icon = [Heart, CalendarDays, Stamp, UserRound][i] ?? UserRound;
                 return (

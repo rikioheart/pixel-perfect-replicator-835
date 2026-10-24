@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { profileCompletion } from "@/lib/home-config";
+import { needsAccountChoice } from "@/lib/account-choice";
+import { AccountChoiceStep } from "@/components/AccountChoiceStep";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -132,6 +134,14 @@ function OnboardingPage() {
     if (save.isError) return;
     setStep((current) => Math.min(STEPS.length - 1, current + 1));
   };
+
+  if (needsAccountChoice(profile)) {
+    return (
+      <AppShell title="Bienvenue" subtitle="Une première question pour bien vous accueillir.">
+        <AccountChoiceStep onDone={refresh} />
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell

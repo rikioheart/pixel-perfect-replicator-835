@@ -20,13 +20,13 @@ import { TASK_STATUS_LABEL, PROJECT_ROLE_LABEL, formatDate } from "@/lib/domain"
 export const Route = createFileRoute("/_authenticated/member")({
   head: () => ({
     meta: [
-      { title: "Mon Compagnon & Moi — La Voix du Chien" },
+      { title: "Mon profil — La Voix du Chien" },
       {
         name: "description",
         content:
           "Espace personnel du membre : mes tâches, mes inscriptions, ma fidélité et l'actualité de l'association.",
       },
-      { property: "og:title", content: "Mon Compagnon & Moi — La Voix du Chien" },
+      { property: "og:title", content: "Mon profil — La Voix du Chien" },
       {
         property: "og:description",
         content: "Un accueil personnalisé selon votre rôle : tâches, événements, fidélité et actualités.",
@@ -95,7 +95,7 @@ function MemberDashboard() {
 
   return (
     <AppShell
-      title="Mon Compagnon & Moi"
+      title="Mon profil"
       subtitle="Ce qui vous concerne, rien de plus"
 
     >

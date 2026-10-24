@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MEMBERSHIP_TYPE_LABEL } from "@/lib/members";
+import { AccountDeletionCard } from "@/components/AccountDeletionCard";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -193,6 +194,10 @@ function ProfilePage() {
         <h2 className="flex items-center gap-2 text-base"><HeartHandshake className="size-4" aria-hidden /> Mon foyer & mes chiens</h2>
         <Button asChild variant="outline"><Link to="/foyer">Ouvrir les fiches de mes chiens</Link></Button>
       </section>
+
+      <div className="mt-6 max-w-xl">
+        <AccountDeletionCard />
+      </div>
     </AppShell>
   );
 }

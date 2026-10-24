@@ -24,7 +24,7 @@ export function isNavItemPrimary(item: NavRuleItem, viewer: NavViewer): boolean 
   return particulier ? Boolean(item.primaryForParticulier) : Boolean(item.primary);
 }
 
-/** Pages regroupées dans l'espace personnel unifié « Mon Compagnon & Moi ». */
+/** Pages regroupées dans l'espace personnel unifié « Mon profil ». */
 export const MEMBER_HUB_TABS = [
   { to: "/member", label: "Accueil" },
   { to: "/foyer", label: "Mon foyer & mes chiens" },

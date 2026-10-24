@@ -97,6 +97,7 @@ export type Database = {
           price_public: number
           professional_id: string | null
           professional_ids: string[]
+          project_id: string | null
           referent_id: string | null
           status: string
           terrain_reservation_id: string | null
@@ -129,6 +130,7 @@ export type Database = {
           price_public?: number
           professional_id?: string | null
           professional_ids?: string[]
+          project_id?: string | null
           referent_id?: string | null
           status?: string
           terrain_reservation_id?: string | null
@@ -161,6 +163,7 @@ export type Database = {
           price_public?: number
           professional_id?: string | null
           professional_ids?: string[]
+          project_id?: string | null
           referent_id?: string | null
           status?: string
           terrain_reservation_id?: string | null
@@ -184,6 +187,13 @@ export type Database = {
             columns: ["professional_id"]
             isOneToOne: false
             referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
@@ -1168,6 +1178,7 @@ export type Database = {
           price_public: number
           professional_id: string | null
           professional_ids: string[]
+          project_id: string | null
           referent_id: string | null
           start_date: string | null
           status: string
@@ -1198,6 +1209,7 @@ export type Database = {
           price_public?: number
           professional_id?: string | null
           professional_ids?: string[]
+          project_id?: string | null
           referent_id?: string | null
           start_date?: string | null
           status?: string
@@ -1228,6 +1240,7 @@ export type Database = {
           price_public?: number
           professional_id?: string | null
           professional_ids?: string[]
+          project_id?: string | null
           referent_id?: string | null
           start_date?: string | null
           status?: string
@@ -1251,6 +1264,13 @@ export type Database = {
             columns: ["professional_id"]
             isOneToOne: false
             referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
@@ -2705,6 +2725,7 @@ export type Database = {
           partnership_percentage: number
           professional_category: string | null
           profile_id: string
+          siret: string | null
           social_links: Json
           updated_at: string
           website_url: string | null
@@ -2719,6 +2740,7 @@ export type Database = {
           partnership_percentage?: number
           professional_category?: string | null
           profile_id: string
+          siret?: string | null
           social_links?: Json
           updated_at?: string
           website_url?: string | null
@@ -2733,6 +2755,7 @@ export type Database = {
           partnership_percentage?: number
           professional_category?: string | null
           profile_id?: string
+          siret?: string | null
           social_links?: Json
           updated_at?: string
           website_url?: string | null
@@ -3065,10 +3088,12 @@ export type Database = {
       profiles: {
         Row: {
           access_level: string
+          account_choice_at: string | null
           avatar_path: string | null
           bio: string | null
           city: string | null
           created_at: string
+          deleted_at: string | null
           department: string | null
           display_name: string | null
           email: string | null
@@ -3088,10 +3113,12 @@ export type Database = {
         }
         Insert: {
           access_level?: string
+          account_choice_at?: string | null
           avatar_path?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           department?: string | null
           display_name?: string | null
           email?: string | null
@@ -3111,10 +3138,12 @@ export type Database = {
         }
         Update: {
           access_level?: string
+          account_choice_at?: string | null
           avatar_path?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           department?: string | null
           display_name?: string | null
           email?: string | null
@@ -4271,6 +4300,7 @@ export type Database = {
       }
     }
     Functions: {
+      account_deletion_blockers: { Args: { _user_id: string }; Returns: Json }
       apply_loyalty_rules: {
         Args: { _activity_id: string; _event_id: string; _user_id: string }
         Returns: number
@@ -4338,6 +4368,16 @@ export type Database = {
       can_view_terrain_reservation: {
         Args: { _rid: string; _user_id: string }
         Returns: boolean
+      }
+      choose_account_type: {
+        Args: {
+          _activity?: string
+          _company?: string
+          _description?: string
+          _siret?: string
+          _type: string
+        }
+        Returns: Json
       }
       claim_bureau_bootstrap: { Args: never; Returns: boolean }
       create_delegation: {
@@ -4446,6 +4486,7 @@ export type Database = {
       list_public_activities: { Args: never; Returns: Json }
       list_public_blog_posts: { Args: never; Returns: Json }
       list_public_pros: { Args: never; Returns: Json }
+      my_account_deletion_check: { Args: never; Returns: Json }
       notify_bureau_members: {
         Args: {
           _entity_id: string
@@ -4518,6 +4559,7 @@ export type Database = {
         }
         Returns: Json
       }
+      request_account_deletion: { Args: { _confirm: string }; Returns: Json }
       resolve_member_from_qr: { Args: { _scanned_code: string }; Returns: Json }
       revoke_delegation: { Args: { _id: string }; Returns: undefined }
       revoke_dog_access: { Args: { _access_id: string }; Returns: undefined }

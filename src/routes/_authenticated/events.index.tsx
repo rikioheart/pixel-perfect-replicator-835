@@ -14,6 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
+import { splitArchive } from "@/lib/archives";
+import { ArchiveToggle } from "@/components/ArchiveToggle";
+import { ParentProjectSelect } from "@/components/ParentProjectSelect";
 
 export const Route = createFileRoute("/_authenticated/events/")({
   head: () => ({
@@ -47,11 +50,13 @@ function EventsPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<"current" | "past">("current");
   const [form, setForm] = useState({
     title: "",
     description: "",
     event_type: "RENCONTRE",
     start_date: "",
+    project_id: "",
     end_date: "",
     location: "",
     address: "",
@@ -78,6 +83,7 @@ function EventsPage() {
         throw new Error("La date de fin doit être postérieure à la date de début.");
       const { error } = await supabase.from("events").insert({
         title: form.title.trim(),
+        project_id: form.project_id || null,
         description: form.description || null,
         event_type: form.event_type,
         start_date: form.start_date ? new Date(form.start_date).toISOString() : null,
@@ -160,6 +166,7 @@ function EventsPage() {
                     </select>
                   </div>
                 </div>
+                <ParentProjectSelect id="ep-project" value={form.project_id} onChange={(v) => setForm({ ...form, project_id: v })} />
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="ev-start">Début</Label>
@@ -219,14 +226,17 @@ function EventsPage() {
     >
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement du calendrier…</p>
-      ) : events.length === 0 ? (
+      ) : (
+        <>
+        <ArchiveToggle view={view} setView={setView} counts={splitArchive(events)} pastLabel="Archives" />
+        {(view === "current" ? splitArchive(events).current : splitArchive(events).past).length === 0 ? (
         <EmptyState
           title="Pas encore d'événement"
           message="Les prochains temps forts de l'association apparaîtront ici."
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {events.map((event) => (
+          {(view === "current" ? splitArchive(events).current : splitArchive(events).past).map((event) => (
             <Card key={event.id} className="overflow-hidden">
               {event.image_url ? (
                 <img
@@ -260,6 +270,8 @@ function EventsPage() {
             </Card>
           ))}
         </div>
+      )}
+        </>
       )}
     </AppShell>
   );
