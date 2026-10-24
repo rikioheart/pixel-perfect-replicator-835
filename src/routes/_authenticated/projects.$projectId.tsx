@@ -32,11 +32,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   PRIORITIES,
   PRIORITY_LABEL,
   PROJECT_ROLE_LABEL,
   PROJECT_STATUSES,
   PROJECT_STATUS_LABEL,
+  TASK_STATUS_LABEL,
   formatDate,
 } from "@/lib/domain";
 import { Comments } from "@/components/Comments";
@@ -44,6 +55,8 @@ import { ProjectContribute, ProjectStorySections } from "@/components/ProjectCon
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 import { EntityPeek } from "@/components/EntityPeek";
 import { isPast, operationalProgress } from "@/lib/archives";
+import { explainDbError, openTasksBeforeClosure } from "@/lib/task-lifecycle";
+import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -68,6 +81,8 @@ function ProjectDetail() {
   const { projectId } = Route.useParams();
   const { user, isBureau, profile } = useAuth();
   const queryClient = useQueryClient();
+  const coordinated = useCoordinatedProjects(user?.id);
+  const [closing, setClosing] = useState<string | null>(null);
 
   const { data: project } = useQuery({
     queryKey: ["project", projectId],
@@ -116,7 +131,7 @@ function ProjectDetail() {
         await supabase
           .from("tasks")
           .select(
-            "id, title, description, status, priority, deadline, assigned_user_id, rejection_reason",
+            "id, title, description, status, priority, deadline, assigned_user_id, created_by, project_id, rejection_reason",
           )
           .eq("project_id", projectId)
           .order("created_at", { ascending: false })
@@ -151,13 +166,39 @@ function ProjectDetail() {
     );
   }
 
+  const isCoordinator =
+    coordinated.has(projectId) ||
+    (members ?? []).some(
+      (m) => m.user_id === user?.id && ["OWNER", "COORDINATOR"].includes((m.project_role ?? "").toUpperCase()),
+    );
+  const canValidate = isBureau || isCoordinator;
+  // Statut et estimation : mêmes droits que la base (Bureau ou responsable du projet).
+  const canManage = isBureau || (Boolean(user?.id) && project.owner_id === user?.id);
+  const progress = operationalProgress(tasks ?? []);
+  const eligibleCount = (tasks ?? []).filter((t) => !["CANCELLED", "REJECTED", "ARCHIVED"].includes(t.status)).length;
+  const doneCount = (tasks ?? []).filter((t) => t.status === "COMPLETED" || t.status === "VALIDATED").length;
+  const openTasks = openTasksBeforeClosure(tasks ?? []);
+
   const updateProject = async (patch: Record<string, string | number | null>) => {
-    const { error } = await supabase.from("projects").update(patch as never).eq("id", projectId);
+    const { data, error } = await supabase.from("projects").update(patch as never).eq("id", projectId).select("id");
     if (error) {
-      toast.error(error.message);
+      toast.error(explainDbError(error));
+      return;
+    }
+    if (!data || data.length === 0) {
+      toast.error("Modification refusée : seuls le responsable du projet et le Bureau peuvent la faire.");
       return;
     }
     await queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    void queryClient.invalidateQueries({ queryKey: ["projects"] });
+  };
+
+  const changeStatus = (status: string) => {
+    if ((status === "COMPLETED" || status === "ARCHIVED") && openTasks.length > 0) {
+      setClosing(status);
+      return;
+    }
+    void updateProject({ status });
   };
 
   return (
