@@ -30,6 +30,19 @@ export function HelpWizard({ open, onOpenChange, projectId, presetType }: { open
     setStep(presetType ? (projectId ? 2 : 1) : 0);
   }, [open, presetType, projectId]);
 
+  // Compétences du profil : proposées en début de message, modifiables ou effaçables.
+  const { data: skills = [] } = useQuery({
+    queryKey: ["my-skills", user?.id],
+    enabled: open && Boolean(user?.id),
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("skills").eq("id", user!.id).maybeSingle();
+      return (data?.skills ?? []).filter((s: string) => s.trim());
+    },
+  });
+  useEffect(() => {
+    if (open && skills.length > 0) setMessage((m) => m || `Mes compétences : ${skills.join(", ")}\n`);
+  }, [open, skills]);
+
   const { data: projects = [] } = useQuery({
     queryKey: ["help-projects"],
     enabled: open,
