@@ -189,9 +189,18 @@ export function AppShell({
   const viewer = { isBureau, isPro };
   const externalLinks = useExternalLinks();
   const visible = NAV_GROUPS.flatMap((group) => group.items).filter((item) => isNavItemVisible(item, viewer));
+  const pillars = NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => isNavItemVisible(item, viewer)),
+  })).filter((group) => group.items.length > 0);
+  // Page active = entrée la plus précise correspondant à l'adresse.
+  const activeItem = visible
+    .filter((item) => pathname === item.to || pathname.startsWith(`${item.to}/`))
+    .sort((a, b) => b.to.length - a.to.length)[0];
+  const activePillar = activeItem ? pillars.find((g) => g.items.includes(activeItem)) : undefined;
+  // Les pages de la console Bureau ont déjà leurs propres onglets : pas de seconde rangée.
+  const pillarTabs = activePillar && !CONSOLE_PATHS.has(pathname) ? activePillar.items.filter((i) => !(activePillar.title === "Console du Bureau" && CONSOLE_PATHS.has(i.to))) : [];
 
-  // Chaque page remonte AppShell : l'état des sections vit dans un store global persistant.
-  const isOpen = useNavSectionsOpen();
   const [mobileOpen, setMobileOpen] = useState(false);
   const asideRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -202,25 +211,32 @@ export function AppShell({
     setMobileOpen(false);
   }, [pathname]);
 
-  const primary = visible.filter((item) => isNavItemPrimary(item, viewer)).slice(0, 5);
-  const hubTab = memberHubTabFor(pathname);
-  const hubGroup = memberHubGroupFor(pathname);
   const dock = isBureau
     ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/calendar", label: "Calendrier", icon: CalendarDays }, { to: "/member", label: "Mon espace", icon: UserRound }]
     : isPro
       ? [{ to: "/espace-pro", label: "Espace pro", icon: Briefcase }, { to: "/espace-pro/chiens", label: "Chiens", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }]
-      : [{ to: "/member", label: "Mon chien", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }, { to: "/blog", label: "Actualités", icon: Newspaper }];
-  const primaryPaths = new Set(primary.map((item) => item.to));
-  const seen = new Set(primaryPaths);
-  const secondary = visible.filter((item) => {
-    if (seen.has(item.to)) return false;
-    seen.add(item.to);
-    return true;
-  });
-  const groups = NAV_GROUPS.map((group) => ({
-    ...group,
-    items: group.items.filter((item) => secondary.includes(item)),
-  })).filter((group) => group.items.length > 0);
+      : [{ to: "/member", label: "Mon chien", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }, { to: "/projects", label: "Projets", icon: FolderKanban }];
+
+  const renderPillar = (group: (typeof pillars)[number], mobile = false) => {
+    const active = activePillar?.title === group.title;
+    const hub = group.items[0];
+    const link = (
+      <Link
+        key={group.title}
+        to={hub.to}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+          active ? "surface-wine" : mobile ? "hover:bg-accent" : "hover:bg-sidebar-accent",
+        )}
+      >
+        <group.icon className="size-4" aria-hidden="true" />
+        {group.title}
+      </Link>
+    );
+    return mobile ? <SheetClose key={group.title} asChild>{link}</SheetClose> : link;
+  };
 
   const renderLink = (item: NavItem, mobile = false) => {
     const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
@@ -270,41 +286,7 @@ export function AppShell({
             </div>
           </div>
           <nav aria-label="Navigation des pages" className="space-y-5">
-            <div className="space-y-1">{primary.map((item) => renderLink(item))}</div>
-
-            {groups.length ? (
-              <details
-                className="group"
-                open={isOpen("__more")}
-                onToggle={(e) => setNavSectionOpen("__more", e.currentTarget.open)}
-              >
-                <summary className="cursor-pointer list-none rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  Tout le reste
-                </summary>
-                <div className="mt-2 space-y-2">
-                  {groups.map((group) => {
-                    const hasActive = group.items.some(
-                      (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
-                    );
-                    return (
-                      <details
-                        key={group.title}
-                        open={hasActive || isOpen(group.title)}
-                        onToggle={(e) => {
-                          if (!hasActive) setNavSectionOpen(group.title, e.currentTarget.open);
-                        }}
-                        className="space-y-1"
-                      >
-                        <summary className="cursor-pointer list-none rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                          {group.title}
-                        </summary>
-                        {group.items.map((item) => renderLink(item))}
-                      </details>
-                    );
-                  })}
-                </div>
-              </details>
-            ) : null}
+            <div className="space-y-1">{pillars.map((g) => renderPillar(g))}</div>
 
             {externalLinks.length ? (
               <div className="space-y-1 border-t border-sidebar-border pt-4">
@@ -380,24 +362,7 @@ export function AppShell({
                 <SheetDescription>{isBureau ? "Gouvernance et actions" : "Votre espace associatif"}</SheetDescription>
               </SheetHeader>
               <nav aria-label="Navigation mobile" className="space-y-6 p-4">
-                <div className="space-y-1 border-b border-border pb-4">{primary.map((item) => renderLink(item, true))}</div>
-                {groups.map((group) => {
-                  const groupItems = group.items;
-                  if (!groupItems.length) return null;
-                  return (
-                    <details
-                      key={group.title}
-                      className="space-y-1"
-                      open={groupItems.some((item) => pathname === item.to || pathname.startsWith(`${item.to}/`)) || isOpen(group.title)}
-                      onToggle={(e) => setNavSectionOpen(group.title, e.currentTarget.open)}
-                    >
-                      <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-md px-3 text-[11px] font-semibold uppercase text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                        {group.title}
-                      </summary>
-                      {groupItems.map((item) => renderLink(item, true))}
-                    </details>
-                  );
-                })}
+                <div className="space-y-1">{pillars.map((g) => renderPillar(g, true))}</div>
                 <Button
                   variant="outline"
                   className="min-h-11 w-full justify-start gap-2"
@@ -420,29 +385,22 @@ export function AppShell({
 
         <main id="contenu-principal" tabIndex={-1} className="min-w-0 flex-1 px-4 py-5 pb-28 focus:outline-none md:p-6">
           <OfflineStatus />
-          {hubTab && !isBureau ? (
-            <div className="mb-5 space-y-2">
-            <nav aria-label="Mon profil" className="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1 sm:grid-cols-4">
-              {MEMBER_HUB_GROUPS.map((t, i) => {
-                const Icon = [Heart, CalendarDays, Stamp, UserRound][i] ?? UserRound;
-                return (
+          {pillarTabs.length > 1 ? (
+            <nav aria-label={activePillar!.title} className="mb-5 flex flex-wrap gap-1 rounded-xl border border-border bg-card p-1">
+              {pillarTabs.map((t) => (
                 <Link
                   key={t.to}
                   to={t.to}
-                  aria-current={hubGroup?.to === t.to ? "page" : undefined}
+                  aria-current={activeItem?.to === t.to ? "page" : undefined}
                   className={cn(
-                    "flex min-h-12 items-center justify-center gap-2 rounded-xl px-2 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring",
-                    hubGroup?.to === t.to ? "bg-primary text-primary-foreground" : "hover:bg-accent",
+                    "inline-flex min-h-10 items-center rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    activeItem?.to === t.to ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
                   )}
                 >
-                  <Icon className="size-4 shrink-0" aria-hidden />{t.label}
+                  {isBureau && t.bureauLabel ? t.bureauLabel : t.label}
                 </Link>
-              );})}
+              ))}
             </nav>
-            <nav aria-label="Pages de cet espace" className="flex flex-wrap gap-2">
-              {MEMBER_HUB_TABS.filter(t => hubGroup?.paths.some(p => p === t.to)).map(t => <Link key={t.to} to={t.to} aria-current={hubTab === t.to ? "page" : undefined} className={cn("inline-flex min-h-11 items-center rounded-lg px-3 text-sm", hubTab === t.to ? "bg-secondary font-medium text-secondary-foreground" : "text-muted-foreground hover:bg-accent")}>{t.label}</Link>)}
-            </nav>
-            </div>
           ) : null}
           {profile?.membership_status === "PENDING" ? (
             <p role="status" className="mb-4 rounded-xl border border-border bg-muted p-3 text-sm">
