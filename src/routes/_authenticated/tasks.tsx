@@ -16,6 +16,8 @@ import { TASK_STATUSES, TASK_STATUS_LABEL } from "@/lib/domain";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { TaskPanel, type TaskPanelValue } from "@/components/panels/TaskPanel";
+import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
+import { canValidateTask } from "@/lib/task-lifecycle";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
@@ -41,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/tasks")({
 function TasksPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
+  const coordinated = useCoordinatedProjects(user?.id);
   const [scope, setScope] = useState<"MINE" | "ALL">("MINE");
   const [status, setStatus] = useState("ALL");
   const [panelOpen, setPanelOpen] = useState(false);
@@ -53,7 +56,7 @@ function TasksPage() {
       let query = supabase
         .from("tasks")
         .select(
-          "id, title, description, status, priority, deadline, assigned_user_id, project_id, rejection_reason, projects(title)",
+          "id, title, description, status, priority, deadline, assigned_user_id, created_by, project_id, rejection_reason, projects(title)",
         )
         .order("deadline", { ascending: true });
       if (scope === "MINE") query = query.eq("assigned_user_id", user!.id);
@@ -62,6 +65,14 @@ function TasksPage() {
   });
 
   const filtered = (tasks ?? []).filter((task) => status === "ALL" || task.status === status);
+  const validatorFor = (task: TaskRow | TaskPanelValue | null) =>
+    task
+      ? canValidateTask(task, {
+          userId: user?.id,
+          isBureau,
+          isProjectCoordinator: Boolean(task.project_id && coordinated.has(task.project_id)),
+        })
+      : isBureau;
 
   return (
     <AppShell
@@ -109,7 +120,10 @@ function TasksPage() {
         <div className="grid gap-4 md:grid-cols-2">
           {filtered.map((task) => (
             <div key={task.id} className="relative">
-              {isBureau || task.assigned_user_id === user?.id ? (
+              {isBureau ||
+              task.assigned_user_id === user?.id ||
+              task.created_by === user?.id ||
+              validatorFor(task) ? (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -127,6 +141,7 @@ function TasksPage() {
                 task={task}
                 currentUserId={user?.id ?? ""}
                 isBureau={isBureau}
+                canValidate={validatorFor(task)}
                 onChanged={() => queryClient.invalidateQueries({ queryKey: ["tasks"] })}
               />
             </div>
@@ -138,6 +153,7 @@ function TasksPage() {
         open={panelOpen}
         onOpenChange={setPanelOpen}
         task={editingTask}
+        canValidate={validatorFor(editingTask)}
         onSaved={() => queryClient.invalidateQueries({ queryKey: ["tasks"] })}
       />
     </AppShell>
