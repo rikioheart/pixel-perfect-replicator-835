@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 /** Colonnes de profil lisibles par l'API. E-mail et téléphone passent par profile_contacts (soi-même ou Bureau). */
 export const PROFILE_COLUMNS =
-  "id, first_name, last_name, display_name, avatar_path, city, department, membership_type, membership_status, membership_date, involvement_level, bio, public_visibility, created_at, updated_at, access_level, person_id, hide_sensitive_dogs, statutory_category";
+  "id, first_name, last_name, display_name, avatar_path, city, department, membership_type, membership_status, membership_date, involvement_level, bio, public_visibility, created_at, updated_at, access_level, person_id, hide_sensitive_dogs, statutory_category, account_choice_at, deleted_at";
 
 type Contact = { id: string; email: string | null; phone: string | null };
 

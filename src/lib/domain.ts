@@ -31,9 +31,9 @@ export const PROJECT_STATUSES = [
 ] as const;
 
 export const PROJECT_STATUS_LABEL: Record<string, string> = {
-  PLANNED: "Planifié",
-  ACTIVE: "Actif",
-  ON_HOLD: "En pause",
+  PLANNED: "À faire",
+  ACTIVE: "En cours",
+  ON_HOLD: "En attente de validation",
   COMPLETED: "Terminé",
   ARCHIVED: "Archivé",
 };
