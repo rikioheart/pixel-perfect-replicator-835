@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { isSafeExternalFormUrl } from "@/lib/form-links";
+import { fieldType, validateAnswer, type FormField } from "@/lib/form-fields";
 
 export const Route = createFileRoute("/formulaire/$formId")({
   head: () => ({
@@ -22,7 +23,6 @@ export const Route = createFileRoute("/formulaire/$formId")({
   component: PublicForm,
 });
 
-type Field = { label: string; required: boolean; long: boolean };
 
 function PublicForm() {
   const { formId } = Route.useParams();
@@ -50,7 +50,7 @@ function PublicForm() {
       <Link to="/" className="mt-4 inline-block underline">Retour à l'accueil</Link>
     </main>
   );
-  const fields = (form.fields ?? []) as Field[];
+  const fields = (form.fields ?? []) as FormField[];
   const anon = !session;
   if (form.external_url && isSafeExternalFormUrl(form.external_url)) return (
     <main className="mx-auto max-w-xl p-4 sm:p-6">
@@ -67,8 +67,7 @@ function PublicForm() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setErr("");
-    const missing = fields.find((f) => f.required && !answers[f.label]?.trim());
-    if (missing) return setErr(`« ${missing.label} » est obligatoire.`);
+    for (const f of fields) { const m = validateAnswer(f, answers[f.label]); if (m) return setErr(m); }
     setState("sending");
     const { error } = await supabase.rpc("submit_form_response", {
       _form_id: form.id, _answers: answers, _name: anon ? name : "", _email: anon ? email : "", _consent: consent,
@@ -87,7 +86,11 @@ function PublicForm() {
         {form.contact && <p><strong>Contact :</strong> {form.contact}</p>}
       </section>
       {state === "done" ? (
-        <p className="mt-6 rounded-xl bg-muted p-4" role="status">Merci, votre réponse a bien été transmise.</p>
+        <section className="mt-6 space-y-3 rounded-xl bg-muted p-5" role="status">
+          <h2 className="font-display text-lg font-bold">Merci, votre réponse a bien été transmise.</h2>
+          <p className="text-sm">Les personnes responsables du formulaire la liront avec attention. Pour toute correction, utilisez le contact indiqué ci-dessus.</p>
+          <Button asChild variant="outline"><Link to={anon ? "/" : "/forms"}>{anon ? "Retour à l'accueil" : "Retour aux formulaires"}</Link></Button>
+        </section>
       ) : (
         <form onSubmit={submit} className="mt-6 space-y-4">
           {anon && (
@@ -99,8 +102,7 @@ function PublicForm() {
           {fields.map((f, i) => (
             <div key={i}>
               <Label htmlFor={`pf-${i}`}>{f.label}{f.required ? " *" : ""}</Label>
-              {f.long ? <Textarea id={`pf-${i}`} maxLength={2000} value={answers[f.label] ?? ""} onChange={(e) => setAnswers({ ...answers, [f.label]: e.target.value })} />
-                : <Input id={`pf-${i}`} maxLength={300} value={answers[f.label] ?? ""} onChange={(e) => setAnswers({ ...answers, [f.label]: e.target.value })} />}
+              <FieldInput id={`pf-${i}`} field={f} value={answers[f.label] ?? ""} onChange={(v) => setAnswers({ ...answers, [f.label]: v })} />
             </div>
           ))}
           {form.consent_required && (
@@ -115,4 +117,25 @@ function PublicForm() {
       )}
     </main>
   );
+}
+
+function FieldInput({ id, field, value, onChange }: { id: string; field: FormField; value: string; onChange: (v: string) => void }) {
+  const t = fieldType(field);
+  const opts = t === "yesno" ? ["Oui", "Non"] : field.options ?? [];
+  if (t === "long") return <Textarea id={id} maxLength={2000} value={value} onChange={(e) => onChange(e.target.value)} />;
+  if (t === "single" || t === "yesno") return (
+    <div role="radiogroup" aria-labelledby={id} id={id} className="mt-1 flex flex-wrap gap-3">
+      {opts.map((o) => <label key={o} className="flex min-h-11 items-center gap-2 text-sm"><input type="radio" className="size-4" name={id} checked={value === o} onChange={() => onChange(o)} />{o}</label>)}
+    </div>
+  );
+  if (t === "multiple") {
+    const picked = value ? value.split(" ; ") : [];
+    return (
+      <div id={id} className="mt-1 flex flex-wrap gap-3">
+        {opts.map((o) => <label key={o} className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" className="size-4" checked={picked.includes(o)} onChange={(e) => onChange((e.target.checked ? [...picked, o] : picked.filter((x) => x !== o)).join(" ; "))} />{o}</label>)}
+      </div>
+    );
+  }
+  const type = t === "date" ? "date" : t === "email" ? "email" : t === "number" ? "number" : "text";
+  return <Input id={id} type={type} inputMode={t === "number" ? "decimal" : undefined} maxLength={300} value={value} onChange={(e) => onChange(e.target.value)} />;
 }
