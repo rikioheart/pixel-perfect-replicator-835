@@ -1060,11 +1060,13 @@ export type Database = {
       dogs: {
         Row: {
           birth_date: string | null
+          birth_estimated: boolean
           breed: string | null
           character: string | null
           created_at: string
           household_id: string | null
           id: string
+          living_environment: string | null
           name: string
           needs: string | null
           owner_id: string
@@ -1072,17 +1074,20 @@ export type Database = {
           private_sections: string[]
           referent_can_share_followup: boolean
           sex: string | null
+          sterilization: string
           updated_at: string
           useful_information: string | null
           visibility: string
         }
         Insert: {
           birth_date?: string | null
+          birth_estimated?: boolean
           breed?: string | null
           character?: string | null
           created_at?: string
           household_id?: string | null
           id?: string
+          living_environment?: string | null
           name: string
           needs?: string | null
           owner_id: string
@@ -1090,17 +1095,20 @@ export type Database = {
           private_sections?: string[]
           referent_can_share_followup?: boolean
           sex?: string | null
+          sterilization?: string
           updated_at?: string
           useful_information?: string | null
           visibility?: string
         }
         Update: {
           birth_date?: string | null
+          birth_estimated?: boolean
           breed?: string | null
           character?: string | null
           created_at?: string
           household_id?: string | null
           id?: string
+          living_environment?: string | null
           name?: string
           needs?: string | null
           owner_id?: string
@@ -1108,6 +1116,7 @@ export type Database = {
           private_sections?: string[]
           referent_can_share_followup?: boolean
           sex?: string | null
+          sterilization?: string
           updated_at?: string
           useful_information?: string | null
           visibility?: string
@@ -3092,6 +3101,7 @@ export type Database = {
           avatar_path: string | null
           bio: string | null
           city: string | null
+          contact_preference: string
           created_at: string
           deleted_at: string | null
           department: string | null
@@ -3108,6 +3118,7 @@ export type Database = {
           person_id: string | null
           phone: string | null
           public_visibility: boolean
+          skills: string[]
           statutory_category: string
           updated_at: string
         }
@@ -3117,6 +3128,7 @@ export type Database = {
           avatar_path?: string | null
           bio?: string | null
           city?: string | null
+          contact_preference?: string
           created_at?: string
           deleted_at?: string | null
           department?: string | null
@@ -3133,6 +3145,7 @@ export type Database = {
           person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
+          skills?: string[]
           statutory_category?: string
           updated_at?: string
         }
@@ -3142,6 +3155,7 @@ export type Database = {
           avatar_path?: string | null
           bio?: string | null
           city?: string | null
+          contact_preference?: string
           created_at?: string
           deleted_at?: string | null
           department?: string | null
@@ -3158,6 +3172,7 @@ export type Database = {
           person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
+          skills?: string[]
           statutory_category?: string
           updated_at?: string
         }
