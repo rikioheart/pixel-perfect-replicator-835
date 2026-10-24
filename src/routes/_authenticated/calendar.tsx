@@ -129,7 +129,7 @@ function CalendarPage() {
         {item.conflict && <AlertTriangle className="ml-auto size-3.5 shrink-0 text-destructive" aria-label="Chevauchement de créneau" />}
       </Tag>
     );
-    return K.peek ? <EntityPeek type={K.peek} id={item.rawId}>{body}</EntityPeek> : body;
+    return K.peek ? <EntityPeek type={K.peek} id={item.rawId} block>{body}</EntityPeek> : body;
   };
 
   return (

@@ -42,8 +42,7 @@ export function EntityPeek({ type, id, children, block }: { type: PeekType; id: 
         <Button
           type="button"
           variant="link"
-          className={`min-h-11 max-w-full rounded-sm ${block ? "h-auto w-full justify-start p-0" : ""}`}
-          data-x=" underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className={`min-h-11 max-w-full rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${block ? "h-auto w-full justify-start p-0" : ""}`}
           aria-label="Afficher les informations autorisées"
         >
           {children}
