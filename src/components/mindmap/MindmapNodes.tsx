@@ -24,10 +24,10 @@ export type MindmapNode =
   | Node<TaskNodeData, "task">;
 
 const statusTone: Record<string, string> = {
-  COMPLETED: "bg-emerald-100 text-emerald-800",
+  COMPLETED: "bg-success/15 text-success",
   ACTIVE: "bg-primary/10 text-primary",
   IN_PROGRESS: "bg-primary/10 text-primary",
-  PENDING_VALIDATION: "bg-amber-100 text-amber-900",
+  PENDING_VALIDATION: "bg-warning/25 text-foreground",
   BLOCKED: "bg-destructive/10 text-destructive",
   ON_HOLD: "bg-muted text-muted-foreground",
 };

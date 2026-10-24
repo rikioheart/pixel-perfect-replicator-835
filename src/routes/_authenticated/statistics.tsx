@@ -226,9 +226,9 @@ function StatisticsPage() {
               <Legend />
               <Line type="monotone" dataKey="membres" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="taches" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="projets" stroke="#0f766e" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="participations" stroke="#b45309" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="tampons" stroke="#4c1d95" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="projets" stroke="var(--chart-3)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="participations" stroke="var(--chart-4)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="tampons" stroke="var(--chart-2)" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
