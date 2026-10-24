@@ -198,17 +198,23 @@ function ProjectDetail() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>Avancement des tâches (calculé)</span>
-                <span>{operationalProgress(tasks ?? []) === null ? "—" : `${operationalProgress(tasks ?? [])}%`}</span>
+                <span>Avancement opérationnel</span>
+                <span>{progress === null ? "—" : `${progress}%`}</span>
               </div>
-              <Progress value={operationalProgress(tasks ?? []) ?? 0} />
+              <Progress value={progress ?? 0} aria-label="Avancement opérationnel" />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {progress === null
+                  ? "Calculé automatiquement dès qu'une tâche existe."
+                  : `Calculé à partir des tâches validées (${doneCount} sur ${eligibleCount}, annulées exclues).`}
+              </p>
             </div>
             <div>
               <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>Avancement global déclaré</span>
+                <span>Estimation du coordinateur</span>
                 <span>{project.progress_percent ?? 0}%</span>
               </div>
-              <Progress value={project.progress_percent ?? 0} />
+              <Progress value={project.progress_percent ?? 0} aria-label="Estimation du coordinateur" />
+              <p className="mt-1 text-xs text-muted-foreground">Valeur déclarée, conservée à part du calcul.</p>
             </div>
           </div>
           {related && (related.activities.length > 0 || related.events.length > 0 || related.editions.length > 0) ? (
@@ -248,14 +254,11 @@ function ProjectDetail() {
             </div>
           ) : null}
 
-          {isBureau ? (
+          {canManage ? (
             <div className="flex flex-wrap items-end gap-3 border-t border-border pt-4">
               <div className="space-y-1">
                 <Label className="text-xs">Statut</Label>
-                <Select
-                  value={project.status}
-                  onValueChange={(value) => updateProject({ status: value })}
-                >
+                <Select value={project.status} onValueChange={changeStatus}>
                   <SelectTrigger className="w-44">
                     <SelectValue />
                   </SelectTrigger>
@@ -270,7 +273,7 @@ function ProjectDetail() {
               </div>
               <div className="space-y-1">
                 <Label className="text-xs" htmlFor="progress">
-                  Avancement (%)
+                  Estimation (%)
                 </Label>
                 <Input
                   id="progress"
@@ -288,6 +291,38 @@ function ProjectDetail() {
               </div>
             </div>
           ) : null}
+          <AlertDialog open={closing !== null} onOpenChange={(o) => !o && setClosing(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Des tâches ne sont pas terminées</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {openTasks.length === 1
+                    ? "Une tâche est encore ouverte."
+                    : `${openTasks.length} tâches sont encore ouvertes.`}{" "}
+                  Vous pouvez quand même changer le statut du projet : elles resteront visibles et modifiables.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <ul className="max-h-48 space-y-1 overflow-y-auto text-sm">
+                {openTasks.map((t) => (
+                  <li key={t.id} className="flex justify-between gap-2">
+                    <span className="truncate">{t.title}</span>
+                    <span className="shrink-0 text-muted-foreground">{TASK_STATUS_LABEL[t.status] ?? t.status}</span>
+                  </li>
+                ))}
+              </ul>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Revenir au projet</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    if (closing) void updateProject({ status: closing });
+                    setClosing(null);
+                  }}
+                >
+                  Confirmer quand même
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           {isBureau ? (
             <details className="border-t border-border pt-4">
               <summary className="cursor-pointer text-sm font-medium">Modifier la présentation du projet</summary>
