@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, Eye, FileText, Flag, HeartHandshake, Share2, Sprout } from "lucide-react";
 import { DogFilePanel, type DogFileTab } from "@/components/DogFile";
-import { activeAccesses } from "@/lib/dog-sharing";
+import { isAccessActive } from "@/lib/dog-sharing";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +35,7 @@ export function MyDogHome({ userId }: { userId: string }) {
         supabase.from("dog_professional_access").select("dog_id, professional_id, revoked, expires_at").in("dog_id", ids),
       ]);
       const shares: Record<string, number> = {};
-      for (const a of activeAccesses((acc.data ?? []).map((r) => ({ ...r, id: r.dog_id, can_identity: false, can_info: false, can_goals: false, can_activities: false, can_observations: false })))) {
+      for (const a of (acc.data ?? []).filter((r) => isAccessActive(r))) {
         shares[a.dog_id] = (shares[a.dog_id] ?? 0) + 1;
       }
       const timeline: Record<string, TimelineItem[]> = {};
