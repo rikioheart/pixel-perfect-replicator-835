@@ -224,8 +224,8 @@ function StatisticsPage() {
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="membres" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="taches" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="membres" stroke="var(--chart-1)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="taches" stroke="var(--chart-5)" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="projets" stroke="var(--chart-3)" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="participations" stroke="var(--chart-4)" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="tampons" stroke="var(--chart-2)" strokeWidth={2} dot={false} />
@@ -243,7 +243,7 @@ function StatisticsPage() {
               <XAxis dataKey="category" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip />
-              <Bar dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="count" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
