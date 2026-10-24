@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLinks } from "@/components/ExternalLinks";
 import { PlaceInfo } from "@/components/PlaceInfo";
 import { LinkedMairies } from "@/components/LinkedMairies";
@@ -43,7 +43,6 @@ import { Comments } from "@/components/Comments";
 import { ProjectContribute, ProjectStorySections } from "@/components/ProjectContribute";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 import { EntityPeek } from "@/components/EntityPeek";
-import { Link } from "@tanstack/react-router";
 import { isPast, operationalProgress } from "@/lib/archives";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
