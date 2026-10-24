@@ -32,11 +32,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   PRIORITIES,
   PRIORITY_LABEL,
   PROJECT_ROLE_LABEL,
   PROJECT_STATUSES,
   PROJECT_STATUS_LABEL,
+  TASK_STATUS_LABEL,
   formatDate,
 } from "@/lib/domain";
 import { Comments } from "@/components/Comments";
@@ -44,6 +55,8 @@ import { ProjectContribute, ProjectStorySections } from "@/components/ProjectCon
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 import { EntityPeek } from "@/components/EntityPeek";
 import { isPast, operationalProgress } from "@/lib/archives";
+import { explainDbError, openTasksBeforeClosure } from "@/lib/task-lifecycle";
+import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -68,6 +81,8 @@ function ProjectDetail() {
   const { projectId } = Route.useParams();
   const { user, isBureau, profile } = useAuth();
   const queryClient = useQueryClient();
+  const coordinated = useCoordinatedProjects(user?.id);
+  const [closing, setClosing] = useState<string | null>(null);
 
   const { data: project } = useQuery({
     queryKey: ["project", projectId],
@@ -116,7 +131,7 @@ function ProjectDetail() {
         await supabase
           .from("tasks")
           .select(
-            "id, title, description, status, priority, deadline, assigned_user_id, rejection_reason",
+            "id, title, description, status, priority, deadline, assigned_user_id, created_by, project_id, rejection_reason",
           )
           .eq("project_id", projectId)
           .order("created_at", { ascending: false })
@@ -151,13 +166,39 @@ function ProjectDetail() {
     );
   }
 
+  const isCoordinator =
+    coordinated.has(projectId) ||
+    (members ?? []).some(
+      (m) => m.user_id === user?.id && ["OWNER", "COORDINATOR"].includes((m.project_role ?? "").toUpperCase()),
+    );
+  const canValidate = isBureau || isCoordinator;
+  // Statut et estimation : mêmes droits que la base (Bureau ou responsable du projet).
+  const canManage = isBureau || (Boolean(user?.id) && project.owner_id === user?.id);
+  const progress = operationalProgress(tasks ?? []);
+  const eligibleCount = (tasks ?? []).filter((t) => !["CANCELLED", "REJECTED", "ARCHIVED"].includes(t.status)).length;
+  const doneCount = (tasks ?? []).filter((t) => t.status === "COMPLETED" || t.status === "VALIDATED").length;
+  const openTasks = openTasksBeforeClosure(tasks ?? []);
+
   const updateProject = async (patch: Record<string, string | number | null>) => {
-    const { error } = await supabase.from("projects").update(patch as never).eq("id", projectId);
+    const { data, error } = await supabase.from("projects").update(patch as never).eq("id", projectId).select("id");
     if (error) {
-      toast.error(error.message);
+      toast.error(explainDbError(error));
+      return;
+    }
+    if (!data || data.length === 0) {
+      toast.error("Modification refusée : seuls le responsable du projet et le Bureau peuvent la faire.");
       return;
     }
     await queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+    void queryClient.invalidateQueries({ queryKey: ["projects"] });
+  };
+
+  const changeStatus = (status: string) => {
+    if ((status === "COMPLETED" || status === "ARCHIVED") && openTasks.length > 0) {
+      setClosing(status);
+      return;
+    }
+    void updateProject({ status });
   };
 
   return (
@@ -198,17 +239,23 @@ function ProjectDetail() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>Avancement des tâches (calculé)</span>
-                <span>{operationalProgress(tasks ?? []) === null ? "—" : `${operationalProgress(tasks ?? [])}%`}</span>
+                <span>Avancement opérationnel</span>
+                <span>{progress === null ? "—" : `${progress}%`}</span>
               </div>
-              <Progress value={operationalProgress(tasks ?? []) ?? 0} />
+              <Progress value={progress ?? 0} aria-label="Avancement opérationnel" />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {progress === null
+                  ? "Calculé automatiquement dès qu'une tâche existe."
+                  : `Calculé à partir des tâches validées (${doneCount} sur ${eligibleCount}, annulées exclues).`}
+              </p>
             </div>
             <div>
               <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>Avancement global déclaré</span>
+                <span>Estimation du coordinateur</span>
                 <span>{project.progress_percent ?? 0}%</span>
               </div>
-              <Progress value={project.progress_percent ?? 0} />
+              <Progress value={project.progress_percent ?? 0} aria-label="Estimation du coordinateur" />
+              <p className="mt-1 text-xs text-muted-foreground">Valeur déclarée, conservée à part du calcul.</p>
             </div>
           </div>
           {related && (related.activities.length > 0 || related.events.length > 0 || related.editions.length > 0) ? (
@@ -248,14 +295,11 @@ function ProjectDetail() {
             </div>
           ) : null}
 
-          {isBureau ? (
+          {canManage ? (
             <div className="flex flex-wrap items-end gap-3 border-t border-border pt-4">
               <div className="space-y-1">
                 <Label className="text-xs">Statut</Label>
-                <Select
-                  value={project.status}
-                  onValueChange={(value) => updateProject({ status: value })}
-                >
+                <Select value={project.status} onValueChange={changeStatus}>
                   <SelectTrigger className="w-44">
                     <SelectValue />
                   </SelectTrigger>
@@ -270,7 +314,7 @@ function ProjectDetail() {
               </div>
               <div className="space-y-1">
                 <Label className="text-xs" htmlFor="progress">
-                  Avancement (%)
+                  Estimation (%)
                 </Label>
                 <Input
                   id="progress"
@@ -288,6 +332,38 @@ function ProjectDetail() {
               </div>
             </div>
           ) : null}
+          <AlertDialog open={closing !== null} onOpenChange={(o) => !o && setClosing(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Des tâches ne sont pas terminées</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {openTasks.length === 1
+                    ? "Une tâche est encore ouverte."
+                    : `${openTasks.length} tâches sont encore ouvertes.`}{" "}
+                  Vous pouvez quand même changer le statut du projet : elles resteront visibles et modifiables.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <ul className="max-h-48 space-y-1 overflow-y-auto text-sm">
+                {openTasks.map((t) => (
+                  <li key={t.id} className="flex justify-between gap-2">
+                    <span className="truncate">{t.title}</span>
+                    <span className="shrink-0 text-muted-foreground">{TASK_STATUS_LABEL[t.status] ?? t.status}</span>
+                  </li>
+                ))}
+              </ul>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Revenir au projet</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    if (closing) void updateProject({ status: closing });
+                    setClosing(null);
+                  }}
+                >
+                  Confirmer quand même
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           {isBureau ? (
             <details className="border-t border-border pt-4">
               <summary className="cursor-pointer text-sm font-medium">Modifier la présentation du projet</summary>
@@ -350,7 +426,7 @@ function ProjectDetail() {
 
       <div className="mt-6 space-y-4">
         <ProjectStorySections project={project} />
-        <ProjectContribute projectId={projectId} />
+        <ProjectContribute projectId={projectId} canModerate={canValidate} />
       </div>
 
       <div className="mt-6">
@@ -365,6 +441,7 @@ function ProjectDetail() {
                 task={task}
                 currentUserId={user?.id ?? ""}
                 isBureau={isBureau}
+                canValidate={canValidate}
                 showProject={false}
                 onChanged={() =>
                   queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })

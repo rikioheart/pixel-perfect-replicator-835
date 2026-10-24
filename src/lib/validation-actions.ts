@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logAudit } from "@/lib/mindmap-actions";
+import { explainDbError, NO_ROW_UPDATED } from "@/lib/task-lifecycle";
 
 export const VALIDATION_COMMENT_MIN = 5;
 
@@ -33,7 +34,7 @@ export async function decideTaskValidation(params: {
     .eq("id", params.taskId)
     .maybeSingle();
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("tasks")
     .update(
       approve
@@ -46,15 +47,18 @@ export async function decideTaskValidation(params: {
           }
         : { status: "IN_PROGRESS", rejection_reason: comment },
     )
-    .eq("id", params.taskId);
-  if (error) throw new Error(error.message);
+    .eq("id", params.taskId)
+    .select("id");
+  if (error) throw new Error(explainDbError(error));
+  if (!updated || updated.length === 0) throw new Error(NO_ROW_UPDATED);
 
-  await supabase.from("task_validation").insert({
+  const { error: decisionError } = await supabase.from("task_validation").insert({
     task_id: params.taskId,
     validated_by: params.actorId,
     status: params.decision,
     comment,
   });
+  if (decisionError) throw new Error(explainDbError(decisionError));
 
   await supabase.from("task_history").insert({
     task_id: params.taskId,

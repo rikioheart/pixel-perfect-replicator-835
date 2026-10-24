@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PRIORITIES, PRIORITY_LABEL, TASK_STATUSES, TASK_STATUS_LABEL } from "@/lib/domain";
+import { editableStatuses, emptyToNull, explainDbError, NO_ROW_UPDATED } from "@/lib/task-lifecycle";
 
 export type TaskPanelValue = {
   id?: string;
@@ -34,15 +35,18 @@ export function TaskPanel({
   onOpenChange,
   task,
   defaultProjectId,
+  canValidate,
   onSaved,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   task?: TaskPanelValue | null;
   defaultProjectId?: string | null;
+  /** Coordinateur du projet ou Bureau : peut poser « Terminée » ou « Archivée ». */
+  canValidate?: boolean;
   onSaved?: () => void;
 }) {
-  const { user } = useAuth();
+  const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const editing = Boolean(task?.id);
   const [saving, setSaving] = useState(false);
@@ -84,32 +88,31 @@ export function TaskPanel({
     try {
       const payload = {
         title: form.title.trim(),
-        description: form.description || null,
+        description: emptyToNull(form.description),
         status: form.status,
         priority: form.priority,
-        deadline: form.deadline || null,
-        project_id: form.project_id || null,
+        deadline: emptyToNull(form.deadline),
+        project_id: emptyToNull(form.project_id),
         assigned_user_id: assignees[0] ?? null,
       };
 
-      let taskId = task?.id ?? null;
-      if (editing && taskId) {
-        const { error } = await supabase.from("tasks").update(payload).eq("id", taskId);
-        if (error) throw error;
+      if (editing && task?.id) {
+        const { data, error } = await supabase.from("tasks").update(payload).eq("id", task.id).select("id");
+        if (error) throw new Error(explainDbError(error));
+        if (!data || data.length === 0) throw new Error(NO_ROW_UPDATED);
       } else {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from("tasks")
           .insert({ ...payload, created_by: user?.id ?? null })
           .select("id")
           .single();
-        if (error) throw error;
-        taskId = data.id;
+        if (error) throw new Error(explainDbError(error));
       }
 
-
       toast.success(editing ? "Tâche mise à jour." : "Tâche créée.");
-      void queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      void queryClient.invalidateQueries({ queryKey: ["mindmap"] });
+      for (const key of ["tasks", "project-tasks", "project", "projects-lite", "mindmap"]) {
+        void queryClient.invalidateQueries({ queryKey: [key] });
+      }
       onSaved?.();
       onOpenChange(false);
     } catch (error) {
@@ -118,6 +121,11 @@ export function TaskPanel({
       setSaving(false);
     }
   };
+
+  const statusOptions = editableStatuses(TASK_STATUSES, canValidate ?? isBureau);
+  if (!statusOptions.includes(form.status as (typeof TASK_STATUSES)[number])) {
+    statusOptions.push(form.status as (typeof TASK_STATUSES)[number]);
+  }
 
   return (
     <SidePanel
@@ -180,7 +188,7 @@ export function TaskPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {TASK_STATUSES.map((status) => (
+              {statusOptions.map((status) => (
                 <SelectItem key={status} value={status}>
                   {TASK_STATUS_LABEL[status]}
                 </SelectItem>

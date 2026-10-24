@@ -330,6 +330,13 @@
       "when": 1792848958881,
       "tag": "0046_lot1_onboarding_deletion_tasks_links",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792850845055,
+      "tag": "0047_lot3_task_lifecycle_validation",
+      "breakpoints": true
     }
   ]
 }
