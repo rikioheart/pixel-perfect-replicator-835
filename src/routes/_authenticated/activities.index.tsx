@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
+import { splitArchive } from "@/lib/archives";
 
 export const Route = createFileRoute("/_authenticated/activities/")({
   head: () => ({
@@ -51,6 +52,7 @@ function ActivitiesPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<"current" | "past">("current");
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -333,14 +335,17 @@ function ActivitiesPage() {
     >
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement des activités…</p>
-      ) : activities.length === 0 ? (
+      ) : (
+        <>
+        <ArchiveToggle view={view} setView={setView} counts={splitArchive(activities)} pastLabel="Historique" />
+        {(view === "current" ? splitArchive(activities).current : splitArchive(activities).past).length === 0 ? (
         <EmptyState
           title="Aucune activité pour l'instant"
           message="Les prochains ateliers et sorties s'afficheront ici dès que le Bureau les aura programmés."
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {activities.map((activity) => {
+          {(view === "current" ? splitArchive(activities).current : splitArchive(activities).past).map((activity) => {
             const participation = myParticipations.find((p) => p.activity_id === activity.id);
             return (
               <Card key={activity.id} className="overflow-hidden">

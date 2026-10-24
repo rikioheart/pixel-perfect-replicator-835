@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
+import { splitArchive } from "@/lib/archives";
 
 export const Route = createFileRoute("/_authenticated/events/")({
   head: () => ({
@@ -47,6 +48,7 @@ function EventsPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<"current" | "past">("current");
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -219,14 +221,17 @@ function EventsPage() {
     >
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement du calendrier…</p>
-      ) : events.length === 0 ? (
+      ) : (
+        <>
+        <ArchiveToggle view={view} setView={setView} counts={splitArchive(events)} pastLabel="Archives" />
+        {(view === "current" ? splitArchive(events).current : splitArchive(events).past).length === 0 ? (
         <EmptyState
           title="Pas encore d'événement"
           message="Les prochains temps forts de l'association apparaîtront ici."
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {events.map((event) => (
+          {(view === "current" ? splitArchive(events).current : splitArchive(events).past).map((event) => (
             <Card key={event.id} className="overflow-hidden">
               {event.image_url ? (
                 <img
