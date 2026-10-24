@@ -218,7 +218,8 @@
 @layer base {
   body { line-height: 1.6; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
-  button, input, select { min-height: 44px; }
+  :where(button:not([role="switch"]):not([role="checkbox"]):not([role="radio"])),
+  :where(input:not([type="checkbox"]):not([type="radio"])), select { min-height: 44px; }
   input, select, textarea { font-size: 1rem; }
   h1, h2, h3, p { overflow-wrap: break-word; }
 }
@@ -232,7 +233,7 @@
 .prefs-comfortable main .gap-4 { gap: 1.25rem; }
 .prefs-comfortable main .text-xs { font-size: 0.8125rem; line-height: 1.55; }
 .prefs-comfortable main .divide-y > * { padding-block: 1.1rem; }
-.prefs-comfortable main [role="tab"], .prefs-comfortable main button, .prefs-comfortable main a[data-slot="button"] { min-height: 2.75rem; }
+.prefs-comfortable main [role="tab"], .prefs-comfortable main :where(button:not([role="switch"]):not([role="checkbox"]):not([role="radio"])) { min-height: 2.75rem; }
 .prefs-comfortable aside nav a, .prefs-comfortable [role="dialog"] nav a { min-height: 2.875rem; }
 .prefs-comfortable [role="menu"] [role="menuitem"] { min-height: 2.75rem; }
 .prefs-reduced-motion *, .prefs-reduced-motion *::before, .prefs-reduced-motion *::after {
