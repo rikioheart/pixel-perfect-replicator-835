@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
 import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
+import { ParentProjectSelect } from "@/components/ParentProjectSelect";
 
 export const Route = createFileRoute("/_authenticated/events/")({
   head: () => ({
@@ -55,6 +56,7 @@ function EventsPage() {
     description: "",
     event_type: "RENCONTRE",
     start_date: "",
+    project_id: "",
     end_date: "",
     location: "",
     address: "",
@@ -81,6 +83,7 @@ function EventsPage() {
         throw new Error("La date de fin doit être postérieure à la date de début.");
       const { error } = await supabase.from("events").insert({
         title: form.title.trim(),
+        project_id: form.project_id || null,
         description: form.description || null,
         event_type: form.event_type,
         start_date: form.start_date ? new Date(form.start_date).toISOString() : null,
@@ -163,6 +166,7 @@ function EventsPage() {
                     </select>
                   </div>
                 </div>
+                <ParentProjectSelect id="ep-project" value={form.project_id} onChange={(v) => setForm({ ...form, project_id: v })} />
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="ev-start">Début</Label>

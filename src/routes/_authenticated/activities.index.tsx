@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
 import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
+import { ParentProjectSelect } from "@/components/ParentProjectSelect";
 
 export const Route = createFileRoute("/_authenticated/activities/")({
   head: () => ({
@@ -59,6 +60,7 @@ function ActivitiesPage() {
     description: "",
     type: "ATELIER",
     date: "",
+    project_id: "",
     location: "",
     address: "",
     price_public: "0",
@@ -134,6 +136,7 @@ function ActivitiesPage() {
       if (form.title.trim().length < 3) throw new Error("Le titre doit faire au moins 3 caractères.");
       const { error } = await supabase.from("activities").insert({
         title: form.title.trim(),
+        project_id: form.project_id || null,
         description: form.description || null,
         type: form.type,
         date: form.date ? new Date(form.date).toISOString() : null,
@@ -162,6 +165,7 @@ function ActivitiesPage() {
         description: "",
         type: "ATELIER",
         date: "",
+    project_id: "",
         location: "",
     address: "",
         price_public: "0",
@@ -230,6 +234,7 @@ function ActivitiesPage() {
                       ))}
                     </select>
                   </div>
+                <ParentProjectSelect id="ap-project" value={form.project_id} onChange={(v) => setForm({ ...form, project_id: v })} />
                   <div>
                     <Label htmlFor="act-date">Date</Label>
                     <Input
