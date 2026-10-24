@@ -21,3 +21,6 @@
 - Thème/confort : user_preferences.theme (SYSTEM/LIGHT/DARK) et comfortable_spacing appliqués par useApplyPreferences dans AppShell, retirés au démontage pour que la page publique garde son rendu.
 - TanStack Start 1.168 : .inputValidator() est l'API actuelle de createServerFn ; ne pas la remplacer par .validator().
 - Dark theme: primary is lightened with navy foreground so text-primary stays ≥ 4.5:1; never hardcode colors (charts use var(--chart-N), never hsl(var(--x)) since tokens are oklch). Why: one token set readable in both themes.
+- Choix du parcours (Particulier/Pro) : une seule fois via choose_account_type (profil PENDING sans account_choice_at), garde d'accès dans _authenticated/route.tsx ; le statut reste PENDING. Pourquoi : la connexion Google ne transmet aucun type.
+- Suppression de compte : request_account_deletion (dépendances projet/remboursements ⇒ Bureau notifié, sinon anonymisation profil/personne) puis désactivation de connexion côté serveur ; finances et comptes rendus conservés.
+- Archives activités/événements et avancement opérationnel des projets : calculés côté client (src/lib/archives.ts), sans statut ni table supplémentaires ; avancement déclaré distinct.
