@@ -1,5 +1,12 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Pass Terrain — valideurs et activation (24 oct.)
+- [x] Pros validés valideurs d'office, Bureau valideur après activation (règles à accepter), suspension possible
+- [x] Pass personnel à activer pour pro/Bureau non particulier ; tampons comme un particulier, jamais sur soi
+- [x] Écran d'activation sur « Mon pass », scan Bureau sur la même page, autre membre du Bureau informé
+- [x] 158 tests + 13 contrôles en base annulés + essai activation/désactivation réel
+- [ ] Essai avec un membre du Bureau non pro dans l'interface et sur téléphone
+
 ## Lot 3 optimisé — Tâches, projets et progression (24 oct.)
 - [x] Sauvegarde fiable (dates/affectation vides, refus visibles, actualisation)
 - [x] Soumettre pour validation / Valider / Renvoyer / Rouvrir, règle imposée par la base

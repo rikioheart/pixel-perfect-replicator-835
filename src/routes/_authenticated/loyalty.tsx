@@ -21,6 +21,9 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import QRCode from 'qrcode';
 import { useOnline, readOfflinePass, type OfflinePass } from '@/lib/offline';
+import { PassAccessPanel, PASS_ACCESS_KEY, fetchPassAccess } from "@/components/PassAccessPanel";
+import { ManualStampCard } from "@/components/ManualStampCard";
+import { hasPersonalPass, showsActivationScreen, validatorSource } from "@/lib/pass-access";
 
 export const Route = createFileRoute("/_authenticated/loyalty")({
   head: () => ({
@@ -53,6 +56,14 @@ function LoyaltyPage() {
   const [qrImage, setQrImage] = useState('');
   const [offlinePass, setOfflinePass] = useState<OfflinePass | null>(null);
 
+  const { data: access } = useQuery({
+    queryKey: [...PASS_ACCESS_KEY, user?.id],
+    enabled: Boolean(user?.id) && online,
+    queryFn: fetchPassAccess,
+  });
+  // Particulier : pass actif d'office. Autres profils : seulement après activation (réponse serveur).
+  const personalActive = access ? hasPersonalPass(access) : profile?.membership_type === "PARTICULIER" || !online;
+
   const { data: card, isLoading, isError } = useQuery({
     queryKey: ["loyalty-card", user?.id],
     enabled: Boolean(user?.id),
@@ -68,7 +79,7 @@ function LoyaltyPage() {
   });
 
   useEffect(() => {
-    if(!card?.qr_code || !user) return;
+    if(!card?.qr_code || !user || !personalActive) return;
     let active = true;
     void QRCode.toDataURL(card.qr_code,{width:220,margin:2}).then(qr => {
       if(!active) return;
@@ -77,7 +88,7 @@ function LoyaltyPage() {
       try { localStorage.setItem('lvdc.offline.pass',JSON.stringify(snapshot)); } catch { toast.info('Le stockage de ce téléphone ne permet pas de sauvegarder le pass.'); }
     });
     return () => { active = false; };
-  }, [card?.qr_code,card?.total_stamps,user?.id,profile?.display_name]);
+  }, [card?.qr_code,card?.total_stamps,user?.id,profile?.display_name,personalActive]);
 
   // Tant que le serveur n'a pas répondu (chargement, hors réseau ou erreur), on affiche la copie locale de CE compte.
   useEffect(() => {
@@ -86,12 +97,12 @@ function LoyaltyPage() {
 
   // Crée la carte à la première visite (jamais si la lecture a échoué : l'absence n'est pas certaine).
   useEffect(() => {
-    if (!user?.id || isLoading || isError || card || !online) return;
+    if (!user?.id || isLoading || isError || card || !online || !personalActive) return;
     void (async () => {
       await supabase.from("loyalty_cards").insert({ member_id: user.id });
       void queryClient.invalidateQueries({ queryKey: ["loyalty-card", user.id] });
     })();
-  }, [user?.id, isLoading, isError, card, queryClient, online]);
+  }, [user?.id, isLoading, isError, card, queryClient, online, personalActive]);
 
   const { data: stamps = [] } = useQuery({
     queryKey: ["loyalty-stamps", card?.id],
@@ -142,6 +153,8 @@ function LoyaltyPage() {
         La carte de fidélité fait partie du règlement intérieur de l'association (article 19 des
         statuts). Elle remercie votre participation, sans jamais comparer les membres entre eux.
       </p>
+      {access && showsActivationScreen(access) && <PassAccessPanel access={access} />}
+      {access && validatorSource(access) === "BUREAU" && <div className="mb-4"><ManualStampCard /></div>}
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
@@ -181,7 +194,9 @@ function LoyaltyPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {card?.qr_code ? (
+            {!personalActive ? (
+              <p className="text-muted-foreground">Votre pass personnel n'est pas activé. Activez-le ci-dessus si vous venez avec votre propre chien.</p>
+            ) : card?.qr_code ? (
               <>
                 <img
                   src={qrImage || undefined}

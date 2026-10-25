@@ -2651,6 +2651,42 @@ export type Database = {
         }
         Relationships: []
       }
+      pass_access: {
+        Row: {
+          personal_pass_at: string | null
+          updated_at: string
+          user_id: string
+          validator_at: string | null
+        }
+        Insert: {
+          personal_pass_at?: string | null
+          updated_at?: string
+          user_id: string
+          validator_at?: string | null
+        }
+        Update: {
+          personal_pass_at?: string | null
+          updated_at?: string
+          user_id?: string
+          validator_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pass_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pass_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       people: {
         Row: {
           city: string | null
@@ -4352,6 +4388,7 @@ export type Database = {
         Args: { _rid: string; _user_id: string }
         Returns: boolean
       }
+      can_receive_stamps: { Args: { _user_id: string }; Returns: boolean }
       can_request_terrain: {
         Args: { _activity_id: string; _project_id: string; _user_id: string }
         Returns: boolean
@@ -4478,6 +4515,7 @@ export type Database = {
         Args: { _household_id: string; _user_id: string }
         Returns: boolean
       }
+      is_pass_validator: { Args: { _user_id: string }; Returns: boolean }
       is_professional: { Args: { _user_id: string }; Returns: boolean }
       is_project_coordinator: {
         Args: { _project_id: string; _user_id: string }
@@ -4506,6 +4544,7 @@ export type Database = {
       list_public_blog_posts: { Args: never; Returns: Json }
       list_public_pros: { Args: never; Returns: Json }
       my_account_deletion_check: { Args: never; Returns: Json }
+      my_pass_access: { Args: never; Returns: Json }
       notify_bureau_members: {
         Args: {
           _entity_id: string
@@ -4584,6 +4623,8 @@ export type Database = {
       revoke_dog_access: { Args: { _access_id: string }; Returns: undefined }
       run_daily_reminders: { Args: never; Returns: undefined }
       run_weekly_bureau_digest: { Args: never; Returns: undefined }
+      set_pass_validator: { Args: { _active: boolean }; Returns: Json }
+      set_personal_pass: { Args: { _active: boolean }; Returns: Json }
       share_dog_access: {
         Args: {
           _activities: boolean

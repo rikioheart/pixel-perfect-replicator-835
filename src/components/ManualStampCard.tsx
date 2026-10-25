@@ -12,7 +12,7 @@ import { normalizePassInput } from "@/lib/pass-code";
 import { PassScanner } from "@/components/PassScanner";
 
 type Opt = { id: string; name: string };
-type Identified = { id: string; name: string; total: number; type: string; status: string };
+type Identified = { id: string; name: string; total: number; status: string; canReceive: boolean; isSelf: boolean };
 
 /** Validation d'un Pass Terrain par un professionnel : caméra, collage ou saisie, puis tampon serveur. */
 export function ManualStampCard() {
@@ -103,7 +103,7 @@ export function ManualStampCard() {
     saveQueue(user.id, readQueue(user.id).filter(i => i.id !== item.id));
     toast.success((res as { submitted?: boolean })?.submitted ? 'Demande transmise au Bureau pour médiation. Aucun tampon n’est ajouté avant sa décision.' : 'Cette demande avait déjà été transmise au Bureau.');
   };
-  const blocked = identified && identified.id === member && (identified.status !== 'ACTIVE' || identified.type !== 'PARTICULIER');
+  const blocked = (identified && identified.id === member && (identified.isSelf || !identified.canReceive)) || (Boolean(member) && member === user?.id);
   const resolve = async (raw: string) => {
     setScanning(false);
     const code = normalizePassInput(raw);
@@ -113,12 +113,12 @@ export function ManualStampCard() {
     const { data: res, error } = await supabase.rpc("resolve_member_from_qr", { _scanned_code: code });
     setResolving(false);
     if (error) { toast.error(error.message); return; }
-    const r = res as { found: boolean; reason?: string; member_id?: string; display_name?: string; total_stamps?: number; membership_type?: string; membership_status?: string };
+    const r = res as { found: boolean; reason?: string; member_id?: string; display_name?: string; total_stamps?: number; membership_status?: string; can_receive_stamps?: boolean; is_self?: boolean };
     if (!r.found) {
       toast.error(r.reason === "AMBIGUOUS" ? "Plusieurs pass correspondent : scannez le QR ou saisissez le code complet." : "Aucun pass ne correspond à ce code.");
       return;
     }
-    setIdentified({ id: r.member_id!, name: r.display_name ?? "Adhérent", total: r.total_stamps ?? 0, type: r.membership_type ?? "", status: r.membership_status ?? "" });
+    setIdentified({ id: r.member_id!, name: r.display_name ?? "Adhérent", total: r.total_stamps ?? 0, status: r.membership_status ?? "", canReceive: r.can_receive_stamps === true, isSelf: r.is_self === true });
     setMember(r.member_id!);
     setCodeInput("");
   };
@@ -130,7 +130,7 @@ export function ManualStampCard() {
   return (
     <section className="panel space-y-3 p-4 text-sm" aria-labelledby="ms-title">
       <h2 id="ms-title" className="flex items-center gap-2 font-display text-lg"><Stamp className="size-4" aria-hidden /> Valider un Pass Terrain</h2>
-      <p className="text-xs text-muted-foreground">Scannez le pass d'un membre particulier, collez ou saisissez son code. Le membre du Bureau choisi est informé.</p>
+      <p className="text-xs text-muted-foreground">Scannez le pass d'un membre, collez ou saisissez son code. Un autre membre du Bureau est informé de chaque tampon.</p>
 
       <div className="space-y-3 rounded-xl border border-border bg-card p-3">
         <div role="tablist" aria-label="Mode de lecture du pass" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
@@ -154,8 +154,7 @@ export function ManualStampCard() {
             <p className="font-medium">{identified.name}</p>
             <p className="text-xs text-muted-foreground">
               {identified.total % 10}/10 tampons sur la carte en cours
-              {identified.status !== "ACTIVE" ? " · adhésion pas encore validée par le Bureau : tampon possible après validation" : ""}
-              {identified.type !== "PARTICULIER" ? " · les tampons manuels sont réservés aux particuliers" : ""}
+              {identified.isSelf ? " · c'est votre propre pass : un autre valideur doit le tamponner" : identified.status !== "ACTIVE" ? " · adhésion pas encore validée par le Bureau : tampon possible après validation" : !identified.canReceive ? " · pass personnel pas encore activé par cette personne" : ""}
             </p>
           </div>
         )}
@@ -170,7 +169,7 @@ export function ManualStampCard() {
       <Label htmlFor="ms-bureau">Membre du Bureau à informer</Label>
       <select id="ms-bureau" className="h-10 w-full rounded-md border border-input bg-background px-2" value={bureau} onChange={(e) => setBureau(e.target.value)}>
         <option value="">Choisir…</option>
-        {(data ?? cached)?.bureau.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+        {(data ?? cached)?.bureau.filter((m) => m.id !== user?.id && m.id !== member).map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
       </select>
       <Label htmlFor="ms-reason">Motif</Label>
       <Input id="ms-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Ex. séance de suivi du 4 octobre" />
