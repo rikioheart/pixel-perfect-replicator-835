@@ -337,6 +337,13 @@
       "when": 1792850845055,
       "tag": "0047_lot3_task_lifecycle_validation",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792927880280,
+      "tag": "0048_pass_terrain_validators_activation",
+      "breakpoints": true
     }
   ]
 }
