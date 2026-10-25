@@ -39,7 +39,7 @@
 - External links use documents (URL, context, sensitivity, service) and ExternalLinks; embedded mode in tasks/reservations/formations. can_add_context_resource controls additions; SENSIBLE is Bureau-only. No sync: links work without APIs.
 
 - One dog file (DogFilePanel: profile, indicators, journal, pros) opened from home and foyer; DogProfiles lists/creates dogs on foyer only. Why: a single place per dog, no duplicate management.
-- Manual stamps live on loyalty; pro home shows pending requests. Why: avoid duplicate forms.
+- Manual stamps: pros scan from espace-pro, Bureau validators from /loyalty (PassAccessPanel). Validator = is_pass_validator (pro ACTIVE, or Bureau with pass_access.validator_at); stamp target = can_receive_stamps (ACTIVE + particulier or activated personal pass); pass_access written only via set_personal_pass/set_pass_validator. Why: one validation form per role, DB-enforced, no self-escalation.
 
 - PublicPartnerDirectory uses list_public_pros/get_public_pro_page with safe HTTP(S) links, no WordPress merge. Why: honor publication choices.
 
