@@ -36,6 +36,9 @@ export function PassAccessPanel({ access }: { access: PassAccess }) {
     onSuccess: (input) => {
       void queryClient.invalidateQueries({ queryKey: PASS_ACCESS_KEY });
       setRulesRead(false);
+      if (input.kind === "pass" && !input.active) {
+        try { localStorage.removeItem("lvdc.offline.pass"); } catch { /* stockage indisponible */ }
+      }
       toast.success(input.kind === "pass"
         ? (input.active ? "Votre pass personnel est activé." : "Votre pass personnel est désactivé.")
         : (input.active ? "Vous pouvez maintenant valider les pass des membres." : "Statut valideur suspendu."));
