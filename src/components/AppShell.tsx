@@ -120,7 +120,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/calendar", label: "Calendrier", icon: CalendarDays, audience: "all" },
       { to: "/formations", label: "Formations", icon: GraduationCap, audience: "all" },
       { to: "/contests", label: "Animations", icon: Trophy, audience: "all" },
-      { to: "/terrain", label: "Terrain", icon: Trees, audience: "pro" },
     ],
   },
   {
@@ -137,12 +136,18 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Réseau & ressources",
+    title: "Réseau & annuaire",
     icon: BookUser,
     items: [
       { to: "/directory", label: "Annuaire", icon: BookUser, audience: "all" },
-      { to: "/documents", label: "Documents", icon: FileText, audience: "all", hideForParticulier: true },
+    ],
+  },
+  {
+    title: "Ressources",
+    icon: LifeBuoy,
+    items: [
       { to: "/forms", label: "Formulaires", icon: ClipboardList, audience: "all" },
+      { to: "/documents", label: "Documents", icon: FileText, audience: "all", hideForParticulier: true },
       { to: "/help", label: "Guides", icon: LifeBuoy, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
     ],
@@ -169,14 +174,21 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/pros", label: "Fiches pros", icon: Briefcase, audience: "bureau" },
       { to: "/admin/chiens", label: "Chiens", icon: Heart, audience: "bureau" },
       { to: "/inventory", label: "Matériel", icon: Package, audience: "bureau" },
-      { to: "/statistics", label: "Statistiques", icon: BarChart3, audience: "bureau" },
-      { to: "/admin/import", label: "Import", icon: UploadCloud, audience: "bureau" },
-      { to: "/admin/advisor", label: "Conseiller", icon: Sparkles, audience: "bureau" },
-      { to: "/admin/audit", label: "Journal", icon: ScrollText, audience: "bureau" },
-      { to: "/admin/loyalty-rules", label: "Fidélité", icon: Stamp, audience: "bureau" },
+      { to: "/terrain", label: "Terrain (gestion)", icon: Trees, audience: "bureau" },
+    ],
+  },
+  {
+    title: "Paramètres",
+    icon: Settings2,
+    items: [
       { to: "/admin/roles", label: "Rôles", icon: KeyRound, audience: "bureau" },
       { to: "/admin/permissions", label: "Permissions", icon: ShieldCheck, audience: "bureau" },
       { to: "/admin/settings", label: "Paramétrage", icon: Settings2, audience: "bureau" },
+      { to: "/admin/loyalty-rules", label: "Fidélité", icon: Stamp, audience: "bureau" },
+      { to: "/admin/import", label: "Import", icon: UploadCloud, audience: "bureau" },
+      { to: "/statistics", label: "Statistiques", icon: BarChart3, audience: "bureau" },
+      { to: "/admin/audit", label: "Journal", icon: ScrollText, audience: "bureau" },
+      { to: "/admin/advisor", label: "Conseiller", icon: Sparkles, audience: "bureau" },
     ],
   },
 ];
@@ -238,7 +250,7 @@ export function AppShell({
         to={hub.to}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200",
+          "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200 motion-reduce:transition-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
           active ? "surface-wine" : mobile ? "hover:bg-accent" : "hover:bg-sidebar-accent",
         )}
@@ -311,6 +323,9 @@ export function AppShell({
               {profile?.display_name ?? profile?.first_name ?? "Membre"}
             </p>
             <p className="text-xs">{isBureau ? "Bureau" : profile?.membership_type}</p>
+            <Link to="/profile" className="mt-1 inline-flex min-h-11 items-center gap-2 text-xs underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <UserRound className="size-3.5" aria-hidden="true" /> Mon profil & données
+            </Link>
           </div>
           <Button
             variant="ghost"
