@@ -93,7 +93,7 @@ type NavGroup = { title: string; icon: typeof LayoutDashboard; items: NavItem[] 
 
 const CONSOLE_PATHS = new Set(["/admin", "/admin/gouvernance", "/admin/validation", "/finance", "/admin/suivi-financier"]);
 
-/** Cinq catégories lisibles ; les permissions restent appliquées par la base. */
+/** Familles lisibles (Réseau, Ressources, Paramètres = regroupements de routes existantes) ; les permissions restent appliquées par la base. */
 const NAV_GROUPS: NavGroup[] = [
   {
     title: "Mon foyer & moi",

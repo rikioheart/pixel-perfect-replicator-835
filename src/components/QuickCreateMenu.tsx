@@ -41,7 +41,6 @@ const ACTIONS: CreateAction[] = [
   { label: "Formulaire", to: "/forms", icon: ClipboardList, proOnly: true },
   { label: "Proposition", to: "/proposals", icon: Lightbulb },
   { label: "Demande d’aide", to: "/help-requests", icon: HandHeart },
-  { label: "Réservation de terrain", to: "/terrain", icon: MapPin, proOnly: true },
 ];
 
 export function QuickCreateMenu() {
