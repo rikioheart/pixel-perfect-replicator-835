@@ -8,7 +8,6 @@ import {
   HandHeart,
   Lightbulb,
   ListPlus,
-  MapPin,
   Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
