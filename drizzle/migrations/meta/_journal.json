@@ -344,6 +344,13 @@
       "when": 1792927880280,
       "tag": "0048_pass_terrain_validators_activation",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1793013826657,
+      "tag": "0049_lot1_profile_columns_terrain_pause",
+      "breakpoints": true
     }
   ]
 }

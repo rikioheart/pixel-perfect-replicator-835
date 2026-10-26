@@ -6,6 +6,7 @@ import { CalendarClock, MapPin, Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ExternalLinks } from "@/components/ExternalLinks";
 import { useAuth } from "@/hooks/useAuth";
+import { canBookTerrain } from "@/lib/nav-rules";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +57,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 function TerrainPage() {
-  const { user, isBureau } = useAuth();
+  const { user, isBureau, isPro } = useAuth();
   const queryClient = useQueryClient();
   const [resourceOpen, setResourceOpen] = useState(false);
   const [resourceName, setResourceName] = useState("");
@@ -238,6 +239,7 @@ function TerrainPage() {
       }
     >
       <div className="grid gap-4 lg:grid-cols-3">
+        {canBookTerrain({ isBureau, isPro }) ? (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Réserver un créneau</CardTitle>
@@ -343,6 +345,17 @@ function TerrainPage() {
             </Button>
           </CardContent>
         </Card>
+        ) : (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Réservations en pause</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm text-muted-foreground">
+              <p role="status">Les réservations du terrain ne sont pas disponibles pour le moment, le temps de la phase de lancement.</p>
+              <p>Votre Pass Terrain et vos tampons restent actifs.</p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">

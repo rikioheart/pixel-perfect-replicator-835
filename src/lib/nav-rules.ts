@@ -15,7 +15,8 @@ export function isNavItemVisible(item: NavRuleItem, viewer: NavViewer): boolean 
   const particulier = !viewer.isBureau && !viewer.isPro;
   if (item.hideForParticulier && particulier) return false;
   if (item.audience === "bureau") return viewer.isBureau;
-  if (item.audience === "pro") return viewer.isBureau || viewer.isPro;
+  // Espace pro : statut professionnel vérifié (is_professional) seulement, jamais déduit du Bureau.
+  if (item.audience === "pro") return viewer.isPro;
   return true;
 }
 
@@ -29,7 +30,6 @@ export const MEMBER_HUB_TABS = [
   { to: "/member", label: "Accueil" },
   { to: "/foyer", label: "Mon foyer & mes chiens" },
   { to: "/participations", label: "Mes sorties" },
-  { to: "/terrain", label: "Mes réservations" },
   { to: "/loyalty", label: "Mon pass & tampons" },
   { to: "/advantages", label: "Avantages" },
   { to: "/parcours", label: "Mon parcours" },
@@ -46,7 +46,7 @@ export function memberHubTabFor(pathname: string): string | null {
 /** Four stable families; every existing personal page remains reachable. */
 export const MEMBER_HUB_GROUPS = [
   { label: "Mon chien", to: "/member", paths: ["/member", "/foyer"] },
-  { label: "Sorties", to: "/participations", paths: ["/participations", "/terrain"] },
+  { label: "Sorties", to: "/participations", paths: ["/participations"] },
   { label: "Mon pass", to: "/loyalty", paths: ["/loyalty", "/advantages"] },
   { label: "Profil & foyer", to: "/profile", paths: ["/profile", "/my-space", "/parcours", "/my-history"] },
 ] as const;
@@ -57,10 +57,10 @@ export function memberHubGroupFor(pathname: string) {
 
 /**
  * Espace pro : refus par défaut. Ouvert seulement quand les rôles sont connus et que le compte est
- * pro validé ou Bureau (hors réseau : dernière vérification serveur de ce compte, voir pro-status.ts).
+* pro validé (hors réseau : dernière vérification serveur de ce compte, voir pro-status.ts).
  */
 export function canOpenProSpace(v: NavViewer & { rolesReady: boolean }): boolean {
-  return v.rolesReady && (v.isPro || v.isBureau);
+  return v.rolesReady && v.isPro;
 }
 
 /** Création de formulaires : Bureau ou professionnel actif seulement, jamais un particulier (doublé par la base). */
@@ -74,4 +74,10 @@ export function canCreateForm(v: NavViewer): boolean {
  */
 export function isParticulierView(v: NavViewer): boolean {
   return !v.isBureau && !v.isPro;
+}
+
+/** Phase bêta : réservations du terrain suspendues pour les membres ; le Bureau garde la gestion (doublé par la base). */
+export const TERRAIN_BOOKING_OPEN = false;
+export function canBookTerrain(v: NavViewer): boolean {
+  return TERRAIN_BOOKING_OPEN || v.isBureau;
 }

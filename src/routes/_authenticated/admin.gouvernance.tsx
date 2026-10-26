@@ -153,7 +153,7 @@ function GovernancePage() {
             const list = sorted.filter((i) => i.bucket === b.code);
             return (
               <section key={b.code} aria-labelledby={`gov-${b.code}`} className="space-y-2">
-                <h2 id={`gov-${b.code}`} className="flex items-center justify-between font-display text-lg">{b.title}<Badge variant="secondary">{list.length}</Badge></h2>
+                <h2 id={`gov-${b.code}`} className="flex items-center justify-between font-display text-lg">{b.title}{list.length > 0 ? <Badge className="border-transparent bg-warning text-warning-foreground hover:bg-warning">{list.length}</Badge> : null}</h2>
                 {list.length === 0 ? <p className="panel p-4 text-sm text-muted-foreground">{b.empty}</p> : list.map((i) => {
                   const urgent = priorityOf(i, today) === "URGENTE";
                   return (

@@ -71,7 +71,7 @@ function AdminConsole() {
       const [profiles, projects, tasks, events, activities, proposals, inventory, partners, mairies, posts] = await Promise.all([
         supabase.from("profiles").select("id, display_name, first_name, last_name, membership_type, membership_status"),
         supabase.from("projects").select("id, title, status, progress_percent, deadline, owner_id").eq("status", "ACTIVE").order("deadline", { ascending: true, nullsFirst: false }),
-        supabase.from("tasks").select("id, title, status, priority, needs_help, is_volunteer_task, deadline, assigned_user_id, submitted_at").neq("status", "COMPLETED"),
+        supabase.from("tasks").select("id, title, status, priority, needs_help, is_volunteer_task, deadline, assigned_user_id, submitted_at").not("status", "in", "(COMPLETED,ARCHIVED)"),
         supabase.from("events").select("id, title, start_date, event_type").gte("start_date", today).order("start_date").limit(6),
         supabase.from("activities").select("id, title, date, type").gte("date", today).order("date").limit(6),
         supabase.from("professional_proposals").select("id, title, type, submitted_by").eq("status", "PENDING"),
@@ -313,7 +313,7 @@ function Block({
         <CardTitle className="flex items-center gap-2 text-base">
           <Icon className="size-4 text-primary" aria-hidden />
           {title}
-          {list ? <Badge variant="secondary" className="ml-auto">{list.length}</Badge> : null}
+          {list && list.length > 0 ? <Badge className="ml-auto border-transparent bg-warning text-warning-foreground hover:bg-warning" aria-label={`${list.length} en attente`}>{list.length}</Badge> : null}
         </CardTitle>
         {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
       </CardHeader>
