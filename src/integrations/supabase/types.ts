@@ -1059,6 +1059,8 @@ export type Database = {
       }
       dogs: {
         Row: {
+          archived_at: string | null
+          archived_reason: string | null
           birth_date: string | null
           birth_estimated: boolean
           breed: string | null
@@ -1080,6 +1082,8 @@ export type Database = {
           visibility: string
         }
         Insert: {
+          archived_at?: string | null
+          archived_reason?: string | null
           birth_date?: string | null
           birth_estimated?: boolean
           breed?: string | null
@@ -1101,6 +1105,8 @@ export type Database = {
           visibility?: string
         }
         Update: {
+          archived_at?: string | null
+          archived_reason?: string | null
           birth_date?: string | null
           birth_estimated?: boolean
           breed?: string | null
