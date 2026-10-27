@@ -22,7 +22,7 @@ export function useMyHouseholds(userId: string | undefined) {
       const [members, children, dogs] = await Promise.all([
         supabase.from("household_members").select("household_id,user_id,role").in("household_id", ids),
         supabase.from("household_children").select("id,household_id,first_name,birth_year").in("household_id", ids),
-        supabase.from("dogs").select("id,household_id,name,breed").in("household_id", ids),
+        supabase.from("dogs").select("id,household_id,name,breed").in("household_id", ids).is("archived_at", null),
       ]);
       const uids = [...new Set((members.data ?? []).map((m) => m.user_id))];
       const { data: profiles } = uids.length

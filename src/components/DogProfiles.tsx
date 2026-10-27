@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Dog, Plus, Trash2, FileText } from "lucide-react";
+import { Dog, Plus, Archive, ArchiveRestore, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { splitArchivedDogs } from "@/lib/dog-archive";
 
 const emptyDog = { name: "", breed: "", birth_date: "", character: "", needs: "", household_id: "" };
 export function DogProfiles({ households, onOpen }: { households: { id: string; name: string }[]; onOpen: (id: string) => void }) {
@@ -17,7 +18,9 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
   const qc = useQueryClient();
   const [dogOpen, setDogOpen] = useState(false);
   const [dog, setDog] = useState(emptyDog);
-  const { data: dogs = [], isPending, isError } = useQuery({
+  const [archiving, setArchiving] = useState<{ id: string; name: string } | null>(null);
+  const [reason, setReason] = useState("");
+  const { data: all = [], isPending, isError } = useQuery({
     queryKey: ["my-dogs", user?.id], enabled: Boolean(user),
     queryFn: async () => {
       if (!user) return [];
@@ -26,6 +29,7 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
       return data ?? [];
     },
   });
+  const { active: dogs, archived } = splitArchivedDogs(all);
   const refresh = async () => {
     await Promise.all(["my-dogs", "my-dog-home", "my-households", "orphan-dogs"].map(key => qc.invalidateQueries({ queryKey: [key] })));
   };
@@ -39,9 +43,16 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
     onSuccess: async () => { toast.success("Chien ajouté."); setDogOpen(false); setDog(emptyDog); await refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
-  const removeDog = useMutation({
-    mutationFn: async (id: string) => { const { error } = await supabase.from("dogs").delete().eq("id", id); if (error) throw error; },
-    onSuccess: async () => { toast.success("Fiche supprimée."); await refresh(); },
+  // Archivage non destructif : historiques, tampons et participations conservés.
+  const setArchived = useMutation({
+    mutationFn: async (input: { id: string; archive: boolean; reason?: string }) => {
+      const { error } = await supabase.from("dogs").update(input.archive
+        ? { archived_at: new Date().toISOString(), archived_reason: input.reason?.trim() || null }
+        : { archived_at: null, archived_reason: null }).eq("id", input.id);
+      if (error) throw error;
+      return input.archive;
+    },
+    onSuccess: async (archive) => { toast.success(archive ? "Fiche archivée. Son historique est conservé." : "Fiche réactivée."); setArchiving(null); setReason(""); await refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
@@ -73,49 +84,35 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
                   </div>
                   <div>
                     <Label htmlFor="dg-birth">Naissance</Label>
-                    <Input
-                      id="dg-birth"
-                      type="date"
-                      value={dog.birth_date}
-                      onChange={(e) => setDog({ ...dog, birth_date: e.target.value })}
-                    />
+                    <Input id="dg-birth" type="date" value={dog.birth_date} onChange={(e) => setDog({ ...dog, birth_date: e.target.value })} />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="dg-char">Caractère</Label>
-                  <Textarea
-                    id="dg-char"
-                    value={dog.character}
-                    onChange={(e) => setDog({ ...dog, character: e.target.value })}
-                  />
+                  <Textarea id="dg-char" value={dog.character} onChange={(e) => setDog({ ...dog, character: e.target.value })} />
                 </div>
                 <div>
                   <Label htmlFor="dg-needs">Besoins particuliers</Label>
-                  <Textarea
-                    id="dg-needs"
-                    value={dog.needs}
-                    onChange={(e) => setDog({ ...dog, needs: e.target.value })}
-                  />
+                  <Textarea id="dg-needs" value={dog.needs} onChange={(e) => setDog({ ...dog, needs: e.target.value })} />
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => addDog.mutate()} disabled={addDog.isPending}>
-                  Ajouter
-                </Button>
+                <Button onClick={() => addDog.mutate()} disabled={addDog.isPending}>Ajouter</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </CardHeader>
-        <CardContent className="grid gap-3 text-sm md:grid-cols-3">
+        <CardContent className="space-y-4 text-sm">
+          <div className="grid gap-3 md:grid-cols-3">
           {isPending ? <p className="text-muted-foreground">Chargement des fiches…</p> : isError ? <p role="alert">Les fiches ne sont pas disponibles pour le moment.</p> : dogs.length === 0 ? (
-            <p className="text-muted-foreground">Aucune fiche chien enregistrée.</p>
+            <p className="text-muted-foreground">Aucune fiche chien active.</p>
           ) : (
             dogs.map((item) => (
               <div key={item.id} className="rounded-md border border-border p-3">
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-medium">{item.name}</p>
-                  <Button variant="ghost" size="icon" className="size-7" aria-label={`Supprimer la fiche de ${item.name}`} onClick={() => removeDog.mutate(item.id)}>
-                    <Trash2 className="size-3.5" />
+                  <Button variant="ghost" size="icon" className="size-7" aria-label={`Archiver la fiche de ${item.name}`} onClick={() => setArchiving({ id: item.id, name: item.name })}>
+                    <Archive className="size-3.5" />
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -128,7 +125,40 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
               </div>
             ))
           )}
+          </div>
+          {archived.length > 0 && (
+            <details className="rounded-md border border-border p-3">
+              <summary className="cursor-pointer text-muted-foreground">Fiches archivées ({archived.length})</summary>
+              <ul className="mt-2 space-y-2">
+                {archived.map((item) => (
+                  <li key={item.id} className="flex flex-wrap items-center justify-between gap-2">
+                    <span>{item.name}{item.archived_reason ? <span className="text-muted-foreground"> · {item.archived_reason}</span> : null}</span>
+                    <span className="flex gap-2">
+                      <Button size="sm" variant="ghost" onClick={() => onOpen(item.id)}>Voir l'historique</Button>
+                      <Button size="sm" variant="outline" disabled={setArchived.isPending} onClick={() => setArchived.mutate({ id: item.id, archive: false })}><ArchiveRestore className="size-4" aria-hidden /> Réactiver</Button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
         </CardContent>
+        <Dialog open={Boolean(archiving)} onOpenChange={(o) => { if (!o) { setArchiving(null); setReason(""); } }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Archiver la fiche de {archiving?.name}</DialogTitle>
+              <DialogDescription>La fiche n'apparaîtra plus dans vos chiens actifs. Son carnet, ses participations et vos tampons sont conservés. Vous pourrez la réactiver à tout moment.</DialogDescription>
+            </DialogHeader>
+            <div>
+              <Label htmlFor="dg-reason">Motif (facultatif)</Label>
+              <Input id="dg-reason" value={reason} maxLength={200} placeholder="Ex. confié à une autre famille" onChange={(e) => setReason(e.target.value)} />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setArchiving(null)}>Annuler</Button>
+              <Button disabled={setArchived.isPending} onClick={() => archiving && setArchived.mutate({ id: archiving.id, archive: true, reason })}>Archiver</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </Card>
   );
 }

@@ -19,6 +19,7 @@ export function MyDogHome({ userId, hideWhenEmpty = false }: { userId: string; h
       const { data: dogs, error } = await supabase
         .from("dogs")
         .select("id, name, breed, birth_date, character, needs, photo_url")
+        .is("archived_at", null)
         .order("created_at");
       if (error) throw error;
       const ids = (dogs ?? []).map((d) => d.id);
