@@ -41,25 +41,28 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { vitrine?: 1 } => (search['vitrine'] ? { vitrine: 1 } : {}),
   component: AuthPage,
 });
 
 function AuthPage() {
   const { session, isBureau, isPro, loading, rolesReady } = useAuth();
   const navigate = useNavigate();
+  const { vitrine } = Route.useSearch();
 
+  // « Voir la vitrine » : un membre connecté consulte la page publique sans être renvoyé ni déconnecté.
   useEffect(() => {
-    if (!loading && rolesReady && session) {
+    if (!vitrine && !loading && rolesReady && session) {
       void navigate({ to: isBureau ? "/admin" : isPro ? "/espace-pro" : "/member" });
     }
-  }, [session, isBureau, isPro, loading, rolesReady, navigate]);
+  }, [vitrine, session, isBureau, isPro, loading, rolesReady, navigate]);
 
   return (
     <div className="public-site min-h-screen bg-background">
       <PublicHeader />
       <main id="contenu" className="public-main">
       <PublicWelcome />
-      <section id="connexion" aria-labelledby="member-title" className="public-section scroll-mt-24 grid items-start gap-8 lg:grid-cols-2">
+      {!session && <section id="connexion" aria-labelledby="member-title" className="public-section scroll-mt-24 grid items-start gap-8 lg:grid-cols-2">
         <div>
           <p className="public-eyebrow mb-3">Adhérents et professionnels</p>
           <h2 id="member-title">Votre espace membre</h2>
@@ -85,7 +88,7 @@ function AuthPage() {
             </TabsContent>
           </Tabs>
         </div>
-      </section>
+      </section>}
       </main>
       <PublicFooter />
     </div>

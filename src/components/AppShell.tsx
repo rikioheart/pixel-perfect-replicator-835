@@ -38,6 +38,8 @@ import {
   GraduationCap,
   HandHeart as HandHeartIcon,
   Sparkles,
+  QrCode,
+  Globe,
   Building2,
   Lightbulb,
   Menu,
@@ -101,7 +103,6 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/member", label: "Accueil", icon: Heart, audience: "all" },
       { to: "/foyer", label: "Mes chiens & foyer", icon: House, audience: "all" },
-      { to: "/loyalty", label: "Mon pass", bureauLabel: "Engagement", icon: Stamp, audience: "all" },
       { to: "/participations", label: "Mes inscriptions", icon: CalendarCheck, audience: "all" },
       { to: "/reimbursements", label: "Paiements", icon: ReceiptText, audience: "all" },
       { to: "/advantages", label: "Avantages", icon: Gift, audience: "all" },
@@ -236,7 +237,7 @@ export function AppShell({
   }, [pathname]);
 
   const dock = isBureau
-    ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/calendar", label: "Calendrier", icon: CalendarDays }, { to: "/member", label: "Mon espace", icon: UserRound }]
+    ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/loyalty", label: "Mon pass", icon: QrCode }, { to: "/member", label: "Mon espace", icon: UserRound }]
     : isPro
       ? [{ to: "/espace-pro", label: "Espace pro", icon: Briefcase }, { to: "/espace-pro/chiens", label: "Chiens", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }]
       : [{ to: "/member", label: "Mon chien", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }, { to: "/projects", label: "Projets", icon: FolderKanban }];
@@ -290,6 +291,9 @@ export function AppShell({
               <p className="text-xs">{isBureau ? "Cockpit Bureau" : isPro ? "Espace professionnel" : "Espace adhérent"}</p>
             </div>
           </div>
+          <Link to="/loyalty" className="mb-5 flex min-h-11 items-center gap-3 rounded-md border border-sidebar-border px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none">
+            <QrCode className="size-4" aria-hidden="true" /> Mon pass
+          </Link>
           <nav aria-label="Navigation des pages" className="space-y-5">
             <div className="space-y-1">{pillars.map((g) => renderPillar(g))}</div>
 
@@ -325,6 +329,9 @@ export function AppShell({
             <p className="text-xs">{isBureau ? "Bureau" : profile?.membership_type}</p>
             <Link to="/profile" className="mt-1 inline-flex min-h-11 items-center gap-2 text-xs underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <UserRound className="size-3.5" aria-hidden="true" /> Mon profil & données
+            </Link>
+            <Link to="/" search={{ vitrine: 1 }} className="flex min-h-11 items-center gap-2 text-xs underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <Globe className="size-3.5" aria-hidden="true" /> Voir la vitrine
             </Link>
           </div>
           <Button
@@ -370,7 +377,9 @@ export function AppShell({
                 <SheetDescription>{isBureau ? "Gouvernance et actions" : "Votre espace associatif"}</SheetDescription>
               </SheetHeader>
               <nav aria-label="Navigation mobile" className="space-y-6 p-4">
+                <Link to="/loyalty" className="flex min-h-11 items-center gap-3 rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent"><QrCode className="size-4" aria-hidden="true" /> Mon pass</Link>
                 <div className="space-y-1">{pillars.map((g) => renderPillar(g, true))}</div>
+                <Link to="/" search={{ vitrine: 1 }} className="flex min-h-11 items-center gap-3 px-3 text-sm hover:underline"><Globe className="size-4" aria-hidden="true" /> Voir la vitrine</Link>
                 <Button
                   variant="outline"
                   className="min-h-11 w-full justify-start gap-2"
