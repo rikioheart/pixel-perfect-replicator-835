@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { HeartHandshake, CalendarDays, ArrowUpRight, BookOpen, QrCode, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import walk from '@/assets/public/walk.asset.json';
 import logoMark from '@/assets/logo-lvdc-mark.png.asset.json';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
   const query = useQuery({queryKey:['public-home'], queryFn:async () => { const {data,error} = await supabase.rpc('get_public_home'); if(error) throw error; return data as unknown as Home; }});
   useEffect(() => { if(query.data) {try {localStorage.setItem('lvdc.public.home',JSON.stringify({...query.data,savedAt:new Date().toISOString()}));}catch{/* unavailable device storage */}} },[query.data]);
   const website = safeWebsite(query.data?.website);
+  const { session } = useAuth();
   return <div className="contents">
     <OfflineStatus />
     <section className="public-hero">
@@ -26,10 +28,12 @@ export function PublicWelcome({ showPartnerLink = true }: { showPartnerLink?: bo
         <h1>La Voix<br />du Chien</h1>
         <p className="hero-slogan">Le chien au cœur. L’humain à ses côtés.</p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button asChild size="lg"><Link to="/loyalty"><QrCode aria-hidden />Mon Pass Terrain</Link></Button>
-          <Button asChild variant="secondary" size="lg"><Link to="/" hash="connexion">Accès membre</Link></Button>
+          {session
+            ? <Button asChild size="lg"><Link to="/loyalty"><QrCode aria-hidden />Mon Pass Terrain</Link></Button>
+            : <Button asChild size="lg"><Link to="/" hash="connexion"><QrCode aria-hidden />Mon Pass Terrain</Link></Button>}
+          {!session && <Button asChild variant="secondary" size="lg"><Link to="/" hash="connexion">Accès membre</Link></Button>}
         </div>
-        <p className="mt-3 text-sm opacity-90">Accessible après votre première connexion, puis disponible même sans réseau.</p>
+        <p className="mt-3 text-sm opacity-90">{session ? 'Votre pass s’ouvre directement. Gardez la session ouverte pour l’afficher sans réseau.' : 'Connectez-vous une première fois pour afficher votre pass ; il reste ensuite disponible sans réseau.'}</p>
       </div>
     </section>
     <nav aria-label="Accès rapides" className="public-discovery">

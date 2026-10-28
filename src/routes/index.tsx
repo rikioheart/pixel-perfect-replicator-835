@@ -41,18 +41,21 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { vitrine?: 1 } => (search.vitrine ? { vitrine: 1 } : {}),
   component: AuthPage,
 });
 
 function AuthPage() {
   const { session, isBureau, isPro, loading, rolesReady } = useAuth();
   const navigate = useNavigate();
+  const { vitrine } = Route.useSearch();
 
+  // « Voir la vitrine » : un membre connecté consulte la page publique sans être renvoyé ni déconnecté.
   useEffect(() => {
-    if (!loading && rolesReady && session) {
+    if (!vitrine && !loading && rolesReady && session) {
       void navigate({ to: isBureau ? "/admin" : isPro ? "/espace-pro" : "/member" });
     }
-  }, [session, isBureau, isPro, loading, rolesReady, navigate]);
+  }, [vitrine, session, isBureau, isPro, loading, rolesReady, navigate]);
 
   return (
     <div className="public-site min-h-screen bg-background">

@@ -3,7 +3,8 @@ import logoMark from '@/assets/logo-lvdc-mark.png.asset.json';
 import { Button } from '@/components/ui/button';
 import { ZONES } from '@/lib/site-content';
 import { useState } from 'react';
-import { Menu, X, LogIn } from 'lucide-react';
+import { Menu, X, LogIn, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { CONTACT_EMAIL, SOCIAL_LINKS } from '@/lib/contact';
 
 const NAV = [
@@ -14,6 +15,7 @@ const NAV = [
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
   const link = 'public-nav-link';
+  const { session } = useAuth();
   return (
     <header className="public-header">
       <a href="#contenu" className="public-skip">Aller au contenu</a>
@@ -26,7 +28,9 @@ export function PublicHeader() {
           {NAV.map((n) => <Link key={n.to} to={n.to} className={link}>{n.label}</Link>)}
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">
-          <Button asChild variant="outline" size="sm" className="public-member-button"><Link to="/" hash="connexion" onClick={() => setOpen(false)}><LogIn aria-hidden /><span className="hidden sm:inline">Espace membres</span><span className="sm:hidden">Connexion</span></Link></Button>
+          {session
+            ? <Button asChild variant="outline" size="sm" className="public-member-button"><Link to="/member" onClick={() => setOpen(false)}><ArrowLeft aria-hidden /><span className="hidden sm:inline">Retour à mon espace</span><span className="sm:hidden">Mon espace</span></Link></Button>
+            : <Button asChild variant="outline" size="sm" className="public-member-button"><Link to="/" hash="connexion" onClick={() => setOpen(false)}><LogIn aria-hidden /><span className="hidden sm:inline">Espace membres</span><span className="sm:hidden">Connexion</span></Link></Button>}
           <Button variant="ghost" size="icon" className="xl:hidden" aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={open} aria-controls="public-mobile-nav" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
         </div>
       </div>
