@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { vitrine?: 1 } => (search.vitrine ? { vitrine: 1 } : {}),
+  validateSearch: (search: Record<string, unknown>): { vitrine?: 1 } => (search['vitrine'] ? { vitrine: 1 } : {}),
   component: AuthPage,
 });
 
