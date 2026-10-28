@@ -88,7 +88,7 @@ function AuthPage() {
             </TabsContent>
           </Tabs>
         </div>
-      </section>
+      </section>}
       </main>
       <PublicFooter />
     </div>
