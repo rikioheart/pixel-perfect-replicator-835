@@ -1,28 +1,36 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+export type HouseholdPerson = {
+  id: string; first_name: string; last_name: string | null; birth_date: string | null; birth_year: number | null; relation: string;
+};
+
 export type HouseholdBundle = {
   id: string;
   name: string;
   adults: { user_id: string; role: string; name: string }[];
-  children: { id: string; first_name: string; birth_year: number | null }[];
-  dogs: { id: string; name: string; breed: string | null }[];
+  /** Personnes du foyer sans compte (enfants, conjoint, parent…). */
+  children: HouseholdPerson[];
+  dogs: { id: string; name: string; breed: string | null; keeper_person_id: string | null }[];
 };
 
-/** Foyers dont l'utilisateur fait partie, avec adultes, enfants et chiens. */
+/** Foyers dont l'utilisateur fait partie (un seul attendu), avec adultes, personnes sans compte et chiens. */
 export function useMyHouseholds(userId: string | undefined) {
   return useQuery({
     queryKey: ["my-households", userId],
     enabled: Boolean(userId),
     queryFn: async (): Promise<HouseholdBundle[]> => {
-      const { data: hh, error } = await supabase.from("households").select("id,name").order("created_at");
-      if (error) throw error;
-      const ids = (hh ?? []).map((h) => h.id);
+      // Le Bureau lit tous les foyers : on ne garde que ceux dont l'utilisateur est membre.
+      const { data: mine, error: e1 } = await supabase.from("household_members").select("household_id").eq("user_id", userId!);
+      if (e1) throw e1;
+      const ids = [...new Set((mine ?? []).map((m) => m.household_id))];
       if (ids.length === 0) return [];
+      const { data: hh, error } = await supabase.from("households").select("id,name").in("id", ids).order("created_at");
+      if (error) throw error;
       const [members, children, dogs] = await Promise.all([
         supabase.from("household_members").select("household_id,user_id,role").in("household_id", ids),
-        supabase.from("household_children").select("id,household_id,first_name,birth_year").in("household_id", ids),
-        supabase.from("dogs").select("id,household_id,name,breed").in("household_id", ids).is("archived_at", null),
+        supabase.from("household_children").select("id,household_id,first_name,last_name,birth_date,birth_year,relation").in("household_id", ids).order("created_at"),
+        supabase.from("dogs").select("id,household_id,name,breed,keeper_person_id").in("household_id", ids).is("archived_at", null),
       ]);
       const uids = [...new Set((members.data ?? []).map((m) => m.user_id))];
       const { data: profiles } = uids.length
