@@ -173,7 +173,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/finance", label: "Comptabilité", icon: Euro, audience: "bureau" },
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
       { to: "/admin/pros", label: "Fiches pros", icon: Briefcase, audience: "bureau" },
-      { to: "/admin/chiens", label: "Chiens", icon: Heart, audience: "bureau" },
+      { to: "/admin/chiens", label: "Foyers & chiens", icon: Heart, audience: "bureau" },
       { to: "/inventory", label: "Matériel", icon: Package, audience: "bureau" },
       { to: "/terrain", label: "Terrain (gestion)", icon: Trees, audience: "bureau" },
     ],
