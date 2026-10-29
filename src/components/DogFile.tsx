@@ -67,20 +67,36 @@ export function DogFilePanel({ dogId, initialTab = "fiche", onClose }: { dogId: 
 type DogRow = {
   id: string; name: string; breed: string | null; sex: string | null; birth_date: string | null;
   character: string | null; needs: string | null; useful_information: string | null;
+  household_id: string | null; keeper_person_id: string | null; identification: string | null; coat_color: string | null;
+  weight_kg: number | null; arrival_date: string | null; sterilization: string | null; birth_estimated: boolean | null;
+  living_environment: string | null; archived_at: string | null;
 };
 
 function ProfileTab({ dog }: { dog: DogRow }) {
   const refresh = useRefreshDog(dog.id);
   const [f, setF] = useState(() => ({
-    name: dog.name, breed: dog.breed ?? "", sex: dog.sex ?? "", birth_date: dog.birth_date ?? "",
+    name: dog.name, breed: dog.breed ?? "", sex: dog.sex ?? "", birth_date: dog.birth_date ?? "", birth_estimated: Boolean(dog.birth_estimated),
     character: dog.character ?? "", needs: dog.needs ?? "", useful_information: dog.useful_information ?? "",
+    keeper_person_id: dog.keeper_person_id ?? "", identification: dog.identification ?? "", coat_color: dog.coat_color ?? "",
+    weight_kg: dog.weight_kg?.toString() ?? "", arrival_date: dog.arrival_date ?? "", sterilization: dog.sterilization ?? "UNKNOWN",
+    living_environment: dog.living_environment ?? "",
   }));
+  const { data: people = [] } = useQuery({
+    queryKey: ["dog-file", dog.id, "household-people", dog.household_id],
+    enabled: Boolean(dog.household_id),
+    queryFn: async () => (await supabase.from("household_children").select("id, first_name, last_name").eq("household_id", dog.household_id!).order("created_at")).data ?? [],
+  });
   const save = useMutation({
     mutationFn: async () => {
       if (f.name.trim().length < 2) throw new Error("Le nom du chien est obligatoire.");
+      const weight = f.weight_kg.trim() ? Number(f.weight_kg.replace(",", ".")) : null;
+      if (weight !== null && (!Number.isFinite(weight) || weight <= 0 || weight >= 150)) throw new Error("Indiquez un poids en kilos (par ex. 12,5).");
       const { error } = await supabase.from("dogs").update({
-        name: f.name.trim(), breed: f.breed.trim() || null, sex: f.sex || null, birth_date: f.birth_date || null,
+        name: f.name.trim(), breed: f.breed.trim() || null, sex: f.sex || null, birth_date: f.birth_date || null, birth_estimated: f.birth_estimated,
         character: f.character.trim() || null, needs: f.needs.trim() || null, useful_information: f.useful_information.trim() || null,
+        keeper_person_id: f.keeper_person_id || null, identification: f.identification.trim() || null, coat_color: f.coat_color.trim() || null,
+        weight_kg: weight, arrival_date: f.arrival_date || null, sterilization: f.sterilization || "UNKNOWN",
+        living_environment: f.living_environment.trim() || null,
       }).eq("id", dog.id);
       if (error) throw error;
     },
@@ -88,24 +104,53 @@ function ProfileTab({ dog }: { dog: DogRow }) {
     onError: (e: Error) => toast.error(e.message),
   });
   return (
-    <form className="space-y-3 pt-3 text-sm" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
-      <div><Label htmlFor="df-name">Nom</Label><Input id="df-name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
-      <div className="grid grid-cols-2 gap-3">
-        <div><Label htmlFor="df-breed">Race</Label><Input id="df-breed" value={f.breed} onChange={(e) => setF({ ...f, breed: e.target.value })} /></div>
-        <div>
-          <Label htmlFor="df-sex">Sexe</Label>
-          <select id="df-sex" className={select} value={f.sex} onChange={(e) => setF({ ...f, sex: e.target.value })}>
-            <option value="">Non précisé</option><option value="Mâle">Mâle</option><option value="Femelle">Femelle</option>
-          </select>
+    <form className="space-y-4 pt-3 text-sm" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
+      {dog.archived_at ? <p role="status" className="rounded-md border border-border bg-muted p-2 text-muted-foreground">Fiche archivée le {new Date(dog.archived_at).toLocaleDateString("fr-FR")}. Son historique reste consultable.</p> : null}
+      <fieldset className="space-y-3">
+        <legend className="font-medium">Identité</legend>
+        <div><Label htmlFor="df-name">Nom</Label><Input id="df-name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><Label htmlFor="df-breed">Race ou type</Label><Input id="df-breed" value={f.breed} onChange={(e) => setF({ ...f, breed: e.target.value })} /></div>
+          <div>
+            <Label htmlFor="df-sex">Sexe</Label>
+            <select id="df-sex" className={select} value={f.sex} onChange={(e) => setF({ ...f, sex: e.target.value })}>
+              <option value="">Non précisé</option><option value="Mâle">Mâle</option><option value="Femelle">Femelle</option>
+            </select>
+          </div>
+          <div><Label htmlFor="df-birth">Naissance</Label><Input id="df-birth" type="date" value={f.birth_date} onChange={(e) => setF({ ...f, birth_date: e.target.value })} /></div>
+          <label className="flex items-end gap-2 pb-2"><input type="checkbox" checked={f.birth_estimated} onChange={(e) => setF({ ...f, birth_estimated: e.target.checked })} /> Date approximative</label>
+          <div><Label htmlFor="df-color">Robe / couleur</Label><Input id="df-color" value={f.coat_color} onChange={(e) => setF({ ...f, coat_color: e.target.value })} /></div>
+          <div><Label htmlFor="df-weight">Poids (kg)</Label><Input id="df-weight" inputMode="decimal" value={f.weight_kg} onChange={(e) => setF({ ...f, weight_kg: e.target.value })} /></div>
+          <div>
+            <Label htmlFor="df-steril">Stérilisé·e</Label>
+            <select id="df-steril" className={select} value={f.sterilization} onChange={(e) => setF({ ...f, sterilization: e.target.value })}>
+              <option value="UNKNOWN">Non précisé</option><option value="YES">Oui</option><option value="NO">Non</option>
+            </select>
+          </div>
+          <div><Label htmlFor="df-arrival">Arrivé·e au foyer le</Label><Input id="df-arrival" type="date" value={f.arrival_date} onChange={(e) => setF({ ...f, arrival_date: e.target.value })} /></div>
         </div>
-      </div>
-      <div><Label htmlFor="df-birth">Naissance</Label><Input id="df-birth" type="date" value={f.birth_date} onChange={(e) => setF({ ...f, birth_date: e.target.value })} /></div>
-      <div><Label htmlFor="df-char">Caractère</Label><Textarea id="df-char" value={f.character} onChange={(e) => setF({ ...f, character: e.target.value })} /></div>
-      <div><Label htmlFor="df-needs">Besoin du moment</Label><Textarea id="df-needs" value={f.needs} onChange={(e) => setF({ ...f, needs: e.target.value })} /></div>
-      <div>
-        <Label htmlFor="df-info">Bon à savoir pour l'accueillir</Label>
-        <Textarea id="df-info" placeholder="Ex. a peur des vélos, adore la balle" value={f.useful_information} onChange={(e) => setF({ ...f, useful_information: e.target.value })} />
-      </div>
+        <div><Label htmlFor="df-ident">N° d'identification (puce ou tatouage, facultatif)</Label><Input id="df-ident" value={f.identification} onChange={(e) => setF({ ...f, identification: e.target.value })} /></div>
+      </fieldset>
+      <fieldset className="space-y-2">
+        <legend className="font-medium">Personne de référence</legend>
+        {dog.household_id ? (
+          <select aria-label="Personne de référence" className={select} value={f.keeper_person_id} onChange={(e) => setF({ ...f, keeper_person_id: e.target.value })}>
+            <option value="">Titulaire du compte</option>
+            {people.map((p) => <option key={p.id} value={p.id}>{[p.first_name, p.last_name].filter(Boolean).join(" ")}</option>)}
+          </select>
+        ) : <p className="text-muted-foreground">Rattachez le chien à votre foyer pour le confier à un proche sans compte.</p>}
+        <p className="text-xs text-muted-foreground">La personne qui s'en occupe au quotidien. Le titulaire du compte reste responsable de la fiche.</p>
+      </fieldset>
+      <fieldset className="space-y-3">
+        <legend className="font-medium">Au quotidien</legend>
+        <div><Label htmlFor="df-env">Cadre de vie</Label><Input id="df-env" placeholder="Ex. maison avec jardin, appartement en ville" value={f.living_environment} onChange={(e) => setF({ ...f, living_environment: e.target.value })} /></div>
+        <div><Label htmlFor="df-char">Caractère</Label><Textarea id="df-char" value={f.character} onChange={(e) => setF({ ...f, character: e.target.value })} /></div>
+        <div><Label htmlFor="df-needs">Besoin du moment</Label><Textarea id="df-needs" value={f.needs} onChange={(e) => setF({ ...f, needs: e.target.value })} /></div>
+        <div>
+          <Label htmlFor="df-info">Bon à savoir pour l'accueillir</Label>
+          <Textarea id="df-info" placeholder="Ex. a peur des vélos, adore la balle" value={f.useful_information} onChange={(e) => setF({ ...f, useful_information: e.target.value })} />
+        </div>
+      </fieldset>
       <Button type="submit" disabled={save.isPending}>Enregistrer</Button>
     </form>
   );

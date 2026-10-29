@@ -1061,13 +1061,17 @@ export type Database = {
         Row: {
           archived_at: string | null
           archived_reason: string | null
+          arrival_date: string | null
           birth_date: string | null
           birth_estimated: boolean
           breed: string | null
           character: string | null
+          coat_color: string | null
           created_at: string
           household_id: string | null
           id: string
+          identification: string | null
+          keeper_person_id: string | null
           living_environment: string | null
           name: string
           needs: string | null
@@ -1080,17 +1084,22 @@ export type Database = {
           updated_at: string
           useful_information: string | null
           visibility: string
+          weight_kg: number | null
         }
         Insert: {
           archived_at?: string | null
           archived_reason?: string | null
+          arrival_date?: string | null
           birth_date?: string | null
           birth_estimated?: boolean
           breed?: string | null
           character?: string | null
+          coat_color?: string | null
           created_at?: string
           household_id?: string | null
           id?: string
+          identification?: string | null
+          keeper_person_id?: string | null
           living_environment?: string | null
           name: string
           needs?: string | null
@@ -1103,17 +1112,22 @@ export type Database = {
           updated_at?: string
           useful_information?: string | null
           visibility?: string
+          weight_kg?: number | null
         }
         Update: {
           archived_at?: string | null
           archived_reason?: string | null
+          arrival_date?: string | null
           birth_date?: string | null
           birth_estimated?: boolean
           breed?: string | null
           character?: string | null
+          coat_color?: string | null
           created_at?: string
           household_id?: string | null
           id?: string
+          identification?: string | null
+          keeper_person_id?: string | null
           living_environment?: string | null
           name?: string
           needs?: string | null
@@ -1126,6 +1140,7 @@ export type Database = {
           updated_at?: string
           useful_information?: string | null
           visibility?: string
+          weight_kg?: number | null
         }
         Relationships: [
           {
@@ -1133,6 +1148,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dogs_keeper_person_id_fkey"
+            columns: ["keeper_person_id"]
+            isOneToOne: false
+            referencedRelation: "household_children"
             referencedColumns: ["id"]
           },
         ]
@@ -1771,25 +1793,34 @@ export type Database = {
       }
       household_children: {
         Row: {
+          birth_date: string | null
           birth_year: number | null
           created_at: string
           first_name: string
           household_id: string
           id: string
+          last_name: string | null
+          relation: string
         }
         Insert: {
+          birth_date?: string | null
           birth_year?: number | null
           created_at?: string
           first_name: string
           household_id: string
           id?: string
+          last_name?: string | null
+          relation?: string
         }
         Update: {
+          birth_date?: string | null
           birth_year?: number | null
           created_at?: string
           first_name?: string
           household_id?: string
           id?: string
+          last_name?: string | null
+          relation?: string
         }
         Relationships: [
           {

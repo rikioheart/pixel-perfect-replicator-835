@@ -6,6 +6,7 @@ import { CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyHouseholds } from "@/lib/households";
+import { RELATION_LABEL } from "@/lib/household-people";
 import { DOG_POLICY_LABEL } from "@/lib/pro-card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -116,7 +117,7 @@ export function RegistrationWizard({ open, onOpenChange, target }: { open: boole
           ) : current === "Qui participe ?" ? (
             <>
               {(hh?.adults ?? [{ user_id: user!.id, name: "Moi", role: "ADMIN" }]).map((a) => check(adults.includes(a.user_id), () => toggle(adults, setAdults, a.user_id), a.name, a.user_id))}
-              {(hh?.children ?? []).map((c) => check(kids.includes(c.id), () => toggle(kids, setKids, c.id), `${c.first_name} (enfant)`, c.id))}
+              {(hh?.children ?? []).map((c) => check(kids.includes(c.id), () => toggle(kids, setKids, c.id), `${c.first_name} (${(RELATION_LABEL[c.relation] ?? "proche").toLowerCase()})`, c.id))}
               <p className="text-xs text-muted-foreground">Les enfants n'ont pas besoin de compte. Chaque personne compte pour une place.</p>
             </>
           ) : current === "Quel(s) chien(s) ?" ? (
