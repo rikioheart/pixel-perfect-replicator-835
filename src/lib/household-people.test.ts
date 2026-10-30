@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageFrom, membersInSeveralHouseholds, personLabel } from "./household-people";
+import { ageFrom, canSubmitAccountClosure, cleanHouseholdName, householdNameOptions, membersInSeveralHouseholds, personLabel } from "./household-people";
 
 describe("personnes du foyer", () => {
   const today = new Date("2026-10-28T12:00:00");
@@ -23,7 +23,6 @@ describe("personnes du foyer", () => {
   });
 });
 
-import { householdNameOptions, cleanHouseholdName, canSubmitAccountClosure } from "./household-people";
 
 describe("nom du foyer", () => {
   it("propose « Mon foyer » en premier, puis « Foyer de Camille »", () => {
