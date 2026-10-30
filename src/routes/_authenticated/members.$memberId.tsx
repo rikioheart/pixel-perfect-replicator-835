@@ -20,6 +20,8 @@ import { MemberForm } from "@/components/MemberForm";
 import { memberFormSchema, type MemberFormValues } from "@/lib/member-schema";
 import { updateMember } from "@/lib/members.functions";
 import { LoadingState } from "@/components/LoadingState";
+import { BureauCloseAccountCard } from "@/components/BureauCloseAccountCard";
+import { useSensitiveRights } from "@/lib/permissions";
 
 export const Route = createFileRoute("/_authenticated/members/$memberId")({
   head: () => ({
@@ -42,7 +44,8 @@ export const Route = createFileRoute("/_authenticated/members/$memberId")({
 
 function MemberDetailPage() {
   const { memberId } = Route.useParams();
-  const { isBureau } = useAuth();
+  const { isBureau, user } = useAuth();
+  const rights = useSensitiveRights();
   const queryClient = useQueryClient();
 
   const { data: member, isLoading } = useQuery({
@@ -144,7 +147,7 @@ function MemberDetailPage() {
         </div>
 
         <div className="space-y-5 lg:col-span-2">
-          {isBureau ? (
+          {isBureau && !member.deleted_at ? (
             <BureauEditor
               member={member}
               onSaved={() => {
@@ -152,6 +155,14 @@ function MemberDetailPage() {
                 void queryClient.invalidateQueries({ queryKey: ["members"] });
               }}
             />
+          ) : null}
+          {isBureau && rights.validateMembers && !member.deleted_at && member.id !== user?.id ? (
+            <BureauCloseAccountCard memberId={member.id} memberName={memberFullName(member)} />
+          ) : null}
+          {member.deleted_at ? (
+            <p role="status" className="rounded-md border border-border bg-muted p-3 text-sm text-muted-foreground">
+              Compte clôturé le {formatDate(member.deleted_at)}. Les traces légales sont conservées sans coordonnées.
+            </p>
           ) : null}
 
           <section className="panel p-5">
