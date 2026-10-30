@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Home, Plus, Trash2, UserPlus, Users, Dog } from "lucide-react";
+import { Home, Pencil, Plus, Trash2, UserPlus, Users, Dog } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { useMemberOptions } from "@/components/MemberPicker";
 import { useMyHouseholds, type HouseholdBundle, type HouseholdPerson } from "@/lib/households";
-import { ageFrom, personLabel, RELATION_LABEL } from "@/lib/household-people";
+import { ageFrom, cleanHouseholdName, householdNameOptions, personLabel, RELATION_LABEL } from "@/lib/household-people";
 import { DogProfiles } from "@/components/DogProfiles";
 import { DogFilePanel } from "@/components/DogFile";
 
@@ -120,7 +121,10 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
 
   return (
     <section className="panel space-y-5 p-5" aria-labelledby={`hh-${h.id}`}>
-      <h2 id={`hh-${h.id}`} className="flex items-center gap-2 font-display text-xl"><Home className="size-5 text-primary" aria-hidden /> {h.name}</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id={`hh-${h.id}`} className="flex items-center gap-2 font-display text-xl"><Home className="size-5 text-primary" aria-hidden /> {h.name}</h2>
+        {h.adults.some((a) => a.name === "Moi" && a.role === "ADMIN") ? <RenameHousehold h={h} /> : null}
+      </div>
       <div className="grid gap-5 text-sm lg:grid-cols-2">
         <div className="space-y-2">
           <h3 className="flex items-center gap-2 font-medium"><Users className="size-4" aria-hidden /> Adultes avec un compte</h3>
@@ -166,9 +170,71 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
   );
 }
 
+function RenameHousehold({ h }: { h: HouseholdBundle }) {
+  const qc = useQueryClient();
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(h.name);
+  const save = async () => {
+    const clean = cleanHouseholdName(name);
+    if (!clean) { toast.error("Le nom du foyer doit comporter au moins 2 caractères."); return; }
+    const { data, error } = await supabase.from("households").update({ name: clean }).eq("id", h.id).select("id");
+    if (error || !data?.length) { toast.error("Seul un adulte qui gère le foyer peut le renommer."); return; }
+    toast.success("Nom du foyer mis à jour.");
+    setEditing(false);
+    void qc.invalidateQueries({ queryKey: ["my-households"] });
+  };
+  if (!editing) {
+    return <Button size="sm" variant="ghost" className="gap-1" onClick={() => { setName(h.name); setEditing(true); }}><Pencil className="size-4" aria-hidden /> Renommer</Button>;
+  }
+  return (
+    <form className="flex flex-wrap items-center gap-2" onSubmit={(e) => { e.preventDefault(); void save(); }}>
+      <Label htmlFor={`rename-${h.id}`} className="sr-only">Nom du foyer</Label>
+      <Input id={`rename-${h.id}`} value={name} maxLength={60} autoFocus onChange={(e) => setName(e.target.value)} className="h-9 w-56" />
+      <Button size="sm" type="submit">Enregistrer</Button>
+      <Button size="sm" type="button" variant="ghost" onClick={() => setEditing(false)}>Annuler</Button>
+    </form>
+  );
+}
+
+function CreateHouseholdDialog({ open, onOpenChange, onCreate, pending, firstName }: {
+  open: boolean; onOpenChange: (o: boolean) => void; onCreate: (name: string) => void; pending: boolean; firstName?: string | null;
+}) {
+  const options = householdNameOptions(firstName);
+  const [choice, setChoice] = useState(options[0]);
+  const [custom, setCustom] = useState("");
+  const name = choice === "custom" ? custom : choice;
+  return (
+    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (o) { setChoice(options[0]); setCustom(""); } }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Créer mon foyer</DialogTitle>
+          <DialogDescription>Choisissez un nom. Vous pourrez le modifier à tout moment.</DialogDescription>
+        </DialogHeader>
+        <fieldset className="space-y-2">
+          <legend className="sr-only">Nom du foyer</legend>
+          {[...options, "custom"].map((o) => (
+            <label key={o} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-border px-3 text-sm has-[:checked]:border-primary">
+              <input type="radio" name="hh-name" value={o} checked={choice === o} onChange={() => setChoice(o)} />
+              {o === "custom" ? "Autre nom" : o}
+            </label>
+          ))}
+          {choice === "custom" ? (
+            <Input aria-label="Nom personnalisé du foyer" placeholder="Ex. Foyer des Pins" maxLength={60} value={custom} autoFocus onChange={(e) => setCustom(e.target.value)} />
+          ) : null}
+        </fieldset>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Annuler</Button>
+          <Button disabled={pending || !cleanHouseholdName(name)} onClick={() => onCreate(name)}>Créer</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function FoyerPage() {
   const { user, profile } = useAuth();
   const [open, setOpen] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
   const qc = useQueryClient();
   const { data: households = [], isLoading } = useMyHouseholds(user?.id);
   const { data: orphanDogs = [] } = useQuery({
@@ -178,19 +244,20 @@ function FoyerPage() {
   });
 
   const create = useMutation({
-    mutationFn: async () => {
-      const name = `Foyer ${profile?.last_name || profile?.first_name || ""}`.trim();
+    mutationFn: async (raw: string) => {
+      const name = cleanHouseholdName(raw);
+      if (!name) throw new Error("Le nom du foyer doit comporter au moins 2 caractères.");
       const { data, error } = await supabase.from("households").insert({ name, created_by: user!.id }).select("id").single();
       if (error) throw new Error(friendly(error.message));
       if (orphanDogs.length) await supabase.from("dogs").update({ household_id: data.id }).in("id", orphanDogs.map((d) => d.id));
     },
-    onSuccess: () => { toast.success("Foyer créé."); void qc.invalidateQueries({ queryKey: ["my-households"] }); void qc.invalidateQueries({ queryKey: ["orphan-dogs"] }); void qc.invalidateQueries({ queryKey: ["my-dogs"] }); },
+    onSuccess: () => { setCreating(false); toast.success("Foyer créé."); void qc.invalidateQueries({ queryKey: ["my-households"] }); void qc.invalidateQueries({ queryKey: ["orphan-dogs"] }); void qc.invalidateQueries({ queryKey: ["my-dogs"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   return (
     <AppShell title="Mon foyer" subtitle="Vos proches, vos chiens et la personne de référence de chacun"
-      actions={households.length === 0 && !isLoading ? <Button size="sm" className="gap-2" onClick={() => create.mutate()} disabled={create.isPending}><Plus className="size-4" aria-hidden /> Créer mon foyer</Button> : undefined}>
+      actions={households.length === 0 && !isLoading ? <Button size="sm" className="gap-2" onClick={() => setCreating(true)}><Plus className="size-4" aria-hidden /> Créer mon foyer</Button> : undefined}>
       {isLoading ? <LoadingState rows={3} /> : households.length === 0 ? (
         <EmptyState title="Pas encore de foyer" message="Créez votre foyer pour inscrire en une fois vos proches et vos chiens. Vos chiens existants y seront rattachés." />
       ) : (
@@ -205,6 +272,7 @@ function FoyerPage() {
       )}
       <DogProfiles households={households} onOpen={(id) => setOpen(id)} />
       {open ? <DogFilePanel dogId={open} onClose={() => setOpen(null)} /> : null}
+      <CreateHouseholdDialog open={creating} onOpenChange={setCreating} onCreate={(n) => create.mutate(n)} pending={create.isPending} firstName={profile?.first_name} />
     </AppShell>
   );
 }

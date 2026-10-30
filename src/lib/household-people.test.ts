@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageFrom, membersInSeveralHouseholds, personLabel } from "./household-people";
+import { ageFrom, canSubmitAccountClosure, cleanHouseholdName, householdNameOptions, membersInSeveralHouseholds, personLabel } from "./household-people";
 
 describe("personnes du foyer", () => {
   const today = new Date("2026-10-28T12:00:00");
@@ -20,5 +20,28 @@ describe("personnes du foyer", () => {
       { user_id: "a", household_id: "h1" }, { user_id: "a", household_id: "h2" }, { user_id: "b", household_id: "h1" },
     ]);
     expect([...dup]).toEqual(["a"]);
+  });
+});
+
+
+describe("nom du foyer", () => {
+  it("propose « Mon foyer » en premier, puis « Foyer de Camille »", () => {
+    expect(householdNameOptions("Camille")).toEqual(["Mon foyer", "Foyer de Camille"]);
+  });
+  it("sans prénom, seul le nom neutre est proposé", () => {
+    expect(householdNameOptions("  ")).toEqual(["Mon foyer"]);
+  });
+  it("refuse un nom vide et nettoie les espaces", () => {
+    expect(cleanHouseholdName(" ")).toBeNull();
+    expect(cleanHouseholdName("  Foyer   des  Pins ")).toBe("Foyer des Pins");
+  });
+});
+
+describe("clôture d'un compte par le Bureau", () => {
+  it("exige un motif et le mot CLÔTURER", () => {
+    expect(canSubmitAccountClosure("Départ sans nouvelles", "clôturer")).toBe(true);
+    expect(canSubmitAccountClosure("Départ sans nouvelles", "CLOTURER")).toBe(true);
+    expect(canSubmitAccountClosure("abc", "CLÔTURER")).toBe(false);
+    expect(canSubmitAccountClosure("Départ sans nouvelles", "SUPPRIMER")).toBe(false);
   });
 });

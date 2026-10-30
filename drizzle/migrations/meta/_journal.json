@@ -365,6 +365,13 @@
       "when": 1793276416740,
       "tag": "0051_lot2b_foyer_unifie",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1793402005040,
+      "tag": "0052_bureau_close_account",
+      "breakpoints": true
     }
   ]
 }

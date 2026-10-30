@@ -11,6 +11,8 @@ export const MEMBERSHIP_STATUS_LABEL: Record<string, string> = {
   ACTIVE: "Actif",
   SUSPENDED: "Suspendu",
   INACTIVE: "Inactif",
+  REFUSED: "Non retenue",
+  EXCLUDED: "Radié·e",
 };
 
 /**
