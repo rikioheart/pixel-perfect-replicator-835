@@ -327,10 +327,7 @@ export function AppShell({
               {profile?.display_name ?? profile?.first_name ?? "Membre"}
             </p>
             <p className="text-xs">{isBureau ? "Bureau" : profile?.membership_type}</p>
-            <Link to="/profile" className="mt-1 inline-flex min-h-11 items-center gap-2 text-xs underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-              <UserRound className="size-3.5" aria-hidden="true" /> Mon profil & données
-            </Link>
-            <Link to="/" search={{ vitrine: 1 }} className="flex min-h-11 items-center gap-2 text-xs underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link to="/" search={{ vitrine: 1 }} className="mt-1 flex min-h-11 items-center gap-2 text-xs underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <Globe className="size-3.5" aria-hidden="true" /> Voir la vitrine
             </Link>
           </div>

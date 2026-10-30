@@ -22,3 +22,27 @@ describe("personnes du foyer", () => {
     expect([...dup]).toEqual(["a"]);
   });
 });
+
+import { householdNameOptions, cleanHouseholdName, canSubmitAccountClosure } from "./household-people";
+
+describe("nom du foyer", () => {
+  it("propose « Mon foyer » en premier, puis « Foyer de Camille »", () => {
+    expect(householdNameOptions("Camille")).toEqual(["Mon foyer", "Foyer de Camille"]);
+  });
+  it("sans prénom, seul le nom neutre est proposé", () => {
+    expect(householdNameOptions("  ")).toEqual(["Mon foyer"]);
+  });
+  it("refuse un nom vide et nettoie les espaces", () => {
+    expect(cleanHouseholdName(" ")).toBeNull();
+    expect(cleanHouseholdName("  Foyer   des  Pins ")).toBe("Foyer des Pins");
+  });
+});
+
+describe("clôture d'un compte par le Bureau", () => {
+  it("exige un motif et le mot CLÔTURER", () => {
+    expect(canSubmitAccountClosure("Départ sans nouvelles", "clôturer")).toBe(true);
+    expect(canSubmitAccountClosure("Départ sans nouvelles", "CLOTURER")).toBe(true);
+    expect(canSubmitAccountClosure("abc", "CLÔTURER")).toBe(false);
+    expect(canSubmitAccountClosure("Départ sans nouvelles", "SUPPRIMER")).toBe(false);
+  });
+});
