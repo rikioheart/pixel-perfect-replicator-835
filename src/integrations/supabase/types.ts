@@ -484,6 +484,59 @@ export type Database = {
         }
         Relationships: []
       }
+      bureau_communications: {
+        Row: {
+          body: string | null
+          channel: string
+          created_at: string
+          created_by: string | null
+          id: string
+          internal_notes: string | null
+          project_id: string | null
+          status: string
+          target_audience: string
+          target_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          internal_notes?: string | null
+          project_id?: string | null
+          status?: string
+          target_audience?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          internal_notes?: string | null
+          project_id?: string | null
+          status?: string
+          target_audience?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bureau_communications_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           author_id: string
@@ -3325,6 +3378,44 @@ export type Database = {
           },
         ]
       }
+      project_milestones: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          done_at: string | null
+          due_date: string | null
+          id: string
+          project_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          project_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          project_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_milestones_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_teams: {
         Row: {
           created_at: string
@@ -3379,6 +3470,9 @@ export type Database = {
           parent_project_id: string | null
           priority: string
           progress_percent: number
+          rex_advice: string | null
+          rex_improvements: string | null
+          rex_successes: string | null
           slug: string | null
           start_date: string | null
           status: string
@@ -3408,6 +3502,9 @@ export type Database = {
           parent_project_id?: string | null
           priority?: string
           progress_percent?: number
+          rex_advice?: string | null
+          rex_improvements?: string | null
+          rex_successes?: string | null
           slug?: string | null
           start_date?: string | null
           status?: string
@@ -3437,6 +3534,9 @@ export type Database = {
           parent_project_id?: string | null
           priority?: string
           progress_percent?: number
+          rex_advice?: string | null
+          rex_improvements?: string | null
+          rex_successes?: string | null
           slug?: string | null
           start_date?: string | null
           status?: string
