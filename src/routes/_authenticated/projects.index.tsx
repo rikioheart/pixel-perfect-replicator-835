@@ -211,7 +211,7 @@ function ProjectCard({
   onEdit,
 }: {
   project: ProjectRow;
-  counts?: { open: number; done: number };
+  counts?: { open: number; done: number } | undefined;
   canEdit?: boolean;
   onEdit?: () => void;
 }) {
