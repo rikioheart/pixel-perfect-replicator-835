@@ -23,6 +23,7 @@ import {
   PROJECT_STATUS_LABEL,
   formatDate,
 } from "@/lib/domain";
+import { taskCounts } from "@/lib/project-followup";
 
 export const Route = createFileRoute("/_authenticated/projects/")({
   head: () => ({
@@ -65,6 +66,11 @@ function ProjectsPage() {
           .select("*, project_categories(name)")
           .order("created_at", { ascending: false })
       ).data ?? [],
+  });
+
+  const { data: counts } = useQuery({
+    queryKey: ["project-task-counts"],
+    queryFn: async () => taskCounts((await supabase.from("tasks").select("project_id,status")).data ?? []),
   });
 
   const filtered = (projects ?? []).filter(
@@ -134,6 +140,7 @@ function ProjectsPage() {
                 <ProjectCard
                   key={project.id}
                   project={project}
+                  counts={counts?.get(project.id)}
                   canEdit={isBureau}
                   onEdit={() => {
                     setEditing(project);
@@ -199,10 +206,12 @@ type ProjectRow = {
 
 function ProjectCard({
   project,
+  counts,
   canEdit,
   onEdit,
 }: {
   project: ProjectRow;
+  counts?: { open: number; done: number } | undefined;
   canEdit?: boolean;
   onEdit?: () => void;
 }) {
@@ -238,6 +247,13 @@ function ProjectCard({
           {PRIORITY_LABEL[project.priority] ?? project.priority} · {formatDate(project.deadline)}
         </span>
       </div>
+      </Link>
+      <Link
+        to="/tasks"
+        search={{ projectId: project.id }}
+        className="mt-1 block px-1 text-xs text-primary hover:underline"
+      >
+        {counts ? `${counts.open} tâche${counts.open > 1 ? "s" : ""} ouverte${counts.open > 1 ? "s" : ""} · ${counts.done} terminée${counts.done > 1 ? "s" : ""}` : "Aucune tâche"} — voir les tâches
       </Link>
     </div>
   );

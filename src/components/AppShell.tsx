@@ -51,7 +51,7 @@ import {
   Route as RouteIcon,
 } from "lucide-react";
 const HandHeart = HandHeartIcon;
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Megaphone } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -133,7 +133,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/help-requests", label: "Entraide", icon: HandHeart, audience: "all" },
       { to: "/avancees", label: "Nos avancées", icon: Sparkles, audience: "all" },
       { to: "/blog", label: "Journal", icon: Newspaper, audience: "all" },
-      { to: "/mindmap", label: "Carte des projets", icon: Network, audience: "all", hideForParticulier: true },
+      { to: "/mindmap", label: "Mindmap des projets", icon: Network, audience: "all", hideForParticulier: true },
     ],
   },
   {
@@ -171,6 +171,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau" },
       { to: "/admin/suivi-financier", label: "Suivi financier", icon: Euro, audience: "bureau" },
       { to: "/finance", label: "Comptabilité", icon: Euro, audience: "bureau" },
+      { to: "/admin/communication", label: "Communication", icon: Megaphone, audience: "bureau" },
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
       { to: "/admin/pros", label: "Fiches pros", icon: Briefcase, audience: "bureau" },
       { to: "/admin/chiens", label: "Foyers & chiens", icon: Heart, audience: "bureau" },

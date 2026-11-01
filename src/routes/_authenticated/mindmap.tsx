@@ -90,6 +90,8 @@ export const Route = createFileRoute("/_authenticated/mindmap")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { projectId?: string } =>
+    typeof search["projectId"] === "string" && search["projectId"] ? { projectId: search["projectId"] as string } : {},
   component: MindmapPage,
 });
 
@@ -228,6 +230,8 @@ function buildGraph(
 function MindmapPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
+  const { projectId: focusId } = Route.useSearch();
+  const navigateFocus = Route.useNavigate();
   const [showTasks, setShowTasks] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState(ALL);
@@ -302,7 +306,18 @@ function MindmapPage() {
   const filteredProjects = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
     const term = search.trim().toLowerCase();
-    return (data?.projects ?? []).filter((project) => {
+    const all = data?.projects ?? [];
+    let focus: Set<string> | null = null;
+    if (focusId && all.some((p) => p.id === focusId)) {
+      focus = new Set([focusId]);
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (const p of all) if (p.parent_project_id && focus.has(p.parent_project_id) && !focus.has(p.id)) { focus.add(p.id); grew = true; }
+      }
+    }
+    return all.filter((project) => {
+      if (focus && !focus.has(project.id)) return false;
       if (statusFilter !== ALL && project.status !== statusFilter) return false;
       if (categoryFilter !== ALL && project.category_id !== categoryFilter) return false;
       if (priorityFilter !== ALL && project.priority !== priorityFilter) return false;
@@ -318,7 +333,7 @@ function MindmapPage() {
         return false;
       return true;
     });
-  }, [data, search, statusFilter, categoryFilter, priorityFilter, ownerFilter, onlyLate]);
+  }, [data, focusId, search, statusFilter, categoryFilter, priorityFilter, ownerFilter, onlyLate]);
 
   const filteredTasks = useMemo(
     () =>
@@ -595,6 +610,21 @@ function MindmapPage() {
     >
       <div className="panel mb-4 space-y-3 p-3">
         <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs">Projet ciblé</Label>
+            <Select
+              value={focusId ?? ALL}
+              onValueChange={(v) => void navigateFocus({ search: v === ALL ? {} : { projectId: v } })}
+            >
+              <SelectTrigger aria-label="Projet ciblé"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL}>Tous les projets</SelectItem>
+                {(data?.projects ?? []).map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Recherche</Label>
             <Input

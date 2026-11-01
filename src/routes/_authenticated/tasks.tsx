@@ -37,6 +37,8 @@ export const Route = createFileRoute("/_authenticated/tasks")({
       },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { projectId?: string } =>
+    typeof search["projectId"] === "string" && search["projectId"] ? { projectId: search["projectId"] as string } : {},
   component: TasksPage,
 });
 
@@ -44,13 +46,19 @@ function TasksPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
   const coordinated = useCoordinatedProjects(user?.id);
-  const [scope, setScope] = useState<"MINE" | "ALL">("MINE");
+  const { projectId } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const [scope, setScope] = useState<"MINE" | "ALL">(projectId ? "ALL" : "MINE");
+  const { data: projectList = [] } = useQuery({
+    queryKey: ["projects-lite"],
+    queryFn: async () => (await supabase.from("projects").select("id,title").order("title")).data ?? [],
+  });
   const [status, setStatus] = useState("ALL");
   const [panelOpen, setPanelOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskPanelValue | null>(null);
 
   const { data: tasks } = useQuery({
-    queryKey: ["tasks", scope, user?.id],
+    queryKey: ["tasks", scope, user?.id, projectId ?? null],
     enabled: Boolean(user?.id),
     queryFn: async () => {
       let query = supabase
@@ -60,6 +68,7 @@ function TasksPage() {
         )
         .order("deadline", { ascending: true });
       if (scope === "MINE") query = query.eq("assigned_user_id", user!.id);
+      if (projectId) query = query.eq("project_id", projectId);
       return ((await query).data ?? []) as TaskRow[];
     },
   });
@@ -97,6 +106,22 @@ function TasksPage() {
           <SelectContent>
             <SelectItem value="MINE">Mes tâches</SelectItem>
             <SelectItem value="ALL">Toutes les tâches visibles</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          value={projectId ?? "ALL"}
+          onValueChange={(v) => void navigate({ search: v === "ALL" ? {} : { projectId: v } })}
+        >
+          <SelectTrigger className="w-60" aria-label="Projet">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Tous les projets</SelectItem>
+            {projectList.map((p) => (
+              <SelectItem key={p.id} value={p.id}>
+                {p.title}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={status} onValueChange={setStatus}>
@@ -153,6 +178,7 @@ function TasksPage() {
         open={panelOpen}
         onOpenChange={setPanelOpen}
         task={editingTask}
+        defaultProjectId={projectId ?? null}
         canValidate={validatorFor(editingTask)}
         onSaved={() => queryClient.invalidateQueries({ queryKey: ["tasks"] })}
       />

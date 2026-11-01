@@ -72,7 +72,7 @@ function Milestones({ project, canManage }: { project: Project; canManage: boole
     else void refresh();
   };
   const add = async () => {
-    if (title.trim().length < 2) return toast.error("Donnez un intitulé à l'étape.");
+    if (title.trim().length < 2) { toast.error("Donnez un intitulé à l'étape."); return; }
     const { data: u } = await supabase.auth.getUser();
     await run(supabase.from("project_milestones").insert({ project_id: project.id, title: title.trim(), due_date: due || null, created_by: u.user?.id ?? null }));
     setTitle("");
@@ -156,9 +156,9 @@ function Journal({ projectId }: { projectId: string }) {
       (await supabase.from("association_updates").select("id,kind,title,body,created_at").eq("project_id", projectId).order("created_at", { ascending: false })).data ?? [],
   });
   const post = async () => {
-    if (form.title.trim().length < 3) return toast.error("Donnez un titre.");
+    if (form.title.trim().length < 3) { toast.error("Donnez un titre."); return; }
     const { error } = await supabase.from("association_updates").insert({ project_id: projectId, kind: form.kind, title: form.title.trim(), body: form.body.trim() || null, is_public: false, created_by: user!.id });
-    if (error) return toast.error(explainDbError(error));
+    if (error) { toast.error(explainDbError(error)); return; }
     toast.success("Avancée ajoutée au journal.");
     setForm({ kind: "PROJET", title: "", body: "" });
     void qc.invalidateQueries({ queryKey: ["project-journal", projectId] });
@@ -213,13 +213,13 @@ function Photos({ projectId, canManage }: { projectId: string; canManage: boolea
   });
   const photos = docs.filter((d) => d.category === "PHOTO" || IMG.test(d.url));
   const add = async () => {
-    if (!/^https:\/\//i.test(url.trim())) return toast.error("Collez un lien https vers la photo (Drive, album…).");
+    if (!/^https:\/\//i.test(url.trim())) { toast.error("Collez un lien https vers la photo (Drive, album…)."); return; }
     const { data: u } = await supabase.auth.getUser();
     const { error } = await supabase.from("documents").insert({
       title: title.trim() || "Photo du projet", url: url.trim(), category: "PHOTO", context_type: "PROJECT", context_id: projectId,
-      sensitivity: "INTERNE", visibility: "MEMBERS", uploaded_by: u.user?.id ?? null,
+      sensitivity: "INTERNE", visibility: "ASSOCIATION", uploaded_by: u.user?.id ?? null,
     } as never);
-    if (error) return toast.error(explainDbError(error));
+    if (error) { toast.error(explainDbError(error)); return; }
     setTitle(""); setUrl("");
     void qc.invalidateQueries({ queryKey: ["project-photos", projectId] });
   };
