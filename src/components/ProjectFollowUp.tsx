@@ -217,7 +217,7 @@ function Photos({ projectId, canManage }: { projectId: string; canManage: boolea
     const { data: u } = await supabase.auth.getUser();
     const { error } = await supabase.from("documents").insert({
       title: title.trim() || "Photo du projet", url: url.trim(), category: "PHOTO", context_type: "PROJECT", context_id: projectId,
-      sensitivity: "INTERNE", visibility: "MEMBERS", uploaded_by: u.user?.id ?? null,
+      sensitivity: "INTERNE", visibility: "ASSOCIATION", uploaded_by: u.user?.id ?? null,
     } as never);
     if (error) return toast.error(explainDbError(error));
     setTitle(""); setUrl("");

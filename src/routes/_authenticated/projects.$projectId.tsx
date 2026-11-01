@@ -57,6 +57,7 @@ import { EntityPeek } from "@/components/EntityPeek";
 import { isPast, operationalProgress } from "@/lib/archives";
 import { explainDbError, openTasksBeforeClosure } from "@/lib/task-lifecycle";
 import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
+import { ProjectFollowUp } from "@/components/ProjectFollowUp";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -209,6 +210,9 @@ function ProjectDetail() {
         <>
           <AiAssist type="project" id={projectId} actions={["SUMMARY", "INCONSISTENCIES", "MINUTES"]} />
           <ShareLinkButton entityType="project" entityId={projectId} defaultLabel={project.title} />
+          <Button asChild size="sm" variant="outline">
+            <Link to="/mindmap" search={{ projectId }}>Mindmap</Link>
+          </Button>
           {isBureau || profile?.membership_status === "ACTIVE" ? (
             <NewTaskDialog
               projectId={projectId}
@@ -426,11 +430,15 @@ function ProjectDetail() {
 
       <div className="mt-6 space-y-4">
         <ProjectStorySections project={project} />
+        <ProjectFollowUp project={project} canManage={canValidate} onProjectPatch={updateProject} />
         <ProjectContribute projectId={projectId} canModerate={canValidate} />
       </div>
 
       <div className="mt-6">
-        <h2 className="mb-4 text-lg">Actions du projet</h2>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-lg">Actions du projet</h2>
+          <Link to="/tasks" search={{ projectId }} className="text-sm text-primary hover:underline">Voir dans la liste des tâches</Link>
+        </div>
         {(tasks ?? []).length === 0 ? (
           <p className="text-sm text-muted-foreground">Aucune tâche créée pour ce projet.</p>
         ) : (
