@@ -84,7 +84,7 @@ function CommunicationPage() {
   const refresh = () => qc.invalidateQueries({ queryKey: ["bureau-communications"] });
 
   const save = async () => {
-    if (form.title.trim().length < 2) return toast.error("Donnez un titre.");
+    if (form.title.trim().length < 2) { toast.error("Donnez un titre."); return; }
     const payload = {
       title: form.title.trim(), body: form.body.trim() || null, status: form.status, channel: form.channel,
       target_audience: form.target_audience, target_date: form.target_date || null, project_id: form.project_id || null,
@@ -93,7 +93,7 @@ function CommunicationPage() {
     const { error } = editing
       ? await supabase.from("bureau_communications").update(payload).eq("id", editing.id)
       : await supabase.from("bureau_communications").insert({ ...payload, created_by: user?.id ?? null });
-    if (error) return toast.error(explainDbError(error));
+    if (error) { toast.error(explainDbError(error)); return; }
     toast.success("Communication enregistrée.");
     setOpen(false);
     void refresh();
@@ -108,7 +108,7 @@ function CommunicationPage() {
     const { error } = await supabase.from("association_updates").insert({
       kind: c.project_id ? "PROJET" : "ACTION", title: c.title, body: c.body, project_id: c.project_id, is_public: false, created_by: user!.id,
     });
-    if (error) return toast.error(explainDbError(error));
+    if (error) { toast.error(explainDbError(error)); return; }
     await supabase.from("bureau_communications").update({ status: "ARCHIVED", updated_at: new Date().toISOString() }).eq("id", c.id);
     toast.success("Relayée dans « Nos avancées » et classée comme diffusée.");
     void refresh();
