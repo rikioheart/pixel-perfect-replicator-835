@@ -200,11 +200,11 @@ function CreateHouseholdDialog({ open, onOpenChange, onCreate, pending, firstNam
   open: boolean; onOpenChange: (o: boolean) => void; onCreate: (name: string) => void; pending: boolean; firstName?: string | null | undefined;
 }) {
   const options = householdNameOptions(firstName);
-  const [choice, setChoice] = useState(options[0]);
+  const [choice, setChoice] = useState<string>(options[0] ?? "custom");
   const [custom, setCustom] = useState("");
   const name = choice === "custom" ? custom : choice;
   return (
-    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (o) { setChoice(options[0]); setCustom(""); } }}>
+    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (o) { setChoice(options[0] ?? "custom"); setCustom(""); } }}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Créer mon foyer</DialogTitle>
