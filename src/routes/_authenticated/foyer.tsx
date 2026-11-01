@@ -197,7 +197,7 @@ function RenameHousehold({ h }: { h: HouseholdBundle }) {
 }
 
 function CreateHouseholdDialog({ open, onOpenChange, onCreate, pending, firstName }: {
-  open: boolean; onOpenChange: (o: boolean) => void; onCreate: (name: string) => void; pending: boolean; firstName?: string | null;
+  open: boolean; onOpenChange: (o: boolean) => void; onCreate: (name: string) => void; pending: boolean; firstName?: string | null | undefined;
 }) {
   const options = householdNameOptions(firstName);
   const [choice, setChoice] = useState(options[0]);
