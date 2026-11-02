@@ -386,6 +386,13 @@
       "when": 1793620784444,
       "tag": "0054_bloc_b_inventory_movements_reservations",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1793620884532,
+      "tag": "0055_bloc_b_inventory_peak_reserved",
+      "breakpoints": true
     }
   ]
 }
