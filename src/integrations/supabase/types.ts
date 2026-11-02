@@ -2068,34 +2068,149 @@ export type Database = {
         Row: {
           alert_threshold: number
           category: string | null
+          condition: string | null
           created_at: string
+          description: string | null
+          document_url: string | null
           id: string
           location: string | null
           name: string
           quantity: number
+          referent_person_id: string | null
+          type: string | null
+          unit_price: number | null
           updated_at: string
         }
         Insert: {
           alert_threshold?: number
           category?: string | null
+          condition?: string | null
           created_at?: string
+          description?: string | null
+          document_url?: string | null
           id?: string
           location?: string | null
           name: string
           quantity?: number
+          referent_person_id?: string | null
+          type?: string | null
+          unit_price?: number | null
           updated_at?: string
         }
         Update: {
           alert_threshold?: number
           category?: string | null
+          condition?: string | null
           created_at?: string
+          description?: string | null
+          document_url?: string | null
           id?: string
           location?: string | null
           name?: string
           quantity?: number
+          referent_person_id?: string | null
+          type?: string | null
+          unit_price?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "inventory_referent_person_id_fkey"
+            columns: ["referent_person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_movements: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          inventory_id: string
+          quantity_change: number
+          reason: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          inventory_id: string
+          quantity_change: number
+          reason?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          inventory_id?: string
+          quantity_change?: number
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "inventory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_reservations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          end_date: string | null
+          id: string
+          inventory_id: string
+          notes: string | null
+          project_id: string
+          quantity: number
+          start_date: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          inventory_id: string
+          notes?: string | null
+          project_id: string
+          quantity: number
+          start_date?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          inventory_id?: string
+          notes?: string | null
+          project_id?: string
+          quantity?: number
+          start_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_reservations_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_reservations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_sheets: {
         Row: {
@@ -4489,6 +4604,10 @@ export type Database = {
     }
     Functions: {
       account_deletion_blockers: { Args: { _user_id: string }; Returns: Json }
+      adjust_inventory_stock: {
+        Args: { _change: number; _inventory_id: string; _reason?: string }
+        Returns: number
+      }
       apply_loyalty_rules: {
         Args: { _activity_id: string; _event_id: string; _user_id: string }
         Returns: number
@@ -4641,6 +4760,24 @@ export type Database = {
           _type?: string
         }
         Returns: Json
+      }
+      inventory_availability: {
+        Args: { _end?: string; _start?: string }
+        Returns: {
+          available: number
+          inventory_id: string
+          reserved: number
+          stock: number
+        }[]
+      }
+      inventory_reserved_quantity: {
+        Args: {
+          _end: string
+          _exclude?: string
+          _inventory_id: string
+          _start: string
+        }
+        Returns: number
       }
       is_active_member: { Args: { _user_id: string }; Returns: boolean }
       is_bureau: { Args: { _user_id: string }; Returns: boolean }

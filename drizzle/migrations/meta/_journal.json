@@ -379,6 +379,13 @@
       "when": 1793443337106,
       "tag": "0053_bloc_a_milestones_rex_communications",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1793620784444,
+      "tag": "0054_bloc_b_inventory_movements_reservations",
+      "breakpoints": true
     }
   ]
 }
