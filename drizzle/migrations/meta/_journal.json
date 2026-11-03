@@ -393,6 +393,13 @@
       "when": 1793620884532,
       "tag": "0055_bloc_b_inventory_peak_reserved",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1793701674218,
+      "tag": "0056_bloc_b_inventory_grants_tighten",
+      "breakpoints": true
     }
   ]
 }

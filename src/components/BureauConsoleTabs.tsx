@@ -6,6 +6,7 @@ const TABS = [
   { to: "/admin/validation", label: "Validations" },
   { to: "/finance", label: "Comptabilité & remboursements" },
   { to: "/admin/suivi-financier", label: "Suivi des opérations" },
+  { to: "/admin/communication", label: "Communication" },
 ] as const;
 
 /** Une seule console Bureau : /admin est l'entrée canonique, les écrans spécialisés sont des onglets. */

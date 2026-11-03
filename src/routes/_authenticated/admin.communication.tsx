@@ -6,6 +6,7 @@ import { Copy, Plus, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
+import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { SidePanel } from "@/components/SidePanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -124,6 +125,7 @@ function CommunicationPage() {
       subtitle="Préparer et relire les annonces. Rien n'est publié automatiquement."
       actions={<Button className="gap-2" onClick={() => openPanel(null)}><Plus className="size-4" aria-hidden /> Préparer une communication</Button>}
     >
+      <BureauConsoleTabs />
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="flex h-auto flex-wrap">

@@ -15,6 +15,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { memberFullName } from "@/lib/members";
+import {
+  AUDIT_CATEGORIES,
+  SOURCE_LABEL,
+  auditCategory,
+  auditLabel,
+  type UnifiedSource,
+} from "@/lib/audit-categories";
 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   head: () => ({
@@ -37,43 +44,9 @@ export const Route = createFileRoute("/_authenticated/admin/audit")({
   component: AuditPage,
 });
 
-const ACTION_LABEL: Record<string, string> = {
-  "project.create": "Création de projet",
-  "project.update": "Modification de projet",
-  "project.delete": "Suppression de projet",
-  "project.link": "Rattachement de projet",
-  "task.create": "Création de tâche",
-  "task.update": "Modification de tâche",
-  "task.status": "Changement de statut de tâche",
-  "task.link": "Rattachement de tâche",
-  "role.assign": "Attribution de rôle",
-  "role.revoke": "Retrait de rôle",
-  "function.assign": "Attribution de fonction",
-  "function.revoke": "Clôture de fonction",
-  "project.create.undo": "Annulation — création de projet",
-  "project.update.undo": "Annulation — modification de projet",
-  "project.delete.undo": "Annulation — suppression de projet",
-  "project.link.undo": "Annulation — rattachement de projet",
-  "task.create.undo": "Annulation — création de tâche",
-  "task.link.undo": "Annulation — rattachement de tâche",
-  "action.undo": "Annulation d'action",
-};
-
-const CATEGORY_OF_ACTION = (action: string): string => {
-  if (action.endsWith(".undo")) return "UNDO";
-  if (action.startsWith("project.")) return "PROJET";
-  if (action.startsWith("task.")) return "TACHE";
-  if (action.startsWith("role.") || action.startsWith("function.")) return "HABILITATION";
-  return "AUTRE";
-};
-
-const CATEGORY_LABEL: Record<string, string> = {
-  PROJET: "Projets",
-  TACHE: "Tâches",
-  HABILITATION: "Habilitations",
-  UNDO: "Annulations",
-  AUTRE: "Autres",
-};
+// Catégories et libellés partagés (src/lib/audit-categories.ts), fondés sur les actions réellement journalisées.
+const CATEGORY_OF_ACTION = (action: string) => auditCategory(action);
+const CATEGORY_LABEL: Record<string, string> = AUDIT_CATEGORIES;
 
 const PAGE_SIZE = 20;
 
@@ -97,12 +70,14 @@ type LogRow = {
   new_values: unknown;
   metadata: unknown;
   created_at: string;
+  source: UnifiedSource;
 };
 
 function AuditPage() {
   const { isBureau } = useAuth();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("ALL");
+  const [source, setSource] = useState("ALL");
   const [action, setAction] = useState("ALL");
   const [actor, setActor] = useState("ALL");
   const [from, setFrom] = useState("");
@@ -111,20 +86,55 @@ function AuditPage() {
   const [entity, setEntity] = useState("ALL");
   const [chronological, setChronological] = useState(false);
 
-  const { data: logs } = useQuery({
+  const { data: auditRows } = useQuery({
     queryKey: ["audit-logs"],
     enabled: isBureau,
     queryFn: async () =>
-      ((
-        await supabase
-          .from("audit_logs")
-          .select(
-            "id, actor_id, action, entity_type, entity_id, old_values, new_values, metadata, created_at",
-          )
-          .order("created_at", { ascending: false })
-          .limit(1000)
-      ).data ?? []) as LogRow[],
+      (
+        (
+          await supabase
+            .from("audit_logs")
+            .select(
+              "id, actor_id, action, entity_type, entity_id, old_values, new_values, metadata, created_at",
+            )
+            .order("created_at", { ascending: false })
+            .limit(1000)
+        ).data ?? []
+      ).map((row) => ({ ...row, source: "AUDIT" as const })) as LogRow[],
   });
+
+  // Imports HelloAsso : mêmes droits que leur écran (RLS ie_select) ; jamais de payload, candidats,
+  // message ni identifiant externe — seulement le résultat, la date et l'auteur.
+  const { data: importRows } = useQuery({
+    queryKey: ["audit-integration-events"],
+    enabled: isBureau,
+    queryFn: async () =>
+      (
+        (
+          await supabase
+            .from("integration_events")
+            .select("id, outcome, entity_type, created_by, created_at")
+            .ilike("source", "helloasso%")
+            .order("created_at", { ascending: false })
+            .limit(500)
+        ).data ?? []
+      ).map(
+        (e): LogRow => ({
+          id: `ie-${e.id}`,
+          actor_id: e.created_by,
+          action: `integration.${e.outcome}`,
+          entity_type: e.entity_type,
+          entity_id: null,
+          old_values: null,
+          new_values: null,
+          metadata: null,
+          created_at: e.created_at,
+          source: "HELLOASSO",
+        }),
+      ),
+  });
+
+  const logs = useMemo(() => [...(auditRows ?? []), ...(importRows ?? [])], [auditRows, importRows]);
 
   const { data: actors } = useQuery({
     queryKey: ["audit-actors"],

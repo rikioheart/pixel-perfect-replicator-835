@@ -93,7 +93,7 @@ type NavItem = {
 
 type NavGroup = { title: string; icon: typeof LayoutDashboard; items: NavItem[] };
 
-const CONSOLE_PATHS = new Set(["/admin", "/admin/gouvernance", "/admin/validation", "/finance", "/admin/suivi-financier"]);
+const CONSOLE_PATHS = new Set(["/admin", "/admin/gouvernance", "/admin/validation", "/finance", "/admin/suivi-financier", "/admin/communication"]);
 
 /** Familles lisibles (Réseau, Ressources, Paramètres = regroupements de routes existantes) ; les permissions restent appliquées par la base. */
 const NAV_GROUPS: NavGroup[] = [
@@ -189,7 +189,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/loyalty-rules", label: "Fidélité", icon: Stamp, audience: "bureau" },
       { to: "/admin/import", label: "Import", icon: UploadCloud, audience: "bureau" },
       { to: "/statistics", label: "Statistiques", icon: BarChart3, audience: "bureau" },
-      { to: "/admin/audit", label: "Journal", icon: ScrollText, audience: "bureau" },
+      { to: "/admin/audit", label: "Historique", icon: ScrollText, audience: "bureau" },
       { to: "/admin/advisor", label: "Conseiller", icon: Sparkles, audience: "bureau" },
     ],
   },
