@@ -26,13 +26,13 @@ import {
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   head: () => ({
     meta: [
-      { title: "Journal d'activité — La Voix du Chien" },
+      { title: "Historique unifié — La Voix du Chien" },
       {
         name: "description",
         content:
           "Traçabilité complète des actions du cockpit : créations, modifications, suppressions, rattachements et habilitations.",
       },
-      { property: "og:title", content: "Journal d'activité — La Voix du Chien" },
+      { property: "og:title", content: "Historique unifié — La Voix du Chien" },
       {
         property: "og:description",
         content: "Historique horodaté, filtrable et paginé des actions réalisées dans le cockpit.",
@@ -241,6 +241,7 @@ function AuditPage() {
     const fromTime = from ? new Date(`${from}T00:00:00`).getTime() : null;
     const toTime = to ? new Date(`${to}T23:59:59`).getTime() : null;
     const rows = (logs ?? []).filter((log) => {
+      if (source !== "ALL" && log.source !== source) return false;
       if (category !== "ALL" && CATEGORY_OF_ACTION(log.action) !== category) return false;
       if (action !== "ALL" && log.action !== action) return false;
       if (actor !== "ALL" && (log.actor_id ?? "SYSTEM") !== actor) return false;
@@ -250,7 +251,7 @@ function AuditPage() {
       if (toTime && time > toTime) return false;
       if (!term) return true;
       const { summary, context } = contextOf(log);
-      return `${ACTION_LABEL[log.action] ?? log.action} ${log.action} ${actorName(
+      return `${auditLabel(log.action)} ${log.action} ${SOURCE_LABEL[log.source]} ${actorName(
         log.actor_id,
       )} ${summary ?? ""} ${context.join(" ")}`
         .toLowerCase()
@@ -263,6 +264,7 @@ function AuditPage() {
   }, [
     logs,
     search,
+    source,
     category,
     action,
     actor,
@@ -277,7 +279,7 @@ function AuditPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, category, action, actor, from, to, entity, chronological]);
+  }, [search, source, category, action, actor, from, to, entity, chronological]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
@@ -285,6 +287,7 @@ function AuditPage() {
 
   const resetFilters = () => {
     setSearch("");
+    setSource("ALL");
     setCategory("ALL");
     setAction("ALL");
     setActor("ALL");
@@ -302,7 +305,7 @@ function AuditPage() {
 
   if (!isBureau) {
     return (
-      <AppShell title="Journal d'activité" subtitle="Accès réservé au Bureau">
+      <AppShell title="Historique" subtitle="Accès réservé au Bureau">
         <p className="text-sm text-muted-foreground">
           Cette page est réservée aux membres du Bureau.
         </p>
@@ -312,8 +315,8 @@ function AuditPage() {
 
   return (
     <AppShell
-      title="Journal d'activité"
-      subtitle="Traçabilité des actions sur les projets, tâches, liens et habilitations"
+      title="Historique unifié"
+      subtitle="Journal de la plateforme et imports HelloAsso, réunis selon vos droits"
     >
       <div className="mb-4 grid gap-2 rounded-lg border border-border bg-card p-4 md:grid-cols-3 lg:grid-cols-6">
         <Input
@@ -321,9 +324,23 @@ function AuditPage() {
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Rechercher (projet, tâche, auteur…)"
           className="lg:col-span-2"
+          aria-label="Rechercher dans l'historique"
         />
+        <Select value={source} onValueChange={setSource}>
+          <SelectTrigger aria-label="Source">
+            <SelectValue placeholder="Source" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">Toutes les sources</SelectItem>
+            {Object.entries(SOURCE_LABEL).map(([code, label]) => (
+              <SelectItem key={code} value={code}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger>
+          <SelectTrigger aria-label="Catégorie">
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent>
@@ -343,7 +360,7 @@ function AuditPage() {
             <SelectItem value="ALL">Tous les types</SelectItem>
             {actionTypes.map((code) => (
               <SelectItem key={code} value={code}>
-                {ACTION_LABEL[code] ?? code}
+                {auditLabel(code)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -418,7 +435,7 @@ function AuditPage() {
             <div key={log.id} className="flex flex-wrap items-start justify-between gap-3 p-4">
               <div className="min-w-0">
                 <p className="text-sm font-medium">
-                  {ACTION_LABEL[log.action] ?? log.action}
+                  {auditLabel(log.action)}
                   {summary ? <span className="text-muted-foreground"> — {summary}</span> : null}
                 </p>
                 {context.length > 0 ? (
@@ -442,9 +459,14 @@ function AuditPage() {
                   </Button>
                 ) : null}
               </div>
-              <Badge variant="outline">
-                {CATEGORY_LABEL[CATEGORY_OF_ACTION(log.action)] ?? log.entity_type}
-              </Badge>
+              <div className="flex flex-wrap gap-1">
+                <Badge variant={log.source === "HELLOASSO" ? "secondary" : "outline"}>
+                  {SOURCE_LABEL[log.source]}
+                </Badge>
+                <Badge variant="outline">
+                  {CATEGORY_LABEL[CATEGORY_OF_ACTION(log.action)] ?? log.entity_type}
+                </Badge>
+              </div>
             </div>
           );
         })}

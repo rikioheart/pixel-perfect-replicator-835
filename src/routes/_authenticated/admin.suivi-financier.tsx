@@ -31,7 +31,7 @@ const CATS = { RECETTE: ["ADHESION", "CONTRIBUTION", "LOCATION_TERRAIN", "ACTIVI
   DEPENSE: ["ACHAT", "MATERIEL", "REMBOURSEMENT", "FRAIS_ACTIVITE", "FRAIS_PROJET", "AUTRE_DEPENSE"] } as const;
 const STATUS_FR: Record<string, string> = { A_RECEVOIR: "À recevoir", RECU: "Reçu", A_PAYER: "À payer", PAYE: "Payé", TRANSMIS: "Transmis compta", ANNULE: "Annulé" };
 const OUT_FR: Record<string, string> = { CREATED: "Créé", UPDATED: "Mis à jour", UNCHANGED: "Déjà connu", TO_REVIEW: "À valider", PERSON_ONLY: "Personne sans compte", ERROR: "Erreur", RESOLVED: "Traité", EXPORTED: "Exporté" };
-const EMPTY = { entry_date: new Date().toISOString().slice(0, 10), direction: "RECETTE", category: "CONTRIBUTION", amount: "", description: "", status: "A_RECEVOIR", receipt_url: "", payment_method: "", external_ref: "", internal_note: "" };
+const EMPTY = { entry_date: new Date().toISOString().slice(0, 10), direction: "RECETTE", category: "CONTRIBUTION", amount: "", description: "", status: "A_RECEVOIR", receipt_url: "", payment_method: "", external_ref: "", internal_note: "", project_id: "", activity_id: "", person_id: "" };
 
 function Page() {
   // Requêtes lancées seulement si le droit est effectif ; la base refuse de toute façon (RLS).
@@ -61,6 +61,19 @@ function Page() {
       return data ?? [];
     },
   });
+  // Rattachements facultatifs d'une opération (colonnes existantes de finance_entries, aucune autre table touchée).
+  const links = useQuery({
+    queryKey: ["finance-entry-links"],
+    enabled: rights.create,
+    queryFn: async () => {
+      const [projects, activities, people] = await Promise.all([
+        supabase.from("projects").select("id, title").order("title"),
+        supabase.from("activities").select("id, title, date").order("date", { ascending: false }).limit(200),
+        supabase.from("people").select("id, display_name, first_name, last_name").order("last_name"),
+      ]);
+      return { projects: projects.data ?? [], activities: activities.data ?? [], people: people.data ?? [] };
+    },
+  });
   const journal = useQuery({
     queryKey: ["integration-events"],
     enabled: canJournal,
@@ -81,6 +94,7 @@ function Page() {
         entry_date: f.entry_date, direction: f.direction, category: f.category, amount,
         description: f.description || null, status: f.status, receipt_url: f.receipt_url || null,
         payment_method: f.payment_method || null, external_ref: f.external_ref || null, internal_note: f.internal_note || null,
+        project_id: f.project_id || null, activity_id: f.activity_id || null, person_id: f.person_id || null,
         ...extra,
       } as never);
       if (error) throw error;
@@ -167,8 +181,18 @@ function Page() {
           <div><Label htmlFor="fe-pm">Mode de paiement</Label><Input id="fe-pm" value={f.payment_method} onChange={(e) => setF({ ...f, payment_method: e.target.value })} /></div>
           <div className="sm:col-span-2"><Label htmlFor="fe-desc">Description</Label><Input id="fe-desc" value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></div>
           <div><Label htmlFor="fe-ref">Référence</Label><Input id="fe-ref" value={f.external_ref} onChange={(e) => setF({ ...f, external_ref: e.target.value })} /></div>
-          <div className="sm:col-span-2"><Label htmlFor="fe-r">Lien du justificatif</Label><Input id="fe-r" placeholder="https://…" value={f.receipt_url} onChange={(e) => setF({ ...f, receipt_url: e.target.value })} /></div>
-          <div><Label htmlFor="fe-n">Note interne</Label><Input id="fe-n" value={f.internal_note} onChange={(e) => setF({ ...f, internal_note: e.target.value })} /></div>
+          <div><Label htmlFor="fe-proj">Projet associé (facultatif)</Label>
+            <select id="fe-proj" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.project_id} onChange={(e) => setF({ ...f, project_id: e.target.value })}>
+              <option value="">Aucun</option>{(links.data?.projects ?? []).map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}</select></div>
+          <div><Label htmlFor="fe-act">Activité associée (facultatif)</Label>
+            <select id="fe-act" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.activity_id} onChange={(e) => setF({ ...f, activity_id: e.target.value })}>
+              <option value="">Aucune</option>{(links.data?.activities ?? []).map((a) => <option key={a.id} value={a.id}>{a.date ? `${a.date} · ` : ""}{a.title}</option>)}</select></div>
+          <div><Label htmlFor="fe-pers">Tiers ou bénéficiaire (facultatif)</Label>
+            <select id="fe-pers" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.person_id} onChange={(e) => setF({ ...f, person_id: e.target.value })}>
+              <option value="">Aucun</option>{(links.data?.people ?? []).map((p) => <option key={p.id} value={p.id}>{p.display_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "Personne"}</option>)}</select></div>
+          <div className="sm:col-span-2"><Label htmlFor="fe-r">Lien du justificatif (facultatif)</Label><Input id="fe-r" placeholder="https://… (photo ou document)" value={f.receipt_url} onChange={(e) => setF({ ...f, receipt_url: e.target.value })} /></div>
+          <div><Label htmlFor="fe-n">Note interne (facultatif)</Label><Input id="fe-n" value={f.internal_note} onChange={(e) => setF({ ...f, internal_note: e.target.value })} /></div>
+          <p className="text-xs text-muted-foreground sm:col-span-3">Ni la note ni le justificatif ne sont obligatoires pour enregistrer une opération.</p>
         </div>
         <Button className="mt-3" onClick={() => add.mutate({})} disabled={add.isPending}>Enregistrer</Button>
       </details>

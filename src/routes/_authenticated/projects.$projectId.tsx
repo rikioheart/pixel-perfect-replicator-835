@@ -437,7 +437,12 @@ function ProjectDetail() {
       <div className="mt-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg">Actions du projet</h2>
-          <Link to="/tasks" search={{ projectId }} className="text-sm text-primary hover:underline">Voir dans la liste des tâches</Link>
+          <span className="flex flex-wrap gap-3">
+            {canValidate ? (
+              <Link to="/inventory" search={{ projectId }} className="text-sm text-primary hover:underline">Matériel du projet</Link>
+            ) : null}
+            <Link to="/tasks" search={{ projectId }} className="text-sm text-primary hover:underline">Voir dans la liste des tâches</Link>
+          </span>
         </div>
         {(tasks ?? []).length === 0 ? (
           <p className="text-sm text-muted-foreground">Aucune tâche créée pour ce projet.</p>
