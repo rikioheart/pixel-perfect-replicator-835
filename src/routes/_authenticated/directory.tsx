@@ -18,6 +18,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { withContacts } from "@/lib/profile-columns";
 import { useAuth } from "@/hooks/useAuth";
+import { EntityPeek } from "@/components/EntityPeek";
+import { DirectoryDogs } from "@/components/DirectoryDogs";
 
 export const Route = createFileRoute("/_authenticated/directory")({
   head: () => ({
@@ -74,6 +76,37 @@ function DirectoryPage() {
       }));
     },
   });
+
+  // Liens existants, filtrés par la RLS : projets visibles (can_view_project) et collaborations publiques/propres/Bureau.
+  const { data: links } = useQuery({
+    queryKey: ["directory-links"],
+    queryFn: async () => {
+      const [members, collabs, partners] = await Promise.all([
+        supabase.from("project_members").select("user_id, project_id, projects(title)"),
+        supabase.from("professional_collaborations").select("professional_id"),
+        supabase.from("partners").select("id, name, type").eq("active", true).order("name"),
+      ]);
+      return { members: members.data ?? [], collabs: collabs.data ?? [], partners: partners.data ?? [] };
+    },
+  });
+  const projectsOf = useMemo(() => {
+    const map = new Map<string, { id: string; title: string }[]>();
+    for (const m of links?.members ?? []) {
+      const title = (m.projects as { title?: string } | null)?.title;
+      if (!m.user_id || !title) continue;
+      const list = map.get(m.user_id) ?? [];
+      if (!list.some((p) => p.id === m.project_id)) list.push({ id: m.project_id, title });
+      map.set(m.user_id, list);
+    }
+    return map;
+  }, [links]);
+  const collabCount = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const c of links?.collabs ?? []) map.set(c.professional_id, (map.get(c.professional_id) ?? 0) + 1);
+    return map;
+  }, [links]);
+  const partnerOrgs = links?.partners ?? [];
+
 
   const departments = useMemo(
     () => Array.from(new Set((data ?? []).map((p) => p.department).filter(Boolean))).sort() as string[],
