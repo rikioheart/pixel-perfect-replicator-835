@@ -1,5 +1,14 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Bloc B — Console, inventaire, finances, annuaire (2 nov.)
+- [x] B1 Onglet Communication dans la console ; historique unifié (journal + imports HelloAsso, 6 catégories + repli)
+- [x] B2 Inventaire : champs facultatifs, entrées/sorties tracées, réservations par projet, anti-surréservation en base (verrou)
+- [x] B3 Suivi des opérations : projet/activité/tiers facultatifs, note et justificatif « (facultatif) » ; /finance inchangé
+- [x] B4 Annuaire : Pros/Particuliers/Partenaires/Chiens, fiches rapides, projets et collaborations ; chiens via fonctions sécurisées
+- [x] 192 tests, contrôle des types, build ; essais en base (concurrence 12 demandes → 3 acceptées) ; écrans Bureau et membre vérifiés
+- [ ] Vérifier sur téléphone ; essai avec un vrai compte coordinateur de projet (aucun disponible)
+
+
 ## Pass Terrain — valideurs et activation (24 oct.)
 - [x] Pros validés valideurs d'office, Bureau valideur après activation (règles à accepter), suspension possible
 - [x] Pass personnel à activer pour pro/Bureau non particulier ; tampons comme un particulier, jamais sur soi
