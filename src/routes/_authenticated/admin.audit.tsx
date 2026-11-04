@@ -26,13 +26,13 @@ import {
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   head: () => ({
     meta: [
-      { title: "Journal d'activité — La Voix du Chien" },
+      { title: "Historique unifié — La Voix du Chien" },
       {
         name: "description",
         content:
           "Traçabilité complète des actions du cockpit : créations, modifications, suppressions, rattachements et habilitations.",
       },
-      { property: "og:title", content: "Journal d'activité — La Voix du Chien" },
+      { property: "og:title", content: "Historique unifié — La Voix du Chien" },
       {
         property: "og:description",
         content: "Historique horodaté, filtrable et paginé des actions réalisées dans le cockpit.",
