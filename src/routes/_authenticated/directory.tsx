@@ -45,6 +45,7 @@ const CATEGORIES: [string, string][] = [
   ["PRO", "Professionnels"],
   ["PARTICULIER", "Particuliers"],
   ["PARTENAIRE", "Partenaires"],
+  ["CHIENS", "Chiens"],
 ];
 
 function DirectoryPage() {
@@ -122,89 +123,136 @@ function DirectoryPage() {
       </div>
       <div className="mb-6 grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label className="text-xs">Recherche</Label>
+          <Label className="text-xs" htmlFor="dir-search">Recherche</Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              id="dir-search"
               className="pl-9"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Nom, structure, spécialité, ville"
+              placeholder={category === "CHIENS" ? "Nom, race, foyer" : "Nom, structure, spécialité, ville"}
             />
           </div>
         </div>
-        <div className="space-y-1">
-          <Label className="text-xs">Département</Label>
-          <Select value={department} onValueChange={setDepartment}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Tous</SelectItem>
-              {departments.map((value) => (
-                <SelectItem key={value} value={value}>
-                  {value}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {category !== "CHIENS" ? (
+          <div className="space-y-1">
+            <Label className="text-xs">Département</Label>
+            <Select value={department} onValueChange={setDepartment}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Tous</SelectItem>
+                {departments.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null}
       </div>
 
-      {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement de l'annuaire…</p>
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          title="Aucun profil trouvé"
-          message="Affinez votre recherche, ou invitez de nouveaux adhérents à rejoindre le réseau."
-        />
+      {category === "CHIENS" ? (
+        <DirectoryDogs search={search} />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((person) => (
-            <article key={person.id} className="rounded-xl border border-border bg-card p-5">
-              <h2 className="font-display text-base font-bold">
-                {person.display_name ||
-                  `${person.first_name ?? ""} ${person.last_name ?? ""}`.trim() ||
-                  "Adhérent"}
-              </h2>
-              {person.pro?.company_name ? (
-                <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Briefcase className="size-3.5" /> {person.pro.company_name}
-                  {person.pro.professional_category ? ` · ${person.pro.professional_category}` : ""}
-                </p>
-              ) : null}
-              {person.city || person.department ? (
-                <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <MapPin className="size-3.5" /> {[person.city, person.department].filter(Boolean).join(" · ")}
-                </p>
-              ) : null}
-              {person.bio ? <p className="mt-3 line-clamp-3 text-sm">{person.bio}</p> : null}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {isBureau ? (
-                  <Link to="/members/$memberId" params={{ memberId: person.id }}>
-                    <Button size="sm" variant="outline" className="rounded-full">
-                      Voir la fiche
-                    </Button>
-                  </Link>
-                ) : null}
-                {person.pro ? (
-                  <Link to="/professionals/$proId" params={{ proId: person.id }}>
-                    <Button size="sm" variant="outline" className="rounded-full">
-                      Fiche pro
-                    </Button>
-                  </Link>
-                ) : null}
-                {isBureau && person.email ? (
-                  <a href={`mailto:${person.email}`}>
-                    <Button size="sm" variant="ghost" className="rounded-full">
-                      <Mail className="mr-2 size-4" /> Contacter
-                    </Button>
-                  </a>
-                ) : null}
+        <>
+          {category === "PARTENAIRE" && partnerOrgs.length > 0 ? (
+            <section aria-label="Structures partenaires" className="mb-6">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold">Structures partenaires</h2>
+                <Link to="/partners" className="text-xs font-medium text-primary hover:underline">Partenaires & avantages</Link>
               </div>
-            </article>
-          ))}
-        </div>
+              <ul className="flex flex-wrap gap-2">
+                {partnerOrgs.map((p) => (
+                  <li key={p.id} className="rounded-full border border-border bg-card px-3 py-1 text-xs">
+                    {p.name}{p.type ? <span className="text-muted-foreground"> · {p.type}</span> : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Chargement de l'annuaire…</p>
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="Aucun profil trouvé"
+              message="Affinez votre recherche, ou invitez de nouveaux adhérents à rejoindre le réseau."
+            />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((person) => {
+                const name =
+                  person.display_name || `${person.first_name ?? ""} ${person.last_name ?? ""}`.trim() || "Adhérent";
+                const personProjects = projectsOf.get(person.id) ?? [];
+                const collabs = collabCount.get(person.id) ?? 0;
+                return (
+                  <article key={person.id} className="rounded-xl border border-border bg-card p-5">
+                    <h2 className="font-display text-base font-bold">
+                      <EntityPeek type={person.pro ? "professional" : "person"} id={person.id}>{name}</EntityPeek>
+                    </h2>
+                    {person.pro?.company_name ? (
+                      <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Briefcase className="size-3.5" /> {person.pro.company_name}
+                        {person.pro.professional_category ? ` · ${person.pro.professional_category}` : ""}
+                      </p>
+                    ) : null}
+                    {person.city || person.department ? (
+                      <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <MapPin className="size-3.5" /> {[person.city, person.department].filter(Boolean).join(" · ")}
+                      </p>
+                    ) : null}
+                    {person.bio ? <p className="mt-3 line-clamp-3 text-sm">{person.bio}</p> : null}
+                    {personProjects.length > 0 || collabs > 0 ? (
+                      <ul aria-label="Projets et collaborations" className="mt-3 flex flex-wrap gap-1.5">
+                        {personProjects.slice(0, 3).map((p) => (
+                          <li key={p.id}>
+                            <Link to="/projects/$projectId" params={{ projectId: p.id }} className="rounded-full bg-muted px-2.5 py-0.5 text-xs hover:underline">
+                              {p.title}
+                            </Link>
+                          </li>
+                        ))}
+                        {personProjects.length > 3 ? <li className="text-xs text-muted-foreground">+{personProjects.length - 3}</li> : null}
+                        {collabs > 0 ? (
+                          <li>
+                            <Link to="/professionals/$proId" params={{ proId: person.id }} className="rounded-full bg-muted px-2.5 py-0.5 text-xs hover:underline">
+                              {collabs} collaboration{collabs > 1 ? "s" : ""}
+                            </Link>
+                          </li>
+                        ) : null}
+                      </ul>
+                    ) : null}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {isBureau ? (
+                        <Link to="/members/$memberId" params={{ memberId: person.id }}>
+                          <Button size="sm" variant="outline" className="rounded-full">
+                            Voir la fiche
+                          </Button>
+                        </Link>
+                      ) : null}
+                      {person.pro ? (
+                        <Link to="/professionals/$proId" params={{ proId: person.id }}>
+                          <Button size="sm" variant="outline" className="rounded-full">
+                            Fiche pro
+                          </Button>
+                        </Link>
+                      ) : null}
+                      {isBureau && person.email ? (
+                        <a href={`mailto:${person.email}`}>
+                          <Button size="sm" variant="ghost" className="rounded-full">
+                            <Mail className="mr-2 size-4" /> Contacter
+                          </Button>
+                        </a>
+                      ) : null}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
     </AppShell>
   );
