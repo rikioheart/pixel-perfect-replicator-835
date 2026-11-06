@@ -4,7 +4,6 @@ import { Heart, LifeBuoy, Lightbulb, MessageCircleQuestion, Sparkles, type Lucid
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { HelpWizard } from "@/components/HelpWizard";
 
 type Entry = { to: string; title: string; text: string; icon: LucideIcon };
 
@@ -27,10 +26,10 @@ function EntryBody({ title, text, icon: Icon }: Omit<Entry, "to">) {
 export function FloatingHelpButton() {
   const { isBureau } = useAuth();
   const [open, setOpen] = useState(false);
-  const [helping, setHelping] = useState(false);
   const before: Entry[] = [
     { to: "/help", title: "Guides pratiques", text: "Comprendre une page ou une démarche, pas à pas.", icon: LifeBuoy },
     { to: "/help-requests", title: "Demander un coup de main", text: "Vous avez besoin d'aide : un membre vous répond.", icon: MessageCircleQuestion },
+    { to: "/je-veux-aider", title: "Je veux aider", text: "Proposer vos compétences ou du temps sur un projet associatif.", icon: Heart },
   ];
   const after: Entry[] = [
     { to: "/proposals", title: "Proposer une idée", text: "Partager une envie ou une amélioration.", icon: Lightbulb },
@@ -62,20 +61,10 @@ export function FloatingHelpButton() {
           </SheetHeader>
           <ul className="mt-6 space-y-2">
             {before.map(link)}
-            <li>
-              <button
-                type="button"
-                className={itemClass}
-                onClick={() => { setOpen(false); setHelping(true); }}
-              >
-                <EntryBody title="Je veux aider" text="Proposer vos compétences ou du temps sur un projet associatif." icon={Heart} />
-              </button>
-            </li>
             {after.map(link)}
           </ul>
         </SheetContent>
       </Sheet>
-      <HelpWizard open={helping} onOpenChange={setHelping} />
     </>
   );
 }
