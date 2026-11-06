@@ -267,9 +267,8 @@ function WantToHelpPage() {
         <h2 id="my-offers-h" className="font-display text-lg">Mes propositions</h2>
         {myOffers.length === 0 ? (
           <EmptyState
-            icon={HandHeart}
             title="Aucune proposition pour l'instant"
-            description="Vos propositions d'aide apparaîtront ici, avec leur avancement."
+            message="Vos propositions d'aide apparaîtront ici, avec leur avancement."
           />
         ) : (
           <ul className="space-y-3 text-sm">
