@@ -31,6 +31,7 @@ import { Route as AuthenticatedFoyerRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedHelpRequestsRouteImport } from './routes/_authenticated/help-requests'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
+import { Route as AuthenticatedJeVeuxAiderRouteImport } from './routes/_authenticated/je-veux-aider'
 import { Route as AuthenticatedLoyaltyRouteImport } from './routes/_authenticated/loyalty'
 import { Route as AuthenticatedMairiesRouteImport } from './routes/_authenticated/mairies'
 import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
@@ -195,6 +196,12 @@ const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedJeVeuxAiderRoute =
+  AuthenticatedJeVeuxAiderRouteImport.update({
+    id: '/je-veux-aider',
+    path: '/je-veux-aider',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLoyaltyRoute = AuthenticatedLoyaltyRouteImport.update({
   id: '/loyalty',
   path: '/loyalty',
@@ -512,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/je-veux-aider': typeof AuthenticatedJeVeuxAiderRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/mairies': typeof AuthenticatedMairiesRoute
   '/member': typeof AuthenticatedMemberRoute
@@ -587,6 +595,7 @@ export interface FileRoutesByTo {
   '/help': typeof AuthenticatedHelpRoute
   '/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/je-veux-aider': typeof AuthenticatedJeVeuxAiderRoute
   '/loyalty': typeof AuthenticatedLoyaltyRoute
   '/mairies': typeof AuthenticatedMairiesRoute
   '/member': typeof AuthenticatedMemberRoute
@@ -665,6 +674,7 @@ export interface FileRoutesById {
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/help-requests': typeof AuthenticatedHelpRequestsRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
+  '/_authenticated/je-veux-aider': typeof AuthenticatedJeVeuxAiderRoute
   '/_authenticated/loyalty': typeof AuthenticatedLoyaltyRoute
   '/_authenticated/mairies': typeof AuthenticatedMairiesRoute
   '/_authenticated/member': typeof AuthenticatedMemberRoute
@@ -743,6 +753,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/help-requests'
     | '/inventory'
+    | '/je-veux-aider'
     | '/loyalty'
     | '/mairies'
     | '/member'
@@ -818,6 +829,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/help-requests'
     | '/inventory'
+    | '/je-veux-aider'
     | '/loyalty'
     | '/mairies'
     | '/member'
@@ -895,6 +907,7 @@ export interface FileRouteTypes {
     | '/_authenticated/help'
     | '/_authenticated/help-requests'
     | '/_authenticated/inventory'
+    | '/_authenticated/je-veux-aider'
     | '/_authenticated/loyalty'
     | '/_authenticated/mairies'
     | '/_authenticated/member'
@@ -1118,6 +1131,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/inventory'
       preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/je-veux-aider': {
+      id: '/_authenticated/je-veux-aider'
+      path: '/je-veux-aider'
+      fullPath: '/je-veux-aider'
+      preLoaderRoute: typeof AuthenticatedJeVeuxAiderRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/loyalty': {
@@ -1532,6 +1552,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHelpRequestsRoute: typeof AuthenticatedHelpRequestsRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
+  AuthenticatedJeVeuxAiderRoute: typeof AuthenticatedJeVeuxAiderRoute
   AuthenticatedLoyaltyRoute: typeof AuthenticatedLoyaltyRoute
   AuthenticatedMairiesRoute: typeof AuthenticatedMairiesRoute
   AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
@@ -1595,6 +1616,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHelpRequestsRoute: AuthenticatedHelpRequestsRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
+  AuthenticatedJeVeuxAiderRoute: AuthenticatedJeVeuxAiderRoute,
   AuthenticatedLoyaltyRoute: AuthenticatedLoyaltyRoute,
   AuthenticatedMairiesRoute: AuthenticatedMairiesRoute,
   AuthenticatedMemberRoute: AuthenticatedMemberRoute,
