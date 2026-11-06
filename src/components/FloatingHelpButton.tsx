@@ -61,20 +61,10 @@ export function FloatingHelpButton() {
           </SheetHeader>
           <ul className="mt-6 space-y-2">
             {before.map(link)}
-            <li>
-              <button
-                type="button"
-                className={itemClass}
-                onClick={() => { setOpen(false); setHelping(true); }}
-              >
-                <EntryBody title="Je veux aider" text="Proposer vos compétences ou du temps sur un projet associatif." icon={Heart} />
-              </button>
-            </li>
             {after.map(link)}
           </ul>
         </SheetContent>
       </Sheet>
-      <HelpWizard open={helping} onOpenChange={setHelping} />
     </>
   );
 }
