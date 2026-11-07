@@ -2067,6 +2067,8 @@ export type Database = {
       inventory: {
         Row: {
           alert_threshold: number
+          archive_reason: string | null
+          archived_at: string | null
           category: string | null
           condition: string | null
           created_at: string
@@ -2083,6 +2085,8 @@ export type Database = {
         }
         Insert: {
           alert_threshold?: number
+          archive_reason?: string | null
+          archived_at?: string | null
           category?: string | null
           condition?: string | null
           created_at?: string
@@ -2099,6 +2103,8 @@ export type Database = {
         }
         Update: {
           alert_threshold?: number
+          archive_reason?: string | null
+          archived_at?: string | null
           category?: string | null
           condition?: string | null
           created_at?: string
@@ -4712,6 +4718,10 @@ export type Database = {
         Args: { _decision: string; _profile_id: string; _reason?: string }
         Returns: Json
       }
+      delete_inventory_item: {
+        Args: { _inventory_id: string }
+        Returns: undefined
+      }
       dog_section_visible: {
         Args: { _dog_id: string; _section: string; _user_id: string }
         Returns: boolean
@@ -4897,6 +4907,10 @@ export type Database = {
       }
       request_account_deletion: { Args: { _confirm: string }; Returns: Json }
       resolve_member_from_qr: { Args: { _scanned_code: string }; Returns: Json }
+      retire_inventory_item: {
+        Args: { _inventory_id: string; _reason?: string }
+        Returns: undefined
+      }
       revoke_delegation: { Args: { _id: string }; Returns: undefined }
       revoke_dog_access: { Args: { _access_id: string }; Returns: undefined }
       run_daily_reminders: { Args: never; Returns: undefined }

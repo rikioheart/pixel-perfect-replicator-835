@@ -90,7 +90,7 @@ function InventoryPage() {
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["inventory"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("inventory").select("*").order("name");
+      const { data, error } = await supabase.from("inventory").select("*").is("archived_at", null).order("name");
       if (error) throw error;
       return data as Item[];
     },
@@ -268,6 +268,27 @@ function InventoryPage() {
     onError: (e: Error) => toast.error(errText(e)),
   });
 
+  const removeItem = useMutation({
+    mutationFn: async ({ item, mode }: { item: Item; mode: "retire" | "delete" }) => {
+      if (mode === "retire") {
+        const reason = prompt(`Sortie définitive de « ${item.name} » (don, perte, casse…). Motif facultatif :`);
+        if (reason === null) throw new Error("__cancel");
+        const { error } = await supabase.rpc("retire_inventory_item", { _inventory_id: item.id, ...(reason.trim() ? { _reason: reason.trim() } : {}) });
+        if (error) throw error;
+      } else {
+        if (!confirm(`Supprimer définitivement « ${item.name} » ? Possible uniquement s'il n'a jamais servi à un projet.`)) throw new Error("__cancel");
+        const { error } = await supabase.rpc("delete_inventory_item", { _inventory_id: item.id });
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_d, v) => {
+      toast.success(v.mode === "retire" ? "Article sorti de l'inventaire, historique conservé." : "Article supprimé.");
+      setEditing(null);
+      refresh();
+    },
+    onError: (e: Error) => { if (e.message !== "__cancel") toast.error(errText(e)); },
+  });
+
   const openEdit = (item: Item | "new") => {
     setForm(
       item === "new"
@@ -298,6 +319,7 @@ function InventoryPage() {
   const itemName = (id: string) => items.find((i) => i.id === id)?.name ?? "Article";
   const shownReservations = focusProject ? reservations.filter((r) => r.project_id === focusProject) : reservations;
   const focusTitle = focusProject ? projects.find((p) => p.id === focusProject)?.title : null;
+  const overdue = reservations.filter((r) => r.status === "ACTIVE" && r.end_date && r.end_date < today());
 
   return (
     <AppShell
@@ -316,6 +338,16 @@ function InventoryPage() {
           <AlertTriangle className="mt-0.5 size-4 text-destructive" />
           <p>
             {lowStock.length} référence{lowStock.length > 1 ? "s" : ""} sous le seuil d'alerte : {lowStock.map((i) => i.name).join(", ")}.
+          </p>
+        </div>
+      ) : null}
+
+      {overdue.length > 0 ? (
+        <div role="status" className="mb-4 flex items-start gap-2 rounded-md border border-border bg-muted/50 p-3 text-sm">
+          <CalendarRange className="mt-0.5 size-4 text-primary" />
+          <p>
+            {overdue.length} prêt{overdue.length > 1 ? "s" : ""} à restituer (date de fin dépassée) :{" "}
+            {overdue.map((r) => itemName(r.inventory_id)).join(", ")}. Marquez-les « rendu » ci-dessous une fois le matériel revenu.
           </p>
         </div>
       ) : null}
@@ -510,6 +542,12 @@ function InventoryPage() {
             <div className="sm:col-span-2"><Label htmlFor="inv-desc">Description (facultatif)</Label><Textarea id="inv-desc" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
           </div>
           <DialogFooter>
+            {editing && editing !== "new" ? (
+              <div className="mr-auto flex flex-wrap gap-2">
+                <Button variant="outline" disabled={removeItem.isPending} onClick={() => removeItem.mutate({ item: editing, mode: "retire" })}>Sortie définitive</Button>
+                <Button variant="ghost" className="text-destructive" disabled={removeItem.isPending} onClick={() => removeItem.mutate({ item: editing, mode: "delete" })}>Supprimer</Button>
+              </div>
+            ) : null}
             <Button onClick={() => saveItem.mutate()} disabled={saveItem.isPending}>{editing === "new" ? "Ajouter" : "Enregistrer"}</Button>
           </DialogFooter>
         </DialogContent>
