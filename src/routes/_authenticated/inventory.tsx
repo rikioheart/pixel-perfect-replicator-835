@@ -542,6 +542,12 @@ function InventoryPage() {
             <div className="sm:col-span-2"><Label htmlFor="inv-desc">Description (facultatif)</Label><Textarea id="inv-desc" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
           </div>
           <DialogFooter>
+            {editing && editing !== "new" ? (
+              <div className="mr-auto flex flex-wrap gap-2">
+                <Button variant="outline" disabled={removeItem.isPending} onClick={() => removeItem.mutate({ item: editing, mode: "retire" })}>Sortie définitive</Button>
+                <Button variant="ghost" className="text-destructive" disabled={removeItem.isPending} onClick={() => removeItem.mutate({ item: editing, mode: "delete" })}>Supprimer</Button>
+              </div>
+            ) : null}
             <Button onClick={() => saveItem.mutate()} disabled={saveItem.isPending}>{editing === "new" ? "Ajouter" : "Enregistrer"}</Button>
           </DialogFooter>
         </DialogContent>
