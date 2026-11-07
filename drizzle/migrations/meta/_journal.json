@@ -400,6 +400,13 @@
       "when": 1793701674218,
       "tag": "0056_bloc_b_inventory_grants_tighten",
       "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1794072328494,
+      "tag": "0057_inventory_retire_delete",
+      "breakpoints": true
     }
   ]
 }
