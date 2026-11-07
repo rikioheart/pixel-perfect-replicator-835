@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { formatParisDateTime, fromParisInput, toParisInput } from "@/lib/places";
 import { DecisionToTask } from "@/components/DecisionToTask";
+import { DecisionToCommunication } from "@/components/DecisionToCommunication";
 
 const KINDS = [
   { code: "AG", label: "Assemblée générale" },
@@ -108,6 +109,7 @@ export function GovernanceRegister() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Button size="sm" variant="outline" onClick={() => { setEditId(r.id); setForm({ kind: r.kind, title: r.title, meeting_at: toParisInput(r.meeting_at ?? `${r.meeting_date}T10:00:00Z`), summary: r.summary ?? "", decisions: r.decisions ?? "", follow_up: r.follow_up ?? "" }); setOpen(true); }}>Modifier</Button>
                   <DecisionToTask record={r} />
+                  <DecisionToCommunication record={r} />
                 </div>
               </div>
             </details>
