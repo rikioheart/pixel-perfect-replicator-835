@@ -101,7 +101,7 @@ function AdminContributions() {
       }
     },
     onSuccess: () => {
-      toast.success("Le membre est affecté à la tâche et prévenu.");
+      toast.success("Le membre est affecté à la tâche.");
       setTaskPick("");
       void qc.invalidateQueries({ queryKey: ["contribution-tasks"] });
       void qc.invalidateQueries({ queryKey: ["project-open-tasks"] });
