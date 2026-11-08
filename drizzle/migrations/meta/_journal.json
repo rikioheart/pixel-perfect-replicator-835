@@ -407,6 +407,13 @@
       "when": 1794072328494,
       "tag": "0057_inventory_retire_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1794138265614,
+      "tag": "0058_digest_link_admin",
+      "breakpoints": true
     }
   ]
 }

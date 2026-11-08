@@ -61,7 +61,10 @@ export function NotificationBell() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex justify-end px-4 pb-2">
+        <div className="flex items-center justify-between px-4 pb-2">
+          <Button variant="link" size="sm" className="px-0" onClick={() => { setOpen(false); void navigate({ to: "/notifications" }); }}>
+            Voir tout l'historique
+          </Button>
           <Button
             variant="ghost"
             size="sm"
