@@ -75,7 +75,38 @@ function AdminContributions() {
       });
       if (error) throw error;
     },
-    onSuccess: () => toast.success("Action créée et reliée à la contribution."),
+    onSuccess: () => { toast.success("Tâche créée et reliée à la proposition."); void qc.invalidateQueries({ queryKey: ["contribution-tasks"] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const { data: linkedTasks = [] } = useQuery({
+    queryKey: ["contribution-tasks", sel?.id],
+    enabled: Boolean(sel),
+    queryFn: async () => (await supabase.from("tasks").select("id,title,status").eq("contribution_id", sel!.id)).data ?? [],
+  });
+  const { data: openTasks = [] } = useQuery({
+    queryKey: ["project-open-tasks", sel?.project_id],
+    enabled: Boolean(sel?.project_id),
+    queryFn: async () =>
+      (await supabase.from("tasks").select("id,title").eq("project_id", sel!.project_id!).in("status", ["TODO", "IN_PROGRESS"]).is("contribution_id", null).order("created_at", { ascending: false }).limit(100)).data ?? [],
+  });
+  const [taskPick, setTaskPick] = useState("");
+  const linkTask = useMutation({
+    mutationFn: async () => {
+      if (!taskPick) throw new Error("Choisissez une tâche.");
+      const t = await supabase.from("tasks").update({ contribution_id: sel!.id, assigned_user_id: sel!.user_id }).eq("id", taskPick);
+      if (t.error) throw t.error;
+      if (["PROPOSED", "DISCUSSION"].includes(sel!.status)) {
+        await supabase.from("contributions").update({ status: "ACCEPTED" }).eq("id", sel!.id);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Le membre est affecté à la tâche.");
+      setTaskPick("");
+      void qc.invalidateQueries({ queryKey: ["contribution-tasks"] });
+      void qc.invalidateQueries({ queryKey: ["project-open-tasks"] });
+      void qc.invalidateQueries({ queryKey: ["contributions"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -121,7 +152,24 @@ function AdminContributions() {
                 </Button>
               ))}
             </div>
-            <Button size="sm" variant="secondary" onClick={() => createTask.mutate()} disabled={createTask.isPending}>Créer une action liée</Button>
+            {linkedTasks.length > 0 ? (
+              <p className="rounded-md bg-muted p-2 text-xs">Tâche liée : {linkedTasks.map((t) => t.title).join(", ")}</p>
+            ) : null}
+            {sel.project_id && openTasks.length > 0 ? (
+              <div className="space-y-1">
+                <Label htmlFor="ct-task">Affecter à une tâche ouverte du projet</Label>
+                <div className="flex gap-2">
+                  <select id="ct-task" className="h-9 flex-1 rounded-md border border-input bg-background px-2 text-sm" value={taskPick} onChange={(e) => setTaskPick(e.target.value)}>
+                    <option value="">Choisir une tâche…</option>
+                    {openTasks.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+                  </select>
+                  <Button size="sm" onClick={() => linkTask.mutate()} disabled={!taskPick || linkTask.isPending}>Affecter</Button>
+                </div>
+              </div>
+            ) : null}
+            {linkedTasks.length === 0 ? (
+              <Button size="sm" variant="secondary" onClick={() => createTask.mutate()} disabled={createTask.isPending}>Créer une nouvelle tâche pour ce membre</Button>
+            ) : null}
           </div>
         ) : null}
       </SidePanel>
