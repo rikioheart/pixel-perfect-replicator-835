@@ -1,36 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import {
-  Briefcase,
-  CalendarClock,
-  CalendarRange,
-  Euro,
-  FolderKanban,
-  HelpCircle,
-  Lightbulb,
-  ListChecks,
-  Package,
-  ShieldCheck,
-  Users,
-  Compass,
-} from "lucide-react";
+import { CalendarClock, CalendarRange, ChevronRight, Compass, Euro, FolderKanban, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSensitiveRights } from "@/lib/permissions";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
-import { AG_CONVOCATION_DAYS, AG_QUORUM, convocationDeadline, isInAgMonth, nextAgYear, quorumReached } from "@/lib/statutes";
-import { CharterBanner } from "@/components/CharterBanner";
+import { AG_CONVOCATION_DAYS, AG_QUORUM, convocationDeadline, isInAgMonth, nextAgYear } from "@/lib/statutes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { TASK_STATUS_LABEL, formatDate } from "@/lib/domain";
-import { NewsFeed } from "@/components/NewsFeed";
-import { PendingMembersQueue } from "@/components/PendingMembersQueue";
+import { formatDate } from "@/lib/domain";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
-import { QuickValidationRow } from "@/components/QuickValidation";
 import { euro, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
 import { PendingActionsStrip } from "@/components/PendingActionsStrip";
 import { isOverdueReservation } from "@/lib/role-home";
@@ -70,31 +52,23 @@ function AdminConsole() {
     enabled: isBureau,
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const [profiles, projects, tasks, events, activities, proposals, inventory, partners, mairies, posts, offers, loans] = await Promise.all([
+      const [profiles, tasks, events, activities, proposals, inventory, offers, loans] = await Promise.all([
         supabase.from("profiles").select("id, display_name, first_name, last_name, membership_type, membership_status"),
-        supabase.from("projects").select("id, title, status, progress_percent, deadline, owner_id").eq("status", "ACTIVE").order("deadline", { ascending: true, nullsFirst: false }),
         supabase.from("tasks").select("id, title, status, priority, needs_help, is_volunteer_task, deadline, assigned_user_id, submitted_at").not("status", "in", "(COMPLETED,ARCHIVED)"),
         supabase.from("events").select("id, title, start_date, event_type").gte("start_date", today).order("start_date").limit(6),
         supabase.from("activities").select("id, title, date, type").gte("date", today).order("date").limit(6),
         supabase.from("professional_proposals").select("id, title, type, submitted_by").eq("status", "PENDING"),
         supabase.from("inventory").select("id, name, quantity, alert_threshold, location"),
-        supabase.from("partners").select("id", { count: "exact", head: true }).eq("active", true),
-        supabase.from("mairies").select("id", { count: "exact", head: true }).neq("status", "CLOSED"),
-        supabase.from("blog_posts").select("id", { count: "exact", head: true }).neq("status", "PUBLISHED"),
         supabase.from("contributions").select("id", { count: "exact", head: true }).in("status", ["PROPOSED", "DISCUSSION"]),
         supabase.from("inventory_reservations").select("status, end_date").eq("status", "ACTIVE").lt("end_date", today),
       ]);
       return {
         profiles: rows(profiles),
-        projects: rows(projects),
         tasks: rows(tasks),
         events: rows(events),
         activities: rows(activities),
         proposals: rows(proposals),
         inventory: rows(inventory),
-        partners: partners.error ? null : (partners.count ?? 0),
-        mairies: mairies.error ? null : (mairies.count ?? 0),
-        posts: posts.error ? null : (posts.count ?? 0),
         offers: offers.error ? null : (offers.count ?? 0),
         overdueLoans: loans.error ? null : (loans.data ?? []).filter((r) => isOverdueReservation(r, today)).length,
       };
@@ -135,20 +109,15 @@ function AdminConsole() {
     const p = profiles?.find((x) => x.id === id);
     return p?.display_name || [p?.first_name, p?.last_name].filter(Boolean).join(" ") || "Membre";
   };
-  const active = profiles?.filter((p) => p.membership_status === "ACTIVE") ?? null;
   const tasks = data?.tasks;
   const toValidate = tasks?.filter((t) => t.status === "PENDING_VALIDATION") ?? null;
   const helpNeeded = tasks?.filter((t) => t.needs_help) ?? null;
   const inProgress = tasks?.filter((t) => t.status === "IN_PROGRESS" || t.status === "TODO") ?? null;
-  const volunteer = tasks?.filter((t) => t.is_volunteer_task && !t.assigned_user_id) ?? null;
-  const projects = data?.projects ?? null;
   const lowStock = data?.inventory?.filter((i) => i.quantity <= i.alert_threshold) ?? null;
   const upcoming = [
     ...(data?.events ?? []).map((e) => ({ id: e.id, title: e.title, date: e.start_date, kind: e.event_type, to: `/events/${e.id}` })),
     ...(data?.activities ?? []).map((a) => ({ id: a.id, title: a.title, date: a.date, kind: a.type, to: `/activities/${a.id}` })),
   ].sort((a, b) => String(a.date).localeCompare(String(b.date))).slice(0, 8);
-  const n = (list: unknown[] | null | undefined) => (list == null ? "—" : String(list.length));
-  const count = (v: number | null | undefined) => (v == null ? "—" : String(v));
 
   const fin = finance.data;
   const rsum = fin?.reimb ? summarizeReimbursements(fin.reimb) : null;
@@ -315,33 +284,29 @@ function Row({ main, sub, right, to }: { main: string; sub?: string | undefined;
 function AgReminder() {
   const year = nextAgYear(new Date());
   const [agDate, setAgDate] = useState(`${year}-06-20`);
-  const [present, setPresent] = useState(0);
   const valid = /^\d{4}-\d{2}-\d{2}$/.test(agDate);
   return (
     <section className="panel mt-6 space-y-3 p-5" aria-labelledby="ag-title">
-      <h2 id="ag-title" className="flex items-center gap-2 text-lg">
-        <CalendarClock className="size-5 text-primary" aria-hidden /> Assemblée générale ordinaire {year}
-      </h2>
-      <p className="text-sm text-muted-foreground">
-        Selon les statuts (article 16) : AG chaque année en juin, convocation avec ordre du jour au
-        moins {AG_CONVOCATION_DAYS} jours avant, quorum de {AG_QUORUM} personnes dont des membres du
-        Bureau et des fondateurs. Présentiel, visio ou hybride.
-      </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="text-sm">
-          Date envisagée
-          <Input type="date" value={agDate} onChange={(e) => setAgDate(e.target.value)} className="mt-1" />
-        </label>
-        <label className="text-sm">
-          Personnes présentes ou représentées
-          <Input type="number" min={0} value={present} onChange={(e) => setPresent(Number(e.target.value) || 0)} className="mt-1" />
-        </label>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="ag-title" className="flex items-center gap-2 text-lg">
+          <CalendarClock className="size-5 text-primary" aria-hidden /> Assemblée générale ordinaire {year}
+        </h2>
+        <Button asChild size="sm" variant="outline">
+          <Link to="/admin/gouvernance">Ouvrir l'émargement</Link>
+        </Button>
       </div>
+      <p className="text-sm text-muted-foreground">
+        Article 16 : AG en juin, convocation au moins {AG_CONVOCATION_DAYS} jours avant, quorum de {AG_QUORUM} personnes
+        présentes ou représentées. L'émargement nominatif calcule le quorum.
+      </p>
+      <label className="block max-w-xs text-sm">
+        Date envisagée
+        <Input type="date" value={agDate} onChange={(e) => setAgDate(e.target.value)} className="mt-1" />
+      </label>
       {valid ? (
         <ul className="space-y-1 text-sm">
-          <li>📨 Convocations à envoyer au plus tard le <strong>{new Date(convocationDeadline(agDate)).toLocaleDateString("fr-FR")}</strong>.</li>
-          {!isInAgMonth(agDate) ? <li>⚠️ Cette date n'est pas en juin, comme le prévoient les statuts.</li> : null}
-          <li>{quorumReached(present) ? "✅ Quorum atteint." : `⏳ Quorum non atteint : ${AG_QUORUM - present} personne(s) manquante(s).`}</li>
+          <li>Convocations à envoyer au plus tard le <strong>{new Date(convocationDeadline(agDate)).toLocaleDateString("fr-FR")}</strong>.</li>
+          {!isInAgMonth(agDate) ? <li className="text-warning-foreground">Cette date n'est pas en juin, comme le prévoient les statuts.</li> : null}
         </ul>
       ) : null}
     </section>
