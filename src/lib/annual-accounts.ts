@@ -80,7 +80,7 @@ const round = (n: number) => Math.round(n * 100) / 100;
 
 function rubricFor(direction: Direction, category: string): string {
   const list = direction === "RECETTE" ? INCOME_RUBRICS : EXPENSE_RUBRICS;
-  return (list.find((r) => (r.codes as readonly string[]).includes(category)) ?? list[list.length - 1]).key;
+  return list.find((r) => (r.codes as readonly string[]).includes(category))?.key ?? "autres";
 }
 
 export function annualAccounts(entries: LedgerEntry[], from: string, to: string): AnnualAccounts {

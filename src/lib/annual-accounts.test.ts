@@ -15,11 +15,11 @@ describe("comptes annuels loi 1901", () => {
     ], "2026-01-01", "2026-12-31");
     const inc = Object.fromEntries(a.income.map((l) => [l.key, l.amount]));
     const exp = Object.fromEntries(a.expenses.map((l) => [l.key, l.amount]));
-    expect(inc.cotisations).toBe(300);
-    expect(inc.dons).toBe(200);
-    expect(inc.activites).toBe(120);
-    expect(exp.materiel).toBe(80);
-    expect(exp.deplacements).toBe(40);
+    expect(inc["cotisations"]).toBe(300);
+    expect(inc["dons"]).toBe(200);
+    expect(inc["activites"]).toBe(120);
+    expect(exp["materiel"]).toBe(80);
+    expect(exp["deplacements"]).toBe(40);
     expect(a.totalIncome).toBe(620);
     expect(a.totalExpenses).toBe(120);
     expect(a.result).toBe(500);
@@ -52,7 +52,7 @@ describe("comptes annuels loi 1901", () => {
     expect(resultLabel(a)).toContain("Déficit");
     const r = agResolutions(a, "2026-01-01", "2026-12-31");
     expect(r.map((x) => x.title)).toEqual(["1. Approbation des comptes", "2. Affectation du résultat", "3. Quitus au trésorier"]);
-    expect(r[1].text).toContain("imputer le déficit");
+    expect(r[1]?.text).toContain("imputer le déficit");
   });
 
   it("une catégorie inconnue tombe dans « Autres »", () => {

@@ -161,7 +161,7 @@ function Page() {
           <div><Label htmlFor="fe-d">Date</Label><Input id="fe-d" type="date" value={f.entry_date} onChange={(e) => setF({ ...f, entry_date: e.target.value })} /></div>
           <div><Label htmlFor="fe-dir">Sens</Label>
             <select id="fe-dir" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.direction}
-              onChange={(e) => setF({ ...f, direction: e.target.value, category: LEDGER_CATEGORIES[e.target.value as "RECETTE"][0].code, status: e.target.value === "RECETTE" ? "A_RECEVOIR" : "A_PAYER" })}>
+              onChange={(e) => setF({ ...f, direction: e.target.value, category: LEDGER_CATEGORIES[e.target.value as "RECETTE"][0]?.code ?? "", status: e.target.value === "RECETTE" ? "A_RECEVOIR" : "A_PAYER" })}>
               <option value="RECETTE">Recette</option><option value="DEPENSE">Dépense</option></select></div>
           <div><Label htmlFor="fe-cat">Catégorie</Label>
             <select id="fe-cat" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })}>
