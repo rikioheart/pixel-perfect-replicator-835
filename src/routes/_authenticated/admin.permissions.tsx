@@ -35,6 +35,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  HIDDEN_PERMISSION_MODULES,
   PERMISSION_MODULE_LABEL,
   fetchPermissions,
   fetchRolePermissions,
