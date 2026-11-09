@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Printer, Search, UserCheck } from "lucide-react";
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { memberFullName } from "@/lib/members";
 import { filterByName } from "@/lib/name-search";
 import { formatParisDateTime } from "@/lib/places";
@@ -24,6 +25,11 @@ export function AgAttendance() {
   const qc = useQueryClient();
   const [recordId, setRecordId] = useState<string>("");
   const [search, setSearch] = useState("");
+  // Feuille repliée par défaut pour alléger la page ; ouverte d'office depuis le raccourci de la Console.
+  const [sheetOpen, setSheetOpen] = useState(false);
+  useEffect(() => {
+    if (window.location.hash === "#emargement") setSheetOpen(true);
+  }, []);
 
   const { data: ags = [] } = useQuery({
     queryKey: ["ag-records"],
@@ -134,7 +140,7 @@ export function AgAttendance() {
   const selectedAg = ags.find((a) => a.id === current);
 
   return (
-    <section aria-labelledby="ag-att-title" className="mt-8 space-y-3 print:mt-0">
+    <section id="emargement" aria-labelledby="ag-att-title" className="mb-6 scroll-mt-20 space-y-3 print:mt-0">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="ag-att-title" className="flex items-center gap-2 font-display text-lg">
           <UserCheck className="size-5 text-primary" aria-hidden /> Émargement de l'Assemblée
@@ -145,7 +151,10 @@ export function AgAttendance() {
             size="sm"
             variant="outline"
             className="print:hidden"
-            onClick={() => window.print()}
+            onClick={() => {
+              setSheetOpen(true);
+              window.setTimeout(() => window.print(), 50);
+            }}
           >
             <Printer className="mr-1 size-4" aria-hidden /> Imprimer la feuille
           </Button>
@@ -210,7 +219,26 @@ export function AgAttendance() {
             >
               {tally.quorum ? "Quorum atteint" : `Quorum : ${tally.counted}/${AG_QUORUM}`}
             </Badge>
+            <Progress
+              value={Math.min(100, (tally.counted / AG_QUORUM) * 100)}
+              aria-label={`Quorum : ${tally.counted} présent(s) ou représenté(s) sur ${AG_QUORUM} requis`}
+              className="h-2 w-full"
+            />
+            <p className="w-full text-xs text-muted-foreground">
+              Calcul automatique : présents + représentés, les excusés ne comptent pas (quorum statutaire : {AG_QUORUM}).
+            </p>
           </div>
+
+          <Button
+            variant="outline"
+            className="w-full justify-center print:hidden"
+            aria-expanded={sheetOpen}
+            onClick={() => setSheetOpen((v) => !v)}
+          >
+            {sheetOpen ? "Replier la feuille d'émargement" : `Ouvrir la feuille d'émargement (${members.length} adhérent(s))`}
+          </Button>
+          {sheetOpen ? (
+          <>
 
           <div className="panel overflow-hidden">
             <table className="w-full text-sm">
@@ -296,6 +324,8 @@ export function AgAttendance() {
             déjà émargée présente ; si elle repart, ses pouvoirs sont retirés. Chaque émargement est
             inscrit dans l'historique.
           </p>
+          </>
+          ) : null}
         </>
       )}
     </section>
