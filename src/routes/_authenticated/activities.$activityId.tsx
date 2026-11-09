@@ -81,7 +81,7 @@ function ActivityDetail() {
   return (
     <AppShell
       title={a.title}
-      subtitle={a.type}
+      subtitle={activityTypes.labelOf(a.type)}
       actions={<Button asChild variant="outline" size="sm" className="gap-2"><Link to="/activities"><ArrowLeft className="size-4" aria-hidden /> Retour</Link></Button>}
     >
       {a.image_url ? <img src={a.image_url} alt={`Illustration de ${a.title}`} className="mb-4 h-48 w-full rounded-lg object-cover sm:h-64" /> : null}
