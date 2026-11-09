@@ -108,7 +108,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/advantages", label: "Avantages", icon: Gift, audience: "all" },
       { to: "/profile", label: "Profil & données", icon: UserRound, audience: "all" },
       { to: "/my-space", label: "Préférences", icon: Settings2, audience: "all" },
-      { to: "/my-history", label: "Historique", icon: History, audience: "all" },
       { to: "/parcours", label: "Parcours", icon: RouteIcon, audience: "all" },
     ],
   },

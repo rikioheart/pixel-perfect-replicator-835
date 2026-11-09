@@ -33,7 +33,6 @@ export const MEMBER_HUB_TABS = [
   { to: "/loyalty", label: "Mon pass & tampons" },
   { to: "/advantages", label: "Avantages" },
   { to: "/parcours", label: "Mon parcours" },
-  { to: "/my-history", label: "Historique" },
   { to: "/profile", label: "Profil" },
   { to: "/my-space", label: "Préférences" },
 ] as const;
@@ -48,7 +47,7 @@ export const MEMBER_HUB_GROUPS = [
   { label: "Mon chien", to: "/member", paths: ["/member", "/foyer"] },
   { label: "Sorties", to: "/participations", paths: ["/participations"] },
   { label: "Mon pass", to: "/loyalty", paths: ["/loyalty", "/advantages"] },
-  { label: "Profil & foyer", to: "/profile", paths: ["/profile", "/my-space", "/parcours", "/my-history"] },
+  { label: "Profil & foyer", to: "/profile", paths: ["/profile", "/my-space", "/parcours"] },
 ] as const;
 
 export function memberHubGroupFor(pathname: string) {
