@@ -351,3 +351,13 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [ ] Essai réel de la fiche chien sur téléphone par un propriétaire et un pro
 - [x] Thème sombre + mode confort contrôlés écran par écran (membre, pro, Bureau, onglets, calendrier) : 0 défaut de contraste mesuré
 - [ ] Revue visuelle complète du mode sombre écran par écran
+
+## Étape 6 — Communication liée aux projets
+- [ ] Brouillons de communication rattachés projet/tâche : titre, contenu, public cible, canal, visuels, responsable, étape
+- [ ] Visibilité : Bureau + équipe du projet pendant l'élaboration ; validation finale Bureau ; contenus publiés visibles dans « Actualités » (Ressources)
+
+## Étape 7 — Statistiques stratégiques & Bilan AG
+- [ ] Statistiques regroupées par thème, libellé « professionnels bienfaiteurs », courbes à la demande
+- [ ] Sélecteurs de période dans le corps de page ; en-tête : Alerte, Rechercher, Créer alignés à droite
+- [ ] Indicateurs : Pass Terrain par partenaire, engagement bénévole, avancement projets/tâches
+- [ ] Fiche exportable « Bilan de l'exercice » pour l'AG
