@@ -32,7 +32,6 @@ import {
   BookUser,
   LifeBuoy,
   Gift,
-  History,
   Trophy,
   ReceiptText,
   GraduationCap,
