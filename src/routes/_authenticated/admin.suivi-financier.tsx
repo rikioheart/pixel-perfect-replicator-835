@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -14,7 +14,6 @@ import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { buildRows, toCsv, toTsv, parseHelloAssoCsv, EXPORT_COLUMNS } from "@/lib/finance-export";
 import { LEDGER_CATEGORIES, categoryLabel } from "@/lib/annual-accounts";
 import { AccountingSplitsPanel } from "@/components/AccountingSplitsPanel";
-import { Link } from "@tanstack/react-router";
 
 const TITLE = "Comptabilité & Grand livre";
 
