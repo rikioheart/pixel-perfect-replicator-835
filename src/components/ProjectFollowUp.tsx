@@ -194,7 +194,7 @@ function Journal({ projectId }: { projectId: string }) {
             <div><Label htmlFor="pj-t" className="text-xs">Titre</Label><Input id="pj-t" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
           </div>
           <div><Label htmlFor="pj-b" className="text-xs">Détails (facultatif)</Label><Textarea id="pj-b" rows={2} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} /></div>
-          <p className="text-xs text-muted-foreground">Visible par les membres dans « Nos avancées », jamais publiée hors de la plateforme.</p>
+          <p className="text-xs text-muted-foreground">Visible par les membres dans « Actualités », jamais publiée hors de la plateforme.</p>
           <Button onClick={post}>Ajouter au journal</Button>
         </div>
       ) : null}

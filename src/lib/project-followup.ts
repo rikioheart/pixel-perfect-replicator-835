@@ -35,12 +35,12 @@ export function taskCounts(tasks: { project_id: string | null; status: string }[
 
 export const COMM_STATUSES: [string, string][] = [
   ["DRAFT", "Brouillons"],
-  ["IN_REVIEW", "En relecture"],
-  ["READY", "Prêtes à diffuser"],
+  ["IN_REVIEW", "À valider"],
+  ["READY", "Validées par le Bureau"],
   ["ARCHIVED", "Diffusées / archivées"],
 ];
 export const COMM_CHANNELS: [string, string][] = [
-  ["INTERNAL_WALL", "Nos avancées (interne)"],
+  ["INTERNAL_WALL", "Actualités (interne)"],
   ["EMAIL_INFO", "E-mail d'information"],
   ["TERRAIN_DISPLAY", "Affichage terrain"],
   ["SOCIAL_POST", "Réseaux sociaux"],
@@ -54,7 +54,12 @@ export const COMM_AUDIENCES: [string, string][] = [
   ["PUBLIC", "Grand public"],
 ];
 
-/** Relais vers « Nos avancées » : seulement une communication prête, pour un canal interne, jamais diffusée automatiquement ailleurs. */
-export function canRelayToWall(c: { status: string; channel: string }) {
-  return c.status === "READY" && c.channel === "INTERNAL_WALL";
+/** Publication dans « Actualités » : seulement après validation du Bureau, une seule fois (contrôlé aussi par publish_communication). */
+export function canPublishToNews(c: { status: string; published_update_id?: string | null }) {
+  return c.status === "READY" && !c.published_update_id;
+}
+
+/** L'équipe du projet rédige et soumet ; une fois validée, seule le Bureau modifie (garde guard_bureau_communication). */
+export function teamCanEditCommunication(status: string) {
+  return status === "DRAFT" || status === "IN_REVIEW";
 }
