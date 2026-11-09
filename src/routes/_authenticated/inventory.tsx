@@ -58,11 +58,11 @@ const errText = (e: Error) =>
 type Item = {
   id: string; name: string; category: string | null; quantity: number; alert_threshold: number; location: string | null;
   type: string | null; condition: string | null; referent_person_id: string | null; unit_price: number | null;
-  document_url: string | null; description: string | null;
+  document_url: string | null; description: string | null; visibility: string;
 };
 const EMPTY_ITEM = {
   name: "", type: "MATERIEL", category: "", quantity: "0", alert_threshold: "0", location: "", condition: "",
-  referent_person_id: "", unit_price: "", document_url: "", description: "",
+  referent_person_id: "", unit_price: "", document_url: "", description: "", visibility: "BUREAU",
 };
 
 function InventoryPage() {
@@ -186,6 +186,7 @@ function InventoryPage() {
         unit_price: form.unit_price.trim() ? Number(form.unit_price.replace(",", ".")) : null,
         document_url: form.document_url.trim() || null,
         description: form.description.trim() || null,
+        visibility: form.visibility,
       };
       // La quantité d'une référence existante ne change que par un mouvement tracé.
       const { error } =
@@ -297,7 +298,7 @@ function InventoryPage() {
             name: item.name, type: item.type ?? "MATERIEL", category: item.category ?? "", quantity: String(item.quantity),
             alert_threshold: String(item.alert_threshold), location: item.location ?? "", condition: item.condition ?? "",
             referent_person_id: item.referent_person_id ?? "", unit_price: item.unit_price != null ? String(item.unit_price) : "",
-            document_url: item.document_url ?? "", description: item.description ?? "",
+            document_url: item.document_url ?? "", description: item.description ?? "", visibility: item.visibility ?? "BUREAU",
           },
     );
     setEditing(item);
@@ -387,7 +388,14 @@ function InventoryPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="flex items-center gap-2 text-base"><Package className="size-4 text-primary" /> {item.name}</CardTitle>
-                    <Badge variant="secondary">{typeLabel(item.type)}</Badge>
+                    <span className="flex flex-wrap justify-end gap-1">
+                      <Badge variant="secondary">{typeLabel(item.type)}</Badge>
+                      {isBureau ? (
+                        <Badge variant={item.visibility === "BUREAU" ? "outline" : "default"} title="Qui voit cette fiche">
+                          {visibilityLabel(item.visibility)}
+                        </Badge>
+                      ) : null}
+                    </span>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
@@ -402,7 +410,7 @@ function InventoryPage() {
                   </dl>
                   <p className="text-xs text-muted-foreground">
                     Seuil {item.alert_threshold}
-                    {item.unit_price != null ? ` · ${Number(item.unit_price).toFixed(2)} €` : ""}
+                    {isBureau && item.unit_price != null ? ` · ${Number(item.unit_price).toFixed(2)} €` : ""}
                     {referent ? ` · Référent : ${referent}` : ""}
                   </p>
                   {item.document_url ? (
@@ -520,6 +528,10 @@ function InventoryPage() {
             <div><Label htmlFor="inv-type">Type</Label>
               <select id="inv-type" className={SELECT} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
                 {INVENTORY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select></div>
+            <div className="sm:col-span-2"><Label htmlFor="inv-vis">Qui voit cette fiche ?</Label>
+              <select id="inv-vis" className={SELECT} value={form.visibility} onChange={(e) => setForm({ ...form, visibility: e.target.value })}>
+                {INVENTORY_VISIBILITY.map((v) => <option key={v.value} value={v.value}>{v.label}</option>)}
               </select></div>
             <div><Label htmlFor="inv-qty">Quantité</Label>
               <Input id="inv-qty" type="number" min="0" value={form.quantity} disabled={editing !== "new"} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />

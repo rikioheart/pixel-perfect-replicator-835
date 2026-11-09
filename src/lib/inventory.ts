@@ -84,3 +84,13 @@ export function movementChange(kind: "IN" | "OUT", quantity: string): number | n
   if (!Number.isInteger(q) || q <= 0) return null;
   return kind === "IN" ? q : -q;
 }
+
+/** Visibilité d'une fiche de matériel (appliquée par la base : can_see_inventory). */
+export const INVENTORY_VISIBILITY = [
+  { value: "BUREAU", label: "Privé Bureau", short: "Privé Bureau" },
+  { value: "PROS", label: "Visible aux professionnels bienfaiteurs", short: "Pros" },
+  { value: "MEMBERS", label: "Visible à tous les adhérents", short: "Adhérents" },
+] as const;
+export type InventoryVisibility = (typeof INVENTORY_VISIBILITY)[number]["value"];
+export const visibilityLabel = (v: string | null | undefined) =>
+  INVENTORY_VISIBILITY.find((x) => x.value === v)?.short ?? "Privé Bureau";
