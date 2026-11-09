@@ -2148,6 +2148,7 @@ export type Database = {
           type: string | null
           unit_price: number | null
           updated_at: string
+          visibility: string
         }
         Insert: {
           alert_threshold?: number
@@ -2166,6 +2167,7 @@ export type Database = {
           type?: string | null
           unit_price?: number | null
           updated_at?: string
+          visibility?: string
         }
         Update: {
           alert_threshold?: number
@@ -2184,6 +2186,7 @@ export type Database = {
           type?: string | null
           unit_price?: number | null
           updated_at?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -4730,6 +4733,10 @@ export type Database = {
       can_receive_stamps: { Args: { _user_id: string }; Returns: boolean }
       can_request_terrain: {
         Args: { _activity_id: string; _project_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_see_inventory: {
+        Args: { _user_id: string; _visibility: string }
         Returns: boolean
       }
       can_share_entity: {
