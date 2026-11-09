@@ -58,6 +58,7 @@ import { isPast, operationalProgress } from "@/lib/archives";
 import { explainDbError, openTasksBeforeClosure } from "@/lib/task-lifecycle";
 import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
 import { ProjectEquipment } from "@/components/ProjectEquipment";
+import { ProjectCommunications } from "@/components/ProjectCommunications";
 import { ProjectFollowUp } from "@/components/ProjectFollowUp";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
@@ -434,6 +435,7 @@ function ProjectDetail() {
         <ProjectFollowUp project={project} canManage={canValidate} onProjectPatch={updateProject} />
         <ProjectContribute projectId={projectId} canModerate={canValidate} />
         {canValidate ? <ProjectEquipment projectId={projectId} /> : null}
+        {isBureau || isCoordinator || (members ?? []).some((m) => m.user_id === user?.id) ? <ProjectCommunications projectId={projectId} /> : null}
       </div>
 
       <div className="mt-6">
