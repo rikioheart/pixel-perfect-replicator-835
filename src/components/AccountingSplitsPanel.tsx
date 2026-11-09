@@ -118,21 +118,26 @@ export function AccountingSplitsPanel() {
         <p className="mt-3 text-sm text-muted-foreground">Aucune part professionnelle enregistrée.</p>
       ) : (
         <ul className="mt-3 space-y-2 text-sm">
-          {proRows.map((r) => (
+          {rows.map((r) => {
+            const hasPro = Boolean(r.professional_id) && Number(r.professional_share) > 0;
+            return (
             <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2 last:border-0">
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{(r.professional_id && names[r.professional_id]) || "Professionnel"}</p>
-                <p className="text-xs text-muted-foreground">{r.label ?? "Recette"} · {new Date(r.recorded_on).toLocaleDateString("fr-FR")}</p>
+                <p className="truncate font-medium">{r.label ?? "Recette"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(r.recorded_on).toLocaleDateString("fr-FR")} · brut {euro(Number(r.gross_revenue))} · asso {euro(Number(r.association_share))}
+                  {hasPro ? ` · ${(r.professional_id && names[r.professional_id]) || "Professionnel"} ${euro(Number(r.professional_share))}` : ""}
+                </p>
               </div>
-              <span className="font-semibold">{euro(Number(r.professional_share))}</span>
-              <Badge variant={r.professional_paid_at ? "default" : "outline"}>{payoutLabel(r.professional_paid_at)}</Badge>
-              {rights.update && r.professional_id !== user?.id ? (
+              {hasPro ? <Badge variant={r.professional_paid_at ? "default" : "outline"}>{payoutLabel(r.professional_paid_at)}</Badge> : null}
+              {hasPro && rights.update && r.professional_id !== user?.id ? (
                 <Button size="sm" variant={r.professional_paid_at ? "ghost" : "outline"} disabled={setPayout.isPending} onClick={() => setPayout.mutate({ id: r.id, paid: !r.professional_paid_at })}>
                   {r.professional_paid_at ? "Annuler" : "Marquer payé"}
                 </Button>
               ) : null}
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </section>
