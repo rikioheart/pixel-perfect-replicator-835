@@ -139,7 +139,7 @@ function MairiesPage() {
         </Button>
       }
     >
-      <DirectoryTabs />
+      <DirectoryTabs current="mairies" />
       <div className="mb-5 flex flex-wrap gap-2">
         {[{ code: "ALL", label: "Tous" }, ...STATUSES].map((status) => (
           <Button
