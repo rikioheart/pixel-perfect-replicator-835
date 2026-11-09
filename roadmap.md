@@ -8,7 +8,7 @@
 - [x] Types d'activités dynamiques (création, renommage, désactivation Bureau) reliés au formulaire d'activité
 - [x] Fidélité en deux onglets (Règles de gain / Récompenses & paliers), règles Pass partenaires, critères nouveaux rôles
 - [x] Paramétrage : « ordre » conservé, familles regroupées en 4 catégories + recherche
-- [ ] Audit final : parcours, ordinateur/mobile, routes orphelines, liens morts, doublons
+- [x] Audit final : parcours, ordinateur/mobile, routes orphelines, liens morts, doublons
 
 ## Console Bureau & parcours membre — demande du 9 nov.
 - [x] Mon foyer & moi : retirer l'onglet « Historique », garder « Parcours » (audit = Bureau, Paramètres)
