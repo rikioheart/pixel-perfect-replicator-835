@@ -16,6 +16,7 @@ import { LoadingState } from "@/components/LoadingState";
 import { RegistrationWizard } from "@/components/RegistrationWizard";
 import { SpotsBadge, useSpots, ExperienceSections } from "@/components/ExperienceBits";
 import { DOG_POLICY_LABEL } from "@/lib/pro-card";
+import { useConfigOptions } from "@/lib/config-options";
 
 export const Route = createFileRoute("/_authenticated/activities/$activityId")({
   head: () => ({
@@ -37,6 +38,7 @@ function ActivityDetail() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
 
+  const activityTypes = useConfigOptions("ACTIVITY_TYPE");
   const { data: a, isLoading } = useQuery({
     queryKey: ["activity", activityId],
     queryFn: async () => {
