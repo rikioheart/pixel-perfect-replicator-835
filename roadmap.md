@@ -1,5 +1,10 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Annuaire, formulaires, Pass — demande du 9 nov.
+- [ ] Annuaire : un seul bandeau (Pros, Particuliers, Partenaires & Avantages, Chiens, Mairies & Institutions, accès Bureau), filtres conservés
+- [ ] Formulaires : suppression par le Bureau avec confirmation
+- [ ] Pass (tampon manuel) : recherche nom/prénom au-dessus de la liste des bénéficiaires
+
 ## Architecture des permissions (/admin/permissions) — demande du 9 nov.
 - [ ] Modules repliables par thème, filtre par rôle, recherche par permission
 - [ ] Droits par défaut recalibrés sur les nouveaux rôles système
