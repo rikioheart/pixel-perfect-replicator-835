@@ -22,6 +22,8 @@ import {
   conditionLabel,
   movementChange,
   typeLabel,
+  INVENTORY_VISIBILITY,
+  visibilityLabel,
   validateItemDraft,
   validateReservationDraft,
 } from "@/lib/inventory";
