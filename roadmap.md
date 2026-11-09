@@ -1,5 +1,12 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Rôles et habilitations (/admin/roles) — demande du 9 nov.
+- [ ] Audit : rôles système, fonctions, catégorie statutaire, dépendances (Espace Pro, Pass, permissions)
+- [ ] Tableau compact + recherche + filtres + panneau latéral
+- [ ] Rôles système alignés (Bureau, Fondateur, Bienfaiteur, Apprenant, Soutien, Particulier) ; accès pro transférés aux bienfaiteurs, anciens rôles pro retirés
+- [ ] Fonctions restreintes (Président/Secrétaire/Trésorier uniques)
+- [ ] Retrait de la « Catégorie statutaire » (Niveau d'accès et rôle système conservés)
+
 ## Accueils par rôle + suites Axes 1 et 4 (8 nov.)
 - [x] Bureau : bandeau « À traiter maintenant » (adhésions, tâches à clôturer, propositions d'aide, matériel non rendu, remboursements, propositions pros, besoins d'aide)
 - [x] Particulier : accueil chien / pass / sorties / « Je veux aider », blocs vides masqués
