@@ -57,17 +57,15 @@ function DocumentsPage() {
     queryKey: ["doc-contexts"],
     enabled: open,
     queryFn: async () => {
-      const [a, e, p, t] = await Promise.all([
+      const [a, e, p] = await Promise.all([
         supabase.from("activities").select("id, title").limit(100),
         supabase.from("events").select("id, title").limit(100),
         supabase.from("projects").select("id, title").limit(100),
-        supabase.from("terrain_reservations").select("id, date, purpose").limit(100),
       ]);
       return [
         ...(a.data ?? []).map((x) => ({ v: `ACTIVITY:${x.id}`, l: `Activité · ${x.title}` })),
         ...(e.data ?? []).map((x) => ({ v: `EVENT:${x.id}`, l: `Événement · ${x.title}` })),
         ...(p.data ?? []).map((x) => ({ v: `PROJECT:${x.id}`, l: `Projet · ${x.title}` })),
-        ...(t.data ?? []).map((x) => ({ v: `RESERVATION:${x.id}`, l: `Terrain · ${x.date} ${x.purpose ?? ""}` })),
       ];
     },
   });

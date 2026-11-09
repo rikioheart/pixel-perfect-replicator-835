@@ -1,4 +1,5 @@
 /** Statistiques stratégiques : calculées en base (bureau_statistics), mises en forme ici. */
+import { accountsCsvLines, type AnnualAccounts } from "./annual-accounts";
 
 export type PartnerPass = { name: string; source: "PRO" | "BUREAU"; tampons: number; personnes: number };
 export type StatsSeries = { mois: string; adherents: number; taches: number; participations: number; tampons: number };
@@ -104,8 +105,9 @@ const csvCell = (v: string | number) => {
 };
 
 /** Export CSV (séparateur « ; » pour les tableurs français). */
-export function bilanCsv(s: BureauStats, from: string, to: string) {
+export function bilanCsv(s: BureauStats, from: string, to: string, accounts?: AnnualAccounts | null) {
   const lines: string[] = [`Bilan de l'exercice;du ${from} au ${to}`, ""];
+  if (accounts) lines.push(...accountsCsvLines(accounts, from, to));
   for (const section of statSections(s)) {
     lines.push(csvCell(section.title));
     for (const [label, value] of section.rows) lines.push(`${csvCell(label)};${csvCell(value)}`);

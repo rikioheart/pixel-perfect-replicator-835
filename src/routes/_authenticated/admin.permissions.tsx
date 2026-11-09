@@ -35,6 +35,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  HIDDEN_PERMISSION_MODULES,
   PERMISSION_MODULE_LABEL,
   fetchPermissions,
   fetchRolePermissions,
@@ -206,11 +207,12 @@ function PermissionsPage() {
 
   const term = search.trim().toLowerCase();
   const modules = useMemo(() => {
+    const shown = permissions.filter((p) => !HIDDEN_PERMISSION_MODULES.has(p.module));
     const filtered = term
-      ? permissions.filter((p) =>
+      ? shown.filter((p) =>
           `${p.name} ${p.code} ${p.description ?? ""}`.toLowerCase().includes(term),
         )
-      : permissions;
+      : shown;
     return groupByModule(filtered);
   }, [permissions, term]);
 

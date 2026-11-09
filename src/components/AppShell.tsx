@@ -167,8 +167,8 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/admin", label: "Console", icon: LayoutDashboard, audience: "bureau" },
       { to: "/admin/validation", label: "Validations", icon: ShieldCheck, audience: "bureau" },
-      { to: "/admin/suivi-financier", label: "Suivi financier", icon: Euro, audience: "bureau" },
-      { to: "/finance", label: "Comptabilité", icon: Euro, audience: "bureau" },
+      { to: "/finance", label: "Remboursements & Notes de frais", icon: ReceiptText, audience: "bureau" },
+      { to: "/admin/suivi-financier", label: "Comptabilité & Grand livre", icon: Euro, audience: "bureau" },
       { to: "/admin/communication", label: "Communication", icon: Megaphone, audience: "bureau" },
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
       { to: "/admin/pros", label: "Fiches pros", icon: Briefcase, audience: "bureau" },

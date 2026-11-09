@@ -11,7 +11,7 @@ import { PendingMembersQueue } from "@/components/PendingMembersQueue";
 import { AgAttendance } from "@/components/AgAttendance";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/domain";
-import { contributionBucket, priorityOf, sortGov, terrainBucket, type GovBucket, type GovItem } from "@/lib/governance";
+import { contributionBucket, priorityOf, sortGov, type GovBucket, type GovItem } from "@/lib/governance";
 
 export const Route = createFileRoute("/_authenticated/admin/gouvernance")({
   head: () => ({
@@ -39,7 +39,6 @@ const BUCKETS: { code: GovBucket; title: string; empty: string }[] = [
 
 const PROPOSAL_STATE: Record<string, string> = { PENDING: "À examiner", APPROVED: "Acceptée", REJECTED: "Refusée" };
 const CONTRIB_STATE: Record<string, string> = { PROPOSED: "Proposée", DISCUSSION: "En discussion", BLOCKED: "Bloquée", ACCEPTED: "Acceptée", IN_PROGRESS: "En cours" };
-const TERRAIN_STATE: Record<string, string> = { PENDING: "À décider", CHANGES_REQUESTED: "Modifications demandées", APPROVED: "Acceptée" };
 
 function GovernancePage() {
   const { isBureau, loading } = useAuth();
@@ -52,18 +51,16 @@ function GovernancePage() {
     enabled: isBureau,
     queryFn: async () => {
       const since30 = new Date(Date.now() - 30 * 86_400_000).toISOString();
-      const [members, tasks, proposals, decided, contribs, terrain, help] = await Promise.all([
+      const [members, tasks, proposals, decided, contribs, help] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("membership_status", "PENDING"),
         supabase.from("tasks").select("id", { count: "exact", head: true }).eq("status", "PENDING_VALIDATION"),
         supabase.from("professional_proposals").select("id, title, type, status, created_at").eq("status", "PENDING"),
         supabase.from("professional_proposals").select("id, title, type, status, reviewed_by, updated_at").in("status", ["APPROVED", "REJECTED"]).gte("updated_at", since30),
         supabase.from("contributions").select("id, title, contribution_type, status, created_at, updated_at, projects(title)").in("status", ["PROPOSED", "DISCUSSION", "BLOCKED", "ACCEPTED", "IN_PROGRESS"]),
-        supabase.from("terrain_reservations").select("id, purpose, status, date, created_at, reviewed_by, terrain_resources(name)").in("status", ["PENDING", "CHANGES_REQUESTED", "APPROVED"]),
         supabase.from("help_requests").select("id, type, status, created_at, handled_by").eq("status", "OPEN"),
       ]);
       const owners = new Set<string>();
       for (const r of rows(decided) ?? []) if (r.reviewed_by) owners.add(r.reviewed_by);
-      for (const r of rows(terrain) ?? []) if (r.reviewed_by) owners.add(r.reviewed_by);
       const names = owners.size
         ? (await supabase.from("profiles").select("id, display_name, first_name, last_name").in("id", [...owners])).data ?? []
         : [];
@@ -73,7 +70,6 @@ function GovernancePage() {
         proposals: rows(proposals),
         decided: rows(decided),
         contribs: rows(contribs),
-        terrain: rows(terrain),
         help: rows(help),
         names,
       };
@@ -115,11 +111,6 @@ function GovernancePage() {
     if (!bucket) continue;
     items.push({ key: `c-${c.id}`, source: "Proposition d'aide", title: c.title, context: c.projects?.title ?? c.contribution_type, state: CONTRIB_STATE[c.status] ?? c.status, bucket, since: bucket === "followup" ? c.updated_at : c.created_at, action: bucket === "decide" ? "Répondre à la proposition" : bucket === "arbitrage" ? "Trancher ou débloquer" : "Suivre la réalisation", link: "/admin/contributions" });
   }
-  for (const t of data?.terrain ?? []) {
-    const bucket = terrainBucket(t.status, t.date, today);
-    if (!bucket) continue;
-    items.push({ key: `t-${t.id}`, source: "Réservation du terrain", title: t.purpose || t.terrain_resources?.name || "Réservation", context: t.terrain_resources?.name, state: TERRAIN_STATE[t.status] ?? t.status, bucket, since: t.created_at, due: t.date, owner: nameOf(t.reviewed_by), action: bucket === "decide" ? "Accepter, refuser ou demander des modifications" : bucket === "arbitrage" ? "Attendre ou relancer le demandeur" : "Créneau confirmé", link: "/terrain" });
-  }
   for (const h of data?.help ?? []) items.push({ key: `h-${h.id}`, source: "Demande d'aide", title: h.type, state: "Ouverte", bucket: "arbitrage", since: h.created_at, action: "Désigner une personne pour répondre", link: "/help-requests" });
 
   const sorted = sortGov(items, today);
@@ -152,6 +143,8 @@ function GovernancePage() {
         </div>
       </section>
 
+      <AgAttendance />
+
       {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : (
         <div className="grid gap-5 xl:grid-cols-3">
           {BUCKETS.map((b) => {
@@ -183,7 +176,6 @@ function GovernancePage() {
         </div>
       )}
       <p className="mt-6 text-xs text-muted-foreground">Priorité calculée : échéance dans 7 jours ou moins, ou sujet en attente depuis 14 jours. Aucune donnée n'est copiée : chaque lien ouvre le dossier d'origine.</p>
-      <AgAttendance />
       <GovernanceRegister />
     </AppShell>
   );

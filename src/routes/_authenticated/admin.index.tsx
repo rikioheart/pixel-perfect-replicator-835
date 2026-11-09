@@ -8,13 +8,13 @@ import { useSensitiveRights } from "@/lib/permissions";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { AG_CONVOCATION_DAYS, AG_QUORUM, convocationDeadline, isInAgMonth, nextAgYear } from "@/lib/statutes";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/domain";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { euro, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
 import { PendingActionsStrip } from "@/components/PendingActionsStrip";
+import { BureauQuickAccess } from "@/components/BureauQuickAccess";
 import { isOverdueReservation } from "@/lib/role-home";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -152,7 +152,7 @@ function AdminConsole() {
     : null;
 
   const shortcuts = [
-    { label: "Besoins de décision & émargement AG", to: "/admin/gouvernance" },
+    { label: "Besoins de décision", to: "/admin/gouvernance" },
     { label: "Inventaire", to: "/inventory" },
     { label: "Annuaire", to: "/directory" },
     { label: "Rôles & habilitations", to: "/admin/roles" },
@@ -163,6 +163,7 @@ function AdminConsole() {
   return (
     <AppShell title="Console du Bureau" subtitle="Le pilotage de l'association, en un coup d'œil">
       <BureauConsoleTabs />
+      <BureauQuickAccess />
       <PendingActionsStrip items={actions} loading={!data} />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -180,7 +181,7 @@ function AdminConsole() {
                 </>
               ) : null}
               {rights.viewGlobal ? (
-                <Row main="Reversements professionnels à payer" right={money(psum?.due)} to="/finance" />
+                <Row main="Reversements professionnels à payer" right={money(psum?.due)} to="/admin/suivi-financier" />
               ) : null}
             </CardContent>
           </Card>
@@ -287,17 +288,12 @@ function AgReminder() {
   const valid = /^\d{4}-\d{2}-\d{2}$/.test(agDate);
   return (
     <section className="panel mt-6 space-y-3 p-5" aria-labelledby="ag-title">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="ag-title" className="flex items-center gap-2 text-lg">
-          <CalendarClock className="size-5 text-primary" aria-hidden /> Assemblée générale ordinaire {year}
-        </h2>
-        <Button asChild size="sm" variant="outline">
-          <Link to="/admin/gouvernance">Ouvrir l'émargement</Link>
-        </Button>
-      </div>
+      <h2 id="ag-title" className="flex items-center gap-2 text-lg">
+        <CalendarClock className="size-5 text-primary" aria-hidden /> Assemblée générale ordinaire {year}
+      </h2>
       <p className="text-sm text-muted-foreground">
         Article 16 : AG en juin, convocation au moins {AG_CONVOCATION_DAYS} jours avant, quorum de {AG_QUORUM} personnes
-        présentes ou représentées. L'émargement nominatif calcule le quorum.
+        présentes ou représentées. L'émargement nominatif (accès rapide en haut de la Console) calcule le quorum.
       </p>
       <label className="block max-w-xs text-sm">
         Date envisagée

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -12,14 +12,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSensitiveRights } from "@/lib/permissions";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { buildRows, toCsv, toTsv, parseHelloAssoCsv, EXPORT_COLUMNS } from "@/lib/finance-export";
+import { LEDGER_CATEGORIES, categoryLabel } from "@/lib/annual-accounts";
+import { AccountingSplitsPanel } from "@/components/AccountingSplitsPanel";
+
+const TITLE = "Comptabilité & Grand livre";
 
 export const Route = createFileRoute("/_authenticated/admin/suivi-financier")({
   head: () => ({
     meta: [
-      { title: "Suivi financier — La Voix du Chien" },
-      { name: "description", content: "Suivi opérationnel des recettes, dépenses, locations et adhésions, avec export pour la comptabilité." },
-      { property: "og:title", content: "Suivi financier — La Voix du Chien" },
-      { property: "og:description", content: "Préparer les données pour la comptabilité, sans la remplacer." },
+      { title: "Comptabilité & Grand livre — La Voix du Chien" },
+      { name: "description", content: "Grand livre de l'association : recettes et dépenses, adhésions HelloAsso, répartitions et exports comptables." },
+      { property: "og:title", content: "Comptabilité & Grand livre — La Voix du Chien" },
+      { property: "og:description", content: "Suivi budgétaire global, recettes HelloAsso et exports pour le bilan de l'exercice." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -27,11 +31,9 @@ export const Route = createFileRoute("/_authenticated/admin/suivi-financier")({
   component: Page,
 });
 
-const CATS = { RECETTE: ["ADHESION", "CONTRIBUTION", "LOCATION_TERRAIN", "ACTIVITE", "FORMATION", "AUTRE_RECETTE"],
-  DEPENSE: ["ACHAT", "MATERIEL", "REMBOURSEMENT", "FRAIS_ACTIVITE", "FRAIS_PROJET", "AUTRE_DEPENSE"] } as const;
 const STATUS_FR: Record<string, string> = { A_RECEVOIR: "À recevoir", RECU: "Reçu", A_PAYER: "À payer", PAYE: "Payé", TRANSMIS: "Transmis compta", ANNULE: "Annulé" };
 const OUT_FR: Record<string, string> = { CREATED: "Créé", UPDATED: "Mis à jour", UNCHANGED: "Déjà connu", TO_REVIEW: "À valider", PERSON_ONLY: "Personne sans compte", ERROR: "Erreur", RESOLVED: "Traité", EXPORTED: "Exporté" };
-const EMPTY = { entry_date: new Date().toISOString().slice(0, 10), direction: "RECETTE", category: "CONTRIBUTION", amount: "", description: "", status: "A_RECEVOIR", receipt_url: "", payment_method: "", external_ref: "", internal_note: "", project_id: "", activity_id: "", person_id: "" };
+const EMPTY = { entry_date: new Date().toISOString().slice(0, 10), direction: "RECETTE", category: "ADHESION", amount: "", description: "", status: "A_RECEVOIR", receipt_url: "", payment_method: "", external_ref: "", internal_note: "", project_id: "", activity_id: "", person_id: "" };
 
 function Page() {
   // Requêtes lancées seulement si le droit est effectif ; la base refuse de toute façon (RLS).
@@ -50,15 +52,6 @@ function Page() {
         .order("entry_date", { ascending: false }).limit(1000);
       if (error) throw error;
       return data;
-    },
-  });
-  const rentals = useQuery({
-    queryKey: ["rentals-untracked"],
-    enabled: rights.viewGlobal,
-    queryFn: async () => {
-      const { data } = await supabase.from("terrain_reservations").select("id, date, purpose, status, rental_terms")
-        .eq("access_mode", "LOCATION").in("status", ["APPROVED", "PENDING"]).order("date", { ascending: false }).limit(100);
-      return data ?? [];
     },
   });
   // Rattachements facultatifs d'une opération (colonnes existantes de finance_entries, aucune autre table touchée).
@@ -84,7 +77,7 @@ function Page() {
     },
   });
 
-  const refresh = () => { void qc.invalidateQueries({ queryKey: ["finance-entries"] }); void qc.invalidateQueries({ queryKey: ["integration-events"] }); void qc.invalidateQueries({ queryKey: ["rentals-untracked"] }); };
+  const refresh = () => { void qc.invalidateQueries({ queryKey: ["finance-entries"] }); void qc.invalidateQueries({ queryKey: ["integration-events"] }); };
 
   const add = useMutation({
     mutationFn: async (extra: Partial<Record<string, unknown>> = {}) => {
@@ -137,25 +130,24 @@ function Page() {
 
   const list = useMemo(() => (entries.data ?? []).filter((e) => !filter || e.status === filter || e.direction === filter), [entries.data, filter]);
   const rows = useMemo(() => buildRows(list as never), [list]);
-  const tracked = new Set((entries.data ?? []).map((e) => e.reservation_id).filter(Boolean));
   const totals = list.filter((e) => e.status !== "ANNULE").reduce((t, e) => {
     t[e.direction === "RECETTE" ? "in" : "out"] += Number(e.amount); return t; }, { in: 0, out: 0 });
 
   const download = () => {
     const blob = new Blob(["\uFEFF" + toCsv(rows)], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `suivi-financier-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `grand-livre-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
   };
 
-  if (!rights.ready) return <AppShell title="Suivi financier"><p role="status" className="text-sm text-muted-foreground">Vérification de vos droits…</p></AppShell>;
-  if (!rights.viewGlobal) return <AppShell title="Suivi financier"><EmptyState title="Droit finances requis" message="Le suivi des opérations est réservé aux membres du Bureau disposant du droit « consulter les finances globales »." /></AppShell>;
+  if (!rights.ready) return <AppShell title={TITLE}><p role="status" className="text-sm text-muted-foreground">Vérification de vos droits…</p></AppShell>;
+  if (!rights.viewGlobal) return <AppShell title={TITLE}><EmptyState title="Droit finances requis" message="Le grand livre est réservé aux membres du Bureau disposant du droit « consulter les finances globales »." /></AppShell>;
   const money = (n: number) => (entries.isError ? "—" : `${n.toFixed(2)} €`);
 
   return (
-    <AppShell title="Suivi financier" subtitle="Suivi opérationnel et préparation des exports. La comptabilité officielle reste tenue dans l'outil comptable de l'association.">
+    <AppShell title={TITLE} subtitle="Suivi budgétaire global : recettes (dont HelloAsso), dépenses, répartitions et exports pour le bilan de l'exercice.">
       <BureauConsoleTabs />
       <section className="mb-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Recettes suivies</p><p className="text-xl font-bold">{money(totals.in)}</p><p className="text-xs text-muted-foreground">Source : opérations suivies, hors annulées</p></div>
-        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Dépenses suivies</p><p className="text-xl font-bold">{money(totals.out)}</p><p className="text-xs text-muted-foreground">Remboursements et reversements : voir Comptabilité</p></div>
+        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Recettes suivies</p><p className="text-xl font-bold">{money(totals.in)}</p><p className="text-xs text-muted-foreground">Grand livre, hors annulées</p></div>
+        <div className="rounded-xl border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Dépenses suivies</p><p className="text-xl font-bold">{money(totals.out)}</p><p className="text-xs text-muted-foreground">Notes de frais : voir <Link to="/finance" className="underline">Remboursements & Notes de frais</Link></p></div>
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-4">
           <Button size="sm" onClick={download}><Download className="mr-1 size-3.5" />CSV</Button>
           <Button size="sm" variant="outline" onClick={() => { void navigator.clipboard.writeText(toTsv(rows)); toast.success("Copié : collez directement dans Google Sheets ou un tableur."); }}><Copy className="mr-1 size-3.5" />Copier pour tableur</Button>
@@ -164,16 +156,16 @@ function Page() {
 
       {rights.create ? (
       <details className="mb-6 rounded-xl border border-border bg-card p-4">
-        <summary className="cursor-pointer font-semibold">Ajouter une opération</summary>
+        <summary className="cursor-pointer font-semibold">Ajouter une écriture au grand livre</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div><Label htmlFor="fe-d">Date</Label><Input id="fe-d" type="date" value={f.entry_date} onChange={(e) => setF({ ...f, entry_date: e.target.value })} /></div>
           <div><Label htmlFor="fe-dir">Sens</Label>
             <select id="fe-dir" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.direction}
-              onChange={(e) => setF({ ...f, direction: e.target.value, category: CATS[e.target.value as "RECETTE"][0], status: e.target.value === "RECETTE" ? "A_RECEVOIR" : "A_PAYER" })}>
+              onChange={(e) => setF({ ...f, direction: e.target.value, category: LEDGER_CATEGORIES[e.target.value as "RECETTE"][0]?.code ?? "", status: e.target.value === "RECETTE" ? "A_RECEVOIR" : "A_PAYER" })}>
               <option value="RECETTE">Recette</option><option value="DEPENSE">Dépense</option></select></div>
           <div><Label htmlFor="fe-cat">Catégorie</Label>
             <select id="fe-cat" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })}>
-              {CATS[f.direction as "RECETTE"].map((c) => <option key={c} value={c}>{c.replace(/_/g, " ").toLowerCase()}</option>)}</select></div>
+              {LEDGER_CATEGORIES[f.direction as "RECETTE"].map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}</select></div>
           <div><Label htmlFor="fe-a">Montant (€)</Label><Input id="fe-a" inputMode="decimal" value={f.amount} onChange={(e) => setF({ ...f, amount: e.target.value })} /></div>
           <div><Label htmlFor="fe-s">Statut</Label>
             <select id="fe-s" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
@@ -198,21 +190,6 @@ function Page() {
       </details>
       ) : null}
 
-      {rights.create && (rentals.data ?? []).filter((r) => !tracked.has(r.id)).length > 0 && (
-        <section className="mb-6 rounded-xl border border-border bg-card p-4">
-          <h2 className="mb-2 font-semibold">Locations de terrain sans suivi</h2>
-          <p className="mb-2 text-xs text-muted-foreground">Une réservation ne devient jamais une opération automatiquement : à vous de décider.</p>
-          {(rentals.data ?? []).filter((r) => !tracked.has(r.id)).map((r) => (
-            <div key={r.id} className="flex flex-wrap items-center gap-2 border-t border-border py-2 text-sm">
-              <span className="flex-1">{r.date} · {r.purpose ?? "Location"} {r.rental_terms ? `· ${r.rental_terms}` : ""}</span>
-              <Button size="sm" variant="outline" onClick={() => {
-                const v = prompt("Montant dû pour cette location (€) ?"); if (v == null) return;
-                add.mutate({ amount: v, reservation_id: r.id, direction: "RECETTE", category: "LOCATION_TERRAIN", status: "A_RECEVOIR", description: `Location terrain ${r.date}` });
-              }}>Suivre le montant dû</Button>
-            </div>
-          ))}
-        </section>
-      )}
 
       <div className="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Filtrer">
         {["", "RECETTE", "DEPENSE", "A_RECEVOIR", "A_PAYER", "TRANSMIS"].map((k) => (
@@ -231,7 +208,7 @@ function Page() {
                 <tr key={e.id} className="border-t border-border">
                   <td className="px-3 py-2">{e.entry_date}</td>
                   <td className="px-3 py-2">{e.direction === "RECETTE" ? "Recette" : "Dépense"}</td>
-                  <td className="px-3 py-2">{e.category.replace(/_/g, " ").toLowerCase()}</td>
+                  <td className="px-3 py-2">{categoryLabel(e.category)}</td>
                   <td className="px-3 py-2 font-semibold">{Number(e.amount).toFixed(2)} €</td>
                   <td className="px-3 py-2">{rows[i]?.personne || rows[i]?.projet || rows[i]?.activite || e.description || "—"}</td>
                   <td className="px-3 py-2">
@@ -245,11 +222,13 @@ function Page() {
           </table>
         </div>
       )}
-      <p className="mt-2 text-xs text-muted-foreground">Colonnes exportées : {EXPORT_COLUMNS.join(", ")}.</p>
+      <p className="mt-2 text-xs text-muted-foreground">Colonnes exportées : {EXPORT_COLUMNS.join(", ")}. Le bilan de l'exercice pour l'AG se prépare dans <Link to="/statistics" className="underline">Statistiques</Link>.</p>
+
+      <AccountingSplitsPanel />
 
       <section className="mt-8 rounded-xl border border-border bg-card p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="flex-1 font-semibold">HelloAsso — adhésions et journal</h2>
+          <h2 className="flex-1 font-semibold">Recettes HelloAsso — adhésions et journal</h2>
           <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-input px-3 py-2 text-sm">
             <Upload className="size-3.5" />Importer un export CSV
             <input type="file" accept=".csv,text/csv" className="sr-only" onChange={(e) => { const file = e.target.files?.[0]; if (file) void importHelloAsso(file); e.target.value = ""; }} />
