@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 
-export type DirectoryView = "pros" | "particuliers" | "partenaires" | "chiens" | "mairies" | "adherents";
+export type DirectoryView =
+  "pros" | "particuliers" | "partenaires" | "chiens" | "mairies" | "adherents";
 
 /**
  * Bandeau unique de l'annuaire : chaque vue garde ses propres filtres sur sa page.
@@ -30,7 +31,12 @@ export function DirectoryTabs({ current }: { current: DirectoryView }) {
       <Link to="/partners" className={cls("partenaires")} aria-current={aria("partenaires")}>
         Partenaires & avantages
       </Link>
-      <Link to="/directory" search={{ vue: "chiens" }} className={cls("chiens")} aria-current={aria("chiens")}>
+      <Link
+        to="/directory"
+        search={{ vue: "chiens" }}
+        className={cls("chiens")}
+        aria-current={aria("chiens")}
+      >
         Chiens
       </Link>
       {isBureau ? (

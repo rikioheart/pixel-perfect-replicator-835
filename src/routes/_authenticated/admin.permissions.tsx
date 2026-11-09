@@ -108,7 +108,8 @@ function PermissionsPage() {
   // Chaque écriture est journalisée par la base (déclencheur), jamais par l'interface.
   const toggle = useMutation({
     mutationFn: async (input: { role: Role; permissionId: string; granted: boolean }) => {
-      if (input.role.code === "ADMIN_BUREAU") throw new Error("Le Bureau conserve toutes les permissions.");
+      if (input.role.code === "ADMIN_BUREAU")
+        throw new Error("Le Bureau conserve toutes les permissions.");
       if (input.granted) {
         const { error } = await supabase
           .from("role_permissions")
@@ -128,7 +129,11 @@ function PermissionsPage() {
   });
 
   const toggleScope = useMutation({
-    mutationFn: async (input: { roleId: string; permissionId: string; requiresProfessional: boolean }) => {
+    mutationFn: async (input: {
+      roleId: string;
+      permissionId: string;
+      requiresProfessional: boolean;
+    }) => {
       const { error } = await supabase
         .from("role_permissions")
         .update({ requires_professional: input.requiresProfessional })
@@ -146,10 +151,14 @@ function PermissionsPage() {
       if (!grants) return;
       const byCode = new Map(permissions.map((p) => [p.code, p.id]));
       const wanted = new Map(
-        grants.filter((g) => byCode.has(g.code)).map((g) => [byCode.get(g.code)!, g.requiresProfessional]),
+        grants
+          .filter((g) => byCode.has(g.code))
+          .map((g) => [byCode.get(g.code)!, g.requiresProfessional]),
       );
       const current = links.filter((l) => l.role_id === role.id);
-      const toRemove = current.filter((l) => !wanted.has(l.permission_id)).map((l) => l.permission_id);
+      const toRemove = current
+        .filter((l) => !wanted.has(l.permission_id))
+        .map((l) => l.permission_id);
       if (toRemove.length) {
         const { error } = await supabase
           .from("role_permissions")
@@ -162,7 +171,11 @@ function PermissionsPage() {
       const toAdd = [...wanted].filter(([id]) => !currentIds.has(id));
       if (toAdd.length) {
         const { error } = await supabase.from("role_permissions").insert(
-          toAdd.map(([id, pro]) => ({ role_id: role.id, permission_id: id, requires_professional: pro })),
+          toAdd.map(([id, pro]) => ({
+            role_id: role.id,
+            permission_id: id,
+            requires_professional: pro,
+          })),
         );
         if (error) throw new Error(error.message);
       }
@@ -212,7 +225,8 @@ function PermissionsPage() {
   }
 
   const shownRoles = roleFilter === "ALL" ? roles : roles.filter((r) => r.id === roleFilter);
-  const selectedRole = roleFilter === "ALL" ? null : (roles.find((r) => r.id === roleFilter) ?? null);
+  const selectedRole =
+    roleFilter === "ALL" ? null : (roles.find((r) => r.id === roleFilter) ?? null);
   const gaps = (role: Role) =>
     permissions.filter((p) => {
       const link = linkMap.get(`${role.id}:${p.id}`);
@@ -270,7 +284,9 @@ function PermissionsPage() {
         ) : null}
 
         {modules.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucune permission ne correspond à « {search} ».</p>
+          <p className="text-sm text-muted-foreground">
+            Aucune permission ne correspond à « {search} ».
+          </p>
         ) : (
           <Accordion
             type="multiple"
@@ -296,12 +312,18 @@ function PermissionsPage() {
                   </AccordionTrigger>
                   <AccordionContent className="pb-0">
                     <div className="overflow-x-auto">
-                      <table className={`w-full text-sm ${shownRoles.length > 2 ? "min-w-[760px]" : ""}`}>
+                      <table
+                        className={`w-full text-sm ${shownRoles.length > 2 ? "min-w-[760px]" : ""}`}
+                      >
                         <thead>
                           <tr className="border-y border-border text-left text-xs text-muted-foreground">
                             <th className="p-3 font-medium">Permission</th>
                             {shownRoles.map((role) => (
-                              <th key={role.id} className="p-3 text-center font-medium" title={role.name}>
+                              <th
+                                key={role.id}
+                                className="p-3 text-center font-medium"
+                                title={role.name}
+                              >
                                 {ROLE_SHORT_LABEL[role.code] ?? role.name}
                               </th>
                             ))}
@@ -309,14 +331,21 @@ function PermissionsPage() {
                         </thead>
                         <tbody>
                           {modulePermissions.map((permission) => (
-                            <tr key={permission.id} className="border-b border-border/60 last:border-0">
+                            <tr
+                              key={permission.id}
+                              className="border-b border-border/60 last:border-0"
+                            >
                               <td className="p-3">
                                 <p>{permission.name}</p>
                                 <p className="text-xs text-muted-foreground">{permission.code}</p>
                               </td>
                               {shownRoles.map((role) => {
                                 const link = linkMap.get(`${role.id}:${permission.id}`);
-                                const actual = !link ? "none" : link.requires_professional ? "pro" : "granted";
+                                const actual = !link
+                                  ? "none"
+                                  : link.requires_professional
+                                    ? "pro"
+                                    : "granted";
                                 const differs = actual !== defaultState(role.code, permission.code);
                                 const locked = role.code === "ADMIN_BUREAU";
                                 return (
@@ -328,7 +357,11 @@ function PermissionsPage() {
                                           aria-label={`${permission.name} pour ${role.name}`}
                                           disabled={locked || toggle.isPending}
                                           onCheckedChange={(next) =>
-                                            toggle.mutate({ role, permissionId: permission.id, granted: next })
+                                            toggle.mutate({
+                                              role,
+                                              permissionId: permission.id,
+                                              granted: next,
+                                            })
                                           }
                                         />
                                         {differs ? (
@@ -434,8 +467,8 @@ function HowItWorks() {
         <div>
           <p className="font-medium text-foreground">Modifier une permission</p>
           <p>
-            Ouvrez un thème, puis activez ou coupez l'interrupteur du rôle concerné. « Tous » ou
-            « Pros validés » précise si le droit vaut pour tout le rôle ou seulement pour les
+            Ouvrez un thème, puis activez ou coupez l'interrupteur du rôle concerné. « Tous » ou «
+            Pros validés » précise si le droit vaut pour tout le rôle ou seulement pour les
             professionnels validés par le Bureau. Un point signale un écart avec le réglage par
             défaut ; filtrez sur un rôle pour le rétablir.
           </p>

@@ -71,7 +71,12 @@ type Member = {
   involvement_level: string | null;
   email?: string | null;
 };
-type Assignment = { id: string; user_id: string; role_id: string; roles: { code?: string; name?: string } | null };
+type Assignment = {
+  id: string;
+  user_id: string;
+  role_id: string;
+  roles: { code?: string; name?: string } | null;
+};
 type MemberFunction = {
   id: string;
   user_id: string;
@@ -82,9 +87,21 @@ type MemberFunction = {
 
 type Pending =
   | { kind: "role.assign"; userId: string; userName: string; roleId: string; roleName: string }
-  | { kind: "role.revoke"; userId: string; userName: string; assignmentId: string; roleName: string }
+  | {
+      kind: "role.revoke";
+      userId: string;
+      userName: string;
+      assignmentId: string;
+      roleName: string;
+    }
   | { kind: "function.assign"; userId: string; userName: string; functionType: string }
-  | { kind: "function.revoke"; userId: string; userName: string; functionId: string; functionType: string };
+  | {
+      kind: "function.revoke";
+      userId: string;
+      userName: string;
+      functionId: string;
+      functionType: string;
+    };
 
 const fnLabel = (type: string) => MEMBER_FUNCTION_LABEL[type] ?? type;
 
@@ -102,13 +119,15 @@ function RolesPage() {
     enabled: isBureau,
     queryFn: async () =>
       (await withContacts(
-        (await supabase
-          .from("profiles")
-          .select(
-            "id, first_name, last_name, display_name, membership_status, membership_type, access_level, involvement_level",
-          )
-          .is("deleted_at", null)
-          .order("last_name", { ascending: true })).data ?? [],
+        (
+          await supabase
+            .from("profiles")
+            .select(
+              "id, first_name, last_name, display_name, membership_status, membership_type, access_level, involvement_level",
+            )
+            .is("deleted_at", null)
+            .order("last_name", { ascending: true })
+        ).data ?? [],
       )) as Member[],
   });
 
@@ -141,7 +160,11 @@ function RolesPage() {
   });
 
   const projectIds = useMemo(
-    () => [...new Set(functions.filter((f) => f.scope_type === "PROJECT" && f.scope_id).map((f) => f.scope_id!))],
+    () => [
+      ...new Set(
+        functions.filter((f) => f.scope_type === "PROJECT" && f.scope_id).map((f) => f.scope_id!),
+      ),
+    ],
     [functions],
   );
   const { data: projectTitles = {} } = useQuery({
@@ -164,18 +187,28 @@ function RolesPage() {
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return members.filter((m) => {
-      if (term && !`${memberFullName(m)} ${m.email ?? ""}`.toLowerCase().includes(term)) return false;
+      if (term && !`${memberFullName(m)} ${m.email ?? ""}`.toLowerCase().includes(term))
+        return false;
       if (roleFilter !== "ALL") {
         const has = assignments.some((a) => a.user_id === m.id && a.role_id === roleFilter);
-        if (roleFilter === "NONE" ? assignments.some((a) => a.user_id === m.id) : !has) return false;
+        if (roleFilter === "NONE" ? assignments.some((a) => a.user_id === m.id) : !has)
+          return false;
       }
-      if (functionFilter !== "ALL" && !functions.some((f) => f.user_id === m.id && f.function_type === functionFilter))
+      if (
+        functionFilter !== "ALL" &&
+        !functions.some((f) => f.user_id === m.id && f.function_type === functionFilter)
+      )
         return false;
       return true;
     });
   }, [members, search, roleFilter, functionFilter, assignments, functions]);
 
-  const logAction = async (action: string, userId: string, values: Record<string, unknown>, summary: string) => {
+  const logAction = async (
+    action: string,
+    userId: string,
+    values: Record<string, unknown>,
+    summary: string,
+  ) => {
     await supabase.from("audit_logs").insert({
       actor_id: user?.id ?? null,
       action,
@@ -192,14 +225,27 @@ function RolesPage() {
         const { error } = await supabase
           .from("user_roles")
           .insert({ user_id: task.userId, role_id: task.roleId, assigned_by: user?.id ?? null });
-        if (error) throw new Error(error.message.includes("duplicate") ? "Ce rôle est déjà attribué." : error.message);
-        await logAction("role.assign", task.userId, { role_id: task.roleId }, `Rôle « ${task.roleName} » attribué à ${task.userName}`);
+        if (error)
+          throw new Error(
+            error.message.includes("duplicate") ? "Ce rôle est déjà attribué." : error.message,
+          );
+        await logAction(
+          "role.assign",
+          task.userId,
+          { role_id: task.roleId },
+          `Rôle « ${task.roleName} » attribué à ${task.userName}`,
+        );
         return `Rôle « ${task.roleName} » attribué.`;
       }
       if (task.kind === "role.revoke") {
         const { error } = await supabase.from("user_roles").delete().eq("id", task.assignmentId);
         if (error) throw new Error(error.message);
-        await logAction("role.revoke", task.userId, { assignment_id: task.assignmentId }, `Rôle « ${task.roleName} » retiré à ${task.userName}`);
+        await logAction(
+          "role.revoke",
+          task.userId,
+          { assignment_id: task.assignmentId },
+          `Rôle « ${task.roleName} » retiré à ${task.userName}`,
+        );
         return `Rôle « ${task.roleName} » retiré.`;
       }
       if (task.kind === "function.assign") {
@@ -212,7 +258,12 @@ function RolesPage() {
               ? `La fonction « ${fnLabel(task.functionType)} » est déjà occupée. Clôturez-la d'abord.`
               : error.message,
           );
-        await logAction("function.assign", task.userId, { function_type: task.functionType }, `Fonction « ${fnLabel(task.functionType)} » attribuée à ${task.userName}`);
+        await logAction(
+          "function.assign",
+          task.userId,
+          { function_type: task.functionType },
+          `Fonction « ${fnLabel(task.functionType)} » attribuée à ${task.userName}`,
+        );
         return "Fonction ajoutée.";
       }
       const { error } = await supabase
@@ -220,7 +271,12 @@ function RolesPage() {
         .update({ active: false, end_date: new Date().toISOString().slice(0, 10) })
         .eq("id", task.functionId);
       if (error) throw new Error(error.message);
-      await logAction("function.revoke", task.userId, { function_id: task.functionId }, `Fonction « ${fnLabel(task.functionType)} » clôturée pour ${task.userName}`);
+      await logAction(
+        "function.revoke",
+        task.userId,
+        { function_id: task.functionId },
+        `Fonction « ${fnLabel(task.functionType)} » clôturée pour ${task.userName}`,
+      );
       return "Fonction clôturée.";
     },
     onSuccess: (message) => {
@@ -234,14 +290,19 @@ function RolesPage() {
   if (!isBureau) {
     return (
       <AppShell title="Rôles & habilitations" subtitle="Accès réservé au Bureau">
-        <p className="text-sm text-muted-foreground">Cette page est réservée aux membres du Bureau.</p>
+        <p className="text-sm text-muted-foreground">
+          Cette page est réservée aux membres du Bureau.
+        </p>
       </AppShell>
     );
   }
 
   /** Validations métier avant ouverture de la confirmation. */
   const request = (task: Pending) => {
-    if (task.kind === "role.assign" && assignments.some((a) => a.user_id === task.userId && a.role_id === task.roleId)) {
+    if (
+      task.kind === "role.assign" &&
+      assignments.some((a) => a.user_id === task.userId && a.role_id === task.roleId)
+    ) {
       toast.error("Ce rôle est déjà attribué à cet adhérent.");
       return;
     }
@@ -257,15 +318,21 @@ function RolesPage() {
       }
     }
     if (task.kind === "function.assign") {
-      if (functions.some((f) => f.user_id === task.userId && f.function_type === task.functionType)) {
+      if (
+        functions.some((f) => f.user_id === task.userId && f.function_type === task.functionType)
+      ) {
         toast.error("Cette fonction est déjà active pour cet adhérent.");
         return;
       }
       if (UNIQUE_FUNCTIONS.includes(task.functionType)) {
         const holder = functions.find((f) => f.function_type === task.functionType);
         if (holder) {
-          const name = memberFullName(members.find((m) => m.id === holder.user_id) ?? { display_name: null });
-          toast.error(`La fonction « ${fnLabel(task.functionType)} » est déjà occupée par ${name}. Clôturez-la d'abord.`);
+          const name = memberFullName(
+            members.find((m) => m.id === holder.user_id) ?? { display_name: null },
+          );
+          toast.error(
+            `La fonction « ${fnLabel(task.functionType)} » est déjà occupée par ${name}. Clôturez-la d'abord.`,
+          );
           return;
         }
       }
@@ -367,7 +434,9 @@ function RolesPage() {
                       </button>
                       <p className="text-xs text-muted-foreground">{m.email ?? "—"}</p>
                       <p className="mt-1 text-xs text-muted-foreground md:hidden">
-                        {memberRoles.map((a) => ROLE_SHORT_LABEL[a.roles?.code ?? ""] ?? a.roles?.name).join(" · ") || "Aucun rôle"}
+                        {memberRoles
+                          .map((a) => ROLE_SHORT_LABEL[a.roles?.code ?? ""] ?? a.roles?.name)
+                          .join(" · ") || "Aucun rôle"}
                       </p>
                     </td>
                     <td className="hidden p-3 md:table-cell">
@@ -388,7 +457,9 @@ function RolesPage() {
                     </td>
                     <td className="hidden p-3 sm:table-cell">
                       <Badge variant="outline">
-                        {MEMBERSHIP_STATUS_LABEL[m.membership_status ?? ""] ?? m.membership_status ?? "—"}
+                        {MEMBERSHIP_STATUS_LABEL[m.membership_status ?? ""] ??
+                          m.membership_status ??
+                          "—"}
                       </Badge>
                     </td>
                     <td className="p-3 text-muted-foreground">
@@ -400,7 +471,9 @@ function RolesPage() {
             </tbody>
           </table>
           {filtered.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground">Aucun membre ne correspond à ces critères.</p>
+            <p className="p-4 text-sm text-muted-foreground">
+              Aucun membre ne correspond à ces critères.
+            </p>
           ) : null}
         </div>
 
@@ -462,7 +535,11 @@ function RolesPage() {
 export default RolesPage;
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{children}</p>;
+  return (
+    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      {children}
+    </p>
+  );
 }
 
 function MemberDetail({
@@ -484,7 +561,9 @@ function MemberDetail({
   const associationFns = functions.filter((f) => !PROJECT_FUNCTIONS.includes(f.function_type));
   const projectFns = functions.filter((f) => PROJECT_FUNCTIONS.includes(f.function_type));
   const available = roles.filter((r) => !assignments.some((a) => a.role_id === r.id));
-  const availableFns = ASSOCIATION_FUNCTIONS.filter((t) => !functions.some((f) => f.function_type === t));
+  const availableFns = ASSOCIATION_FUNCTIONS.filter(
+    (t) => !functions.some((f) => f.function_type === t),
+  );
 
   return (
     <div className="space-y-6">
@@ -502,7 +581,13 @@ function MemberDetail({
                   <button
                     type="button"
                     onClick={() =>
-                      onRequest({ kind: "role.revoke", userId: member.id, userName: name, assignmentId: a.id, roleName })
+                      onRequest({
+                        kind: "role.revoke",
+                        userId: member.id,
+                        userName: name,
+                        assignmentId: a.id,
+                        roleName,
+                      })
                     }
                     aria-label={`Retirer le rôle ${roleName}`}
                   >
@@ -519,7 +604,13 @@ function MemberDetail({
             onValueChange={(value) => {
               const role = roles.find((r) => r.id === value);
               if (role)
-                onRequest({ kind: "role.assign", userId: member.id, userName: name, roleId: role.id, roleName: role.name });
+                onRequest({
+                  kind: "role.assign",
+                  userId: member.id,
+                  userName: name,
+                  roleId: role.id,
+                  roleName: role.name,
+                });
             }}
           >
             <SelectTrigger aria-label="Attribuer un rôle">
@@ -574,7 +665,12 @@ function MemberDetail({
           <Select
             value=""
             onValueChange={(value) =>
-              onRequest({ kind: "function.assign", userId: member.id, userName: name, functionType: value })
+              onRequest({
+                kind: "function.assign",
+                userId: member.id,
+                userName: name,
+                functionType: value,
+              })
             }
           >
             <SelectTrigger aria-label="Ajouter une fonction">
@@ -682,7 +778,10 @@ function MemberLevels({
       </div>
       <div>
         <SectionTitle>Niveau d'implication</SectionTitle>
-        <Select value={involvementLevel ?? ""} onValueChange={(value) => save({ involvement_level: value })}>
+        <Select
+          value={involvementLevel ?? ""}
+          onValueChange={(value) => save({ involvement_level: value })}
+        >
           <SelectTrigger aria-label="Niveau d'implication">
             <SelectValue placeholder="Niveau d'implication" />
           </SelectTrigger>

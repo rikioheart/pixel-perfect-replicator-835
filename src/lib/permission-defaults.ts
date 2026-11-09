@@ -70,7 +70,8 @@ export type DefaultGrant = { code: string; requiresProfessional: boolean };
 
 /** Droits par défaut d'un rôle ; `null` = tous les droits (Bureau). */
 export function defaultGrantsFor(roleCode: string): DefaultGrant[] | null {
-  const plain = (codes: readonly string[]) => codes.map((code) => ({ code, requiresProfessional: false }));
+  const plain = (codes: readonly string[]) =>
+    codes.map((code) => ({ code, requiresProfessional: false }));
   switch (roleCode) {
     case "ADMIN_BUREAU":
       return null;

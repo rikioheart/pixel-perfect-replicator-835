@@ -49,18 +49,31 @@ export function AgAttendance() {
           .eq("membership_status", "ACTIVE")
           .is("deleted_at", null),
         supabase.from("user_roles").select("user_id, roles(code)"),
-        supabase.from("member_functions").select("user_id, function_type").eq("active", true).eq("function_type", "FOUNDER"),
+        supabase
+          .from("member_functions")
+          .select("user_id, function_type")
+          .eq("active", true)
+          .eq("function_type", "FOUNDER"),
       ]);
       if (profiles.error) throw profiles.error;
       const bureau = new Set(
-        (roles.data ?? []).filter((r) => (r.roles as { code?: string } | null)?.code === "ADMIN_BUREAU").map((r) => r.user_id),
+        (roles.data ?? [])
+          .filter((r) => (r.roles as { code?: string } | null)?.code === "ADMIN_BUREAU")
+          .map((r) => r.user_id),
       );
       const founders = new Set([
-        ...(roles.data ?? []).filter((r) => (r.roles as { code?: string } | null)?.code === "MEMBRE_FONDATEUR").map((r) => r.user_id),
+        ...(roles.data ?? [])
+          .filter((r) => (r.roles as { code?: string } | null)?.code === "MEMBRE_FONDATEUR")
+          .map((r) => r.user_id),
         ...(fns.data ?? []).map((f) => f.user_id),
       ]);
       return (profiles.data ?? [])
-        .map((p) => ({ id: p.id, name: memberFullName(p), bureau: bureau.has(p.id), founder: founders.has(p.id) }))
+        .map((p) => ({
+          id: p.id,
+          name: memberFullName(p),
+          bureau: bureau.has(p.id),
+          founder: founders.has(p.id),
+        }))
         .sort((a, b) => a.name.localeCompare(b.name, "fr"));
     },
   });
@@ -80,14 +93,27 @@ export function AgAttendance() {
 
   const refresh = () => void qc.invalidateQueries({ queryKey: ["ag-attendance", current] });
   const set = useMutation({
-    mutationFn: async (input: { memberId: string; status: AgAttendanceStatus | null; proxy?: string | null }) => {
+    mutationFn: async (input: {
+      memberId: string;
+      status: AgAttendanceStatus | null;
+      proxy?: string | null;
+    }) => {
       if (input.status === null) {
-        const { error } = await supabase.from("ag_attendance").delete().eq("record_id", current).eq("member_id", input.memberId);
+        const { error } = await supabase
+          .from("ag_attendance")
+          .delete()
+          .eq("record_id", current)
+          .eq("member_id", input.memberId);
         if (error) throw error;
         return;
       }
       const { error } = await supabase.from("ag_attendance").upsert(
-        { record_id: current, member_id: input.memberId, status: input.status, proxy_holder_id: input.proxy ?? null },
+        {
+          record_id: current,
+          member_id: input.memberId,
+          status: input.status,
+          proxy_holder_id: input.proxy ?? null,
+        },
         { onConflict: "record_id,member_id" },
       );
       if (error) throw error;
@@ -97,7 +123,10 @@ export function AgAttendance() {
   });
 
   const byMember = useMemo(() => new Map(rows.map((r) => [r.member_id, r])), [rows]);
-  const core = useMemo(() => new Set(members.filter((m) => m.bureau || m.founder).map((m) => m.id)), [members]);
+  const core = useMemo(
+    () => new Set(members.filter((m) => m.bureau || m.founder).map((m) => m.id)),
+    [members],
+  );
   const tally = agTally(rows, core);
   const presents = members.filter((m) => byMember.get(m.id)?.status === "PRESENT");
   const shown = filterByName(members, search);
@@ -108,10 +137,16 @@ export function AgAttendance() {
     <section aria-labelledby="ag-att-title" className="mt-8 space-y-3 print:mt-0">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="ag-att-title" className="flex items-center gap-2 font-display text-lg">
-          <UserCheck className="size-5 text-primary" aria-hidden /> Émargement de l'Assemblée générale
+          <UserCheck className="size-5 text-primary" aria-hidden /> Émargement de l'Assemblée
+          générale
         </h2>
         {current ? (
-          <Button size="sm" variant="outline" className="print:hidden" onClick={() => window.print()}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="print:hidden"
+            onClick={() => window.print()}
+          >
             <Printer className="mr-1 size-4" aria-hidden /> Imprimer la feuille
           </Button>
         ) : null}
@@ -119,7 +154,8 @@ export function AgAttendance() {
 
       {ags.length === 0 ? (
         <p className="panel p-4 text-sm text-muted-foreground">
-          Créez d'abord l'AG dans le registre ci-dessous (type « Assemblée générale ») pour ouvrir son émargement.
+          Créez d'abord l'AG dans le registre ci-dessous (type « Assemblée générale ») pour ouvrir
+          son émargement.
         </p>
       ) : (
         <>
@@ -137,7 +173,10 @@ export function AgAttendance() {
               ))}
             </select>
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden
+              />
               <Input
                 type="search"
                 value={search}
@@ -152,14 +191,23 @@ export function AgAttendance() {
           <div className="panel flex flex-wrap items-center gap-3 p-4 text-sm" role="status">
             {selectedAg ? (
               <span className="font-medium">
-                {selectedAg.title} · {formatParisDateTime(selectedAg.meeting_at ?? selectedAg.meeting_date)}
+                {selectedAg.title} ·{" "}
+                {formatParisDateTime(selectedAg.meeting_at ?? selectedAg.meeting_date)}
               </span>
             ) : null}
             <span>{tally.present} présent(s)</span>
             <span>{tally.represented} représenté(s)</span>
             <span>{tally.excused} excusé(s)</span>
-            <span className="text-muted-foreground">dont {tally.core} membre(s) du Bureau ou fondateur(s)</span>
-            <Badge className={tally.quorum ? "ml-auto" : "ml-auto border-transparent bg-warning text-warning-foreground hover:bg-warning"}>
+            <span className="text-muted-foreground">
+              dont {tally.core} membre(s) du Bureau ou fondateur(s)
+            </span>
+            <Badge
+              className={
+                tally.quorum
+                  ? "ml-auto"
+                  : "ml-auto border-transparent bg-warning text-warning-foreground hover:bg-warning"
+              }
+            >
               {tally.quorum ? "Quorum atteint" : `Quorum : ${tally.counted}/${AG_QUORUM}`}
             </Badge>
           </div>
@@ -184,7 +232,9 @@ export function AgAttendance() {
                           {m.founder ? <Badge variant="outline">Fondateur</Badge> : null}
                         </span>
                         {r?.status === "REPRESENTED" ? (
-                          <p className="text-xs text-muted-foreground">Pouvoir donné à {nameOf(r.proxy_holder_id)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Pouvoir donné à {nameOf(r.proxy_holder_id)}
+                          </p>
                         ) : null}
                       </td>
                       <td className="p-3">
@@ -197,7 +247,9 @@ export function AgAttendance() {
                               className="h-8 px-2 text-xs"
                               aria-pressed={r?.status === s}
                               disabled={set.isPending}
-                              onClick={() => set.mutate({ memberId: m.id, status: r?.status === s ? null : s })}
+                              onClick={() =>
+                                set.mutate({ memberId: m.id, status: r?.status === s ? null : s })
+                              }
                             >
                               {STATUS_LABEL[s]}
                             </Button>
@@ -216,11 +268,13 @@ export function AgAttendance() {
                             }
                           >
                             <option value="">Représenté par…</option>
-                            {presents.filter((p) => p.id !== m.id).map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.name}
-                              </option>
-                            ))}
+                            {presents
+                              .filter((p) => p.id !== m.id)
+                              .map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.name}
+                                </option>
+                              ))}
                           </select>
                         </div>
                         <span className="hidden text-xs print:inline">
@@ -233,11 +287,14 @@ export function AgAttendance() {
                 })}
               </tbody>
             </table>
-            {shown.length === 0 ? <p className="p-4 text-sm text-muted-foreground">Aucun adhérent ne correspond.</p> : null}
+            {shown.length === 0 ? (
+              <p className="p-4 text-sm text-muted-foreground">Aucun adhérent ne correspond.</p>
+            ) : null}
           </div>
           <p className="text-xs text-muted-foreground print:hidden">
-            Seuls les adhérents à l'adhésion active sont listés. Un pouvoir se donne à une personne déjà émargée présente ;
-            si elle repart, ses pouvoirs sont retirés. Chaque émargement est inscrit dans l'historique.
+            Seuls les adhérents à l'adhésion active sont listés. Un pouvoir se donne à une personne
+            déjà émargée présente ; si elle repart, ses pouvoirs sont retirés. Chaque émargement est
+            inscrit dans l'historique.
           </p>
         </>
       )}
