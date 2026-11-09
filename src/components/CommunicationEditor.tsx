@@ -115,11 +115,12 @@ export function CommunicationEditor({
 
   const statuses = isBureau ? COMM_STATUSES : COMM_STATUSES.filter(([k]) => k === "DRAFT" || k === "IN_REVIEW");
 
-  const save = async () => {
-    if (form.title.trim().length < 2) return toast.error("Donnez un titre.");
+  const save = async (): Promise<void> => {
+    const fail = (m: string) => void toast.error(m);
+    if (form.title.trim().length < 2) return fail("Donnez un titre.");
     const visuals = form.visuals_url.trim();
-    if (visuals && !isSafeExternalFormUrl(visuals)) return toast.error("Le lien des visuels doit commencer par https:// (Canva, Drive…).");
-    if (!isBureau && !projectId) return toast.error("Rattachez la communication à un projet.");
+    if (visuals && !isSafeExternalFormUrl(visuals)) return fail("Le lien des visuels doit commencer par https:// (Canva, Drive…).");
+    if (!isBureau && !projectId) return fail("Rattachez la communication à un projet.");
     setSaving(true);
     const payload = {
       title: form.title.trim(),
@@ -138,7 +139,7 @@ export function CommunicationEditor({
       ? await supabase.from("bureau_communications").update(payload).eq("id", editing.id)
       : await supabase.from("bureau_communications").insert({ ...payload, created_by: user?.id ?? null });
     setSaving(false);
-    if (error) return toast.error(explainDbError(error));
+    if (error) return fail(explainDbError(error));
     toast.success(form.status === "IN_REVIEW" ? "Communication transmise au Bureau pour validation." : "Communication enregistrée.");
     onOpenChange(false);
     onSaved();

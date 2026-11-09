@@ -21,9 +21,9 @@ export function CommunicationCard({
   onChanged,
 }: {
   c: Communication;
-  ownerName?: string;
-  taskTitle?: string;
-  projectTitle?: string;
+  ownerName?: string | undefined;
+  taskTitle?: string | undefined;
+  projectTitle?: string | undefined;
   onEdit: (c: Communication) => void;
   onChanged: () => void;
 }) {
@@ -32,13 +32,19 @@ export function CommunicationCard({
 
   const setStatus = async (status: string, message: string) => {
     const { error } = await supabase.from("bureau_communications").update({ status }).eq("id", c.id);
-    if (error) return toast.error(explainDbError(error));
+    if (error) {
+      toast.error(explainDbError(error));
+      return;
+    }
     toast.success(message);
     onChanged();
   };
   const publish = async () => {
     const { error } = await supabase.rpc("publish_communication", { _id: c.id });
-    if (error) return toast.error(explainDbError(error));
+    if (error) {
+      toast.error(explainDbError(error));
+      return;
+    }
     toast.success("Publiée dans « Actualités ».");
     onChanged();
   };
