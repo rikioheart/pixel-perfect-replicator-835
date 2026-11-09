@@ -25,13 +25,13 @@ import { isOverdueReservation } from "@/lib/role-home";
 export const Route = createFileRoute("/_authenticated/member")({
   head: () => ({
     meta: [
-      { title: "Mon chien et moi — La Voix du Chien" },
+      { title: "Mon compagnon & moi — La Voix du Chien" },
       {
         name: "description",
         content:
           "Accueil du membre : son chien, son pass, ses prochaines sorties et les façons de donner un coup de main.",
       },
-      { property: "og:title", content: "Mon chien et moi — La Voix du Chien" },
+      { property: "og:title", content: "Mon compagnon & moi — La Voix du Chien" },
       {
         property: "og:description",
         content: "Votre chien, votre pass, vos prochaines sorties et l'entraide de l'association.",
@@ -114,7 +114,7 @@ function MemberDashboard() {
     : "Votre chien, votre pass et ce qui vous concerne ici.";
 
   return (
-    <AppShell title="Mon chien et moi" subtitle="Ce qui vous concerne, rien de plus">
+    <AppShell title="Mon compagnon & moi" subtitle="Ce qui vous concerne, rien de plus">
       <div className="space-y-6">
         <HomeHero
           firstName={profile?.first_name ?? profile?.display_name ?? ""}
@@ -292,7 +292,7 @@ function CoordinatorInbox({ userId }: { userId: string | undefined }) {
       loading={isLoading}
       calmMessage="Rien n'attend votre décision dans vos projets."
       items={[
-        { key: "tasks", label: "Tâches à valider", count: data?.tasks ?? 0, to: single ? `/tasks?projectId=${single}` : "/tasks" },
+        { key: "tasks", label: "Tâches à valider", count: data?.tasks ?? 0, to: "/tasks", search: single ? { projectId: single } : undefined },
         { key: "offers", label: "Propositions d'aide reçues", count: data?.offers ?? 0, to: single ? `/projects/${single}` : "/projects" },
         { key: "loans", label: "Matériel non rendu", count: data?.loans ?? 0, to: "/inventory" },
       ]}
