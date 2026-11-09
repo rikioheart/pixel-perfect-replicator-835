@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { PublicWelcome } from '@/components/PublicWelcome';
 import { PublicFooter, PublicHeader } from '@/components/PublicHeader';
 import { useOnline } from '@/lib/offline';
+import { homePathFor } from '@/lib/role-home';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,7 +54,7 @@ function AuthPage() {
   // « Voir la vitrine » : un membre connecté consulte la page publique sans être renvoyé ni déconnecté.
   useEffect(() => {
     if (!vitrine && !loading && rolesReady && session) {
-      void navigate({ to: isBureau ? "/admin" : isPro ? "/espace-pro" : "/member" });
+      void navigate({ to: homePathFor({ isBureau, isPro }) });
     }
   }, [vitrine, session, isBureau, isPro, loading, rolesReady, navigate]);
 

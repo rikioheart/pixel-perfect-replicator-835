@@ -1,5 +1,14 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Accueils par rôle + suites Axes 1 et 4 (8 nov.)
+- [x] Bureau : bandeau « À traiter maintenant » (adhésions, tâches à clôturer, propositions d'aide, matériel non rendu, remboursements, propositions pros, besoins d'aide)
+- [x] Particulier : accueil chien / pass / sorties / « Je veux aider », blocs vides masqués
+- [x] Coordinateur : « À traiter dans vos projets » sur son accueil
+- [x] Pro : tuiles cliquables, prochaines activités à côté du lecteur de pass
+- [x] Bénévole prévenu une seule fois quand sa proposition devient une tâche
+- [x] Tâche validée → retour d'expérience du projet
+- [ ] Essai réel sur téléphone avec caméra (scan QR) ; essai avec un vrai coordinateur
+
 ## Bloc B — Console, inventaire, finances, annuaire (2 nov.)
 - [x] B1 Onglet Communication dans la console ; historique unifié (journal + imports HelloAsso, 6 catégories + repli)
 - [x] B2 Inventaire : champs facultatifs, entrées/sorties tracées, réservations par projet, anti-surréservation en base (verrou)

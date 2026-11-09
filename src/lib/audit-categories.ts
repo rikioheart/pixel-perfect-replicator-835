@@ -37,6 +37,7 @@ const LABELS: Record<string, string> = {
   "project.update": "Modification de projet",
   "project.delete": "Suppression de projet",
   "project.link": "Rattachement de projet",
+  "project.rex_from_task": "Retour d'expérience ajouté depuis une tâche",
   "task.create": "Création de tâche",
   "task.update": "Modification de tâche",
   "task.status": "Changement de statut de tâche",

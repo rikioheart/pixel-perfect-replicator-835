@@ -12,6 +12,7 @@ import { explainDbError, NO_ROW_UPDATED } from "@/lib/task-lifecycle";
 import { decideTaskValidation, VALIDATION_COMMENT_MIN } from "@/lib/validation-actions";
 import { Comments } from "@/components/Comments";
 import { ExternalLinks } from "@/components/ExternalLinks";
+import { canAddTaskRex, REX_FIELDS, type RexField } from "@/lib/role-home";
 
 export type TaskRow = {
   id: string;
@@ -49,6 +50,9 @@ export function TaskCard({
   const [proofType, setProofType] = useState("");
   const [decisionComment, setDecisionComment] = useState("");
   const [busy, setBusy] = useState(false);
+  const [rexOpen, setRexOpen] = useState(false);
+  const [rexField, setRexField] = useState<RexField>("rex_successes");
+  const [rexNote, setRexNote] = useState("");
   const proofTypes = useConfigOptions("PROOF_TYPE");
 
   const isMine = task.assigned_user_id === currentUserId;
@@ -143,6 +147,23 @@ export function TaskCard({
       onChanged();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Décision impossible.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const addRex = async () => {
+    setBusy(true);
+    try {
+      const { error } = await supabase.rpc("add_task_rex", { _task_id: task.id, _field: rexField, _note: rexNote.trim() });
+      if (error) {
+        toast.error(explainDbError(error));
+        return;
+      }
+      toast.success("Ajouté au retour d'expérience du projet.");
+      setRexNote("");
+      setRexOpen(false);
+      onChanged();
     } finally {
       setBusy(false);
     }
@@ -288,9 +309,45 @@ export function TaskCard({
       ) : null}
 
       {task.status === "COMPLETED" && canValidate ? (
-        <Button size="sm" variant="ghost" onClick={reopen} disabled={busy}>
-          Rouvrir la tâche
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {canAddTaskRex(task, canValidate) ? (
+            <Button size="sm" variant="outline" onClick={() => setRexOpen((v) => !v)} aria-expanded={rexOpen}>
+              Nourrir le retour d'expérience
+            </Button>
+          ) : null}
+          <Button size="sm" variant="ghost" onClick={reopen} disabled={busy}>
+            Rouvrir la tâche
+          </Button>
+        </div>
+      ) : null}
+
+      {rexOpen ? (
+        <div className="space-y-2 rounded-md border border-border p-3">
+          <p className="text-xs text-muted-foreground">
+            Ce mot rejoint l'onglet « Retour d'expérience » du projet, précédé du nom de la tâche.
+          </p>
+          <select
+            aria-label="Rubrique du retour d'expérience"
+            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+            value={rexField}
+            onChange={(e) => setRexField(e.target.value as RexField)}
+          >
+            {REX_FIELDS.map((f) => (
+              <option key={f.value} value={f.value}>{f.label}</option>
+            ))}
+          </select>
+          <Textarea
+            rows={2}
+            aria-label="Votre retour"
+            placeholder="Ce que cette tâche nous apprend"
+            value={rexNote}
+            maxLength={1000}
+            onChange={(e) => setRexNote(e.target.value)}
+          />
+          <Button size="sm" onClick={addRex} disabled={busy || rexNote.trim().length < 3}>
+            Ajouter au projet
+          </Button>
+        </div>
       ) : null}
 
       <ExternalLinks contextType="TASK" contextId={task.id} embedded />

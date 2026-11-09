@@ -74,8 +74,16 @@ function AdminContributions() {
         assigned_user_id: sel!.user_id, contribution_id: sel!.id, created_by: user!.id, status: "TODO",
       });
       if (error) throw error;
+      // Après la tâche : le membre reçoit un seul message « votre proposition devient une tâche ».
+      if (["PROPOSED", "DISCUSSION"].includes(sel!.status)) {
+        await supabase.from("contributions").update({ status: "ACCEPTED" }).eq("id", sel!.id);
+      }
     },
-    onSuccess: () => { toast.success("Tâche créée et reliée à la proposition."); void qc.invalidateQueries({ queryKey: ["contribution-tasks"] }); },
+    onSuccess: () => {
+      toast.success("Tâche créée, le membre est prévenu.");
+      void qc.invalidateQueries({ queryKey: ["contribution-tasks"] });
+      void qc.invalidateQueries({ queryKey: ["contributions"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -101,7 +109,7 @@ function AdminContributions() {
       }
     },
     onSuccess: () => {
-      toast.success("Le membre est affecté à la tâche.");
+      toast.success("Le membre est affecté à la tâche et prévenu.");
       setTaskPick("");
       void qc.invalidateQueries({ queryKey: ["contribution-tasks"] });
       void qc.invalidateQueries({ queryKey: ["project-open-tasks"] });

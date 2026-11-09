@@ -236,6 +236,15 @@ export function AppShell({
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+  // Sur téléphone, les onglets tiennent sur une ligne défilante : l'onglet actif reste visible.
+  const tabsRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const nav = tabsRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (nav && active && nav.scrollWidth > nav.clientWidth) {
+      nav.scrollLeft = Math.max(0, active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2);
+    }
+  }, [pathname]);
 
   const dock = isBureau
     ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/loyalty", label: "Mon pass", icon: QrCode }, { to: "/member", label: "Mon espace", icon: UserRound }]
@@ -401,14 +410,14 @@ export function AppShell({
         <main id="contenu-principal" tabIndex={-1} className="min-w-0 flex-1 px-4 py-5 pb-28 focus:outline-none md:p-6">
           <OfflineStatus />
           {pillarTabs.length > 1 ? (
-            <nav aria-label={activePillar!.title} className="mb-5 flex flex-wrap gap-1 rounded-xl border border-border bg-card p-1">
+            <nav ref={tabsRef} aria-label={activePillar!.title} className="relative mb-5 flex gap-1 overflow-x-auto rounded-xl border border-border bg-card p-1 md:flex-wrap">
               {pillarTabs.map((t) => (
                 <Link
                   key={t.to}
                   to={t.to}
                   aria-current={activeItem?.to === t.to ? "page" : undefined}
                   className={cn(
-                    "inline-flex min-h-10 items-center rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
                     activeItem?.to === t.to ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
                   )}
                 >
