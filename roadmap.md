@@ -17,9 +17,9 @@
 - [ ] Émargement nominatif de l'Assemblée Générale
 
 ## Annuaire, formulaires, Pass — demande du 9 nov.
-- [ ] Annuaire : un seul bandeau (Pros, Particuliers, Partenaires & Avantages, Chiens, Mairies & Institutions, accès Bureau), filtres conservés
-- [ ] Formulaires : suppression par le Bureau avec confirmation
-- [ ] Pass (tampon manuel) : recherche nom/prénom au-dessus de la liste des bénéficiaires
+- [x] Annuaire : un seul bandeau (Pros, Particuliers, Partenaires & Avantages, Chiens, Mairies & Institutions, accès Bureau), filtres conservés
+- [x] Formulaires : suppression par le Bureau avec confirmation
+- [x] Pass (tampon manuel) : recherche nom/prénom au-dessus de la liste des bénéficiaires
 
 ## Architecture des permissions (/admin/permissions) — demande du 9 nov.
 - [x] Modules repliables par thème, filtre par rôle, recherche par permission
