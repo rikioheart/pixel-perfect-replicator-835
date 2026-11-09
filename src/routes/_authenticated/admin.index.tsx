@@ -8,7 +8,6 @@ import { useSensitiveRights } from "@/lib/permissions";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { AG_CONVOCATION_DAYS, AG_QUORUM, convocationDeadline, isInAgMonth, nextAgYear } from "@/lib/statutes";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/domain";
