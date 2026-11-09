@@ -1,13 +1,13 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
 ## Inventaire, fidélité, types d'activités, paramétrage — demande du 9 nov.
-- [ ] Masquer temporairement la page Terrain
-- [ ] « Inventaire » rangé sous Ressources
-- [ ] Visibilité par fiche matériel (Privé Bureau / Pros bienfaiteurs / Tous les adhérents) + badges Bureau
-- [ ] Associer et réserver du matériel depuis la fiche projet
-- [ ] Types d'activités dynamiques (création, renommage, désactivation Bureau) reliés au formulaire d'activité
-- [ ] Fidélité en deux onglets (Règles de gain / Récompenses & paliers), règles Pass partenaires, critères nouveaux rôles
-- [ ] Paramétrage : « ordre » conservé, familles regroupées en 4 catégories + recherche
+- [x] Masquer temporairement la page Terrain
+- [x] « Inventaire » rangé sous Ressources
+- [x] Visibilité par fiche matériel (Privé Bureau / Pros bienfaiteurs / Tous les adhérents) + badges Bureau
+- [x] Associer et réserver du matériel depuis la fiche projet
+- [x] Types d'activités dynamiques (création, renommage, désactivation Bureau) reliés au formulaire d'activité
+- [x] Fidélité en deux onglets (Règles de gain / Récompenses & paliers), règles Pass partenaires, critères nouveaux rôles
+- [x] Paramétrage : « ordre » conservé, familles regroupées en 4 catégories + recherche
 - [ ] Audit final : parcours, ordinateur/mobile, routes orphelines, liens morts, doublons
 
 ## Console Bureau & parcours membre — demande du 9 nov.
