@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convocationDeadline, isInAgMonth, nextAgYear, quorumReached } from "./statutes";
+import { agTally, convocationDeadline, isInAgMonth, nextAgYear, quorumReached } from "./statutes";
 
 describe("repères statutaires de l'AG", () => {
   it("convocation au plus tard 15 jours avant", () => {
@@ -17,5 +17,26 @@ describe("repères statutaires de l'AG", () => {
   it("prochaine AG l'année suivante une fois juin passé", () => {
     expect(nextAgYear(new Date(Date.UTC(2026, 9, 11)))).toBe(2027);
     expect(nextAgYear(new Date(Date.UTC(2026, 2, 1)))).toBe(2026);
+  });
+});
+
+describe("émargement de l'AG", () => {
+  const row = (id: string, status: "PRESENT" | "REPRESENTED" | "EXCUSED") => ({ member_id: id, status });
+
+  it("présents et représentés comptent pour le quorum de 8, pas les excusés", () => {
+    const rows = [
+      ...["a", "b", "c", "d", "e", "f"].map((id) => row(id, "PRESENT")),
+      row("g", "REPRESENTED"),
+      row("h", "EXCUSED"),
+    ];
+    const t = agTally(rows, new Set());
+    expect(t.counted).toBe(7);
+    expect(t.quorum).toBe(false);
+    expect(agTally([...rows, row("i", "REPRESENTED")], new Set()).quorum).toBe(true);
+  });
+
+  it("compte les membres du Bureau et fondateurs présents ou représentés", () => {
+    const t = agTally([row("a", "PRESENT"), row("b", "EXCUSED"), row("c", "REPRESENTED")], new Set(["a", "b", "c"]));
+    expect(t.core).toBe(2);
   });
 });
