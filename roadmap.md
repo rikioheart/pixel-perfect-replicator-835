@@ -1,5 +1,11 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Optimisations routes, finances, Pass/AG, bilan loi 1901 — demande du 9 nov.
+- [x] Supprimer les redirections internes obsolètes ; page Terrain conservée mais retirée partout (calendrier, documents, gouvernance, permissions, grand livre, notifications)
+- [x] « Remboursements & Notes de frais » (/finance) vs « Comptabilité & Grand livre » (/admin/suivi-financier), onglets et menu
+- [x] Console : accès rapides « Valider un pass » et « Émargement de l'AG » avec quorum calculé
+- [x] Bilan d'exercice loi 1901 : recettes / dépenses / résultat, ventilations, encadré de vote (approbation, affectation, quitus)
+
 ## Inventaire, fidélité, types d'activités, paramétrage — demande du 9 nov.
 - [x] Masquer temporairement la page Terrain
 - [x] « Inventaire » rangé sous Ressources
