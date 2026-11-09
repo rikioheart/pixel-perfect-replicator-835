@@ -1,5 +1,11 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Console Bureau & parcours membre — demande du 9 nov.
+- [ ] Mon foyer & moi : retirer l'onglet « Historique », garder « Parcours » (audit = Bureau, Paramètres)
+- [ ] /admin : cockpit épuré (alertes, montants à verser, événements clés, raccourcis, « Qui fait quoi » compact), sans doublons
+- [ ] File des adhésions déplacée dans /admin/gouvernance, indicateur gardé sur la Console
+- [ ] Émargement nominatif de l'Assemblée Générale
+
 ## Annuaire, formulaires, Pass — demande du 9 nov.
 - [ ] Annuaire : un seul bandeau (Pros, Particuliers, Partenaires & Avantages, Chiens, Mairies & Institutions, accès Bureau), filtres conservés
 - [ ] Formulaires : suppression par le Bureau avec confirmation
