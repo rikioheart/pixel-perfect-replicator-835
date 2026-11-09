@@ -72,7 +72,7 @@ function DirectoryPage() {
     },
   });
 
-  // Liens existants, filtrés par la RLS : projets visibles (can_view_project) et collaborations publiques/propres/Bureau.
+  // Projets visibles, filtrés par la RLS (can_view_project).
   const { data: links } = useQuery({
     queryKey: ["directory-links"],
     queryFn: async () => {
