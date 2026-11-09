@@ -21,7 +21,7 @@ const RULES: [AuditCategory, string[]][] = [
   ["MEMBRES", ["MEMBERSHIP", "MEMBER_LEVEL", "ACCOUNT", "INTEGRATION."]],
   ["PROJETS", ["PROJECT.", "TASK", "MILESTONE"]],
   ["CHIENS", ["DOG", "HOUSEHOLD"]],
-  ["HABILITATIONS", ["ROLE.", "FUNCTION.", "PERMISSION_", "DELEGATION_", "PASS_VALIDATOR"]],
+  ["HABILITATIONS", ["ROLE.", "FUNCTION.", "PERMISSION_", "ROLES_", "DELEGATION_", "PASS_VALIDATOR"]],
   ["FIDELITE", ["LOYALTY", "PASS_"]],
 ];
 
@@ -51,6 +51,8 @@ const LABELS: Record<string, string> = {
   "function.revoke": "Clôture de fonction",
   PERMISSION_GRANTED: "Permission accordée",
   PERMISSION_REVOKED: "Permission retirée",
+  PERMISSION_SCOPE_UPDATED: "Permission : portée pro modifiée",
+  ROLES_RECALIBRATED: "Rôles et droits recalibrés",
   DELEGATION_CREATE: "Délégation créée",
   DELEGATION_REVOKE: "Délégation retirée",
   PASS_VALIDATOR_ON: "Valideur Pass activé",
