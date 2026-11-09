@@ -53,6 +53,7 @@ export function GovernanceRegister() {
       toast.success(editId ? "Compte rendu mis à jour." : "Compte rendu enregistré.");
       setOpen(false); setEditId(null); setForm(EMPTY);
       void qc.invalidateQueries({ queryKey: ["governance-records"] });
+      void qc.invalidateQueries({ queryKey: ["ag-records"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
