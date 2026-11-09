@@ -150,14 +150,6 @@ function AdminConsole() {
   const n = (list: unknown[] | null | undefined) => (list == null ? "—" : String(list.length));
   const count = (v: number | null | undefined) => (v == null ? "—" : String(v));
 
-  // Repères d'ensemble (informatifs) ; ce qui demande une action est dans « À traiter maintenant ».
-  const kpis = [
-    { label: "Membres actifs", value: n(active), icon: Users, to: "/directory" },
-    { label: "Professionnels actifs", value: n(active?.filter((p) => p.membership_type === "PROFESSIONNEL")), icon: Briefcase, to: "/directory" },
-    { label: "Particuliers actifs", value: n(active?.filter((p) => p.membership_type === "PARTICULIER")), icon: Users, to: "/directory" },
-    { label: "Projets actifs", value: n(projects), icon: FolderKanban, to: "/projects" },
-  ];
-
   const fin = finance.data;
   const rsum = fin?.reimb ? summarizeReimbursements(fin.reimb) : null;
   const psum = fin?.acc ? summarizePayouts(fin.acc) : null;
@@ -165,143 +157,98 @@ function AdminConsole() {
   const money = (v: number | undefined) => (v == null || finance.isError ? "—" : euro(v));
   const len = (list: unknown[] | null | undefined) => (list == null ? null : list.length);
 
+  // Alertes : uniquement ce qui attend une décision ; chaque ligne mène à l'écran qui la traite.
   const actions = [
-    { key: "members", label: "Adhésions à valider", count: len(profiles?.filter((p) => p.membership_status === "PENDING")), to: "#adhesions" },
+    { key: "members", label: "Adhésions à valider", count: len(profiles?.filter((p) => p.membership_status === "PENDING")), to: "/admin/gouvernance" },
     { key: "tasks", label: "Tâches en attente de clôture", count: len(toValidate), to: "/admin/validation" },
     { key: "offers", label: "Propositions d'aide à orienter", count: data ? data.offers : 0, to: "/admin/contributions" },
     { key: "loans", label: "Matériel non rendu", count: data ? data.overdueLoans : 0, to: "/inventory" },
+    { key: "stock", label: "Stocks sous le seuil d'alerte", count: len(lowStock), to: "/inventory" },
     ...(canReimb ? [{ key: "reimb", label: "Remboursements à décider", count: finance.isError ? null : finance.data ? (pendingCount ?? null) : 0, to: "/finance" }] : []),
     { key: "proposals", label: "Propositions des professionnels", count: len(data?.proposals), to: "/proposals" },
     { key: "help", label: "Besoins d'aide signalés", count: len(helpNeeded), to: "/help-requests" },
   ];
 
+  // « Qui fait quoi » compact : une ligne par personne, nombre de tâches et la plus proche échéance.
+  const whoDoesWhat = inProgress
+    ? [...inProgress.reduce((map, t) => {
+        const key = t.assigned_user_id ?? "";
+        const entry = map.get(key) ?? { id: key, count: 0, next: t };
+        entry.count += 1;
+        if (t.deadline && (!entry.next.deadline || t.deadline < entry.next.deadline)) entry.next = t;
+        map.set(key, entry);
+        return map;
+      }, new Map<string, { id: string; count: number; next: (typeof inProgress)[number] }>()).values()]
+        .sort((a, b) => b.count - a.count)
+    : null;
+
+  const shortcuts = [
+    { label: "Besoins de décision & émargement AG", to: "/admin/gouvernance" },
+    { label: "Inventaire", to: "/inventory" },
+    { label: "Annuaire", to: "/directory" },
+    { label: "Rôles & habilitations", to: "/admin/roles" },
+    { label: "Historique", to: "/admin/audit" },
+    { label: "Paramètres", to: "/admin/settings" },
+  ];
+
   return (
-    <AppShell
-      title="Console du Bureau"
-      subtitle="Ce qui demande une action, en un coup d'œil"
-    >
+    <AppShell title="Console du Bureau" subtitle="Le pilotage de l'association, en un coup d'œil">
       <BureauConsoleTabs />
       <PendingActionsStrip items={actions} loading={!data} />
-      <div className="mt-6">
-        <PendingMembersQueue />
-      </div>
-
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {kpis.map((kpi) => (
-          <Link key={kpi.label} to={kpi.to} className="panel block p-4 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span className="text-xs uppercase tracking-wide">{kpi.label}</span>
-              <kpi.icon className="size-4" aria-hidden />
-            </div>
-            <p className="mt-2 font-display text-3xl">{kpi.value}</p>
-          </Link>
-        ))}
-      </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <Block
-          icon={ShieldCheck}
-          title="Actions à valider"
-          hint="Validez ou renvoyez directement ici : le commentaire est obligatoire et rejoint l'historique."
-          list={toValidate}
-        >
-          {toValidate?.map((t) => (
-            <QuickValidationRow key={t.id} task={{ id: t.id, title: t.title, submitted_at: t.submitted_at, assignee: nameOf(t.assigned_user_id) }} />
-          ))}
-        </Block>
-
-        <Block
-          icon={HelpCircle}
-          title="Besoins d'aide"
-          hint="Signaler un blocage est un appui demandé au collectif, jamais un échec."
-          list={helpNeeded}
-          emptyLabel="Aucun besoin d'aide signalé pour le moment."
-        >
-          {helpNeeded?.map((t) => <Row key={t.id} main={t.title} sub={nameOf(t.assigned_user_id)} right="Besoin d'aide" to="/tasks" />)}
-        </Block>
-
-        <Block icon={FolderKanban} title="Projets actifs" list={projects} emptyLabel="Aucun projet actif pour le moment.">
-          {projects?.map((p) => (
-            <div key={p.id} className="space-y-1 border-b border-border pb-2 last:border-0">
-              <div className="flex items-center justify-between gap-3">
-                <Link to="/projects/$projectId" params={{ projectId: p.id }} className="truncate font-medium hover:underline">{p.title}</Link>
-                <span className="shrink-0 text-xs text-muted-foreground">{p.progress_percent ?? 0}%</span>
-              </div>
-              <Progress value={p.progress_percent ?? 0} />
-              <p className="text-xs text-muted-foreground">
-                Référent : {nameOf(p.owner_id)}{p.deadline ? ` · échéance ${formatDate(p.deadline)}` : ""}
-              </p>
-            </div>
-          ))}
-        </Block>
-
-        <Block icon={Users} title="Qui fait quoi ?" list={inProgress}>
-          {inProgress?.slice(0, 12).map((t) => (
-            <Row key={t.id} main={t.title} sub={`${nameOf(t.assigned_user_id)} · ${TASK_STATUS_LABEL[t.status] ?? t.status}`} right={t.deadline ? formatDate(t.deadline) : undefined} to="/tasks" />
-          ))}
-        </Block>
-
-        <Block icon={ListChecks} title="Tâches ouvertes aux bénévoles" hint="À qui veut contribuer, à son niveau." list={volunteer}>
-          {volunteer?.map((t) => <Row key={t.id} main={t.title} sub="Non attribuée" right={t.priority} to="/tasks" />)}
-        </Block>
-
-        <Block icon={CalendarRange} title="À venir" list={data ? upcoming : null} emptyLabel="Aucun événement ni activité programmé.">
-          {upcoming.map((u) => <Row key={u.id} main={u.title} sub={`${u.kind} · ${u.date ? formatDate(u.date) : "date à définir"}`} to={u.to} />)}
-        </Block>
-
-        <Block icon={Lightbulb} title="Propositions des professionnels" list={data?.proposals ?? null}>
-          {data?.proposals?.map((p) => <Row key={p.id} main={p.title} sub={`${nameOf(p.submitted_by)} · ${p.type}`} right="À étudier" to="/proposals" />)}
-        </Block>
-
         {rights.viewGlobal || canReimb ? (
           <Card className="min-w-0">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-base"><Euro className="size-4 text-primary" aria-hidden />Sommes à verser</CardTitle>
-              <p className="text-xs text-muted-foreground">Deux sources distinctes, jamais additionnées : demandes de remboursement et lignes comptables.</p>
+              <CardTitle className="flex items-center gap-2 text-base"><Euro className="size-4 text-primary" aria-hidden />Montants en attente de versement</CardTitle>
+              <p className="text-xs text-muted-foreground">Deux sources distinctes, jamais additionnées.</p>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               {canReimb ? (
                 <>
-                  <Row main="Remboursements en attente de décision" sub={pendingCount == null ? undefined : `${pendingCount} demande(s) · source : remboursements`} right={money(rsum?.pending)} to="/finance" />
+                  <Row main="Remboursements à décider" sub={pendingCount == null ? undefined : `${pendingCount} demande(s)`} right={money(rsum?.pending)} to="/finance" />
                   <Row main="Remboursements approuvés, à payer" right={money(rsum?.approved)} to="/finance" />
-                  <Row main="Remboursements payés" right={money(rsum?.paid)} to="/finance" />
                 </>
               ) : null}
               {rights.viewGlobal ? (
-                <>
-                  <Row main="Reversements professionnels à payer" sub="Source : lignes comptables" right={money(psum?.due)} to="/finance" />
-                  <Row main="Reversements professionnels payés" right={money(psum?.paid)} to="/finance" />
-                </>
+                <Row main="Reversements professionnels à payer" right={money(psum?.due)} to="/finance" />
               ) : null}
             </CardContent>
           </Card>
         ) : null}
 
-        <Block icon={Package} title="Ressources à surveiller" list={lowStock} emptyLabel="Tous les stocks sont au-dessus du seuil d'alerte.">
-          {lowStock?.map((i) => <Row key={i.id} main={i.name} sub={i.location ?? "Emplacement non précisé"} right={`${i.quantity} / seuil ${i.alert_threshold}`} to="/inventory" />)}
+        <Block icon={CalendarRange} title="Prochains rendez-vous" list={data ? upcoming : null} emptyLabel="Aucun événement ni activité programmé." badge={false}>
+          {upcoming.map((u) => <Row key={u.id} main={u.title} sub={`${u.kind} · ${u.date ? formatDate(u.date) : "date à définir"}`} to={u.to} />)}
+        </Block>
+
+        <Block icon={Users} title="Qui fait quoi ?" hint="Tâches en cours, par personne." list={whoDoesWhat} emptyLabel="Aucune tâche en cours." badge={false}>
+          {whoDoesWhat?.slice(0, 8).map((w) => (
+            <Row
+              key={w.id || "none"}
+              main={nameOf(w.id || null)}
+              sub={`${w.next.title}${w.count > 1 ? ` et ${w.count - 1} autre(s)` : ""}`}
+              right={w.next.deadline ? formatDate(w.next.deadline) : `${w.count} tâche(s)`}
+              to="/tasks"
+            />
+          ))}
         </Block>
 
         <Card className="min-w-0">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base"><Compass className="size-4 text-primary" aria-hidden />Raccourcis</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <Row main="Partenaires actifs" right={count(data?.partners)} to="/directory" />
-            <Row main="Projets avec des mairies en cours" right={count(data?.mairies)} to="/mairies" />
-            <Row main="Contenus en préparation" right={count(data?.posts)} to="/blog" />
-            <Row main="Rôles et habilitations" to="/admin/roles" />
-            <Row main="Journal d'activité" to="/admin/audit" />
-            <Row main="Paramètres" to="/admin/settings" />
+          <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
+            {shortcuts.map((s) => (
+              <Link key={s.to} to={s.to} className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-border px-3 py-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <span className="truncate">{s.label}</span>
+                <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              </Link>
+            ))}
           </CardContent>
         </Card>
       </div>
 
       <AgReminder />
-
-      <div className="mt-6">
-        <CharterBanner />
-        <NewsFeed />
-      </div>
     </AppShell>
   );
 }
@@ -313,6 +260,7 @@ function Block({
   children,
   list,
   emptyLabel = "Rien à signaler.",
+  badge = true,
 }: {
   icon: typeof FolderKanban;
   title: string;
@@ -320,6 +268,7 @@ function Block({
   children: ReactNode;
   list: unknown[] | null | undefined;
   emptyLabel?: string;
+  badge?: boolean;
 }) {
   return (
     <Card className="min-w-0">
@@ -327,7 +276,7 @@ function Block({
         <CardTitle className="flex items-center gap-2 text-base">
           <Icon className="size-4 text-primary" aria-hidden />
           {title}
-          {list && list.length > 0 ? <Badge className="ml-auto border-transparent bg-warning text-warning-foreground hover:bg-warning" aria-label={`${list.length} en attente`}>{list.length}</Badge> : null}
+          {badge && list && list.length > 0 ? <Badge className="ml-auto border-transparent bg-warning text-warning-foreground hover:bg-warning" aria-label={`${list.length} en attente`}>{list.length}</Badge> : null}
         </CardTitle>
         {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
       </CardHeader>
