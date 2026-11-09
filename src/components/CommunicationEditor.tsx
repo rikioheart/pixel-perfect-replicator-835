@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { explainDbError } from "@/lib/task-lifecycle";
-import { isSafeHttpUrl } from "@/lib/safe-url";
+import { isSafeExternalFormUrl } from "@/lib/form-links";
 import { COMM_AUDIENCES, COMM_CHANNELS, COMM_STATUSES } from "@/lib/project-followup";
 
 export type Communication = {
@@ -118,7 +118,7 @@ export function CommunicationEditor({
   const save = async () => {
     if (form.title.trim().length < 2) return toast.error("Donnez un titre.");
     const visuals = form.visuals_url.trim();
-    if (visuals && !(isSafeHttpUrl(visuals) && visuals.startsWith("https://"))) return toast.error("Le lien des visuels doit commencer par https:// (Canva, Drive…).");
+    if (visuals && !isSafeExternalFormUrl(visuals)) return toast.error("Le lien des visuels doit commencer par https:// (Canva, Drive…).");
     if (!isBureau && !projectId) return toast.error("Rattachez la communication à un projet.");
     setSaving(true);
     const payload = {
