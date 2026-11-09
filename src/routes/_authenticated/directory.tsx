@@ -39,21 +39,16 @@ export const Route = createFileRoute("/_authenticated/directory")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { vue?: "chiens" } =>
+    search.vue === "chiens" ? { vue: "chiens" } : {},
   component: DirectoryPage,
 });
-
-const CATEGORIES: [string, string][] = [
-  ["ALL", "Tout le réseau"],
-  ["PRO", "Professionnels"],
-  ["PARTICULIER", "Particuliers"],
-  ["PARTENAIRE", "Partenaires"],
-  ["CHIENS", "Chiens"],
-];
 
 function DirectoryPage() {
   const { isBureau } = useAuth();
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("ALL");
+  const { vue } = Route.useSearch();
+  const category = vue === "chiens" ? "CHIENS" : "PARTICULIER";
   const [department, setDepartment] = useState("ALL");
 
   const { data, isLoading } = useQuery({
@@ -81,12 +76,10 @@ function DirectoryPage() {
   const { data: links } = useQuery({
     queryKey: ["directory-links"],
     queryFn: async () => {
-      const [members, collabs, partners] = await Promise.all([
-        supabase.from("project_members").select("user_id, project_id, projects(title)"),
-        supabase.from("professional_collaborations").select("professional_id"),
-        supabase.from("partners").select("id, name, type").eq("active", true).order("name"),
-      ]);
-      return { members: members.data ?? [], collabs: collabs.data ?? [], partners: partners.data ?? [] };
+      const { data: members } = await supabase
+        .from("project_members")
+        .select("user_id, project_id, projects(title)");
+      return { members: members ?? [] };
     },
   });
   const projectsOf = useMemo(() => {
@@ -100,14 +93,6 @@ function DirectoryPage() {
     }
     return map;
   }, [links]);
-  const collabCount = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const c of links?.collabs ?? []) map.set(c.professional_id, (map.get(c.professional_id) ?? 0) + 1);
-    return map;
-  }, [links]);
-  const partnerOrgs = links?.partners ?? [];
-
-
   const departments = useMemo(
     () => Array.from(new Set((data ?? []).map((p) => p.department).filter(Boolean))).sort() as string[],
     [data],
@@ -118,9 +103,8 @@ function DirectoryPage() {
     return (data ?? []).filter((person) => {
       if (!isBureau && !person.public_visibility) return false;
       const type = (person.membership_type ?? "").toUpperCase();
-      if (category === "PRO" && !type.includes("PRO")) return false;
-      if (category === "PARTENAIRE" && !type.includes("PARTENAIRE")) return false;
-      if (category === "PARTICULIER" && (type.includes("PRO") || type.includes("PARTENAIRE"))) return false;
+      // Pros et partenaires ont leur propre vue (bandeau de l'annuaire).
+      if (type.includes("PRO") || type.includes("PARTENAIRE")) return false;
       if (department !== "ALL" && person.department !== department) return false;
       if (!term) return true;
       return `${person.display_name ?? ""} ${person.city ?? ""} ${person.pro?.company_name ?? ""} ${
@@ -129,11 +113,11 @@ function DirectoryPage() {
         .toLowerCase()
         .includes(term);
     });
-  }, [data, search, category, department, isBureau]);
+  }, [data, search, department, isBureau]);
 
   return (
     <AppShell
-      title="Annuaire du réseau — guichet unique"
+      title="Réseau & annuaire"
       subtitle="Les personnes et les compétences de l'association, filtrables par catégorie et territoire."
       actions={
         isBureau ? (
@@ -145,15 +129,7 @@ function DirectoryPage() {
         ) : undefined
       }
     >
-      <DirectoryTabs />
-      <div role="tablist" aria-label="Listes de l'annuaire" className="mb-4 flex flex-wrap gap-1 rounded-xl border border-border bg-card p-1">
-        {CATEGORIES.map(([value, label]) => (
-          <button key={value} type="button" role="tab" aria-selected={category === value} onClick={() => setCategory(value)}
-            className={category === value ? "rounded-lg bg-primary px-3 py-1.5 text-sm text-primary-foreground" : "rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted"}>
-            {label}
-          </button>
-        ))}
-      </div>
+      <DirectoryTabs current={category === "CHIENS" ? "chiens" : "particuliers"} />
       <div className="mb-6 grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
           <Label className="text-xs" htmlFor="dir-search">Recherche</Label>
@@ -192,21 +168,6 @@ function DirectoryPage() {
         <DirectoryDogs search={search} />
       ) : (
         <>
-          {category === "PARTENAIRE" && partnerOrgs.length > 0 ? (
-            <section aria-label="Structures partenaires" className="mb-6">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold">Structures partenaires</h2>
-                <Link to="/partners" className="text-xs font-medium text-primary hover:underline">Partenaires & avantages</Link>
-              </div>
-              <ul className="flex flex-wrap gap-2">
-                {partnerOrgs.map((p) => (
-                  <li key={p.id} className="rounded-full border border-border bg-card px-3 py-1 text-xs">
-                    {p.name}{p.type ? <span className="text-muted-foreground"> · {p.type}</span> : null}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Chargement de l'annuaire…</p>
           ) : filtered.length === 0 ? (
@@ -220,11 +181,10 @@ function DirectoryPage() {
                 const name =
                   person.display_name || `${person.first_name ?? ""} ${person.last_name ?? ""}`.trim() || "Adhérent";
                 const personProjects = projectsOf.get(person.id) ?? [];
-                const collabs = collabCount.get(person.id) ?? 0;
                 return (
                   <article key={person.id} className="rounded-xl border border-border bg-card p-5">
                     <h2 className="font-display text-base font-bold">
-                      <EntityPeek type={person.pro ? "professional" : "person"} id={person.id}>{name}</EntityPeek>
+                      <EntityPeek type="person" id={person.id}>{name}</EntityPeek>
                     </h2>
                     {person.pro?.company_name ? (
                       <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -238,8 +198,8 @@ function DirectoryPage() {
                       </p>
                     ) : null}
                     {person.bio ? <p className="mt-3 line-clamp-3 text-sm">{person.bio}</p> : null}
-                    {personProjects.length > 0 || collabs > 0 ? (
-                      <ul aria-label="Projets et collaborations" className="mt-3 flex flex-wrap gap-1.5">
+                    {personProjects.length > 0 ? (
+                      <ul aria-label="Projets" className="mt-3 flex flex-wrap gap-1.5">
                         {personProjects.slice(0, 3).map((p) => (
                           <li key={p.id}>
                             <Link to="/projects/$projectId" params={{ projectId: p.id }} className="rounded-full bg-muted px-2.5 py-0.5 text-xs hover:underline">
@@ -248,13 +208,6 @@ function DirectoryPage() {
                           </li>
                         ))}
                         {personProjects.length > 3 ? <li className="text-xs text-muted-foreground">+{personProjects.length - 3}</li> : null}
-                        {collabs > 0 ? (
-                          <li>
-                            <Link to="/professionals/$proId" params={{ proId: person.id }} className="rounded-full bg-muted px-2.5 py-0.5 text-xs hover:underline">
-                              {collabs} collaboration{collabs > 1 ? "s" : ""}
-                            </Link>
-                          </li>
-                        ) : null}
                       </ul>
                     ) : null}
                     <div className="mt-4 flex flex-wrap gap-2">
