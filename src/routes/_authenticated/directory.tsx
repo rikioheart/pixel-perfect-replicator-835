@@ -39,8 +39,8 @@ export const Route = createFileRoute("/_authenticated/directory")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { vue?: "chiens" } =>
-    search["vue"] === "chiens" ? { vue: "chiens" } : {},
+  validateSearch: (search: Record<string, unknown>): { vue?: "pros" | "chiens" } =>
+    search["vue"] === "chiens" ? { vue: "chiens" } : search["vue"] === "pros" ? { vue: "pros" } : {},
   component: DirectoryPage,
 });
 
@@ -48,7 +48,7 @@ function DirectoryPage() {
   const { isBureau } = useAuth();
   const [search, setSearch] = useState("");
   const { vue } = Route.useSearch();
-  const category = vue === "chiens" ? "CHIENS" : "PARTICULIER";
+  const category = vue === "chiens" ? "CHIENS" : vue === "pros" ? "PRO" : "PARTICULIER";
   const [department, setDepartment] = useState("ALL");
 
   const { data, isLoading } = useQuery({
@@ -103,8 +103,8 @@ function DirectoryPage() {
     return (data ?? []).filter((person) => {
       if (!isBureau && !person.public_visibility) return false;
       const type = (person.membership_type ?? "").toUpperCase();
-      // Pros et partenaires ont leur propre vue (bandeau de l'annuaire).
-      if (type.includes("PRO") || type.includes("PARTENAIRE")) return false;
+      // Une vue par public (bandeau de l'annuaire) ; les structures partenaires ont leur page.
+      if (category === "PRO" ? !type.includes("PRO") : type.includes("PRO") || type.includes("PARTENAIRE")) return false;
       if (department !== "ALL" && person.department !== department) return false;
       if (!term) return true;
       return `${person.display_name ?? ""} ${person.city ?? ""} ${person.pro?.company_name ?? ""} ${
@@ -113,7 +113,7 @@ function DirectoryPage() {
         .toLowerCase()
         .includes(term);
     });
-  }, [data, search, department, isBureau]);
+  }, [data, search, department, isBureau, category]);
 
   return (
     <AppShell
@@ -129,7 +129,7 @@ function DirectoryPage() {
         ) : undefined
       }
     >
-      <DirectoryTabs current={category === "CHIENS" ? "chiens" : "particuliers"} />
+      <DirectoryTabs current={category === "CHIENS" ? "chiens" : category === "PRO" ? "pros" : "particuliers"} />
       <div className="mb-6 grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
           <Label className="text-xs" htmlFor="dir-search">Recherche</Label>
@@ -184,7 +184,7 @@ function DirectoryPage() {
                 return (
                   <article key={person.id} className="rounded-xl border border-border bg-card p-5">
                     <h2 className="font-display text-base font-bold">
-                      <EntityPeek type="person" id={person.id}>{name}</EntityPeek>
+                      <EntityPeek type={person.pro ? "professional" : "person"} id={person.id}>{name}</EntityPeek>
                     </h2>
                     {person.pro?.company_name ? (
                       <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">

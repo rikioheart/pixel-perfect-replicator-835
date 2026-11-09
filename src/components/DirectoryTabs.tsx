@@ -22,7 +22,7 @@ export function DirectoryTabs({ current }: { current: DirectoryView }) {
       aria-label="Réseau & annuaire"
       className="mb-5 flex gap-1 overflow-x-auto rounded-xl border border-border bg-card p-1 md:flex-wrap"
     >
-      <Link to="/professionals" className={cls("pros")} aria-current={aria("pros")}>
+      <Link to="/directory" search={{ vue: "pros" }} className={cls("pros")} aria-current={aria("pros")}>
         Pros
       </Link>
       <Link to="/directory" className={cls("particuliers")} aria-current={aria("particuliers")}>
