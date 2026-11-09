@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
-  CalendarRange, MapPinned, Sparkle, PartyPopper, GraduationCap, ListChecks, FolderKanban,
-  ChevronLeft, ChevronRight, AlertTriangle,
+  CalendarRange, Sparkle, PartyPopper, GraduationCap, ListChecks, FolderKanban,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
@@ -37,12 +37,7 @@ const KINDS: Record<Kind, { label: string; icon: typeof CalendarRange; peek?: Pe
   PROJECT: { label: "Projets", icon: FolderKanban, peek: "project" },
 };
 
-const STATUS_FR: Record<string, string> = {
-  DRAFT: "brouillon", PENDING: "en attente", CHANGES_REQUESTED: "à modifier", APPROVED: "validée",
-  REFUSED: "refusée", CANCELLED: "annulée",
-};
-
-type Item = { id: string; rawId: string; kind: Kind; title: string; date: string; detail: string; conflict?: boolean };
+type Item = { id: string; rawId: string; kind: Kind; title: string; date: string; detail: string };
 
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
@@ -109,13 +104,12 @@ function CalendarPage() {
     // Inside EntityPeek the trigger is already a button: render a span to avoid nested buttons.
     const Tag = K.peek ? "span" : "button";
     const body = (
-      <Tag {...(K.peek ? {} : { type: "button" as const })} className={`flex w-full min-w-0 items-center gap-2 rounded-lg border bg-card text-left ${compact ? "px-1.5 py-1" : "px-4 py-3"} ${item.conflict ? "border-destructive" : "border-border"} hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring`}>
+      <Tag {...(K.peek ? {} : { type: "button" as const })} className={`flex w-full min-w-0 items-center gap-2 rounded-lg border bg-card text-left ${compact ? "px-1.5 py-1" : "px-4 py-3"} border-border hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring`}>
         <Icon className="size-3.5 shrink-0 text-primary" aria-hidden />
         <span className="min-w-0">
           <span title={item.title} className={`block truncate font-semibold ${compact ? "text-xs" : "text-sm"}`}>{item.title}</span>
           {!compact && <span className="block truncate text-xs text-muted-foreground">{K.label}{item.detail ? ` · ${item.detail}` : ""}</span>}
         </span>
-        {item.conflict && <AlertTriangle className="ml-auto size-3.5 shrink-0 text-destructive" aria-label="Chevauchement de créneau" />}
       </Tag>
     );
     return K.peek ? <EntityPeek type={K.peek} id={item.rawId} block>{body}</EntityPeek> : body;
