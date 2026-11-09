@@ -170,7 +170,7 @@ function AdminConsole() {
     { key: "tasks", label: "Tâches en attente de clôture", count: len(toValidate), to: "/admin/validation" },
     { key: "offers", label: "Propositions d'aide à orienter", count: data ? data.offers : 0, to: "/admin/contributions" },
     { key: "loans", label: "Matériel non rendu", count: data ? data.overdueLoans : 0, to: "/inventory" },
-    ...(canReimb ? [{ key: "reimb", label: "Remboursements à décider", count: finance.data ? (pendingCount ?? null) : 0, to: "/finance" }] : []),
+    ...(canReimb ? [{ key: "reimb", label: "Remboursements à décider", count: finance.isError ? null : finance.data ? (pendingCount ?? null) : 0, to: "/finance" }] : []),
     { key: "proposals", label: "Propositions des professionnels", count: len(data?.proposals), to: "/proposals" },
     { key: "help", label: "Besoins d'aide signalés", count: len(helpNeeded), to: "/help-requests" },
   ];
@@ -179,11 +179,6 @@ function AdminConsole() {
     <AppShell
       title="Console du Bureau"
       subtitle="Ce qui demande une action, en un coup d'œil"
-      actions={
-        <Button asChild variant="secondary">
-          <Link to="/admin/validation">Validations en attente</Link>
-        </Button>
-      }
     >
       <BureauConsoleTabs />
       <PendingActionsStrip items={actions} loading={!data} />
