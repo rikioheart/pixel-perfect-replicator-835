@@ -149,3 +149,25 @@ function frDay(d: string) {
   const [y, m, day] = d.split("-");
   return `${day}/${m}/${y}`;
 }
+
+const cell = (v: string | number) => {
+  const text = String(v);
+  const safe = /^[=+\-@]/.test(text) ? `'${text}` : text;
+  return /[";\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
+};
+const num = (n: number) => n.toFixed(2).replace(".", ",");
+
+/** Lignes CSV (séparateur « ; ») du compte de résultat et des résolutions, pour l'export du bilan. */
+export function accountsCsvLines(a: AnnualAccounts, from: string, to: string): string[] {
+  const lines = ["Compte de résultat (comptabilité de trésorerie);Montant (€)", "Recettes"];
+  for (const l of a.income) lines.push(`${cell(l.label)};${num(l.amount)}`);
+  lines.push(`Total des recettes;${num(a.totalIncome)}`, "Dépenses");
+  for (const l of a.expenses) lines.push(`${cell(l.label)};${num(l.amount)}`);
+  lines.push(`Total des dépenses;${num(a.totalExpenses)}`);
+  lines.push(`${cell(resultLabel(a))};${num(a.result)}`);
+  lines.push(`Restant à encaisser (non compris);${num(a.pendingIncome)}`, `Restant à payer (non compris);${num(a.pendingExpenses)}`, "");
+  lines.push("Résolutions soumises au vote;Pour;Contre;Abstention");
+  for (const r of agResolutions(a, from, to)) lines.push(`${cell(`${r.title} — ${r.text}`)};;;`);
+  lines.push("");
+  return lines;
+}
