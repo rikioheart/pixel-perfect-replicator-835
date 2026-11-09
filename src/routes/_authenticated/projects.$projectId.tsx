@@ -57,6 +57,7 @@ import { EntityPeek } from "@/components/EntityPeek";
 import { isPast, operationalProgress } from "@/lib/archives";
 import { explainDbError, openTasksBeforeClosure } from "@/lib/task-lifecycle";
 import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
+import { ProjectEquipment } from "@/components/ProjectEquipment";
 import { ProjectFollowUp } from "@/components/ProjectFollowUp";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
@@ -432,15 +433,13 @@ function ProjectDetail() {
         <ProjectStorySections project={project} />
         <ProjectFollowUp project={project} canManage={canValidate} onProjectPatch={updateProject} />
         <ProjectContribute projectId={projectId} canModerate={canValidate} />
+        {canValidate ? <ProjectEquipment projectId={projectId} /> : null}
       </div>
 
       <div className="mt-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg">Actions du projet</h2>
           <span className="flex flex-wrap gap-3">
-            {canValidate ? (
-              <Link to="/inventory" search={{ projectId }} className="text-sm text-primary hover:underline">Matériel du projet</Link>
-            ) : null}
             <Link to="/tasks" search={{ projectId }} className="text-sm text-primary hover:underline">Voir dans la liste des tâches</Link>
           </span>
         </div>

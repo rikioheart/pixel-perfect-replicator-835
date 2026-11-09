@@ -147,6 +147,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/forms", label: "Formulaires", icon: ClipboardList, audience: "all" },
       { to: "/documents", label: "Documents", icon: FileText, audience: "all", hideForParticulier: true },
+      { to: "/inventory", label: "Inventaire", icon: Package, audience: "all" },
       { to: "/help", label: "Guides", icon: LifeBuoy, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
     ],
@@ -173,8 +174,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
       { to: "/admin/pros", label: "Fiches pros", icon: Briefcase, audience: "bureau" },
       { to: "/admin/chiens", label: "Foyers & chiens", icon: Heart, audience: "bureau" },
-      { to: "/inventory", label: "Matériel", icon: Package, audience: "bureau" },
-      { to: "/terrain", label: "Terrain (gestion)", icon: Trees, audience: "bureau" },
     ],
   },
   {
