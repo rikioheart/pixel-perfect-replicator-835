@@ -353,8 +353,8 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [ ] Revue visuelle complète du mode sombre écran par écran
 
 ## Étape 6 — Communication liée aux projets
-- [ ] Brouillons de communication rattachés projet/tâche : titre, contenu, public cible, canal, visuels, responsable, étape
-- [ ] Visibilité : Bureau + équipe du projet pendant l'élaboration ; validation finale Bureau ; contenus publiés visibles dans « Actualités » (Ressources)
+- [x] Brouillons de communication rattachés projet/tâche : titre, contenu, public cible, canal, visuels, responsable, étape
+- [x] Visibilité : Bureau + équipe du projet pendant l'élaboration ; validation finale Bureau ; contenus publiés visibles dans « Actualités » (Ressources)
 
 ## Étape 7 — Statistiques stratégiques & Bilan AG
 - [ ] Statistiques regroupées par thème, libellé « professionnels bienfaiteurs », courbes à la demande
