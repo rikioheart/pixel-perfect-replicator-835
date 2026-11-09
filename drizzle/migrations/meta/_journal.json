@@ -428,6 +428,13 @@
       "when": 1794187494527,
       "tag": "0060_permissions_pro_scope_and_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1794188098384,
+      "tag": "0061_ag_attendance",
+      "breakpoints": true
     }
   ]
 }

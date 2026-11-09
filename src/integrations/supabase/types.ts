@@ -320,6 +320,72 @@ export type Database = {
           },
         ]
       }
+      ag_attendance: {
+        Row: {
+          id: string
+          member_id: string
+          proxy_holder_id: string | null
+          record_id: string
+          recorded_at: string
+          recorded_by: string | null
+          status: string
+        }
+        Insert: {
+          id?: string
+          member_id: string
+          proxy_holder_id?: string | null
+          record_id: string
+          recorded_at?: string
+          recorded_by?: string | null
+          status: string
+        }
+        Update: {
+          id?: string
+          member_id?: string
+          proxy_holder_id?: string | null
+          record_id?: string
+          recorded_at?: string
+          recorded_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ag_attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_proxy_holder_id_fkey"
+            columns: ["proxy_holder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_proxy_holder_id_fkey"
+            columns: ["proxy_holder_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "governance_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_suggestions: {
         Row: {
           action: string
