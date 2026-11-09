@@ -114,8 +114,8 @@ export function AccountingSplitsPanel() {
         ))}
       </div>
 
-      {isError ? <p className="mt-3 text-sm text-destructive">Répartitions indisponibles (chargement ou droits).</p> : proRows.length === 0 ? (
-        <p className="mt-3 text-sm text-muted-foreground">Aucune part professionnelle enregistrée.</p>
+      {isError ? <p className="mt-3 text-sm text-destructive">Répartitions indisponibles (chargement ou droits).</p> : rows.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Aucune répartition enregistrée.</p>
       ) : (
         <ul className="mt-3 space-y-2 text-sm">
           {rows.map((r) => {
