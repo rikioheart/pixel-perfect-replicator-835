@@ -53,6 +53,7 @@ const LABELS: Record<string, string> = {
   PERMISSION_REVOKED: "Permission retirée",
   PERMISSION_SCOPE_UPDATED: "Permission : portée pro modifiée",
   ROLES_RECALIBRATED: "Rôles et droits recalibrés",
+  FORM_DELETED: "Formulaire supprimé",
   DELEGATION_CREATE: "Délégation créée",
   DELEGATION_REVOKE: "Délégation retirée",
   PASS_VALIDATOR_ON: "Valideur Pass activé",
