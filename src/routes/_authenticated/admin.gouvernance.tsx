@@ -143,6 +143,8 @@ function GovernancePage() {
         </div>
       </section>
 
+      <AgAttendance />
+
       {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : (
         <div className="grid gap-5 xl:grid-cols-3">
           {BUCKETS.map((b) => {
@@ -174,7 +176,6 @@ function GovernancePage() {
         </div>
       )}
       <p className="mt-6 text-xs text-muted-foreground">Priorité calculée : échéance dans 7 jours ou moins, ou sujet en attente depuis 14 jours. Aucune donnée n'est copiée : chaque lien ouvre le dossier d'origine.</p>
-      <AgAttendance />
       <GovernanceRegister />
     </AppShell>
   );
