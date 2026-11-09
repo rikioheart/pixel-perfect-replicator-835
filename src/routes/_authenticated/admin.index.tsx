@@ -32,6 +32,8 @@ import { PendingMembersQueue } from "@/components/PendingMembersQueue";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { QuickValidationRow } from "@/components/QuickValidation";
 import { euro, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { PendingActionsStrip } from "@/components/PendingActionsStrip";
+import { isOverdueReservation } from "@/lib/role-home";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -68,7 +70,7 @@ function AdminConsole() {
     enabled: isBureau,
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const [profiles, projects, tasks, events, activities, proposals, inventory, partners, mairies, posts] = await Promise.all([
+      const [profiles, projects, tasks, events, activities, proposals, inventory, partners, mairies, posts, offers, loans] = await Promise.all([
         supabase.from("profiles").select("id, display_name, first_name, last_name, membership_type, membership_status"),
         supabase.from("projects").select("id, title, status, progress_percent, deadline, owner_id").eq("status", "ACTIVE").order("deadline", { ascending: true, nullsFirst: false }),
         supabase.from("tasks").select("id, title, status, priority, needs_help, is_volunteer_task, deadline, assigned_user_id, submitted_at").not("status", "in", "(COMPLETED,ARCHIVED)"),
@@ -79,6 +81,8 @@ function AdminConsole() {
         supabase.from("partners").select("id", { count: "exact", head: true }).eq("active", true),
         supabase.from("mairies").select("id", { count: "exact", head: true }).neq("status", "CLOSED"),
         supabase.from("blog_posts").select("id", { count: "exact", head: true }).neq("status", "PUBLISHED"),
+        supabase.from("contributions").select("id", { count: "exact", head: true }).in("status", ["PROPOSED", "DISCUSSION"]),
+        supabase.from("inventory_reservations").select("status, end_date").eq("status", "ACTIVE").lt("end_date", today),
       ]);
       return {
         profiles: rows(profiles),
@@ -91,6 +95,8 @@ function AdminConsole() {
         partners: partners.error ? null : (partners.count ?? 0),
         mairies: mairies.error ? null : (mairies.count ?? 0),
         posts: posts.error ? null : (posts.count ?? 0),
+        offers: offers.error ? null : (offers.count ?? 0),
+        overdueLoans: loans.error ? null : (loans.data ?? []).filter((r) => isOverdueReservation(r, today)).length,
       };
     },
   });
@@ -144,13 +150,12 @@ function AdminConsole() {
   const n = (list: unknown[] | null | undefined) => (list == null ? "—" : String(list.length));
   const count = (v: number | null | undefined) => (v == null ? "—" : String(v));
 
+  // Repères d'ensemble (informatifs) ; ce qui demande une action est dans « À traiter maintenant ».
   const kpis = [
     { label: "Membres actifs", value: n(active), icon: Users, to: "/directory" },
     { label: "Professionnels actifs", value: n(active?.filter((p) => p.membership_type === "PROFESSIONNEL")), icon: Briefcase, to: "/directory" },
     { label: "Particuliers actifs", value: n(active?.filter((p) => p.membership_type === "PARTICULIER")), icon: Users, to: "/directory" },
     { label: "Projets actifs", value: n(projects), icon: FolderKanban, to: "/projects" },
-    { label: "Tâches à valider", value: n(toValidate), icon: ShieldCheck, to: "/admin/validation" },
-    { label: "Besoins d'aide", value: n(helpNeeded), icon: HelpCircle, to: "/help-requests" },
   ];
 
   const fin = finance.data;
@@ -158,6 +163,17 @@ function AdminConsole() {
   const psum = fin?.acc ? summarizePayouts(fin.acc) : null;
   const pendingCount = fin?.reimb?.filter((r) => r.status === "PENDING").length;
   const money = (v: number | undefined) => (v == null || finance.isError ? "—" : euro(v));
+  const len = (list: unknown[] | null | undefined) => (list == null ? null : list.length);
+
+  const actions = [
+    { key: "members", label: "Adhésions à valider", count: len(profiles?.filter((p) => p.membership_status === "PENDING")), to: "#adhesions" },
+    { key: "tasks", label: "Tâches en attente de clôture", count: len(toValidate), to: "/admin/validation" },
+    { key: "offers", label: "Propositions d'aide à orienter", count: data ? data.offers : 0, to: "/admin/contributions" },
+    { key: "loans", label: "Matériel non rendu", count: data ? data.overdueLoans : 0, to: "/inventory" },
+    ...(canReimb ? [{ key: "reimb", label: "Remboursements à décider", count: finance.data ? (pendingCount ?? null) : 0, to: "/finance" }] : []),
+    { key: "proposals", label: "Propositions des professionnels", count: len(data?.proposals), to: "/proposals" },
+    { key: "help", label: "Besoins d'aide signalés", count: len(helpNeeded), to: "/help-requests" },
+  ];
 
   return (
     <AppShell
@@ -170,9 +186,12 @@ function AdminConsole() {
       }
     >
       <BureauConsoleTabs />
-      <PendingMembersQueue />
+      <PendingActionsStrip items={actions} loading={!data} />
+      <div className="mt-6">
+        <PendingMembersQueue />
+      </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((kpi) => (
           <Link key={kpi.label} to={kpi.to} className="panel block p-4 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <div className="flex items-center justify-between text-muted-foreground">

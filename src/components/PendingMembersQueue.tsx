@@ -47,7 +47,7 @@ export function PendingMembersQueue() {
   });
 
   return (
-    <section className="panel space-y-3 p-4" aria-labelledby="pending-members-title">
+    <section id="adhesions" className="panel scroll-mt-20 space-y-3 p-4" aria-labelledby="pending-members-title">
       <div className="flex items-center justify-between gap-2">
         <h2 id="pending-members-title" className="flex items-center gap-2 font-display text-lg">
           <UserCheck className="size-4" aria-hidden /> Adhésions à valider
