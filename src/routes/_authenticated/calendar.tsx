@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/calendar")({
   head: () => ({
     meta: [
       { title: "Calendrier associatif — La Voix du Chien" },
-      { name: "description", content: "Activités, événements, formations, terrain, projets et échéances dans un seul calendrier." },
+      { name: "description", content: "Activités, événements, formations, projets et échéances dans un seul calendrier." },
       { property: "og:title", content: "Calendrier associatif — La Voix du Chien" },
       { property: "og:description", content: "Toute la vie de l'association, jour après jour, au même endroit." },
       { property: "og:type", content: "website" },
@@ -25,14 +25,14 @@ export const Route = createFileRoute("/_authenticated/calendar")({
   component: CalendarPage,
 });
 
-type Kind = "ACTIVITY" | "EVENT" | "FORMATION" | "TERRAIN" | "TASK" | "PROJECT";
+// Réservations du terrain retirées de la plateforme (page conservée hors navigation).
+type Kind = "ACTIVITY" | "EVENT" | "FORMATION" | "TASK" | "PROJECT";
 type View = "list" | "week" | "month";
 
 const KINDS: Record<Kind, { label: string; icon: typeof CalendarRange; peek?: PeekType }> = {
   ACTIVITY: { label: "Activités", icon: Sparkle, peek: "activity" },
   EVENT: { label: "Événements", icon: PartyPopper, peek: "event" },
   FORMATION: { label: "Formations", icon: GraduationCap },
-  TERRAIN: { label: "Terrain", icon: MapPinned, peek: "reservation" },
   TASK: { label: "Échéances", icon: ListChecks, peek: "task" },
   PROJECT: { label: "Projets", icon: FolderKanban, peek: "project" },
 };
@@ -49,7 +49,7 @@ const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart
 /** Les éléments viennent de leurs tables métier (RLS appliquée) : aucune copie « calendrier ». */
 function CalendarPage() {
   const [active, setActive] = useState<Record<Kind, boolean>>({
-    ACTIVITY: true, EVENT: true, FORMATION: true, TERRAIN: true, TASK: true, PROJECT: true,
+    ACTIVITY: true, EVENT: true, FORMATION: true, TASK: true, PROJECT: true,
   });
   const [view, setView] = useState<View>("list");
   const [cursor, setCursor] = useState(() => new Date());
@@ -57,19 +57,13 @@ function CalendarPage() {
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["shared-calendar"],
     queryFn: async (): Promise<Item[]> => {
-      const [a, e, f, r, t, p] = await Promise.all([
+      const [a, e, f, t, p] = await Promise.all([
         supabase.from("activities").select("id, title, date, location, category"),
         supabase.from("events").select("id, title, start_date, location, visibility"),
         supabase.from("formations").select("id, title, date, start_time, location"),
-        supabase.from("terrain_reservations").select("id, resource_id, date, start_time, end_time, purpose, status, work_category, equipment_requested"),
         supabase.from("tasks").select("id, title, deadline, status").not("deadline", "is", null).neq("status", "DONE"),
         supabase.from("projects").select("id, title, deadline").not("deadline", "is", null).is("archived_at", null),
       ]);
-      const res = r.data ?? [];
-      const live = res.filter((x) => x.status === "PENDING" || x.status === "APPROVED");
-      const conflict = (x: (typeof res)[number]) =>
-        live.some((y) => y.id !== x.id && y.resource_id === x.resource_id && y.date === x.date &&
-          y.start_time < x.end_time && x.start_time < y.end_time);
       const out: Item[] = [
         ...(a.data ?? []).filter((x) => x.date).map((x) => ({ id: `a-${x.id}`, rawId: x.id, kind: "ACTIVITY" as const, title: x.title,
           date: x.date!.slice(0, 10), detail: [x.category, x.location].filter(Boolean).join(" · ") })),
@@ -77,11 +71,6 @@ function CalendarPage() {
           date: x.start_date!.slice(0, 10), detail: x.location ?? "" })),
         ...(f.data ?? []).filter((x) => x.date).map((x) => ({ id: `f-${x.id}`, rawId: x.id, kind: "FORMATION" as const, title: x.title,
           date: x.date!.slice(0, 10), detail: [x.start_time, x.location].filter(Boolean).join(" · ") })),
-        ...res.filter((x) => x.status !== "CANCELLED").map((x) => ({ id: `t-${x.id}`, rawId: x.id, kind: "TERRAIN" as const,
-          title: x.purpose || x.work_category || "Réservation de terrain", date: x.date,
-          detail: [`${x.start_time.slice(0, 5)}–${x.end_time.slice(0, 5)}`, STATUS_FR[x.status] ?? x.status,
-            x.equipment_requested ? `matériel : ${x.equipment_requested}` : null].filter(Boolean).join(" · "),
-          conflict: (x.status === "PENDING" || x.status === "APPROVED") && conflict(x) })),
         ...(t.data ?? []).map((x) => ({ id: `k-${x.id}`, rawId: x.id, kind: "TASK" as const, title: x.title, date: x.deadline!, detail: "échéance de tâche" })),
         ...(p.data ?? []).map((x) => ({ id: `p-${x.id}`, rawId: x.id, kind: "PROJECT" as const, title: x.title, date: x.deadline!, detail: "échéance de projet" })),
       ];
