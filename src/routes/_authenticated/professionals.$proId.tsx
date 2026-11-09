@@ -200,7 +200,7 @@ function ProfessionalDetailPage() {
           {isBureau ? (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Suivi financier</CardTitle>
+                <CardTitle className="text-base">Répartitions et reversements</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 {accounting.length === 0 ? (

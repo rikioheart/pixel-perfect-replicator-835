@@ -180,7 +180,7 @@ function AdminConsole() {
                 </>
               ) : null}
               {rights.viewGlobal ? (
-                <Row main="Reversements professionnels à payer" right={money(psum?.due)} to="/finance" />
+                <Row main="Reversements professionnels à payer" right={money(psum?.due)} to="/admin/suivi-financier" />
               ) : null}
             </CardContent>
           </Card>
