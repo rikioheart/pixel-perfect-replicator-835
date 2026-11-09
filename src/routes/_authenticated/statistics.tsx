@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { BarChart3, Download, Printer } from "lucide-react";
+import { BarChart3, Download, Landmark, Printer } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,9 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { bilanCsv, periodPresets, statSections, type BureauStats, type StatSection } from "@/lib/statistics";
+import { agResolutions, annualAccounts, euroFr, resultLabel, type AnnualAccounts } from "@/lib/annual-accounts";
+import { useSensitiveRights } from "@/lib/permissions";
+import { AG_QUORUM } from "@/lib/statutes";
 
 export const Route = createFileRoute("/_authenticated/statistics")({
   head: () => ({
@@ -30,7 +33,25 @@ const monthLabel = (m: string) => `${MONTHS[Number(m.slice(5, 7)) - 1]} ${m.slic
 const frDate = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString("fr-FR", { dateStyle: "long" });
 const esc = (v: string | number) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-function printBilan(sections: StatSection[], stats: BureauStats, from: string, to: string) {
+function accountsHtml(a: AnnualAccounts | null, from: string, to: string, volunteerTasks: number) {
+  if (!a) return `<p class="note">Comptes non inclus : le droit « consulter les finances globales » est nécessaire pour les éditer.</p>`;
+  const lines = (list: AnnualAccounts["income"]) => list.map((l) => `<tr><td>${esc(l.label)}</td><td class="n">${esc(euroFr(l.amount))}</td></tr>`).join("");
+  const votes = agResolutions(a, from, to)
+    .map((r) => `<div class="res"><p><strong>${esc(r.title)}</strong><br>${esc(r.text)}</p>
+<table class="vote"><tr><th>Pour</th><th>Contre</th><th>Abstention</th><th>Décision</th></tr><tr><td></td><td></td><td></td><td>☐ Adoptée &nbsp; ☐ Rejetée</td></tr></table></div>`)
+    .join("");
+  return `<h2>Compte de résultat de l'exercice</h2>
+<div class="cols"><table><tr><th>Recettes</th><th class="n">Montant</th></tr>${lines(a.income)}<tr class="tot"><td>Total des recettes</td><td class="n">${esc(euroFr(a.totalIncome))}</td></tr></table>
+<table><tr><th>Dépenses</th><th class="n">Montant</th></tr>${lines(a.expenses)}<tr class="tot"><td>Total des dépenses</td><td class="n">${esc(euroFr(a.totalExpenses))}</td></tr></table></div>
+<p class="result">Résultat net de l'exercice : ${esc(resultLabel(a))}</p>
+<p class="note">Comptabilité de trésorerie : seules les opérations encaissées ou payées sont retenues. Restant à encaisser : ${esc(euroFr(a.pendingIncome))} · restant à payer : ${esc(euroFr(a.pendingExpenses))} (non compris).
+Contributions volontaires en nature : ${volunteerTasks} tâche(s) bénévole(s) réalisée(s), non valorisées en euros.</p>
+<h2>Vote de l'Assemblée générale</h2>
+<div class="box"><p>Membres présents ou représentés : ______ · quorum statutaire : ${AG_QUORUM} · quorum atteint : ☐ oui ☐ non</p>${votes}
+<div class="sign"><span>Le/la président(e)</span><span>Le/la trésorier(ère)</span><span>Le/la secrétaire de séance</span></div></div>`;
+}
+
+function printBilan(sections: StatSection[], stats: BureauStats, from: string, to: string, accounts: AnnualAccounts | null) {
   const w = window.open("", "_blank");
   if (!w) return;
   const blocks = sections
@@ -44,15 +65,20 @@ function printBilan(sections: StatSection[], stats: BureauStats, from: string, t
   w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bilan de l'exercice — La Voix du Chien</title>
 <style>body{font-family:Georgia,serif;margin:32px;color:#1f2937}h1{font-size:22px;margin:0}p.sub{margin:4px 0 20px;color:#555}
 h2{font-size:15px;margin:22px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:13px}
-td,th{padding:5px 4px;border-bottom:1px solid #eee;text-align:left}.n{text-align:right;white-space:nowrap}footer{margin-top:28px;font-size:11px;color:#666}</style></head>
-<body><h1>Bilan de l'exercice — La Voix du Chien</h1><p class="sub">Du ${esc(frDate(from))} au ${esc(frDate(to))} · document préparé pour l'Assemblée générale</p>
-${blocks}${partners}<footer>Chiffres issus de la plateforme à la date d'édition (${esc(new Date().toLocaleDateString("fr-FR"))}). Aucun classement de personnes.</footer>
+td,th{padding:5px 4px;border-bottom:1px solid #eee;text-align:left}.n{text-align:right;white-space:nowrap}footer{margin-top:28px;font-size:11px;color:#666}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}.tot td{font-weight:700;border-top:2px solid #999}.result{font-size:16px;font-weight:700;margin:12px 0 4px}
+.note{font-size:12px;color:#555}.box{border:2px solid #333;padding:12px 16px;border-radius:6px;font-family:system-ui,sans-serif;font-size:13px}
+.res{margin:10px 0}.vote td{height:26px;border:1px solid #bbb}.vote th{border:1px solid #bbb;font-weight:600}.sign{display:flex;justify-content:space-between;margin-top:24px;padding-top:36px}
+.sign span{border-top:1px solid #333;padding-top:4px;width:30%;text-align:center;font-size:12px}@media print{.box{break-inside:avoid}}</style></head>
+<body><h1>Bilan de l'exercice — La Voix du Chien</h1><p class="sub">Association loi 1901 · exercice du ${esc(frDate(from))} au ${esc(frDate(to))} · document préparé pour l'Assemblée générale ordinaire</p>
+${accountsHtml(accounts, from, to, stats.volunteers.taches_benevoles_realisees)}<h2 style="margin-top:28px">Rapport d'activité</h2>${blocks}${partners}<footer>Chiffres issus de la plateforme à la date d'édition (${esc(new Date().toLocaleDateString("fr-FR"))}) : document préparatoire, à valider par le trésorier avant présentation. Aucun classement de personnes.</footer>
 <script>window.onload=function(){window.print()}</script></body></html>`);
   w.document.close();
 }
 
 function StatisticsPage() {
   const { isBureau } = useAuth();
+  const rights = useSensitiveRights();
   const presets = periodPresets();
   const [range, setRange] = useState<{ from: string; to: string }>({ from: presets[0].from, to: presets[0].to });
   const [showCharts, setShowCharts] = useState(false);
@@ -84,6 +110,22 @@ function StatisticsPage() {
     },
   });
 
+  // Comptes de l'exercice : grand livre uniquement (droit finances globales), filtré sur la période.
+  const ledger = useQuery({
+    queryKey: ["bilan-ledger", range.from, range.to],
+    enabled: isBureau && rights.viewGlobal && Boolean(range.from && range.to) && range.from <= range.to,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("finance_entries")
+        .select("entry_date, direction, category, amount, status")
+        .gte("entry_date", range.from)
+        .lte("entry_date", range.to);
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+  const accounts = ledger.data ? annualAccounts(ledger.data, range.from, range.to) : null;
+
   if (!isBureau) {
     return (
       <AppShell title="Statistiques stratégiques" subtitle="Accès réservé au Bureau">
@@ -95,7 +137,7 @@ function StatisticsPage() {
   const sections = data ? statSections(data) : [];
   const downloadCsv = () => {
     if (!data) return;
-    const blob = new Blob([`\ufeff${bilanCsv(data, range.from, range.to)}`], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob([`\ufeff${bilanCsv(data, range.from, range.to, accounts)}`], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -132,7 +174,7 @@ function StatisticsPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:ml-auto">
-          <Button size="sm" variant="outline" className="gap-2" disabled={!data} onClick={() => data && printBilan(sections, data, range.from, range.to)}>
+          <Button size="sm" variant="outline" className="gap-2" disabled={!data} onClick={() => data && printBilan(sections, data, range.from, range.to, accounts)}>
             <Printer className="size-4" aria-hidden /> Bilan de l'exercice (PDF)
           </Button>
           <Button size="sm" variant="outline" className="gap-2" disabled={!data} onClick={downloadCsv}>
@@ -140,6 +182,8 @@ function StatisticsPage() {
           </Button>
         </div>
       </section>
+
+      {rights.viewGlobal ? <AccountsPanel accounts={accounts} loading={ledger.isLoading} failed={ledger.isError} from={range.from} to={range.to} /> : null}
 
       {error ? <p className="text-sm text-destructive">{(error as Error).message}</p> : null}
       {isLoading || !data ? (
@@ -232,5 +276,54 @@ function StatisticsPage() {
         </>
       )}
     </AppShell>
+  );
+}
+
+/** Compte de résultat loi 1901 : recettes, dépenses, résultat net, puis aperçu des résolutions soumises à l'AG. */
+function AccountsPanel({ accounts, loading, failed, from, to }: { accounts: AnnualAccounts | null; loading: boolean; failed: boolean; from: string; to: string }) {
+  if (failed) return <p className="panel mb-4 p-4 text-sm text-destructive">Comptes de l'exercice indisponibles (chargement ou droits).</p>;
+  if (loading || !accounts) return <p className="mb-4 text-sm text-muted-foreground">Calcul des comptes de l'exercice…</p>;
+  const List = ({ title, lines, total }: { title: string; lines: AnnualAccounts["income"]; total: number }) => (
+    <div className="min-w-0">
+      <h3 className="mb-1 text-sm font-semibold">{title}</h3>
+      <dl className="divide-y divide-border text-sm">
+        {lines.map((l) => (
+          <div key={l.key} className="flex items-baseline justify-between gap-3 py-1.5">
+            <dt className="text-muted-foreground">{l.label}</dt>
+            <dd className="tabular-nums">{euroFr(l.amount)}</dd>
+          </div>
+        ))}
+        <div className="flex items-baseline justify-between gap-3 py-1.5 font-semibold">
+          <dt>Total</dt>
+          <dd className="tabular-nums">{euroFr(total)}</dd>
+        </div>
+      </dl>
+    </div>
+  );
+  return (
+    <section className="panel mb-6 space-y-4 p-5" aria-labelledby="accounts-title">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 id="accounts-title" className="flex flex-1 items-center gap-2 text-lg"><Landmark className="size-5 text-primary" aria-hidden /> Comptes de l'exercice</h2>
+        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${accounts.kind === "DEFICIT" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
+          {resultLabel(accounts)}
+        </span>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        <List title="Recettes" lines={accounts.income} total={accounts.totalIncome} />
+        <List title="Dépenses" lines={accounts.expenses} total={accounts.totalExpenses} />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Grand livre, comptabilité de trésorerie : opérations encaissées ou payées uniquement ({accounts.entries}). Restant à encaisser {euroFr(accounts.pendingIncome)} · restant à payer {euroFr(accounts.pendingExpenses)}, non compris.
+      </p>
+      <div className="rounded-lg border-2 border-border p-4">
+        <h3 className="mb-2 text-sm font-semibold">Soumis au vote de l'Assemblée générale</h3>
+        <ol className="space-y-2 text-sm">
+          {agResolutions(accounts, from, to).map((r) => (
+            <li key={r.title}><span className="font-medium">{r.title}</span> — <span className="text-muted-foreground">{r.text}</span></li>
+          ))}
+        </ol>
+        <p className="mt-2 text-xs text-muted-foreground">La fiche imprimable ajoute pour chaque résolution les cases Pour / Contre / Abstention et les signatures.</p>
+      </div>
+    </section>
   );
 }
