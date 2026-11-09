@@ -32,7 +32,6 @@ import {
   BookUser,
   LifeBuoy,
   Gift,
-  History,
   Trophy,
   ReceiptText,
   GraduationCap,
@@ -47,7 +46,6 @@ import {
 
   House,
   ClipboardList,
-  Trees,
   Route as RouteIcon,
 } from "lucide-react";
 const HandHeart = HandHeartIcon;
@@ -108,7 +106,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/advantages", label: "Avantages", icon: Gift, audience: "all" },
       { to: "/profile", label: "Profil & données", icon: UserRound, audience: "all" },
       { to: "/my-space", label: "Préférences", icon: Settings2, audience: "all" },
-      { to: "/my-history", label: "Historique", icon: History, audience: "all" },
       { to: "/parcours", label: "Parcours", icon: RouteIcon, audience: "all" },
     ],
   },
@@ -131,7 +128,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/tasks", label: "Tâches", icon: ListChecks, audience: "all" },
       { to: "/proposals", label: "Idées", icon: Lightbulb, audience: "all" },
       { to: "/help-requests", label: "Entraide", icon: HandHeart, audience: "all" },
-      { to: "/avancees", label: "Nos avancées", icon: Sparkles, audience: "all" },
       { to: "/blog", label: "Journal", icon: Newspaper, audience: "all" },
       { to: "/mindmap", label: "Mindmap des projets", icon: Network, audience: "all", hideForParticulier: true },
     ],
@@ -149,6 +145,8 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/forms", label: "Formulaires", icon: ClipboardList, audience: "all" },
       { to: "/documents", label: "Documents", icon: FileText, audience: "all", hideForParticulier: true },
+      { to: "/avancees", label: "Actualités", icon: Sparkles, audience: "all" },
+      { to: "/inventory", label: "Inventaire", icon: Package, audience: "all" },
       { to: "/help", label: "Guides", icon: LifeBuoy, audience: "all" },
       { to: "/charter", label: "Notre façon de travailler", icon: HeartHandshake, audience: "all" },
     ],
@@ -175,8 +173,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/admin/contributions", label: "Propositions d'aide", icon: HandHeart, audience: "bureau" },
       { to: "/admin/pros", label: "Fiches pros", icon: Briefcase, audience: "bureau" },
       { to: "/admin/chiens", label: "Foyers & chiens", icon: Heart, audience: "bureau" },
-      { to: "/inventory", label: "Matériel", icon: Package, audience: "bureau" },
-      { to: "/terrain", label: "Terrain (gestion)", icon: Trees, audience: "bureau" },
     ],
   },
   {

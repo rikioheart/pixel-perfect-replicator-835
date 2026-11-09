@@ -7,6 +7,8 @@ import { useSensitiveRights } from "@/lib/permissions";
 import { AppShell } from "@/components/AppShell";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { GovernanceRegister } from "@/components/GovernanceRegister";
+import { PendingMembersQueue } from "@/components/PendingMembersQueue";
+import { AgAttendance } from "@/components/AgAttendance";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/domain";
 import { contributionBucket, priorityOf, sortGov, terrainBucket, type GovBucket, type GovItem } from "@/lib/governance";
@@ -122,7 +124,6 @@ function GovernancePage() {
 
   const sorted = sortGov(items, today);
   const queues = [
-    { label: "Adhésions à valider", value: data?.members, to: "/admin", hint: "File unique des adhésions" },
     { label: "Tâches à valider", value: data?.tasks, to: "/admin/validation", hint: "Preuves soumises" },
     ...(canReimb ? [
       { label: "Remboursements à décider", value: reimb.data?.pending, to: "/finance", hint: "Droit financier requis" },
@@ -134,10 +135,14 @@ function GovernancePage() {
     <AppShell title="Besoins de décision" subtitle="Ce que le Bureau doit trancher, et ce qui a été décidé">
       <BureauConsoleTabs />
 
+      <div className="mb-6">
+        <PendingMembersQueue />
+      </div>
+
       <section aria-labelledby="queues-title" className="mb-6">
         <h2 id="queues-title" className="mb-2 font-display text-lg">Validations courantes</h2>
         <p className="mb-3 text-xs text-muted-foreground">Ces dossiers se traitent dans leur file habituelle ; ils sont seulement signalés ici.</p>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {queues.map((q) => (
             <Link key={q.label} to={q.to as never} className="panel flex items-center justify-between gap-2 p-3 text-sm hover:bg-muted">
               <span><span className="block font-medium">{q.label}</span><span className="text-xs text-muted-foreground">{q.hint}</span></span>
@@ -178,6 +183,7 @@ function GovernancePage() {
         </div>
       )}
       <p className="mt-6 text-xs text-muted-foreground">Priorité calculée : échéance dans 7 jours ou moins, ou sujet en attente depuis 14 jours. Aucune donnée n'est copiée : chaque lien ouvre le dossier d'origine.</p>
+      <AgAttendance />
       <GovernanceRegister />
     </AppShell>
   );

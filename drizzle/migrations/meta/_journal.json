@@ -428,6 +428,41 @@
       "when": 1794187494527,
       "tag": "0060_permissions_pro_scope_and_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1794188098384,
+      "tag": "0061_ag_attendance",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1794188530765,
+      "tag": "0062_inventory_visibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1794188844732,
+      "tag": "0063_inventory_availability_visibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1794189254460,
+      "tag": "0064_project_communications",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1794189561347,
+      "tag": "0065_bureau_statistics",
+      "breakpoints": true
     }
   ]
 }

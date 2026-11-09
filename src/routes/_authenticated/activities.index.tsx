@@ -18,6 +18,7 @@ import { SidePanel } from "@/components/SidePanel";
 import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
 import { ParentProjectSelect } from "@/components/ParentProjectSelect";
+import { useConfigOptions } from "@/lib/config-options";
 
 export const Route = createFileRoute("/_authenticated/activities/")({
   head: () => ({
@@ -40,7 +41,6 @@ export const Route = createFileRoute("/_authenticated/activities/")({
   component: ActivitiesPage,
 });
 
-const ACTIVITY_TYPES = ["ATELIER", "BALADE", "FORMATION", "RENCONTRE"] as const;
 
 function formatDate(value: string | null) {
   if (!value) return "Date à définir";
@@ -53,6 +53,8 @@ function formatDate(value: string | null) {
 function ActivitiesPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
+  // Types d'activités : liste dynamique gérée par le Bureau (Paramétrage / Fidélité).
+  const activityTypes = useConfigOptions("ACTIVITY_TYPE");
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"current" | "past">("current");
   const [form, setForm] = useState({
@@ -227,9 +229,12 @@ function ActivitiesPage() {
                       value={form.type}
                       onChange={(e) => setForm({ ...form, type: e.target.value })}
                     >
-                      {ACTIVITY_TYPES.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
+                      {!activityTypes.options.some((o) => o.code === form.type) ? (
+                        <option value={form.type}>{activityTypes.labelOf(form.type)}</option>
+                      ) : null}
+                      {activityTypes.options.map((o) => (
+                        <option key={o.code} value={o.code}>
+                          {o.label}
                         </option>
                       ))}
                     </select>
@@ -366,7 +371,7 @@ function ActivitiesPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-base"><Link to="/activities/$activityId" params={{ activityId: activity.id }} className="hover:underline">{activity.title}</Link></CardTitle>
-                    <Badge variant="secondary">{activity.type}</Badge>
+                    <Badge variant="secondary">{activityTypes.labelOf(activity.type)}</Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">

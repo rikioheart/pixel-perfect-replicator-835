@@ -1,36 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { BarChart3, Download, Printer } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { bilanCsv, periodPresets, statSections, type BureauStats, type StatSection } from "@/lib/statistics";
 
 export const Route = createFileRoute("/_authenticated/statistics")({
   head: () => ({
     meta: [
       { title: "Statistiques stratégiques — La Voix du Chien" },
-      {
-        name: "description",
-        content:
-          "Évolution du réseau, des projets, des participations et de la fidélité de l'association.",
-      },
+      { name: "description", content: "Membres, activités, projets, engagement bénévole et Pass Terrain, avec la fiche Bilan de l'exercice pour l'AG." },
       { property: "og:title", content: "Statistiques stratégiques — La Voix du Chien" },
-      {
-        property: "og:description",
-        content: "Suivi chiffré de la vie associative : adhérents, projets, activités, fidélité.",
-      },
+      { property: "og:description", content: "Vue stratégique de la vie associative et bilan exportable pour l'Assemblée générale." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -38,216 +25,212 @@ export const Route = createFileRoute("/_authenticated/statistics")({
   component: StatisticsPage,
 });
 
-type Period = "month" | "quarter" | "year";
+const MONTHS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+const monthLabel = (m: string) => `${MONTHS[Number(m.slice(5, 7)) - 1]} ${m.slice(2, 4)}`;
+const frDate = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString("fr-FR", { dateStyle: "long" });
+const esc = (v: string | number) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-const PERIODS: [Period, string][] = [
-  ["month", "12 derniers mois"],
-  ["quarter", "8 derniers trimestres"],
-  ["year", "5 dernières années"],
-];
-
-type Row = { created_at?: string | null; [key: string]: unknown };
-
-function bucketKey(date: Date, period: Period) {
-  if (period === "year") return String(date.getFullYear());
-  if (period === "quarter") return `T${Math.floor(date.getMonth() / 3) + 1} ${date.getFullYear()}`;
-  return date.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
-}
-
-function buildBuckets(period: Period) {
-  const now = new Date();
-  const keys: string[] = [];
-  const count = period === "year" ? 5 : period === "quarter" ? 8 : 12;
-  for (let i = count - 1; i >= 0; i--) {
-    const d = new Date(now);
-    if (period === "year") d.setFullYear(now.getFullYear() - i);
-    else if (period === "quarter") d.setMonth(now.getMonth() - i * 3);
-    else d.setMonth(now.getMonth() - i);
-    const key = bucketKey(d, period);
-    if (!keys.includes(key)) keys.push(key);
-  }
-  return keys;
-}
-
-function tally(rows: Row[] | null, field: string, period: Period, keys: string[]) {
-  const map = new Map<string, number>(keys.map((k) => [k, 0]));
-  for (const row of rows ?? []) {
-    const raw = row[field] as string | null | undefined;
-    if (!raw) continue;
-    const key = bucketKey(new Date(raw), period);
-    if (map.has(key)) map.set(key, (map.get(key) ?? 0) + 1);
-  }
-  return map;
+function printBilan(sections: StatSection[], stats: BureauStats, from: string, to: string) {
+  const w = window.open("", "_blank");
+  if (!w) return;
+  const blocks = sections
+    .map((s) => `<h2>${esc(s.title)}</h2><table>${s.rows.map(([l, v]) => `<tr><td>${esc(l)}</td><td class="n">${esc(v)}</td></tr>`).join("")}</table>`)
+    .join("");
+  const partners = stats.pass.par_partenaire.length
+    ? `<h2>Pass Terrain par partenaire</h2><table><tr><th>Partenaire</th><th class="n">Tampons</th><th class="n">Personnes</th></tr>${stats.pass.par_partenaire
+        .map((p) => `<tr><td>${esc(p.name)}</td><td class="n">${p.tampons}</td><td class="n">${p.personnes}</td></tr>`)
+        .join("")}</table>`
+    : "";
+  w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Bilan de l'exercice — La Voix du Chien</title>
+<style>body{font-family:Georgia,serif;margin:32px;color:#1f2937}h1{font-size:22px;margin:0}p.sub{margin:4px 0 20px;color:#555}
+h2{font-size:15px;margin:22px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:13px}
+td,th{padding:5px 4px;border-bottom:1px solid #eee;text-align:left}.n{text-align:right;white-space:nowrap}footer{margin-top:28px;font-size:11px;color:#666}</style></head>
+<body><h1>Bilan de l'exercice — La Voix du Chien</h1><p class="sub">Du ${esc(frDate(from))} au ${esc(frDate(to))} · document préparé pour l'Assemblée générale</p>
+${blocks}${partners}<footer>Chiffres issus de la plateforme à la date d'édition (${esc(new Date().toLocaleDateString("fr-FR"))}). Aucun classement de personnes.</footer>
+<script>window.onload=function(){window.print()}</script></body></html>`);
+  w.document.close();
 }
 
 function StatisticsPage() {
-  const [period, setPeriod] = useState<Period>("month");
+  const { isBureau } = useAuth();
+  const presets = periodPresets();
+  const [range, setRange] = useState<{ from: string; to: string }>({ from: presets[0].from, to: presets[0].to });
+  const [showCharts, setShowCharts] = useState(false);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["statistics"],
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["bureau-statistics", range.from, range.to],
+    enabled: isBureau && Boolean(range.from && range.to) && range.from <= range.to,
     queryFn: async () => {
-      const [profiles, projects, tasks, activities, events, participations, pros, cards, stamps, audit, categories] =
-        await Promise.all([
-          supabase.from("profiles").select("id, created_at, membership_type, membership_status"),
-          supabase.from("projects").select("id, created_at, status, category_id"),
-          supabase.from("tasks").select("id, created_at, status, completed_at"),
-          supabase.from("activities").select("id, created_at"),
-          supabase.from("events").select("id, created_at"),
-          supabase.from("participations").select("id, created_at, user_id"),
-          supabase.from("pro_details").select("id"),
-          supabase.from("loyalty_cards").select("id"),
-          supabase.from("loyalty_stamps").select("id, created_at, stamps"),
-          supabase.from("audit_logs").select("id"),
-          supabase.from("project_categories").select("id, name"),
-        ]);
-      return {
-        profiles: profiles.data ?? [],
-        projects: projects.data ?? [],
-        tasks: tasks.data ?? [],
-        activities: activities.data ?? [],
-        events: events.data ?? [],
-        participations: participations.data ?? [],
-        pros: pros.data ?? [],
-        cards: cards.data ?? [],
-        stamps: stamps.data ?? [],
-        audit: audit.data ?? [],
-        categories: categories.data ?? [],
-      };
+      const { data, error } = await supabase.rpc("bureau_statistics", { _from: range.from, _to: range.to });
+      if (error) throw new Error(error.message);
+      return data as unknown as BureauStats;
+    },
+  });
+  const { data: categoryData = [] } = useQuery({
+    queryKey: ["stats-projects-by-category"],
+    enabled: isBureau && showCharts,
+    queryFn: async () => {
+      const [p, c] = await Promise.all([
+        supabase.from("projects").select("category_id").is("archived_at", null),
+        supabase.from("project_categories").select("id, name"),
+      ]);
+      const names = new Map((c.data ?? []).map((x) => [x.id, x.name]));
+      const counts = new Map<string, number>();
+      for (const row of p.data ?? []) {
+        const label = (row.category_id && names.get(row.category_id)) || "Sans catégorie";
+        counts.set(label, (counts.get(label) ?? 0) + 1);
+      }
+      return [...counts.entries()].map(([category, count]) => ({ category, count }));
     },
   });
 
-  if (isLoading || !data) {
+  if (!isBureau) {
     return (
-      <AppShell title="Statistiques stratégiques" subtitle="Chargement…">
-        <p className="text-sm text-muted-foreground">Calcul des statistiques en cours…</p>
+      <AppShell title="Statistiques stratégiques" subtitle="Accès réservé au Bureau">
+        <p className="text-sm text-muted-foreground">Les statistiques de l'association sont consultées par le Bureau.</p>
       </AppShell>
     );
   }
 
-  const totals: [string, number][] = [
-    [
-      "Professionnels actifs",
-      data.profiles.filter(
-        (p) => (p.membership_type ?? "").toUpperCase().includes("PRO") && p.membership_status === "ACTIVE",
-      ).length,
-    ],
-    [
-      "Particuliers actifs",
-      data.profiles.filter(
-        (p) => !(p.membership_type ?? "").toUpperCase().includes("PRO") && p.membership_status === "ACTIVE",
-      ).length,
-    ],
-    ["Adhérents inscrits", data.profiles.length],
-    ["Projets", data.projects.length],
-    ["Projets terminés", data.projects.filter((p) => p.status === "COMPLETED").length],
-    ["Tâches réalisées", data.tasks.filter((t) => t.status === "COMPLETED" || t.completed_at).length],
-    ["Activités", data.activities.length],
-    ["Événements", data.events.length],
-    ["Participations", data.participations.length],
-    ["Fiches professionnelles", data.pros.length],
-    ["Cartes de fidélité", data.cards.length],
-    ["Tampons distribués", data.stamps.reduce((sum, s) => sum + (s.stamps ?? 0), 0)],
-    ["Actions tracées", data.audit.length],
-    [
-      "Bénévoles actifs",
-      new Set(data.participations.map((p) => p.user_id).filter(Boolean)).size,
-    ],
-  ];
-
-  const keys = buildBuckets(period);
-  const membres = tally(data.profiles, "created_at", period, keys);
-  const taches = tally(
-    data.tasks.filter((t) => t.completed_at),
-    "completed_at",
-    period,
-    keys,
-  );
-  const projets = tally(data.projects, "created_at", period, keys);
-  const parts = tally(data.participations, "created_at", period, keys);
-  const tampons = tally(data.stamps, "created_at", period, keys);
-
-  const chart = keys.map((label) => ({
-    label,
-    membres: membres.get(label) ?? 0,
-    taches: taches.get(label) ?? 0,
-    projets: projets.get(label) ?? 0,
-    participations: parts.get(label) ?? 0,
-    tampons: tampons.get(label) ?? 0,
-  }));
-
-  const categoryLabels = new Map(data.categories.map((c) => [c.id, c.name]));
-  const byCategory = new Map<string, number>();
-  for (const project of data.projects) {
-    const label = (project.category_id && categoryLabels.get(project.category_id)) || "Sans catégorie";
-    byCategory.set(label, (byCategory.get(label) ?? 0) + 1);
-  }
-  const categoryData = [...byCategory.entries()].map(([category, count]) => ({ category, count }));
+  const sections = data ? statSections(data) : [];
+  const downloadCsv = () => {
+    if (!data) return;
+    const blob = new Blob([`\ufeff${bilanCsv(data, range.from, range.to)}`], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bilan-exercice-${range.from}-${range.to}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const chart = (data?.series ?? []).map((s) => ({ ...s, label: monthLabel(s.mois) }));
 
   return (
-    <AppShell
-      title="Statistiques stratégiques"
-      subtitle="L'évolution du réseau et des actions, en un coup d'œil."
-      actions={
-        <div className="flex gap-2">
-          {PERIODS.map(([value, label]) => (
+    <AppShell title="Statistiques stratégiques" subtitle="La vie de l'association par thème, et le bilan de l'exercice pour l'AG">
+      <section className="panel mb-4 flex flex-wrap items-end gap-3 p-4" aria-label="Période">
+        <div className="flex flex-wrap gap-2">
+          {presets.map((p) => (
             <Button
-              key={value}
+              key={p.key}
               size="sm"
-              variant={period === value ? "default" : "outline"}
-              onClick={() => setPeriod(value)}
+              variant={range.from === p.from && range.to === p.to ? "default" : "outline"}
+              aria-pressed={range.from === p.from && range.to === p.to}
+              onClick={() => setRange({ from: p.from, to: p.to })}
             >
-              {label}
+              {p.label}
             </Button>
           ))}
         </div>
-      }
-    >
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {totals.map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
-            <p className="mt-2 font-display text-2xl font-bold text-primary">{value}</p>
+        <div className="flex flex-wrap items-end gap-2">
+          <div>
+            <Label htmlFor="st-from" className="text-xs">Du</Label>
+            <Input id="st-from" type="date" value={range.from} max={range.to} onChange={(e) => setRange({ ...range, from: e.target.value })} className="h-9" />
           </div>
-        ))}
-      </section>
-
-      <section className="mt-6 rounded-xl border border-border bg-card p-5">
-        <h2 className="font-display text-lg font-bold">Évolution</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Nouveaux adhérents, tâches terminées, projets créés, participations et tampons de fidélité.
-        </p>
-        <div className="mt-6 h-72 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chart} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="membres" stroke="var(--chart-1)" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="taches" stroke="var(--chart-5)" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="projets" stroke="var(--chart-3)" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="participations" stroke="var(--chart-4)" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="tampons" stroke="var(--chart-2)" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div>
+            <Label htmlFor="st-to" className="text-xs">Au</Label>
+            <Input id="st-to" type="date" value={range.to} min={range.from} onChange={(e) => setRange({ ...range, to: e.target.value })} className="h-9" />
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:ml-auto">
+          <Button size="sm" variant="outline" className="gap-2" disabled={!data} onClick={() => data && printBilan(sections, data, range.from, range.to)}>
+            <Printer className="size-4" aria-hidden /> Bilan de l'exercice (PDF)
+          </Button>
+          <Button size="sm" variant="outline" className="gap-2" disabled={!data} onClick={downloadCsv}>
+            <Download className="size-4" aria-hidden /> Tableur
+          </Button>
         </div>
       </section>
 
-      <section className="mt-6 rounded-xl border border-border bg-card p-5">
-        <h2 className="font-display text-lg font-bold">Projets par catégorie</h2>
-        <div className="mt-6 h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={categoryData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="category" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="count" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+      {error ? <p className="text-sm text-destructive">{(error as Error).message}</p> : null}
+      {isLoading || !data ? (
+        <p className="text-sm text-muted-foreground">Calcul des statistiques en cours…</p>
+      ) : (
+        <>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {sections.map((s) => (
+              <section key={s.title} className="panel p-4" aria-label={s.title}>
+                <h2 className="mb-2 text-base">{s.title}</h2>
+                <dl className="divide-y divide-border text-sm">
+                  {s.rows.map(([label, value]) => (
+                    <div key={label} className="flex items-baseline justify-between gap-3 py-1.5">
+                      <dt className="text-muted-foreground">{label}</dt>
+                      <dd className="font-display text-lg font-semibold text-primary">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ))}
+            <section className="panel p-4" aria-label="Pass Terrain par partenaire">
+              <h2 className="mb-2 text-base">Pass Terrain par partenaire</h2>
+              {data.pass.par_partenaire.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Aucun tampon attribué par un partenaire sur la période.</p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-muted-foreground">
+                      <th className="py-1 font-medium">Partenaire</th>
+                      <th className="py-1 text-right font-medium">Tampons</th>
+                      <th className="py-1 text-right font-medium">Personnes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {data.pass.par_partenaire.map((p) => (
+                      <tr key={`${p.name}-${p.source}`}>
+                        <td className="py-1.5">{p.name}{p.source === "BUREAU" ? <span className="text-xs text-muted-foreground"> · Bureau</span> : null}</td>
+                        <td className="py-1.5 text-right">{p.tampons}</td>
+                        <td className="py-1.5 text-right">{p.personnes}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              <p className="mt-2 text-xs text-muted-foreground">Classé par nom : un suivi de partenariat, jamais un classement.</p>
+            </section>
+          </div>
+
+          <div className="mt-6">
+            <Button variant="outline" className="gap-2" aria-expanded={showCharts} onClick={() => setShowCharts((v) => !v)}>
+              <BarChart3 className="size-4" aria-hidden /> {showCharts ? "Masquer les courbes" : "Afficher les courbes"}
+            </Button>
+          </div>
+          {showCharts ? (
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <section className="panel p-5">
+                <h2 className="text-base">Évolution mois par mois</h2>
+                <div className="mt-4 h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chart} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis dataKey="label" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
+                      <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="adherents" name="Inscriptions" stroke="var(--chart-1)" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="taches" name="Tâches réalisées" stroke="var(--chart-5)" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="participations" name="Participations" stroke="var(--chart-4)" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="tampons" name="Tampons" stroke="var(--chart-2)" strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </section>
+              <section className="panel p-5">
+                <h2 className="text-base">Projets par catégorie</h2>
+                <div className="mt-4 h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={categoryData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis dataKey="category" tick={{ fontSize: 11 }} />
+                      <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="count" name="Projets" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </section>
+            </div>
+          ) : null}
+        </>
+      )}
     </AppShell>
   );
 }

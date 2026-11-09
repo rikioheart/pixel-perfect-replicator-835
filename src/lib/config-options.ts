@@ -54,6 +54,17 @@ export const CONFIG_FAMILIES: { family: string; label: string; hint: string }[] 
   },
 ];
 
+/** Familles regroupées par grande catégorie pour la page Paramétrage. */
+export const CONFIG_CATEGORIES: { label: string; families: string[] }[] = [
+  {
+    label: "Gouvernance & Membres",
+    families: ["ACCESS_LEVEL", "INVOLVEMENT_LEVEL", "MEMBERSHIP_STATUS", "MEMBER_FUNCTION", "PRO_LEVEL", "PARTICULIER_LEVEL", "PROFESSIONAL_CATEGORY", "PARTNER_CATEGORY", "LOYALTY_RULE"],
+  },
+  { label: "Projets & Actions", families: ["PROJECT_CATEGORY", "PROJECT_ROLE", "PROJECT_STATUS", "TASK_STATUS", "PROOF_TYPE", "PRIORITY"] },
+  { label: "Événements & Activités", families: ["ACTIVITY_TYPE", "EVENT_TYPE"] },
+  { label: "Documents & Médias", families: ["DOCUMENT_CATEGORY", "VISIBILITY", "HOME_MEDIA", "EXTERNAL_LINK"] },
+];
+
 export const CONFIG_FAMILY_LABEL: Record<string, string> = Object.fromEntries(
   CONFIG_FAMILIES.map((f) => [f.family, f.label]),
 );

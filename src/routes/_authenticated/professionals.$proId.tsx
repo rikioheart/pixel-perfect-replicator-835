@@ -111,7 +111,7 @@ function ProfessionalDetailPage() {
       subtitle={pro.professional_category ?? "Professionnel partenaire"}
       actions={
         <Button asChild variant="outline" size="sm" className="gap-2">
-          <Link to="/professionals">
+          <Link to="/directory" search={{ vue: "pros" }}>
             <ArrowLeft className="size-4" /> Annuaire
           </Link>
         </Button>

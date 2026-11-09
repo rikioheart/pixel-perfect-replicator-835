@@ -29,7 +29,15 @@ export const LOYALTY_SCOPE_LABEL: Record<string, string> = Object.fromEntries(
   LOYALTY_SCOPES.map((s) => [s.value, s.label]),
 );
 
-export const MEMBERSHIP_TYPES = ["PARTICULIER", "PROFESSIONNEL", "BUREAU"] as const;
+/**
+ * Éligibilité d'une règle : comparée au type d'adhésion par le moteur en base.
+ * Les professionnels validés sont les membres bienfaiteurs (rôle) ; « BUREAU » n'est pas un type d'adhésion.
+ */
+export const LOYALTY_ELIGIBILITY = [
+  { value: "PARTICULIER", label: "Particuliers" },
+  { value: "PROFESSIONNEL", label: "Membres bienfaiteurs (pros validés)" },
+] as const;
+export const eligibilityLabel = (code: string) => LOYALTY_ELIGIBILITY.find((e) => e.value === code)?.label ?? code;
 
 export async function fetchLoyaltyRules(): Promise<LoyaltyRule[]> {
   const { data, error } = await supabase

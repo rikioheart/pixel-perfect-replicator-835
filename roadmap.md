@@ -1,25 +1,25 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
 ## Inventaire, fidélité, types d'activités, paramétrage — demande du 9 nov.
-- [ ] Masquer temporairement la page Terrain
-- [ ] « Inventaire » rangé sous Ressources
-- [ ] Visibilité par fiche matériel (Privé Bureau / Pros bienfaiteurs / Tous les adhérents) + badges Bureau
-- [ ] Associer et réserver du matériel depuis la fiche projet
-- [ ] Types d'activités dynamiques (création, renommage, désactivation Bureau) reliés au formulaire d'activité
-- [ ] Fidélité en deux onglets (Règles de gain / Récompenses & paliers), règles Pass partenaires, critères nouveaux rôles
-- [ ] Paramétrage : « ordre » conservé, familles regroupées en 4 catégories + recherche
-- [ ] Audit final : parcours, ordinateur/mobile, routes orphelines, liens morts, doublons
+- [x] Masquer temporairement la page Terrain
+- [x] « Inventaire » rangé sous Ressources
+- [x] Visibilité par fiche matériel (Privé Bureau / Pros bienfaiteurs / Tous les adhérents) + badges Bureau
+- [x] Associer et réserver du matériel depuis la fiche projet
+- [x] Types d'activités dynamiques (création, renommage, désactivation Bureau) reliés au formulaire d'activité
+- [x] Fidélité en deux onglets (Règles de gain / Récompenses & paliers), règles Pass partenaires, critères nouveaux rôles
+- [x] Paramétrage : « ordre » conservé, familles regroupées en 4 catégories + recherche
+- [x] Audit final : parcours, ordinateur/mobile, routes orphelines, liens morts, doublons
 
 ## Console Bureau & parcours membre — demande du 9 nov.
-- [ ] Mon foyer & moi : retirer l'onglet « Historique », garder « Parcours » (audit = Bureau, Paramètres)
-- [ ] /admin : cockpit épuré (alertes, montants à verser, événements clés, raccourcis, « Qui fait quoi » compact), sans doublons
-- [ ] File des adhésions déplacée dans /admin/gouvernance, indicateur gardé sur la Console
-- [ ] Émargement nominatif de l'Assemblée Générale
+- [x] Mon foyer & moi : retirer l'onglet « Historique », garder « Parcours » (audit = Bureau, Paramètres)
+- [x] /admin : cockpit épuré (alertes, montants à verser, événements clés, raccourcis, « Qui fait quoi » compact), sans doublons
+- [x] File des adhésions déplacée dans /admin/gouvernance, indicateur gardé sur la Console
+- [x] Émargement nominatif de l'Assemblée Générale
 
 ## Annuaire, formulaires, Pass — demande du 9 nov.
-- [ ] Annuaire : un seul bandeau (Pros, Particuliers, Partenaires & Avantages, Chiens, Mairies & Institutions, accès Bureau), filtres conservés
-- [ ] Formulaires : suppression par le Bureau avec confirmation
-- [ ] Pass (tampon manuel) : recherche nom/prénom au-dessus de la liste des bénéficiaires
+- [x] Annuaire : un seul bandeau (Pros, Particuliers, Partenaires & Avantages, Chiens, Mairies & Institutions, accès Bureau), filtres conservés
+- [x] Formulaires : suppression par le Bureau avec confirmation
+- [x] Pass (tampon manuel) : recherche nom/prénom au-dessus de la liste des bénéficiaires
 
 ## Architecture des permissions (/admin/permissions) — demande du 9 nov.
 - [x] Modules repliables par thème, filtre par rôle, recherche par permission
@@ -351,3 +351,13 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [ ] Essai réel de la fiche chien sur téléphone par un propriétaire et un pro
 - [x] Thème sombre + mode confort contrôlés écran par écran (membre, pro, Bureau, onglets, calendrier) : 0 défaut de contraste mesuré
 - [ ] Revue visuelle complète du mode sombre écran par écran
+
+## Étape 6 — Communication liée aux projets
+- [x] Brouillons de communication rattachés projet/tâche : titre, contenu, public cible, canal, visuels, responsable, étape
+- [x] Visibilité : Bureau + équipe du projet pendant l'élaboration ; validation finale Bureau ; contenus publiés visibles dans « Actualités » (Ressources)
+
+## Étape 7 — Statistiques stratégiques & Bilan AG
+- [x] Statistiques regroupées par thème, libellé « professionnels bienfaiteurs », courbes à la demande
+- [x] Sélecteurs de période dans le corps de page ; en-tête : Alerte, Rechercher, Créer alignés à droite
+- [x] Indicateurs : Pass Terrain par partenaire, engagement bénévole, avancement projets/tâches
+- [x] Fiche exportable « Bilan de l'exercice » pour l'AG

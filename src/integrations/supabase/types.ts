@@ -320,6 +320,72 @@ export type Database = {
           },
         ]
       }
+      ag_attendance: {
+        Row: {
+          id: string
+          member_id: string
+          proxy_holder_id: string | null
+          record_id: string
+          recorded_at: string
+          recorded_by: string | null
+          status: string
+        }
+        Insert: {
+          id?: string
+          member_id: string
+          proxy_holder_id?: string | null
+          record_id: string
+          recorded_at?: string
+          recorded_by?: string | null
+          status: string
+        }
+        Update: {
+          id?: string
+          member_id?: string
+          proxy_holder_id?: string | null
+          record_id?: string
+          recorded_at?: string
+          recorded_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ag_attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_proxy_holder_id_fkey"
+            columns: ["proxy_holder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_proxy_holder_id_fkey"
+            columns: ["proxy_holder_id"]
+            isOneToOne: false
+            referencedRelation: "public_professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ag_attendance_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "governance_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_suggestions: {
         Row: {
           action: string
@@ -492,12 +558,18 @@ export type Database = {
           created_by: string | null
           id: string
           internal_notes: string | null
+          owner_id: string | null
           project_id: string | null
+          published_update_id: string | null
           status: string
           target_audience: string
           target_date: string | null
+          task_id: string | null
           title: string
           updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          visuals_url: string | null
         }
         Insert: {
           body?: string | null
@@ -506,12 +578,18 @@ export type Database = {
           created_by?: string | null
           id?: string
           internal_notes?: string | null
+          owner_id?: string | null
           project_id?: string | null
+          published_update_id?: string | null
           status?: string
           target_audience?: string
           target_date?: string | null
+          task_id?: string | null
           title: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          visuals_url?: string | null
         }
         Update: {
           body?: string | null
@@ -520,12 +598,18 @@ export type Database = {
           created_by?: string | null
           id?: string
           internal_notes?: string | null
+          owner_id?: string | null
           project_id?: string | null
+          published_update_id?: string | null
           status?: string
           target_audience?: string
           target_date?: string | null
+          task_id?: string | null
           title?: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          visuals_url?: string | null
         }
         Relationships: [
           {
@@ -533,6 +617,20 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bureau_communications_published_update_id_fkey"
+            columns: ["published_update_id"]
+            isOneToOne: false
+            referencedRelation: "association_updates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bureau_communications_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
             referencedColumns: ["id"]
           },
         ]
@@ -2082,6 +2180,7 @@ export type Database = {
           type: string | null
           unit_price: number | null
           updated_at: string
+          visibility: string
         }
         Insert: {
           alert_threshold?: number
@@ -2100,6 +2199,7 @@ export type Database = {
           type?: string | null
           unit_price?: number | null
           updated_at?: string
+          visibility?: string
         }
         Update: {
           alert_threshold?: number
@@ -2118,6 +2218,7 @@ export type Database = {
           type?: string | null
           unit_price?: number | null
           updated_at?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -4645,6 +4746,7 @@ export type Database = {
         Args: { _code: string; _user_id: string }
         Returns: boolean
       }
+      bureau_statistics: { Args: { _from: string; _to: string }; Returns: Json }
       can_add_context_resource: {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
@@ -4664,6 +4766,10 @@ export type Database = {
       can_receive_stamps: { Args: { _user_id: string }; Returns: boolean }
       can_request_terrain: {
         Args: { _activity_id: string; _project_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_see_inventory: {
+        Args: { _user_id: string; _visibility: string }
         Returns: boolean
       }
       can_share_entity: {
@@ -4696,6 +4802,10 @@ export type Database = {
       }
       can_view_terrain_reservation: {
         Args: { _rid: string; _user_id: string }
+        Returns: boolean
+      }
+      can_work_on_communication: {
+        Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
       choose_account_type: {
@@ -4895,6 +5005,7 @@ export type Database = {
           phone: string
         }[]
       }
+      publish_communication: { Args: { _id: string }; Returns: string }
       recompute_loyalty_all: { Args: never; Returns: number }
       recompute_loyalty_for_member: {
         Args: { _user_id: string }

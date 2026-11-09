@@ -18,10 +18,10 @@ import { UPDATE_KINDS } from "@/lib/contributions";
 export const Route = createFileRoute("/_authenticated/avancees")({
   head: () => ({
     meta: [
-      { title: "Ce que nous construisons ensemble — La Voix du Chien" },
-      { name: "description", content: "Projets qui avancent, actions réalisées, partenariats et besoins d'aide de l'association." },
-      { property: "og:title", content: "Ce que nous construisons ensemble — La Voix du Chien" },
-      { property: "og:description", content: "Le mur des avancées de l'association." },
+      { title: "Actualités — La Voix du Chien" },
+      { name: "description", content: "Actualités de l'association : projets qui avancent, actions réalisées, communications validées par le Bureau." },
+      { property: "og:title", content: "Actualités — La Voix du Chien" },
+      { property: "og:description", content: "Les actualités internes de l'association." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -45,19 +45,19 @@ function WallPage() {
       });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Avancée publiée."); setOpen(false); setForm({ kind: "PROJET", title: "", body: "", is_public: false }); void qc.invalidateQueries({ queryKey: ["association-updates"] }); },
+    onSuccess: () => { toast.success("Actualité publiée."); setOpen(false); setForm({ kind: "PROJET", title: "", body: "", is_public: false }); void qc.invalidateQueries({ queryKey: ["association-updates"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   return (
-    <AppShell title="Ce que nous construisons ensemble" subtitle="Les avancées de l'association, sans compétition"
+    <AppShell title="Actualités" subtitle="Ce que nous construisons ensemble, sans compétition"
       actions={<>
         <Button size="sm" variant="outline" className="gap-2" onClick={() => setHelp(true)}><HandHeart className="size-4" aria-hidden /> Je veux aider</Button>
-        {canPost ? <Button size="sm" className="gap-2" onClick={() => setOpen(true)}><Plus className="size-4" aria-hidden /> Partager une avancée</Button> : null}
+        {canPost ? <Button size="sm" className="gap-2" onClick={() => setOpen(true)}><Plus className="size-4" aria-hidden /> Partager une actualité</Button> : null}
       </>}>
       <UpdatesWall limit={50} />
       <HelpWizard open={help} onOpenChange={setHelp} />
-      <SidePanel open={open} onOpenChange={setOpen} title="Partager une avancée">
+      <SidePanel open={open} onOpenChange={setOpen} title="Partager une actualité">
         <div className="space-y-3">
           <div>
             <Label htmlFor="up-k">Type</Label>

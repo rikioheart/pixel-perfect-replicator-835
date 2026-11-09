@@ -22,3 +22,15 @@ export function quorumReached(present: number): boolean {
 export function nextAgYear(today: Date): number {
   return today.getUTCMonth() > AG_MONTH ? today.getUTCFullYear() + 1 : today.getUTCFullYear();
 }
+
+export type AgAttendanceStatus = "PRESENT" | "REPRESENTED" | "EXCUSED";
+
+/** Décompte de l'émargement : présents + représentés comptent pour le quorum, jamais les excusés. */
+export function agTally(rows: { member_id: string; status: AgAttendanceStatus }[], statutoryCore: Set<string>) {
+  const present = rows.filter((r) => r.status === "PRESENT").length;
+  const represented = rows.filter((r) => r.status === "REPRESENTED").length;
+  const excused = rows.filter((r) => r.status === "EXCUSED").length;
+  const counted = present + represented;
+  const core = rows.filter((r) => r.status !== "EXCUSED" && statutoryCore.has(r.member_id)).length;
+  return { present, represented, excused, counted, core, quorum: quorumReached(counted) };
+}

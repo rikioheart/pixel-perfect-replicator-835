@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canRelayToWall, milestoneState, sortMilestones, taskCounts } from "./project-followup";
+import { canPublishToNews, teamCanEditCommunication, milestoneState, sortMilestones, taskCounts } from "./project-followup";
 
 describe("jalons", () => {
   it("un jalon atteint reste atteint même en retard", () => {
@@ -35,9 +35,16 @@ describe("compteur de tâches par projet", () => {
 });
 
 describe("communication Bureau", () => {
-  it("relais vers Nos avancées seulement si prête et canal interne", () => {
-    expect(canRelayToWall({ status: "READY", channel: "INTERNAL_WALL" })).toBe(true);
-    expect(canRelayToWall({ status: "DRAFT", channel: "INTERNAL_WALL" })).toBe(false);
-    expect(canRelayToWall({ status: "READY", channel: "SOCIAL_POST" })).toBe(false);
+  it("publication dans Actualités seulement après validation du Bureau, une seule fois", () => {
+    expect(canPublishToNews({ status: "READY" })).toBe(true);
+    expect(canPublishToNews({ status: "IN_REVIEW" })).toBe(false);
+    expect(canPublishToNews({ status: "DRAFT" })).toBe(false);
+    expect(canPublishToNews({ status: "READY", published_update_id: "u1" })).toBe(false);
+  });
+  it("l'équipe ne modifie plus une communication validée", () => {
+    expect(teamCanEditCommunication("DRAFT")).toBe(true);
+    expect(teamCanEditCommunication("IN_REVIEW")).toBe(true);
+    expect(teamCanEditCommunication("READY")).toBe(false);
+    expect(teamCanEditCommunication("ARCHIVED")).toBe(false);
   });
 });
