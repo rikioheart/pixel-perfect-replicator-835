@@ -33,6 +33,9 @@ export const PERMISSION_MODULE_LABEL: Record<string, string> = {
 
 export const PERMISSION_MODULE_ORDER = Object.keys(PERMISSION_MODULE_LABEL);
 
+/** Modules retirés de l'interface (droits conservés en base, jamais proposés à l'écran). */
+export const HIDDEN_PERMISSION_MODULES = new Set(["terrain"]);
+
 export async function fetchPermissions(): Promise<Permission[]> {
   const { data, error } = await supabase
     .from("permissions")
