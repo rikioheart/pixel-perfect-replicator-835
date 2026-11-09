@@ -12,7 +12,13 @@ export function homePathFor({ isBureau, isPro }: RoleFlags): "/admin" | "/espace
   return "/member";
 }
 
-export type PendingAction = { key: string; label: string; count: number | null; to: string };
+export type PendingAction = {
+  key: string;
+  label: string;
+  count: number | null;
+  to: string;
+  search?: Record<string, string> | undefined;
+};
 
 /**
  * Actions en attente, dans l'ordre d'urgence donné, sans les compteurs nuls.

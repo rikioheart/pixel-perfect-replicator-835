@@ -46,7 +46,7 @@ export function PendingActionsStrip({
                 {item.to.startsWith("#") ? (
                   <a href={item.to} className={cls}>{body}</a>
                 ) : (
-                  <Link to={item.to} className={cls}>{body}</Link>
+                  <Link to={item.to} search={item.search as never} className={cls}>{body}</Link>
                 )}
               </li>
             );
