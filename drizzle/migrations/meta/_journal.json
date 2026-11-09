@@ -421,6 +421,13 @@
       "when": 1794186736847,
       "tag": "0059_help_offer_task_notice_and_task_rex",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1794187494527,
+      "tag": "0060_permissions_pro_scope_and_audit",
+      "breakpoints": true
     }
   ]
 }
