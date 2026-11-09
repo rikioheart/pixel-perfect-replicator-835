@@ -15,20 +15,6 @@ export const MEMBERSHIP_STATUS_LABEL: Record<string, string> = {
   EXCLUDED: "Radié·e",
 };
 
-/**
- * Catégories statutaires (article 5 des statuts). Indépendantes des fonctions :
- * un fondateur ou un bienfaiteur peut aussi être au Bureau ou représentant,
- * un membre actif peut aussi être bénévole.
- */
-export const STATUTORY_CATEGORIES = ["FONDATEUR", "ACTIF", "BIENFAITEUR", "APPRENANT", "SOUTIEN"] as const;
-
-export const STATUTORY_CATEGORY_LABEL: Record<string, string> = {
-  FONDATEUR: "Membre fondateur",
-  ACTIF: "Membre actif / adhérent",
-  BIENFAITEUR: "Membre bienfaiteur",
-  APPRENANT: "Membre apprenant",
-  SOUTIEN: "Membre soutien",
-};
 
 export const MEMBER_FUNCTION_LABEL: Record<string, string> = {
   FOUNDER: "Fondateur",
@@ -36,12 +22,33 @@ export const MEMBER_FUNCTION_LABEL: Record<string, string> = {
   PRESIDENT: "Président",
   SECRETARY: "Secrétaire",
   TREASURER: "Trésorier",
-  REPRESENTANT_PRO: "Représentant des membres professionnels",
-  REPRESENTANT_PARTICULIER: "Représentant des membres particuliers",
+  REPRESENTANT_PRO: "Représentant des professionnels",
+  REPRESENTANT_PARTICULIER: "Représentant des particuliers",
   COORDINATOR: "Coordinateur",
   REFERENT: "Référent",
   VOLUNTEER: "Bénévole",
 };
+
+/**
+ * Fonctions associatives attribuables depuis « Rôles & habilitations ».
+ * Coordinateur et Référent restent des responsabilités de projet (attribuées depuis le projet) ;
+ * « Membre du Bureau » est un rôle système, plus une fonction.
+ */
+export const ASSOCIATION_FUNCTIONS = [
+  "FOUNDER",
+  "PRESIDENT",
+  "SECRETARY",
+  "TREASURER",
+  "REPRESENTANT_PRO",
+  "REPRESENTANT_PARTICULIER",
+  "VOLUNTEER",
+] as const;
+
+/** Une seule personne à la fois (garanti aussi par la base). */
+export const UNIQUE_FUNCTIONS = ["PRESIDENT", "SECRETARY", "TREASURER"];
+
+/** Responsabilités liées à un projet, visibles mais gérées depuis le projet. */
+export const PROJECT_FUNCTIONS = ["COORDINATOR", "REFERENT"];
 
 export function memberFullName(member: {
   display_name?: string | null;
