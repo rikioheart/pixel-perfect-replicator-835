@@ -4746,6 +4746,7 @@ export type Database = {
         Args: { _code: string; _user_id: string }
         Returns: boolean
       }
+      bureau_statistics: { Args: { _from: string; _to: string }; Returns: Json }
       can_add_context_resource: {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
