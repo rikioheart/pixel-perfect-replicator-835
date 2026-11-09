@@ -306,7 +306,7 @@ function AgReminder() {
       {valid ? (
         <ul className="space-y-1 text-sm">
           <li>Convocations à envoyer au plus tard le <strong>{new Date(convocationDeadline(agDate)).toLocaleDateString("fr-FR")}</strong>.</li>
-          {!isInAgMonth(agDate) ? <li className="text-warning-foreground">Cette date n'est pas en juin, comme le prévoient les statuts.</li> : null}
+          {!isInAgMonth(agDate) ? <li className="font-medium">Attention : cette date n'est pas en juin, comme le prévoient les statuts.</li> : null}
         </ul>
       ) : null}
     </section>
