@@ -558,12 +558,18 @@ export type Database = {
           created_by: string | null
           id: string
           internal_notes: string | null
+          owner_id: string | null
           project_id: string | null
+          published_update_id: string | null
           status: string
           target_audience: string
           target_date: string | null
+          task_id: string | null
           title: string
           updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          visuals_url: string | null
         }
         Insert: {
           body?: string | null
@@ -572,12 +578,18 @@ export type Database = {
           created_by?: string | null
           id?: string
           internal_notes?: string | null
+          owner_id?: string | null
           project_id?: string | null
+          published_update_id?: string | null
           status?: string
           target_audience?: string
           target_date?: string | null
+          task_id?: string | null
           title: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          visuals_url?: string | null
         }
         Update: {
           body?: string | null
@@ -586,12 +598,18 @@ export type Database = {
           created_by?: string | null
           id?: string
           internal_notes?: string | null
+          owner_id?: string | null
           project_id?: string | null
+          published_update_id?: string | null
           status?: string
           target_audience?: string
           target_date?: string | null
+          task_id?: string | null
           title?: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          visuals_url?: string | null
         }
         Relationships: [
           {
@@ -599,6 +617,20 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bureau_communications_published_update_id_fkey"
+            columns: ["published_update_id"]
+            isOneToOne: false
+            referencedRelation: "association_updates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bureau_communications_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
             referencedColumns: ["id"]
           },
         ]
@@ -4771,6 +4803,10 @@ export type Database = {
         Args: { _rid: string; _user_id: string }
         Returns: boolean
       }
+      can_work_on_communication: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       choose_account_type: {
         Args: {
           _activity?: string
@@ -4968,6 +5004,7 @@ export type Database = {
           phone: string
         }[]
       }
+      publish_communication: { Args: { _id: string }; Returns: string }
       recompute_loyalty_all: { Args: never; Returns: number }
       recompute_loyalty_for_member: {
         Args: { _user_id: string }
