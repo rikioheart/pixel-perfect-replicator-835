@@ -418,7 +418,7 @@ function RolesPage() {
         open={openMember !== null}
         onOpenChange={(open) => !open && setOpenId(null)}
         title={openMember ? memberFullName(openMember) : ""}
-        description={openMember?.email ?? undefined}
+        {...(openMember?.email ? { description: openMember.email } : {})}
       >
         {openMember ? (
           <MemberDetail
