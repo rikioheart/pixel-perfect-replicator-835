@@ -357,7 +357,7 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Visibilité : Bureau + équipe du projet pendant l'élaboration ; validation finale Bureau ; contenus publiés visibles dans « Actualités » (Ressources)
 
 ## Étape 7 — Statistiques stratégiques & Bilan AG
-- [ ] Statistiques regroupées par thème, libellé « professionnels bienfaiteurs », courbes à la demande
-- [ ] Sélecteurs de période dans le corps de page ; en-tête : Alerte, Rechercher, Créer alignés à droite
-- [ ] Indicateurs : Pass Terrain par partenaire, engagement bénévole, avancement projets/tâches
-- [ ] Fiche exportable « Bilan de l'exercice » pour l'AG
+- [x] Statistiques regroupées par thème, libellé « professionnels bienfaiteurs », courbes à la demande
+- [x] Sélecteurs de période dans le corps de page ; en-tête : Alerte, Rechercher, Créer alignés à droite
+- [x] Indicateurs : Pass Terrain par partenaire, engagement bénévole, avancement projets/tâches
+- [x] Fiche exportable « Bilan de l'exercice » pour l'AG
