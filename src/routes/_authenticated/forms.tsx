@@ -16,6 +16,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { canCreateForm } from "@/lib/nav-rules";
 import { FIELD_TYPES, FIELD_TYPE_LABEL, needsOptions, normalizeFields, type FieldType, type FormField } from "@/lib/form-fields";
 import { Plus, Trash2 } from "lucide-react";
+import { logAudit } from "@/lib/mindmap-actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/forms")({
   head: () => ({
@@ -45,6 +56,7 @@ function FormsPage() {
   const [qs, setQs] = useState<FormField[]>(START);
   const setQ = (i: number, patch: Partial<FormField>) => setQs((l) => l.map((q, j) => (j === i ? { ...q, ...patch } : q)));
   const [openId, setOpenId] = useState<string | null>(null);
+  const [toDelete, setToDelete] = useState<{ id: string; title: string } | null>(null);
 
   const { data: forms = [], isLoading } = useQuery({
     queryKey: ["forms"],
@@ -105,6 +117,29 @@ function FormsPage() {
       if (error) throw error;
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["forms"] }),
+    onError: (e: Error) => toast.error(e.message),
+  });
+  // Suppression réservée au Bureau (RLS forms_delete) ; les réponses liées partent avec le formulaire.
+  const remove = useMutation({
+    mutationFn: async (form: { id: string; title: string }) => {
+      const { data, error } = await supabase.from("forms").delete().eq("id", form.id).select("id");
+      if (error) throw error;
+      if (!data?.length) throw new Error("Suppression refusée.");
+      await logAudit({
+        actorId: user?.id ?? null,
+        action: "FORM_DELETED",
+        entityType: "form",
+        entityId: form.id,
+        oldValues: { title: form.title },
+        metadata: { summary: `Formulaire « ${form.title} » supprimé` },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Formulaire supprimé.");
+      setToDelete(null);
+      setOpenId(null);
+      void qc.invalidateQueries({ queryKey: ["forms"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   const review = useMutation({
@@ -208,6 +243,11 @@ function FormsPage() {
                   {mine && fm.status === "PUBLISHED" && <Button size="sm" variant="secondary" onClick={() => setStatus.mutate({ id: fm.id, status: "CLOSED" })}>Clore</Button>}
                   {!fm.external_url && <Button size="sm" variant="ghost" onClick={() => setOpenId(openId === fm.id ? null : fm.id)}>Réponses</Button>}
                   {fm.external_url && <span className="self-center text-xs text-muted-foreground">Formulaire externe : les réponses restent dans Google Forms, avec ses propres droits d'accès.</span>}
+                  {isBureau && (
+                    <Button size="sm" variant="ghost" className="ml-auto text-destructive hover:text-destructive" onClick={() => setToDelete({ id: fm.id, title: fm.title })}>
+                      <Trash2 className="mr-1 size-3.5" aria-hidden />Supprimer
+                    </Button>
+                  )}
                 </div>
                 {openId === fm.id && (
                   <div className="mt-3 space-y-2 border-t border-border pt-3">
@@ -233,6 +273,26 @@ function FormsPage() {
           })}
         </div>
       )}
+      <AlertDialog open={toDelete !== null} onOpenChange={(open) => !open && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer ce formulaire ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              « {toDelete?.title} » et toutes les réponses reçues sur la plateforme seront définitivement supprimés. Un formulaire Google Forms relié n'est pas touché. Pour simplement arrêter les réponses, préférez « Clore ».
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={remove.isPending}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={remove.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(e) => { e.preventDefault(); if (toDelete) remove.mutate(toDelete); }}
+            >
+              Supprimer définitivement
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }

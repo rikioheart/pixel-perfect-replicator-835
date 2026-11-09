@@ -167,7 +167,7 @@ function PartnersPage() {
         ) : null
       }
     >
-      <DirectoryTabs />
+      <DirectoryTabs current="partenaires" />
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement des partenaires…</p>
       ) : partners.length === 0 ? (

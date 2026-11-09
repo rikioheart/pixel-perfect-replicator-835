@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Camera, ClipboardPaste, Stamp } from "lucide-react";
+import { Camera, ClipboardPaste, Search, Stamp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useOnline, readQueue, saveQueue, parisDay, canAutoSync, needsMediation, type PendingStamp } from '@/lib/offline';
 import { normalizePassInput } from "@/lib/pass-code";
 import { PassScanner } from "@/components/PassScanner";
+import { filterByName } from "@/lib/name-search";
 
 type Opt = { id: string; name: string };
 type Identified = { id: string; name: string; total: number; status: string; canReceive: boolean; isSelf: boolean };
@@ -27,6 +28,7 @@ export function ManualStampCard() {
   const [codeInput, setCodeInput] = useState("");
   const [resolving, setResolving] = useState(false);
   const [identified, setIdentified] = useState<Identified | null>(null);
+  const [memberSearch, setMemberSearch] = useState("");
   const { data } = useQuery({
     queryKey: ["manual-stamp-options", user?.id],
     enabled: !!user && online,
@@ -160,12 +162,44 @@ export function ManualStampCard() {
         )}
       </div>
 
-      <Label htmlFor="ms-member">Ou choisir dans la liste</Label>
-      <select id="ms-member" className="h-10 w-full rounded-md border border-input bg-background px-2" value={member} onChange={(e) => { setMember(e.target.value); setIdentified(null); }}>
-        <option value="">Choisir…</option>
-        {identified && !(data ?? cached)?.members.some((m) => m.id === identified.id) && <option value={identified.id}>{identified.name}</option>}
-        {(data ?? cached)?.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-      </select>
+      <Label htmlFor="ms-member-search">Ou choisir dans la liste</Label>
+      {(() => {
+        const all = (data ?? cached)?.members ?? [];
+        const shown = filterByName(all, memberSearch);
+        const selected = all.find((m) => m.id === member);
+        return (
+          <>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+              <Input
+                id="ms-member-search"
+                type="search"
+                value={memberSearch}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setMemberSearch(next);
+                  const matches = filterByName(all, next);
+                  if (next.trim() && matches.length === 1) { setMember(matches[0]!.id); setIdentified(null); }
+                }}
+                placeholder="Rechercher par nom ou prénom"
+                autoComplete="off"
+                className="pl-9"
+              />
+            </div>
+            {memberSearch.trim() ? (
+              <p className="text-xs text-muted-foreground" aria-live="polite">
+                {shown.length === 0 ? "Aucun bénéficiaire ne correspond." : shown.length === 1 ? "1 bénéficiaire trouvé, sélectionné." : `${shown.length} bénéficiaires trouvés.`}
+              </p>
+            ) : null}
+            <select id="ms-member" aria-label="Bénéficiaire" className="h-10 w-full rounded-md border border-input bg-background px-2" value={member} onChange={(e) => { setMember(e.target.value); setIdentified(null); }}>
+              <option value="">Choisir…</option>
+              {identified && !all.some((m) => m.id === identified.id) && <option value={identified.id}>{identified.name}</option>}
+              {selected && !shown.some((m) => m.id === selected.id) && <option value={selected.id}>{selected.name}</option>}
+              {shown.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+            </select>
+          </>
+        );
+      })()}
       <Label htmlFor="ms-bureau">Membre du Bureau à informer</Label>
       <select id="ms-bureau" className="h-10 w-full rounded-md border border-input bg-background px-2" value={bureau} onChange={(e) => setBureau(e.target.value)}>
         <option value="">Choisir…</option>

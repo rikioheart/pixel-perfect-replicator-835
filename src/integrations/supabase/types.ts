@@ -3776,14 +3776,17 @@ export type Database = {
       role_permissions: {
         Row: {
           permission_id: string
+          requires_professional: boolean
           role_id: string
         }
         Insert: {
           permission_id: string
+          requires_professional?: boolean
           role_id: string
         }
         Update: {
           permission_id?: string
+          requires_professional?: boolean
           role_id?: string
         }
         Relationships: [

@@ -86,7 +86,7 @@ function MembersPage() {
         </Button>
       }
     >
-      <DirectoryTabs />
+      <DirectoryTabs current="adherents" />
       <div className="space-y-5">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-64 flex-1">

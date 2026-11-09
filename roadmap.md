@@ -1,17 +1,38 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Inventaire, fidélité, types d'activités, paramétrage — demande du 9 nov.
+- [ ] Masquer temporairement la page Terrain
+- [ ] « Inventaire » rangé sous Ressources
+- [ ] Visibilité par fiche matériel (Privé Bureau / Pros bienfaiteurs / Tous les adhérents) + badges Bureau
+- [ ] Associer et réserver du matériel depuis la fiche projet
+- [ ] Types d'activités dynamiques (création, renommage, désactivation Bureau) reliés au formulaire d'activité
+- [ ] Fidélité en deux onglets (Règles de gain / Récompenses & paliers), règles Pass partenaires, critères nouveaux rôles
+- [ ] Paramétrage : « ordre » conservé, familles regroupées en 4 catégories + recherche
+- [ ] Audit final : parcours, ordinateur/mobile, routes orphelines, liens morts, doublons
+
+## Console Bureau & parcours membre — demande du 9 nov.
+- [ ] Mon foyer & moi : retirer l'onglet « Historique », garder « Parcours » (audit = Bureau, Paramètres)
+- [ ] /admin : cockpit épuré (alertes, montants à verser, événements clés, raccourcis, « Qui fait quoi » compact), sans doublons
+- [ ] File des adhésions déplacée dans /admin/gouvernance, indicateur gardé sur la Console
+- [ ] Émargement nominatif de l'Assemblée Générale
+
+## Annuaire, formulaires, Pass — demande du 9 nov.
+- [ ] Annuaire : un seul bandeau (Pros, Particuliers, Partenaires & Avantages, Chiens, Mairies & Institutions, accès Bureau), filtres conservés
+- [ ] Formulaires : suppression par le Bureau avec confirmation
+- [ ] Pass (tampon manuel) : recherche nom/prénom au-dessus de la liste des bénéficiaires
+
 ## Architecture des permissions (/admin/permissions) — demande du 9 nov.
-- [ ] Modules repliables par thème, filtre par rôle, recherche par permission
-- [ ] Droits par défaut recalibrés sur les nouveaux rôles système
-- [ ] Volet « Comment ça marche ? » (fonctionnement, modification, règles de sécurité)
-- [ ] Chaque modification tracée dans l'historique (/admin/audit)
+- [x] Modules repliables par thème, filtre par rôle, recherche par permission
+- [x] Droits par défaut recalibrés sur les nouveaux rôles système
+- [x] Volet « Comment ça marche ? » (fonctionnement, modification, règles de sécurité)
+- [x] Chaque modification tracée dans l'historique (/admin/audit)
 
 ## Rôles et habilitations (/admin/roles) — demande du 9 nov.
-- [ ] Audit : rôles système, fonctions, catégorie statutaire, dépendances (Espace Pro, Pass, permissions)
-- [ ] Tableau compact + recherche + filtres + panneau latéral
-- [ ] Rôles système alignés (Bureau, Fondateur, Bienfaiteur, Apprenant, Soutien, Particulier) ; accès pro transférés aux bienfaiteurs, anciens rôles pro retirés
-- [ ] Fonctions restreintes (Président/Secrétaire/Trésorier uniques)
-- [ ] Retrait de la « Catégorie statutaire » (Niveau d'accès et rôle système conservés)
+- [x] Audit : rôles système, fonctions, catégorie statutaire, dépendances (Espace Pro, Pass, permissions)
+- [x] Tableau compact + recherche + filtres + panneau latéral
+- [x] Rôles système alignés (Bureau, Fondateur, Bienfaiteur, Apprenant, Soutien, Particulier) ; accès pro transférés aux bienfaiteurs, anciens rôles pro retirés
+- [x] Fonctions restreintes (Président/Secrétaire/Trésorier uniques)
+- [x] Retrait de la « Catégorie statutaire » (Niveau d'accès et rôle système conservés)
 
 ## Accueils par rôle + suites Axes 1 et 4 (8 nov.)
 - [x] Bureau : bandeau « À traiter maintenant » (adhésions, tâches à clôturer, propositions d'aide, matériel non rendu, remboursements, propositions pros, besoins d'aide)

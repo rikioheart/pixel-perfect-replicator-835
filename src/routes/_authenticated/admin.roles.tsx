@@ -1,13 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ShieldCheck, X } from "lucide-react";
+import { ChevronRight, Loader2, Search, ShieldCheck, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { withContacts } from "@/lib/profile-columns";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
-import { Button } from "@/components/ui/button";
+import { SidePanel } from "@/components/SidePanel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,7 +27,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MEMBER_FUNCTION_LABEL, STATUTORY_CATEGORIES, STATUTORY_CATEGORY_LABEL, memberFullName } from "@/lib/members";
+import {
+  ASSOCIATION_FUNCTIONS,
+  MEMBERSHIP_STATUS_LABEL,
+  MEMBER_FUNCTION_LABEL,
+  PROJECT_FUNCTIONS,
+  UNIQUE_FUNCTIONS,
+  memberFullName,
+} from "@/lib/members";
+import { ROLE_SHORT_LABEL, sortRoles } from "@/lib/permission-defaults";
 import { useConfigOptions } from "@/lib/config-options";
 import { logAudit } from "@/lib/mindmap-actions";
 
@@ -43,7 +51,7 @@ export const Route = createFileRoute("/_authenticated/admin/roles")({
       { property: "og:title", content: "Rôles & habilitations — La Voix du Chien" },
       {
         property: "og:description",
-        content: "Gestion fine des habilitations et des fonctions du Bureau.",
+        content: "Gestion des habilitations et des fonctions de l'association.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -52,9 +60,25 @@ export const Route = createFileRoute("/_authenticated/admin/roles")({
   component: RolesPage,
 });
 
-const FUNCTION_TYPES = Object.keys(MEMBER_FUNCTION_LABEL);
-/** Fonctions statutaires uniques dans l'association. */
-const UNIQUE_FUNCTIONS = ["PRESIDENT", "SECRETARY", "TREASURER"];
+type Member = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  display_name: string | null;
+  membership_status: string | null;
+  membership_type: string | null;
+  access_level: string | null;
+  involvement_level: string | null;
+  email?: string | null;
+};
+type Assignment = { id: string; user_id: string; role_id: string; roles: { code?: string; name?: string } | null };
+type MemberFunction = {
+  id: string;
+  user_id: string;
+  function_type: string;
+  scope_type: string | null;
+  scope_id: string | null;
+};
 
 type Pending =
   | { kind: "role.assign"; userId: string; userName: string; roleId: string; roleName: string }
@@ -62,51 +86,71 @@ type Pending =
   | { kind: "function.assign"; userId: string; userName: string; functionType: string }
   | { kind: "function.revoke"; userId: string; userName: string; functionId: string; functionType: string };
 
+const fnLabel = (type: string) => MEMBER_FUNCTION_LABEL[type] ?? type;
+
 function RolesPage() {
   const { isBureau, user } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+  const [functionFilter, setFunctionFilter] = useState("ALL");
+  const [openId, setOpenId] = useState<string | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
 
-  const { data: members } = useQuery({
+  const { data: members = [] } = useQuery({
     queryKey: ["rbac-members"],
     enabled: isBureau,
     queryFn: async () =>
-      withContacts(
+      (await withContacts(
         (await supabase
           .from("profiles")
           .select(
-            "id, first_name, last_name, display_name, membership_status, membership_type, access_level, involvement_level, statutory_category",
+            "id, first_name, last_name, display_name, membership_status, membership_type, access_level, involvement_level",
           )
-          .order("created_at", { ascending: true })).data ?? [],
-      ),
+          .is("deleted_at", null)
+          .order("last_name", { ascending: true })).data ?? [],
+      )) as Member[],
   });
 
-  const { data: roles } = useQuery({
+  const { data: rawRoles = [] } = useQuery({
     queryKey: ["rbac-roles"],
     enabled: isBureau,
     queryFn: async () =>
       (await supabase.from("roles").select("id, code, name, description").order("code")).data ?? [],
   });
+  const roles = useMemo(() => sortRoles(rawRoles), [rawRoles]);
 
-  const { data: assignments } = useQuery({
+  const { data: assignments = [] } = useQuery({
     queryKey: ["rbac-assignments"],
     enabled: isBureau,
     queryFn: async () =>
-      (await supabase.from("user_roles").select("id, user_id, role_id, roles(code, name)")).data ??
-      [],
+      ((await supabase.from("user_roles").select("id, user_id, role_id, roles(code, name)")).data ??
+        []) as Assignment[],
   });
 
-  const { data: functions } = useQuery({
+  const { data: functions = [] } = useQuery({
     queryKey: ["rbac-functions"],
     enabled: isBureau,
     queryFn: async () =>
-      (
+      ((
         await supabase
           .from("member_functions")
-          .select("id, user_id, function_type, active")
+          .select("id, user_id, function_type, scope_type, scope_id")
           .eq("active", true)
-      ).data ?? [],
+      ).data ?? []) as MemberFunction[],
+  });
+
+  const projectIds = useMemo(
+    () => [...new Set(functions.filter((f) => f.scope_type === "PROJECT" && f.scope_id).map((f) => f.scope_id!))],
+    [functions],
+  );
+  const { data: projectTitles = {} } = useQuery({
+    queryKey: ["rbac-project-titles", projectIds],
+    enabled: isBureau && projectIds.length > 0,
+    queryFn: async () => {
+      const { data } = await supabase.from("projects").select("id, title").in("id", projectIds);
+      return Object.fromEntries((data ?? []).map((p) => [p.id, p.title as string]));
+    },
   });
 
   const invalidate = () => {
@@ -115,28 +159,23 @@ function RolesPage() {
     void queryClient.invalidateQueries({ queryKey: ["audit-logs"] });
   };
 
-  const bureauRoleCount = useMemo(
-    () =>
-      (assignments ?? []).filter(
-        (a) => (a.roles as { code?: string } | null)?.code === "ADMIN_BUREAU",
-      ).length,
-    [assignments],
-  );
+  const bureauRoleCount = assignments.filter((a) => a.roles?.code === "ADMIN_BUREAU").length;
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return members ?? [];
-    return (members ?? []).filter((m) =>
-      `${memberFullName(m)} ${m.email ?? ""}`.toLowerCase().includes(term),
-    );
-  }, [members, search]);
+    return members.filter((m) => {
+      if (term && !`${memberFullName(m)} ${m.email ?? ""}`.toLowerCase().includes(term)) return false;
+      if (roleFilter !== "ALL") {
+        const has = assignments.some((a) => a.user_id === m.id && a.role_id === roleFilter);
+        if (roleFilter === "NONE" ? assignments.some((a) => a.user_id === m.id) : !has) return false;
+      }
+      if (functionFilter !== "ALL" && !functions.some((f) => f.user_id === m.id && f.function_type === functionFilter))
+        return false;
+      return true;
+    });
+  }, [members, search, roleFilter, functionFilter, assignments, functions]);
 
-  const logAction = async (
-    action: string,
-    userId: string,
-    values: Record<string, unknown>,
-    summary: string,
-  ) => {
+  const logAction = async (action: string, userId: string, values: Record<string, unknown>, summary: string) => {
     await supabase.from("audit_logs").insert({
       actor_id: user?.id ?? null,
       action,
@@ -153,40 +192,27 @@ function RolesPage() {
         const { error } = await supabase
           .from("user_roles")
           .insert({ user_id: task.userId, role_id: task.roleId, assigned_by: user?.id ?? null });
-        if (error)
-          throw new Error(
-            error.message.includes("duplicate") ? "Ce rôle est déjà attribué." : error.message,
-          );
-        await logAction(
-          "role.assign",
-          task.userId,
-          { role_id: task.roleId },
-          `Rôle « ${task.roleName} » attribué à ${task.userName}`,
-        );
+        if (error) throw new Error(error.message.includes("duplicate") ? "Ce rôle est déjà attribué." : error.message);
+        await logAction("role.assign", task.userId, { role_id: task.roleId }, `Rôle « ${task.roleName} » attribué à ${task.userName}`);
         return `Rôle « ${task.roleName} » attribué.`;
       }
       if (task.kind === "role.revoke") {
         const { error } = await supabase.from("user_roles").delete().eq("id", task.assignmentId);
         if (error) throw new Error(error.message);
-        await logAction(
-          "role.revoke",
-          task.userId,
-          { assignment_id: task.assignmentId },
-          `Rôle « ${task.roleName} » retiré à ${task.userName}`,
-        );
+        await logAction("role.revoke", task.userId, { assignment_id: task.assignmentId }, `Rôle « ${task.roleName} » retiré à ${task.userName}`);
         return `Rôle « ${task.roleName} » retiré.`;
       }
       if (task.kind === "function.assign") {
         const { error } = await supabase
           .from("member_functions")
           .insert({ user_id: task.userId, function_type: task.functionType, active: true });
-        if (error) throw new Error(error.message);
-        await logAction(
-          "function.assign",
-          task.userId,
-          { function_type: task.functionType },
-          `Fonction « ${MEMBER_FUNCTION_LABEL[task.functionType]} » attribuée à ${task.userName}`,
-        );
+        if (error)
+          throw new Error(
+            error.code === "23505"
+              ? `La fonction « ${fnLabel(task.functionType)} » est déjà occupée. Clôturez-la d'abord.`
+              : error.message,
+          );
+        await logAction("function.assign", task.userId, { function_type: task.functionType }, `Fonction « ${fnLabel(task.functionType)} » attribuée à ${task.userName}`);
         return "Fonction ajoutée.";
       }
       const { error } = await supabase
@@ -194,12 +220,7 @@ function RolesPage() {
         .update({ active: false, end_date: new Date().toISOString().slice(0, 10) })
         .eq("id", task.functionId);
       if (error) throw new Error(error.message);
-      await logAction(
-        "function.revoke",
-        task.userId,
-        { function_id: task.functionId },
-        `Fonction « ${MEMBER_FUNCTION_LABEL[task.functionType]} » clôturée pour ${task.userName}`,
-      );
+      await logAction("function.revoke", task.userId, { function_id: task.functionId }, `Fonction « ${fnLabel(task.functionType)} » clôturée pour ${task.userName}`);
       return "Fonction clôturée.";
     },
     onSuccess: (message) => {
@@ -213,53 +234,38 @@ function RolesPage() {
   if (!isBureau) {
     return (
       <AppShell title="Rôles & habilitations" subtitle="Accès réservé au Bureau">
-        <p className="text-sm text-muted-foreground">
-          Cette page est réservée aux membres du Bureau.
-        </p>
+        <p className="text-sm text-muted-foreground">Cette page est réservée aux membres du Bureau.</p>
       </AppShell>
     );
   }
 
   /** Validations métier avant ouverture de la confirmation. */
   const request = (task: Pending) => {
-    if (task.kind === "role.assign") {
-      const already = (assignments ?? []).some(
-        (a) => a.user_id === task.userId && a.role_id === task.roleId,
-      );
-      if (already) {
-        toast.error("Ce rôle est déjà attribué à cet adhérent.");
-        return;
-      }
+    if (task.kind === "role.assign" && assignments.some((a) => a.user_id === task.userId && a.role_id === task.roleId)) {
+      toast.error("Ce rôle est déjà attribué à cet adhérent.");
+      return;
     }
     if (task.kind === "role.revoke") {
-      const isAdminRole = (assignments ?? []).find((a) => a.id === task.assignmentId);
-      const code = (isAdminRole?.roles as { code?: string } | null)?.code;
+      const code = assignments.find((a) => a.id === task.assignmentId)?.roles?.code;
       if (code === "ADMIN_BUREAU" && bureauRoleCount <= 1) {
-        toast.error("Impossible : au moins un administrateur du Bureau doit rester en place.");
+        toast.error("Impossible : au moins un membre du Bureau doit rester en place.");
         return;
       }
       if (code === "ADMIN_BUREAU" && task.userId === user?.id) {
-        toast.error("Vous ne pouvez pas retirer votre propre rôle d'administrateur.");
+        toast.error("Vous ne pouvez pas retirer votre propre rôle Bureau.");
         return;
       }
     }
     if (task.kind === "function.assign") {
-      const duplicate = (functions ?? []).some(
-        (f) => f.user_id === task.userId && f.function_type === task.functionType,
-      );
-      if (duplicate) {
+      if (functions.some((f) => f.user_id === task.userId && f.function_type === task.functionType)) {
         toast.error("Cette fonction est déjà active pour cet adhérent.");
         return;
       }
       if (UNIQUE_FUNCTIONS.includes(task.functionType)) {
-        const holder = (functions ?? []).find((f) => f.function_type === task.functionType);
+        const holder = functions.find((f) => f.function_type === task.functionType);
         if (holder) {
-          const name = memberFullName(
-            (members ?? []).find((m) => m.id === holder.user_id) ?? { display_name: null },
-          );
-          toast.error(
-            `La fonction « ${MEMBER_FUNCTION_LABEL[task.functionType]} » est déjà occupée par ${name}. Clôturez-la d'abord.`,
-          );
+          const name = memberFullName(members.find((m) => m.id === holder.user_id) ?? { display_name: null });
+          toast.error(`La fonction « ${fnLabel(task.functionType)} » est déjà occupée par ${name}. Clôturez-la d'abord.`);
           return;
         }
       }
@@ -274,188 +280,164 @@ function RolesPage() {
       case "role.revoke":
         return `Retirer le rôle « ${task.roleName} » à ${task.userName} ?`;
       case "function.assign":
-        return `Attribuer la fonction « ${MEMBER_FUNCTION_LABEL[task.functionType]} » à ${task.userName} ?`;
+        return `Attribuer la fonction « ${fnLabel(task.functionType)} » à ${task.userName} ?`;
       default:
-        return `Clôturer la fonction « ${MEMBER_FUNCTION_LABEL[task.functionType]} » de ${task.userName} ?`;
+        return `Clôturer la fonction « ${fnLabel(task.functionType)} » de ${task.userName} ?`;
     }
   };
 
+  const openMember = members.find((m) => m.id === openId) ?? null;
+
   return (
-    <AppShell
-      title="Rôles & habilitations"
-      subtitle="Qui peut faire quoi dans le cockpit associatif"
-      actions={
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Rechercher un adhérent"
-          className="w-56"
-        />
-      }
-    >
+    <AppShell title="Rôles & habilitations" subtitle="Qui peut faire quoi dans l'association">
       <div className="space-y-4">
-        {filtered.map((member) => {
-          const memberRoles = (assignments ?? []).filter((a) => a.user_id === member.id);
-          const memberFunctions = (functions ?? []).filter((f) => f.user_id === member.id);
-          const name = memberFullName(member);
-          return (
-            <div key={member.id} className="rounded-lg border border-border bg-card p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-medium">{name}</p>
-                  <p className="text-xs text-muted-foreground">{member.email ?? "—"}</p>
-                </div>
-                <Badge variant="outline">{member.membership_status}</Badge>
-              </div>
+        <div className="panel flex flex-col gap-3 p-4 lg:flex-row lg:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Rechercher un membre (nom, e-mail)"
+              aria-label="Rechercher un membre"
+              className="pl-9"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3 lg:flex">
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="lg:w-48" aria-label="Filtrer par rôle">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Tous les rôles</SelectItem>
+                <SelectItem value="NONE">Sans rôle</SelectItem>
+                {roles.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {r.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={functionFilter} onValueChange={setFunctionFilter}>
+              <SelectTrigger className="lg:w-48" aria-label="Filtrer par fonction">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Toutes les fonctions</SelectItem>
+                {ASSOCIATION_FUNCTIONS.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {fnLabel(t)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <div>
-                  <p className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    <ShieldCheck className="size-3.5" /> Rôles système
-                  </p>
-                  <div className="mb-2 flex flex-wrap gap-2">
-                    {memberRoles.length === 0 ? (
-                      <span className="text-sm text-muted-foreground">Aucun rôle</span>
-                    ) : (
-                      memberRoles.map((a) => {
-                        const roleName = (a.roles as { name?: string } | null)?.name ?? "Rôle";
-                        return (
-                          <Badge key={a.id} className="gap-1">
-                            {roleName}
-                            <button
-                              onClick={() =>
-                                request({
-                                  kind: "role.revoke",
-                                  userId: member.id,
-                                  userName: name,
-                                  assignmentId: a.id,
-                                  roleName,
-                                })
-                              }
-                              aria-label={`Retirer le rôle ${roleName}`}
-                            >
-                              <X className="size-3" />
-                            </button>
-                          </Badge>
-                        );
-                      })
-                    )}
-                  </div>
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      const role = (roles ?? []).find((r) => r.id === value);
-                      if (!role) return;
-                      request({
-                        kind: "role.assign",
-                        userId: member.id,
-                        userName: name,
-                        roleId: role.id,
-                        roleName: role.name,
-                      });
-                    }}
+        <div className="panel overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                <th className="p-3 font-medium">Membre</th>
+                <th className="hidden p-3 font-medium md:table-cell">Rôles</th>
+                <th className="hidden p-3 font-medium lg:table-cell">Fonctions</th>
+                <th className="hidden p-3 font-medium sm:table-cell">Adhésion</th>
+                <th className="w-8 p-3" aria-hidden />
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((m) => {
+                const memberRoles = assignments.filter((a) => a.user_id === m.id);
+                const memberFns = functions.filter((f) => f.user_id === m.id);
+                return (
+                  <tr
+                    key={m.id}
+                    className="cursor-pointer border-b border-border/60 last:border-0 hover:bg-muted/40"
+                    onClick={() => setOpenId(m.id)}
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Attribuer un rôle" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(roles ?? []).map((role) => (
-                        <SelectItem key={role.id} value={role.id}>
-                          {role.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <td className="p-3">
+                      <button
+                        type="button"
+                        className="text-left font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenId(m.id);
+                        }}
+                      >
+                        {memberFullName(m)}
+                      </button>
+                      <p className="text-xs text-muted-foreground">{m.email ?? "—"}</p>
+                      <p className="mt-1 text-xs text-muted-foreground md:hidden">
+                        {memberRoles.map((a) => ROLE_SHORT_LABEL[a.roles?.code ?? ""] ?? a.roles?.name).join(" · ") || "Aucun rôle"}
+                      </p>
+                    </td>
+                    <td className="hidden p-3 md:table-cell">
+                      <div className="flex flex-wrap gap-1">
+                        {memberRoles.length === 0 ? (
+                          <span className="text-xs text-muted-foreground">Aucun</span>
+                        ) : (
+                          memberRoles.map((a) => (
+                            <Badge key={a.id} variant="secondary">
+                              {ROLE_SHORT_LABEL[a.roles?.code ?? ""] ?? a.roles?.name}
+                            </Badge>
+                          ))
+                        )}
+                      </div>
+                    </td>
+                    <td className="hidden p-3 text-xs text-muted-foreground lg:table-cell">
+                      {memberFns.map((f) => fnLabel(f.function_type)).join(" · ") || "—"}
+                    </td>
+                    <td className="hidden p-3 sm:table-cell">
+                      <Badge variant="outline">
+                        {MEMBERSHIP_STATUS_LABEL[m.membership_status ?? ""] ?? m.membership_status ?? "—"}
+                      </Badge>
+                    </td>
+                    <td className="p-3 text-muted-foreground">
+                      <ChevronRight className="size-4" />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {filtered.length === 0 ? (
+            <p className="p-4 text-sm text-muted-foreground">Aucun membre ne correspond à ces critères.</p>
+          ) : null}
+        </div>
 
-                <div>
-                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Fonctions associatives
-                  </p>
-                  <div className="mb-2 flex flex-wrap gap-2">
-                    {memberFunctions.length === 0 ? (
-                      <span className="text-sm text-muted-foreground">Aucune fonction</span>
-                    ) : (
-                      memberFunctions.map((f) => (
-                        <Badge key={f.id} variant="secondary" className="gap-1">
-                          {MEMBER_FUNCTION_LABEL[f.function_type] ?? f.function_type}
-                          <button
-                            onClick={() =>
-                              request({
-                                kind: "function.revoke",
-                                userId: member.id,
-                                userName: name,
-                                functionId: f.id,
-                                functionType: f.function_type,
-                              })
-                            }
-                            aria-label="Clôturer la fonction"
-                          >
-                            <X className="size-3" />
-                          </button>
-                        </Badge>
-                      ))
-                    )}
-                  </div>
-                  <Select
-                    value=""
-                    onValueChange={(value) =>
-                      request({
-                        kind: "function.assign",
-                        userId: member.id,
-                        userName: name,
-                        functionType: value,
-                      })
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Ajouter une fonction" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {FUNCTION_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {MEMBER_FUNCTION_LABEL[type]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+          <ShieldCheck className="size-3.5" />
+          {filtered.length} membre(s). Les droits de chaque rôle se règlent dans{" "}
+          <Link to="/admin/permissions" className="underline underline-offset-2">
+            Permissions
+          </Link>
+          .
+        </p>
+      </div>
 
-                <MemberLevels
-                  memberId={member.id}
-                  memberName={name}
-                  accessLevel={member.access_level ?? "STANDARD"}
-                  involvementLevel={member.involvement_level ?? null}
-                  category={member.statutory_category ?? "ACTIF"}
-                />
-              </div>
-
-            </div>
-          );
-        })}
-        {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucun adhérent trouvé.</p>
+      <SidePanel
+        open={openMember !== null}
+        onOpenChange={(open) => !open && setOpenId(null)}
+        title={openMember ? memberFullName(openMember) : ""}
+        {...(openMember?.email ? { description: openMember.email } : {})}
+      >
+        {openMember ? (
+          <MemberDetail
+            member={openMember}
+            roles={roles}
+            assignments={assignments.filter((a) => a.user_id === openMember.id)}
+            functions={functions.filter((f) => f.user_id === openMember.id)}
+            projectTitles={projectTitles}
+            onRequest={request}
+          />
         ) : null}
-      </div>
-
-      <div className="mt-8 rounded-lg border border-border bg-muted/40 p-4">
-        <p className="text-sm font-medium">Référentiel des rôles</p>
-        <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-          {(roles ?? []).map((role) => (
-            <li key={role.id}>
-              <span className="font-medium text-foreground">{role.name}</span> — {role.description}
-            </li>
-          ))}
-        </ul>
-      </div>
+      </SidePanel>
 
       <AlertDialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmer l'habilitation</AlertDialogTitle>
             <AlertDialogDescription>
-              {pending ? confirmText(pending) : null} Cette action est tracée dans le journal
-              d'activité.
+              {pending ? confirmText(pending) : null} Cette action est inscrite dans l'historique.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -479,29 +461,191 @@ function RolesPage() {
 
 export default RolesPage;
 
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{children}</p>;
+}
+
+function MemberDetail({
+  member,
+  roles,
+  assignments,
+  functions,
+  projectTitles,
+  onRequest,
+}: {
+  member: Member;
+  roles: { id: string; code: string; name: string; description: string | null }[];
+  assignments: Assignment[];
+  functions: MemberFunction[];
+  projectTitles: Record<string, string>;
+  onRequest: (task: Pending) => void;
+}) {
+  const name = memberFullName(member);
+  const associationFns = functions.filter((f) => !PROJECT_FUNCTIONS.includes(f.function_type));
+  const projectFns = functions.filter((f) => PROJECT_FUNCTIONS.includes(f.function_type));
+  const available = roles.filter((r) => !assignments.some((a) => a.role_id === r.id));
+  const availableFns = ASSOCIATION_FUNCTIONS.filter((t) => !functions.some((f) => f.function_type === t));
+
+  return (
+    <div className="space-y-6">
+      <section>
+        <SectionTitle>Rôles système</SectionTitle>
+        <div className="mb-2 flex flex-wrap gap-2">
+          {assignments.length === 0 ? (
+            <span className="text-sm text-muted-foreground">Aucun rôle</span>
+          ) : (
+            assignments.map((a) => {
+              const roleName = a.roles?.name ?? "Rôle";
+              return (
+                <Badge key={a.id} className="gap-1">
+                  {roleName}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onRequest({ kind: "role.revoke", userId: member.id, userName: name, assignmentId: a.id, roleName })
+                    }
+                    aria-label={`Retirer le rôle ${roleName}`}
+                  >
+                    <X className="size-3" />
+                  </button>
+                </Badge>
+              );
+            })
+          )}
+        </div>
+        {available.length > 0 ? (
+          <Select
+            value=""
+            onValueChange={(value) => {
+              const role = roles.find((r) => r.id === value);
+              if (role)
+                onRequest({ kind: "role.assign", userId: member.id, userName: name, roleId: role.id, roleName: role.name });
+            }}
+          >
+            <SelectTrigger aria-label="Attribuer un rôle">
+              <SelectValue placeholder="Attribuer un rôle" />
+            </SelectTrigger>
+            <SelectContent>
+              {available.map((role) => (
+                <SelectItem key={role.id} value={role.id}>
+                  {role.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : null}
+        {member.membership_type === "PROFESSIONNEL" ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Professionnel : le rôle « Membre bienfaiteur » lui ouvre les outils pro une fois son
+            adhésion validée par le Bureau.
+          </p>
+        ) : null}
+      </section>
+
+      <section>
+        <SectionTitle>Fonctions associatives</SectionTitle>
+        <div className="mb-2 flex flex-wrap gap-2">
+          {associationFns.length === 0 ? (
+            <span className="text-sm text-muted-foreground">Aucune fonction</span>
+          ) : (
+            associationFns.map((f) => (
+              <Badge key={f.id} variant="secondary" className="gap-1">
+                {fnLabel(f.function_type)}
+                <button
+                  type="button"
+                  onClick={() =>
+                    onRequest({
+                      kind: "function.revoke",
+                      userId: member.id,
+                      userName: name,
+                      functionId: f.id,
+                      functionType: f.function_type,
+                    })
+                  }
+                  aria-label={`Clôturer la fonction ${fnLabel(f.function_type)}`}
+                >
+                  <X className="size-3" />
+                </button>
+              </Badge>
+            ))
+          )}
+        </div>
+        {availableFns.length > 0 ? (
+          <Select
+            value=""
+            onValueChange={(value) =>
+              onRequest({ kind: "function.assign", userId: member.id, userName: name, functionType: value })
+            }
+          >
+            <SelectTrigger aria-label="Ajouter une fonction">
+              <SelectValue placeholder="Ajouter une fonction" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableFns.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {fnLabel(type)}
+                  {UNIQUE_FUNCTIONS.includes(type) ? " (unique)" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : null}
+      </section>
+
+      {projectFns.length > 0 ? (
+        <section>
+          <SectionTitle>Responsabilités de projet</SectionTitle>
+          <ul className="space-y-1 text-sm">
+            {projectFns.map((f) => (
+              <li key={f.id} className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline">{fnLabel(f.function_type)}</Badge>
+                {f.scope_type === "PROJECT" && f.scope_id ? (
+                  <Link
+                    to="/projects/$projectId"
+                    params={{ projectId: f.scope_id }}
+                    className="text-muted-foreground underline underline-offset-2"
+                  >
+                    {projectTitles[f.scope_id] ?? "Voir le projet"}
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-xs text-muted-foreground">Se gèrent depuis la page du projet.</p>
+        </section>
+      ) : null}
+
+      <MemberLevels
+        memberId={member.id}
+        memberName={name}
+        accessLevel={member.access_level ?? "STANDARD"}
+        involvementLevel={member.involvement_level ?? null}
+      />
+    </div>
+  );
+}
+
 /**
  * Niveau d'accès et niveau d'implication sont volontairement séparés du rôle
- * principal et des fonctions associatives : ils se cumulent sans s'écraser.
+ * et des fonctions associatives : ils se cumulent sans s'écraser.
  */
 function MemberLevels({
   memberId,
   memberName,
   accessLevel,
   involvementLevel,
-  category,
 }: {
   memberId: string;
   memberName: string;
   accessLevel: string;
   involvementLevel: string | null;
-  category: string;
 }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const access = useConfigOptions("ACCESS_LEVEL");
   const involvement = useConfigOptions("INVOLVEMENT_LEVEL");
 
-  const save = async (patch: { access_level?: string; involvement_level?: string; statutory_category?: string }) => {
+  const save = async (patch: { access_level?: string; involvement_level?: string }) => {
     const { error } = await supabase.from("profiles").update(patch).eq("id", memberId);
     if (error) {
       toast.error(error.message);
@@ -520,34 +664,11 @@ function MemberLevels({
   };
 
   return (
-    <>
-      <div className="md:col-span-2">
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Catégorie statutaire (article 5)
-        </p>
-        <Select value={category} onValueChange={(value) => save({ statutory_category: value })}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Catégorie statutaire" />
-          </SelectTrigger>
-          <SelectContent>
-            {STATUTORY_CATEGORIES.map((code) => (
-              <SelectItem key={code} value={code}>
-                {STATUTORY_CATEGORY_LABEL[code]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Se cumule avec les fonctions : un fondateur ou un bienfaiteur peut être au Bureau ou
-          représentant, un membre actif peut être bénévole.
-        </p>
-      </div>
+    <section className="grid gap-4 sm:grid-cols-2">
       <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Niveau d'accès
-        </p>
+        <SectionTitle>Niveau d'accès</SectionTitle>
         <Select value={accessLevel} onValueChange={(value) => save({ access_level: value })}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger aria-label="Niveau d'accès">
             <SelectValue placeholder="Niveau d'accès" />
           </SelectTrigger>
           <SelectContent>
@@ -559,16 +680,10 @@ function MemberLevels({
           </SelectContent>
         </Select>
       </div>
-
       <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Niveau d'implication
-        </p>
-        <Select
-          value={involvementLevel ?? ""}
-          onValueChange={(value) => save({ involvement_level: value })}
-        >
-          <SelectTrigger className="w-full">
+        <SectionTitle>Niveau d'implication</SectionTitle>
+        <Select value={involvementLevel ?? ""} onValueChange={(value) => save({ involvement_level: value })}>
+          <SelectTrigger aria-label="Niveau d'implication">
             <SelectValue placeholder="Niveau d'implication" />
           </SelectTrigger>
           <SelectContent>
@@ -580,6 +695,6 @@ function MemberLevels({
           </SelectContent>
         </Select>
       </div>
-    </>
+    </section>
   );
 }
