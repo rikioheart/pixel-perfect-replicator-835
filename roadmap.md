@@ -1,5 +1,11 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Architecture des permissions (/admin/permissions) — demande du 9 nov.
+- [ ] Modules repliables par thème, filtre par rôle, recherche par permission
+- [ ] Droits par défaut recalibrés sur les nouveaux rôles système
+- [ ] Volet « Comment ça marche ? » (fonctionnement, modification, règles de sécurité)
+- [ ] Chaque modification tracée dans l'historique (/admin/audit)
+
 ## Rôles et habilitations (/admin/roles) — demande du 9 nov.
 - [ ] Audit : rôles système, fonctions, catégorie statutaire, dépendances (Espace Pro, Pass, permissions)
 - [ ] Tableau compact + recherche + filtres + panneau latéral
