@@ -4610,6 +4610,10 @@ export type Database = {
     }
     Functions: {
       account_deletion_blockers: { Args: { _user_id: string }; Returns: Json }
+      add_task_rex: {
+        Args: { _field: string; _note: string; _task_id: string }
+        Returns: undefined
+      }
       adjust_inventory_stock: {
         Args: { _change: number; _inventory_id: string; _reason?: string }
         Returns: number

@@ -414,6 +414,13 @@
       "when": 1794138265614,
       "tag": "0058_digest_link_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1794186736847,
+      "tag": "0059_help_offer_task_notice_and_task_rex",
+      "breakpoints": true
     }
   ]
 }
