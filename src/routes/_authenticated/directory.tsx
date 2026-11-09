@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/directory")({
     ],
   }),
   validateSearch: (search: Record<string, unknown>): { vue?: "chiens" } =>
-    search.vue === "chiens" ? { vue: "chiens" } : {},
+    search["vue"] === "chiens" ? { vue: "chiens" } : {},
   component: DirectoryPage,
 });
 
