@@ -43,8 +43,16 @@ export async function fetchPermissions(): Promise<Permission[]> {
   return (data ?? []) as Permission[];
 }
 
-export async function fetchRolePermissions(): Promise<{ role_id: string; permission_id: string }[]> {
-  const { data, error } = await supabase.from("role_permissions").select("role_id, permission_id");
+export type RolePermissionLink = {
+  role_id: string;
+  permission_id: string;
+  requires_professional: boolean;
+};
+
+export async function fetchRolePermissions(): Promise<RolePermissionLink[]> {
+  const { data, error } = await supabase
+    .from("role_permissions")
+    .select("role_id, permission_id, requires_professional");
   if (error) throw new Error(error.message);
   return data ?? [];
 }
@@ -66,22 +74,26 @@ export function groupByModule(permissions: Permission[]) {
  * Le Bureau conserve un accès complet quoi qu'il arrive.
  */
 export function useMyPermissions() {
-  const { user, isBureau } = useAuth();
+  const { user, isBureau, isPro } = useAuth();
   const query = useQuery({
-    queryKey: ["my-permissions", user?.id],
+    queryKey: ["my-permissions", user?.id, isPro],
     enabled: Boolean(user?.id),
     staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_roles")
-        .select("role_permissions:roles(role_permissions(permissions(code)))")
+        .select("role_permissions:roles(role_permissions(requires_professional, permissions(code)))")
         .eq("user_id", user!.id);
       if (error) throw new Error(error.message);
       const codes = new Set<string>();
       for (const row of (data ?? []) as unknown as {
-        role_permissions: { role_permissions: { permissions: { code: string } | null }[] } | null;
+        role_permissions: {
+          role_permissions: { requires_professional: boolean; permissions: { code: string } | null }[];
+        } | null;
       }[]) {
         for (const rp of row.role_permissions?.role_permissions ?? []) {
+          // Miroir de has_permission : un droit « pro » ne vaut que pour un pro validé.
+          if (rp.requires_professional && !isPro) continue;
           if (rp.permissions?.code) codes.add(rp.permissions.code);
         }
       }
