@@ -5,12 +5,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-type Entry = { to: string; title: string; text: string; icon: LucideIcon };
+type Entry = { to: string; title: string; text: string; icon: LucideIcon; search?: Record<string, string> };
 
 const itemClass =
   "flex w-full gap-3 rounded-xl border border-border p-3 text-left hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
-function EntryBody({ title, text, icon: Icon }: Omit<Entry, "to">) {
+function EntryBody({ title, text, icon: Icon }: Omit<Entry, "to" | "search">) {
   return (
     <>
       <Icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
@@ -27,7 +27,7 @@ export function FloatingHelpButton() {
   const { isBureau } = useAuth();
   const [open, setOpen] = useState(false);
   const before: Entry[] = [
-    { to: "/help", title: "Guides pratiques", text: "Comprendre une page ou une démarche, pas à pas.", icon: LifeBuoy },
+    { to: "/help", search: { onglet: "assistant" }, title: "Guides & assistant", text: "Poser votre question ou lire un guide pas à pas.", icon: LifeBuoy },
     { to: "/help-requests", title: "Demander un coup de main", text: "Vous avez besoin d'aide : un membre vous répond.", icon: MessageCircleQuestion },
     { to: "/je-veux-aider", title: "Je veux aider", text: "Proposer vos compétences ou du temps sur un projet associatif.", icon: Heart },
   ];
@@ -38,7 +38,7 @@ export function FloatingHelpButton() {
   const link = (e: Entry) => (
     <li key={e.to}>
       <SheetClose asChild>
-        <Link to={e.to} className={itemClass}><EntryBody {...e} /></Link>
+        <Link to={e.to} {...(e.search ? { search: e.search } : {})} className={itemClass}><EntryBody title={e.title} text={e.text} icon={e.icon} /></Link>
       </SheetClose>
     </li>
   );

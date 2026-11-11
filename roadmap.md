@@ -1,5 +1,10 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Centre d'aide & assistant — demande du 11 nov.
+- [x] 13 guides officiels publiés avec leurs visibilités (ALL / PRO_BUREAU / BUREAU)
+- [x] Publication/modification/suppression réservées au Bureau (proposition adhérent = en attente)
+- [x] Onglet « Poser une question » : assistant fondé uniquement sur les guides autorisés, liens vers les guides
+
 ## Bureau, Pass, annuaire, matériel — demande du 11 nov.
 - [x] Président/Secrétaire/Trésorier ⇒ rôle Bureau automatique + historique
 - [x] Fin de mandat : conserver ou retirer le rôle Bureau (anti-blocage du dernier membre)
