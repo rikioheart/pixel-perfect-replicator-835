@@ -71,24 +71,27 @@ export default function HelpAssistant() {
   return (
     <section aria-label="Assistant du Centre d'aide" className="flex flex-col rounded-xl border border-border bg-card">
       <header className="flex items-center justify-between gap-3 border-b border-border p-4">
-        <div className="flex items-center gap-3">
-          <img src={logoMark.url} alt="" className="size-9 rounded-full border border-border object-contain p-0.5" />
+        <div className="flex min-w-0 items-center gap-3">
+          <img src={logoMark.url} alt="" className="size-9 shrink-0 rounded-full border border-border object-contain p-0.5" />
           <div>
             <h2 className="font-display text-base font-bold">Assistant des guides</h2>
-            <p className="text-xs text-muted-foreground">Répond uniquement à partir des guides de l'association.</p>
+            <p className="text-xs text-muted-foreground">D'après les guides de l'association uniquement.</p>
           </div>
         </div>
         {messages.length ? (
           <Button
             variant="ghost"
             size="sm"
+            className="shrink-0"
+            aria-label="Nouvelle question"
             onClick={() => {
               setMessages([]);
               setError(null);
             }}
             disabled={pending}
           >
-            <RotateCcw className="mr-1 size-4" aria-hidden /> Nouvelle question
+            <RotateCcw className="size-4 sm:mr-1" aria-hidden />
+            <span className="sr-only sm:not-sr-only">Nouvelle question</span>
           </Button>
         ) : null}
       </header>
