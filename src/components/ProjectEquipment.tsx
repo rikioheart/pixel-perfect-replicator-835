@@ -26,7 +26,7 @@ export function ProjectEquipment({ projectId }: { projectId: string }) {
   const [draft, setDraft] = useState({ itemId: "", quantity: "1", start: today(), end: "", notes: "" });
 
   const { data: items = [] } = useQuery({
-    queryKey: ["inventory"],
+    queryKey: ["inventory", "project-picker"],
     queryFn: async () => {
       const { data, error } = await supabase.from("inventory").select("id, name, quantity").is("archived_at", null).order("name");
       if (error) throw error;
@@ -47,18 +47,20 @@ export function ProjectEquipment({ projectId }: { projectId: string }) {
     },
   });
 
-  const { data: available } = useQuery({
-    queryKey: ["inventory-period", draft.itemId, draft.start, draft.end],
-    enabled: Boolean(draft.itemId && draft.start),
+  // Disponibilité de tout l'inventaire général sur la période demandée (stock − réservations actives).
+  const { data: availability } = useQuery({
+    queryKey: ["inventory-period", "project", draft.start, draft.end],
+    enabled: open && Boolean(draft.start) && (!draft.end || draft.end >= draft.start),
     queryFn: async () => {
       const { data, error } = await supabase.rpc("inventory_availability", {
         _start: draft.start,
         ...(draft.end ? { _end: draft.end } : {}),
       });
       if (error) throw error;
-      return (data ?? []).find((a) => a.inventory_id === draft.itemId)?.available ?? 0;
+      return new Map((data ?? []).map((a) => [a.inventory_id, a.available as number]));
     },
   });
+  const available = draft.itemId && availability ? (availability.get(draft.itemId) ?? 0) : undefined;
 
   const refresh = () => {
     for (const k of ["inventory-reservations", "inventory-availability", "inventory-period"])
@@ -131,11 +133,14 @@ export function ProjectEquipment({ projectId }: { projectId: string }) {
             <Label htmlFor="pe-item">Matériel</Label>
             <select id="pe-item" className={SELECT} value={draft.itemId} onChange={(e) => setDraft({ ...draft, itemId: e.target.value })}>
               <option value="">Choisir…</option>
-              {items.map((i) => (
-                <option key={i.id} value={i.id}>
-                  {i.name} (stock {i.quantity})
-                </option>
-              ))}
+              {items.map((i) => {
+                const free = availability?.get(i.id);
+                return (
+                  <option key={i.id} value={i.id} disabled={free === 0 && i.id !== draft.itemId}>
+                    {i.name} — {free === undefined ? `stock ${i.quantity}` : free === 0 ? "indisponible sur ces dates" : `${free} disponible(s) / ${i.quantity}`}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <div>

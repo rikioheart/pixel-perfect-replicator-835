@@ -38,6 +38,12 @@ import {
 import { ROLE_SHORT_LABEL, sortRoles } from "@/lib/permission-defaults";
 import { useConfigOptions } from "@/lib/config-options";
 import { logAudit } from "@/lib/mindmap-actions";
+import {
+  bureauRevokeBlock,
+  isExecutiveFunction,
+  needsBureauRole,
+  reconnectHint,
+} from "@/lib/bureau-team";
 
 export const Route = createFileRoute("/_authenticated/admin/roles")({
   head: () => ({
@@ -101,6 +107,9 @@ type Pending =
       userName: string;
       functionId: string;
       functionType: string;
+      /** Fin de mandat exécutif : affectation Bureau existante et choix de l'administrateur. */
+      bureauAssignmentId?: string;
+      alsoRevokeBureau?: boolean;
     };
 
 const fnLabel = (type: string) => MEMBER_FUNCTION_LABEL[type] ?? type;
@@ -113,6 +122,7 @@ function RolesPage() {
   const [functionFilter, setFunctionFilter] = useState("ALL");
   const [openId, setOpenId] = useState<string | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
+  const [alsoRevokeBureau, setAlsoRevokeBureau] = useState(false);
 
   const { data: members = [] } = useQuery({
     queryKey: ["rbac-members"],
@@ -264,6 +274,25 @@ function RolesPage() {
           { function_type: task.functionType },
           `Fonction « ${fnLabel(task.functionType)} » attribuée à ${task.userName}`,
         );
+        const codes = assignments
+          .filter((a) => a.user_id === task.userId)
+          .map((a) => a.roles?.code ?? "");
+        if (needsBureauRole(task.functionType, codes)) {
+          const bureauRole = roles.find((r) => r.code === "ADMIN_BUREAU");
+          if (!bureauRole) throw new Error("Fonction ajoutée, mais le rôle Bureau est introuvable : attribuez-le à la main.");
+          const { error: roleError } = await supabase
+            .from("user_roles")
+            .insert({ user_id: task.userId, role_id: bureauRole.id, assigned_by: user?.id ?? null });
+          if (roleError && !roleError.message.includes("duplicate"))
+            throw new Error(`Fonction ajoutée, mais le rôle Bureau n'a pas pu être attribué : ${roleError.message}`);
+          await logAction(
+            "role.assign",
+            task.userId,
+            { role_id: bureauRole.id, role_code: "ADMIN_BUREAU", automatic: true, reason_function: task.functionType },
+            `Rôle « ${bureauRole.name} » attribué automatiquement à ${task.userName} (fonction « ${fnLabel(task.functionType)} »)`,
+          );
+          return `Fonction « ${fnLabel(task.functionType)} » ajoutée, avec le rôle « ${bureauRole.name} ».`;
+        }
         return "Fonction ajoutée.";
       }
       const { error } = await supabase
@@ -277,10 +306,23 @@ function RolesPage() {
         { function_id: task.functionId },
         `Fonction « ${fnLabel(task.functionType)} » clôturée pour ${task.userName}`,
       );
-      return "Fonction clôturée.";
+      if (task.alsoRevokeBureau && task.bureauAssignmentId) {
+        const { error: roleError } = await supabase.from("user_roles").delete().eq("id", task.bureauAssignmentId);
+        if (roleError) throw new Error(`Fonction clôturée, mais le rôle Bureau n'a pas pu être retiré : ${roleError.message}`);
+        await logAction(
+          "role.revoke",
+          task.userId,
+          { assignment_id: task.bureauAssignmentId, role_code: "ADMIN_BUREAU", end_of_term: task.functionType },
+          `Rôle Bureau retiré à ${task.userName} (fin de mandat « ${fnLabel(task.functionType)} »)`,
+        );
+        return "Fonction clôturée et rôle Bureau retiré.";
+      }
+      return isExecutiveFunction(task.functionType) && task.bureauAssignmentId
+        ? "Fonction clôturée, rôle Bureau conservé."
+        : "Fonction clôturée.";
     },
-    onSuccess: (message) => {
-      toast.success(message);
+    onSuccess: (message, task) => {
+      toast.success(message, { description: reconnectHint(task.userName), duration: 8000 });
       invalidate();
       setPending(null);
     },
@@ -308,14 +350,22 @@ function RolesPage() {
     }
     if (task.kind === "role.revoke") {
       const code = assignments.find((a) => a.id === task.assignmentId)?.roles?.code;
-      if (code === "ADMIN_BUREAU" && bureauRoleCount <= 1) {
-        toast.error("Impossible : au moins un membre du Bureau doit rester en place.");
+      const block =
+        code === "ADMIN_BUREAU"
+          ? bureauRevokeBlock({ bureauCount: bureauRoleCount, isSelf: task.userId === user?.id })
+          : null;
+      if (block) {
+        toast.error(block);
         return;
       }
-      if (code === "ADMIN_BUREAU" && task.userId === user?.id) {
-        toast.error("Vous ne pouvez pas retirer votre propre rôle Bureau.");
-        return;
-      }
+    }
+    if (task.kind === "function.revoke" && isExecutiveFunction(task.functionType)) {
+      const bureauAssignment = assignments.find(
+        (a) => a.user_id === task.userId && a.roles?.code === "ADMIN_BUREAU",
+      );
+      setAlsoRevokeBureau(false);
+      setPending({ ...task, ...(bureauAssignment ? { bureauAssignmentId: bureauAssignment.id } : {}) });
+      return;
     }
     if (task.kind === "function.assign") {
       if (
@@ -511,15 +561,34 @@ function RolesPage() {
             <AlertDialogTitle>Confirmer l'habilitation</AlertDialogTitle>
             <AlertDialogDescription>
               {pending ? confirmText(pending) : null} Cette action est inscrite dans l'historique.
+              {pending?.kind === "function.assign" && isExecutiveFunction(pending.functionType)
+                ? " Le rôle « Membre du Bureau » lui sera aussi attribué s'il ne l'a pas déjà."
+                : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {pending?.kind === "function.revoke" && pending.bureauAssignmentId ? (
+            <EndOfTermChoice
+              block={bureauRevokeBlock({ bureauCount: bureauRoleCount, isSelf: pending.userId === user?.id })}
+              value={alsoRevokeBureau}
+              onChange={setAlsoRevokeBureau}
+            />
+          ) : null}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={mutation.isPending}>Annuler</AlertDialogCancel>
             <AlertDialogAction
               disabled={mutation.isPending}
               onClick={(e) => {
                 e.preventDefault();
-                if (pending) mutation.mutate(pending);
+                if (!pending) return;
+                const block =
+                  pending.kind === "function.revoke" && pending.bureauAssignmentId
+                    ? bureauRevokeBlock({ bureauCount: bureauRoleCount, isSelf: pending.userId === user?.id })
+                    : null;
+                mutation.mutate(
+                  pending.kind === "function.revoke"
+                    ? { ...pending, alsoRevokeBureau: alsoRevokeBureau && !block }
+                    : pending,
+                );
               }}
             >
               {mutation.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
@@ -533,6 +602,43 @@ function RolesPage() {
 }
 
 export default RolesPage;
+
+/** Fin de mandat exécutif : l'administrateur choisit explicitement le sort du rôle Bureau. */
+function EndOfTermChoice({
+  block,
+  value,
+  onChange,
+}: {
+  block: string | null;
+  value: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <fieldset className="space-y-2 rounded-lg border border-border p-3 text-sm">
+      <legend className="px-1 font-medium">Et le rôle « Membre du Bureau » ?</legend>
+      <label className="flex items-start gap-2">
+        <input type="radio" name="end-of-term" className="mt-1" checked={!value} onChange={() => onChange(false)} />
+        <span>Le conserver (la personne reste membre du Bureau)</span>
+      </label>
+      <label className={`flex items-start gap-2 ${block ? "opacity-50" : ""}`}>
+        <input
+          type="radio"
+          name="end-of-term"
+          className="mt-1"
+          checked={value}
+          disabled={Boolean(block)}
+          onChange={() => onChange(true)}
+        />
+        <span>Le retirer aussi (fin de mandat complète)</span>
+      </label>
+      {block ? (
+        <p role="alert" className="rounded-md bg-muted p-2 text-xs">
+          {block}
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (

@@ -29,6 +29,17 @@ export function ManualStampCard() {
   const [resolving, setResolving] = useState(false);
   const [identified, setIdentified] = useState<Identified | null>(null);
   const [memberSearch, setMemberSearch] = useState("");
+  const [activityId, setActivityId] = useState("");
+  // Activités récentes que ce valideur encadre (Bureau : toutes) ; la base revérifie au tampon.
+  const { data: activities = [] } = useQuery({
+    queryKey: ["stamp-activities", user?.id],
+    enabled: !!user && online,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("list_stamp_activities");
+      if (error) return [];
+      return (data ?? []) as { id: string; title: string; date: string }[];
+    },
+  });
   const { data } = useQuery({
     queryKey: ["manual-stamp-options", user?.id],
     enabled: !!user && online,
@@ -75,21 +86,22 @@ export function ManualStampCard() {
       if(!user) throw new Error('Connexion requise.');
       if(!navigator.onLine) {
         const items = readQueue(user.id);
+        if(activityId) throw new Error('Sans réseau, la présence à une activité ne peut pas être enregistrée : retirez l’activité ou attendez le réseau.');
         if(items.some(i => i.member === member && i.day === parisDay())) throw new Error('Une demande est déjà en attente pour cette personne aujourd’hui.');
         saveQueue(user.id,[...items,{id:crypto.randomUUID(),owner:user.id,member,bureau,reason:reason.trim(),day:parisDay(),state:'pending'}]);
         return {awarded:false,queued:true};
       }
       const { data: res, error } = await supabase.rpc("award_manual_stamp", {
         _member_id: member, _bureau_id: bureau, _reason: reason.trim(),
-        _activity_id: null as unknown as string, _event_id: null as unknown as string,
+        _activity_id: (activityId || null) as unknown as string, _event_id: null as unknown as string,
       });
       if (error) throw error;
-      return res as { awarded: boolean; message?: string; queued?: boolean };
+      return res as { awarded: boolean; message?: string; queued?: boolean; attendance_synced?: boolean };
     },
     onSuccess: (r) => {
       if(r.queued) { toast.info('Demande sauvegardée sur ce téléphone. Validation au retour du réseau.'); setReason(''); }
-      else if (r.awarded) { toast.success("Tampon attribué, le Bureau est informé."); setReason(""); }
-      else toast.info(r.message ?? "Tampon déjà attribué.");
+      else if (r.awarded) { toast.success(r.attendance_synced ? "Tampon attribué et présence enregistrée sur l'activité. Le Bureau est informé." : "Tampon attribué, le Bureau est informé."); setReason(""); }
+      else toast.info(r.attendance_synced ? `${r.message ?? "Tampon déjà attribué."} La présence sur l'activité est à jour.` : (r.message ?? "Tampon déjà attribué."));
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -205,6 +217,17 @@ export function ManualStampCard() {
         <option value="">Choisir…</option>
         {(data ?? cached)?.bureau.filter((m) => m.id !== user?.id && m.id !== member).map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
       </select>
+      <Label htmlFor="ms-activity">Activité concernée (facultatif)</Label>
+      <select id="ms-activity" className="h-10 w-full rounded-md border border-input bg-background px-2" value={activityId} disabled={!online} onChange={(e) => {
+        const next = e.target.value;
+        setActivityId(next);
+        const act = activities.find((a) => a.id === next);
+        if (act && !reason.trim()) setReason(act.title);
+      }}>
+        <option value="">Aucune (tampon libre)</option>
+        {activities.map((a) => <option key={a.id} value={a.id}>{a.title} — {new Date(a.date).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "short" })}</option>)}
+      </select>
+      {activityId ? <p className="text-xs text-muted-foreground">La présence de la personne sera notée automatiquement sur cette activité.</p> : null}
       <Label htmlFor="ms-reason">Motif</Label>
       <Input id="ms-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Ex. séance de suivi du 4 octobre" />
       <Button onClick={() => award.mutate()} disabled={award.isPending || (!data && !cached) || Boolean(blocked)}>{online ? 'Attribuer le tampon' : 'Garder la demande en attente'}</Button>

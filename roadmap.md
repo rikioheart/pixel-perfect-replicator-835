@@ -1,5 +1,14 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Bureau, Pass, annuaire, matériel — demande du 11 nov.
+- [x] Président/Secrétaire/Trésorier ⇒ rôle Bureau automatique + historique
+- [x] Fin de mandat : conserver ou retirer le rôle Bureau (anti-blocage du dernier membre)
+- [x] Message « prévenir le membre de se reconnecter » après tout changement de rôle/fonction
+- [x] Raccourci Trésorier « Comptabilité & Grand livre » (menu + barre mobile)
+- [x] Annuaire : onglet « Équipe du Bureau » (sans filtre Fondateur)
+- [x] Tampon Pass lié à une activité ⇒ présence notée, sans tampon en double
+- [x] Matériel du projet : disponibilité par objet sur les dates choisies
+
 ## Optimisations routes, finances, Pass/AG, bilan loi 1901 — demande du 9 nov.
 - [x] Supprimer les redirections internes obsolètes ; page Terrain conservée mais retirée partout (calendrier, documents, gouvernance, permissions, grand livre, notifications)
 - [x] « Remboursements & Notes de frais » (/finance) vs « Comptabilité & Grand livre » (/admin/suivi-financier), onglets et menu

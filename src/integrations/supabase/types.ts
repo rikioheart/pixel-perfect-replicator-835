@@ -4948,6 +4948,14 @@ export type Database = {
       list_public_activities: { Args: never; Returns: Json }
       list_public_blog_posts: { Args: never; Returns: Json }
       list_public_pros: { Args: never; Returns: Json }
+      list_stamp_activities: {
+        Args: never
+        Returns: {
+          date: string
+          id: string
+          title: string
+        }[]
+      }
       my_account_deletion_check: { Args: never; Returns: Json }
       my_pass_access: { Args: never; Returns: Json }
       notify_bureau_members: {
