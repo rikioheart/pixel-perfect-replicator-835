@@ -26,7 +26,7 @@ export function ProjectEquipment({ projectId }: { projectId: string }) {
   const [draft, setDraft] = useState({ itemId: "", quantity: "1", start: today(), end: "", notes: "" });
 
   const { data: items = [] } = useQuery({
-    queryKey: ["inventory"],
+    queryKey: ["inventory", "project-picker"],
     queryFn: async () => {
       const { data, error } = await supabase.from("inventory").select("id, name, quantity").is("archived_at", null).order("name");
       if (error) throw error;
@@ -49,7 +49,7 @@ export function ProjectEquipment({ projectId }: { projectId: string }) {
 
   // Disponibilité de tout l'inventaire général sur la période demandée (stock − réservations actives).
   const { data: availability } = useQuery({
-    queryKey: ["inventory-period", draft.start, draft.end],
+    queryKey: ["inventory-period", "project", draft.start, draft.end],
     enabled: open && Boolean(draft.start) && (!draft.end || draft.end >= draft.start),
     queryFn: async () => {
       const { data, error } = await supabase.rpc("inventory_availability", {
