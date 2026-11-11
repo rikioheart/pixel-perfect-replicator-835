@@ -67,7 +67,6 @@ export const askHelpAssistant = createServerFn({ method: "POST" })
         text: {
           format: { type: "json_schema", name: "help_answer", strict: true, schema: HELP_ANSWER_SCHEMA as never },
         },
-        store: false,
       });
       let raw = "";
       for (const item of response.output ?? []) {
@@ -84,7 +83,7 @@ export const askHelpAssistant = createServerFn({ method: "POST" })
     } catch (error) {
       if (error instanceof RateLimitError) throw new Error("Beaucoup de questions en ce moment : réessayez dans une minute.");
       if (error instanceof PaymentRequiredError)
-        throw new Error("L'assistant est momentanément indisponible. Le Bureau a été invité à vérifier les crédits IA.");
+        throw new Error("L'assistant est momentanément indisponible. Réessayez plus tard, ou passez par l'Entraide.");
       if (error instanceof GatewayError) {
         console.error("help-assistant gateway error", error.code, error.ids);
         throw new Error("L'assistant n'a pas pu répondre. Réessayez dans un instant.");
