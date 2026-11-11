@@ -69,7 +69,7 @@ export default function HelpAssistant() {
   };
 
   return (
-    <section aria-label="Assistant du Centre d'aide" className="flex flex-col rounded-xl border border-border bg-card">
+    <section aria-label="Assistant du Centre d'aide" className="mb-16 flex flex-col rounded-xl border border-border bg-card md:mb-0">
       <header className="flex items-center justify-between gap-3 border-b border-border p-4">
         <div className="flex min-w-0 items-center gap-3">
           <img src={logoMark.url} alt="" className="size-9 shrink-0 rounded-full border border-border object-contain p-0.5" />
