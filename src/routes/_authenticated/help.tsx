@@ -1,8 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { BookOpen, IdCard, LifeBuoy, Plus, Check, X, Trash2, Pencil } from "lucide-react";
+import { BookOpen, IdCard, LifeBuoy, Plus, Check, X, Trash2, Pencil, MessageCircleQuestion } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { SidePanel } from "@/components/SidePanel";
@@ -21,6 +31,11 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
+// Chargé seulement à l'ouverture de l'onglet : la page des guides reste légère.
+const HelpAssistant = lazy(() => import("@/components/HelpAssistant"));
+
+type HelpSearch = { guide?: string; onglet?: "assistant" | "fiches" };
+
 export const Route = createFileRoute("/_authenticated/help")({
   head: () => ({
     meta: [
@@ -38,6 +53,10 @@ export const Route = createFileRoute("/_authenticated/help")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+  }),
+  validateSearch: (search: Record<string, unknown>): HelpSearch => ({
+    ...(typeof search["guide"] === "string" ? { guide: search["guide"] } : {}),
+    ...(search["onglet"] === "assistant" || search["onglet"] === "fiches" ? { onglet: search["onglet"] } : {}),
   }),
   component: HelpCenterPage,
 });
@@ -73,7 +92,15 @@ const emptyGuide = {
 function HelpCenterPage() {
   const { user, isBureau } = useAuth();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<"GUIDES" | "SHEETS">("GUIDES");
+  const { guide: focusGuide, onglet } = Route.useSearch();
+  const [tab, setTab] = useState<"GUIDES" | "ASSISTANT" | "SHEETS">(
+    onglet === "assistant" ? "ASSISTANT" : onglet === "fiches" ? "SHEETS" : "GUIDES",
+  );
+  const [toDelete, setToDelete] = useState<{ id: string; title: string } | null>(null);
+  useEffect(() => {
+    if (onglet === "assistant") setTab("ASSISTANT");
+    else if (onglet === "fiches") setTab("SHEETS");
+  }, [onglet]);
   const [search, setSearch] = useState("");
   const [moduleFilter, setModuleFilter] = useState("ALL");
   const [guide, setGuide] = useState<typeof emptyGuide | null>(null);
@@ -109,6 +136,18 @@ function HelpCenterPage() {
       return data ?? [];
     },
   });
+
+  // Lien direct vers un guide (depuis l'assistant) : on l'affiche et on le met en évidence.
+  useEffect(() => {
+    if (!focusGuide) return;
+    setTab("GUIDES");
+    setSearch("");
+    setModuleFilter("ALL");
+    const timer = window.setTimeout(() => {
+      document.getElementById(`guide-${focusGuide}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [focusGuide, guides.length]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -172,6 +211,7 @@ function HelpCenterPage() {
       if (error) throw error;
     },
     onSuccess: () => {
+      setToDelete(null);
       toast.success("Guide supprimé.");
       queryClient.invalidateQueries({ queryKey: ["help-guides"] });
     },
@@ -242,6 +282,14 @@ function HelpCenterPage() {
         </Button>
         <Button
           size="sm"
+          variant={tab === "ASSISTANT" ? "default" : "outline"}
+          className="rounded-full"
+          onClick={() => setTab("ASSISTANT")}
+        >
+          <MessageCircleQuestion className="mr-2 size-4" /> Poser une question
+        </Button>
+        <Button
+          size="sm"
           variant={tab === "SHEETS" ? "default" : "outline"}
           className="rounded-full"
           onClick={() => setTab("SHEETS")}
@@ -250,7 +298,11 @@ function HelpCenterPage() {
         </Button>
       </div>
 
-      {tab === "GUIDES" ? (
+      {tab === "ASSISTANT" ? (
+        <Suspense fallback={<p className="text-sm text-muted-foreground">Ouverture de l'assistant…</p>}>
+          <HelpAssistant />
+        </Suspense>
+      ) : tab === "GUIDES" ? (
         <>
           <div className="mb-5 grid gap-3 sm:grid-cols-2">
             <Input
@@ -281,7 +333,11 @@ function HelpCenterPage() {
           ) : (
             <div className="grid gap-4 lg:grid-cols-2">
               {filtered.map((item) => (
-                <article key={item.id} className="rounded-xl border border-border bg-card p-5">
+                <article
+                  key={item.id}
+                  id={`guide-${item.id}`}
+                  className={`scroll-mt-24 rounded-xl border bg-card p-5 ${focusGuide === item.id ? "border-primary ring-2 ring-primary/40" : "border-border"}`}
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="font-display text-base font-bold">{item.title}</h2>
@@ -327,7 +383,12 @@ function HelpCenterPage() {
                         >
                           <Pencil className="size-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => removeGuide.mutate(item.id)}>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          aria-label={`Supprimer le guide ${item.title}`}
+                          onClick={() => setToDelete({ id: item.id, title: item.title })}
+                        >
                           <Trash2 className="size-4" />
                         </Button>
                       </div>
@@ -546,6 +607,28 @@ function HelpCenterPage() {
           </Select>
         </div>
       </SidePanel>
+      <AlertDialog open={toDelete !== null} onOpenChange={(open) => !open && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer ce guide ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              « {toDelete?.title} » ne sera plus visible, ni utilisé par l'assistant. Cette action est définitive.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removeGuide.isPending}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={removeGuide.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (toDelete) removeGuide.mutate(toDelete.id);
+              }}
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
