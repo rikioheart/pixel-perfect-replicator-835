@@ -20,6 +20,11 @@ import { withContacts } from "@/lib/profile-columns";
 import { useAuth } from "@/hooks/useAuth";
 import { EntityPeek } from "@/components/EntityPeek";
 import { DirectoryDogs } from "@/components/DirectoryDogs";
+import { Badge } from "@/components/ui/badge";
+import { EXECUTIVE_FUNCTIONS, bureauTeamIds } from "@/lib/bureau-team";
+import { MEMBER_FUNCTION_LABEL } from "@/lib/members";
+
+type DirectoryVue = "pros" | "chiens" | "bureau";
 
 export const Route = createFileRoute("/_authenticated/directory")({
   head: () => ({
@@ -39,8 +44,10 @@ export const Route = createFileRoute("/_authenticated/directory")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { vue?: "pros" | "chiens" } =>
-    search["vue"] === "chiens" ? { vue: "chiens" } : search["vue"] === "pros" ? { vue: "pros" } : {},
+  validateSearch: (search: Record<string, unknown>): { vue?: DirectoryVue } =>
+    search["vue"] === "chiens" || search["vue"] === "pros" || search["vue"] === "bureau"
+      ? { vue: search["vue"] }
+      : {},
   component: DirectoryPage,
 });
 
@@ -48,7 +55,8 @@ function DirectoryPage() {
   const { isBureau } = useAuth();
   const [search, setSearch] = useState("");
   const { vue } = Route.useSearch();
-  const category = vue === "chiens" ? "CHIENS" : vue === "pros" ? "PRO" : "PARTICULIER";
+  const category =
+    vue === "chiens" ? "CHIENS" : vue === "pros" ? "PRO" : vue === "bureau" ? "BUREAU" : "PARTICULIER";
   const [department, setDepartment] = useState("ALL");
 
   const { data, isLoading } = useQuery({
@@ -93,6 +101,27 @@ function DirectoryPage() {
     }
     return map;
   }, [links]);
+  // Équipe du Bureau : rôle Bureau (list_bureau_members) ou fonction exécutive active (lisible par tous).
+  const { data: team } = useQuery({
+    queryKey: ["directory-bureau-team"],
+    enabled: category === "BUREAU",
+    queryFn: async () => {
+      const [bureau, fns] = await Promise.all([
+        supabase.rpc("list_bureau_members"),
+        supabase
+          .from("member_functions")
+          .select("user_id, function_type, scope_type")
+          .eq("active", true)
+          .eq("scope_type", "ASSOCIATION")
+          .in("function_type", [...EXECUTIVE_FUNCTIONS]),
+      ]);
+      const bureauIds = ((bureau.data ?? []) as unknown as { id: string }[]).map((b) => b.id);
+      const functions = fns.data ?? [];
+      const titles = new Map<string, string[]>();
+      for (const f of functions) titles.set(f.user_id, [...(titles.get(f.user_id) ?? []), f.function_type]);
+      return { ids: bureauTeamIds(bureauIds, functions), titles };
+    },
+  });
   const departments = useMemo(
     () => Array.from(new Set((data ?? []).map((p) => p.department).filter(Boolean))).sort() as string[],
     [data],
@@ -104,7 +133,9 @@ function DirectoryPage() {
       if (!isBureau && !person.public_visibility) return false;
       const type = (person.membership_type ?? "").toUpperCase();
       // Une vue par public (bandeau de l'annuaire) ; les structures partenaires ont leur page.
-      if (category === "PRO" ? !type.includes("PRO") : type.includes("PRO") || type.includes("PARTENAIRE")) return false;
+      if (category === "BUREAU") {
+        if (!team?.ids.has(person.id)) return false;
+      } else if (category === "PRO" ? !type.includes("PRO") : type.includes("PRO") || type.includes("PARTENAIRE")) return false;
       if (department !== "ALL" && person.department !== department) return false;
       if (!term) return true;
       return `${person.display_name ?? ""} ${person.city ?? ""} ${person.pro?.company_name ?? ""} ${
@@ -113,7 +144,7 @@ function DirectoryPage() {
         .toLowerCase()
         .includes(term);
     });
-  }, [data, search, department, isBureau, category]);
+  }, [data, search, department, isBureau, category, team]);
 
   return (
     <AppShell
@@ -129,7 +160,9 @@ function DirectoryPage() {
         ) : undefined
       }
     >
-      <DirectoryTabs current={category === "CHIENS" ? "chiens" : category === "PRO" ? "pros" : "particuliers"} />
+      <DirectoryTabs
+        current={category === "CHIENS" ? "chiens" : category === "PRO" ? "pros" : category === "BUREAU" ? "bureau" : "particuliers"}
+      />
       <div className="mb-6 grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
           <Label className="text-xs" htmlFor="dir-search">Recherche</Label>
@@ -168,7 +201,7 @@ function DirectoryPage() {
         <DirectoryDogs search={search} />
       ) : (
         <>
-          {isLoading ? (
+          {isLoading || (category === "BUREAU" && !team) ? (
             <p className="text-sm text-muted-foreground">Chargement de l'annuaire…</p>
           ) : filtered.length === 0 ? (
             <EmptyState
@@ -186,6 +219,16 @@ function DirectoryPage() {
                     <h2 className="font-display text-base font-bold">
                       <EntityPeek type={person.pro ? "professional" : "person"} id={person.id}>{name}</EntityPeek>
                     </h2>
+                    {category === "BUREAU" ? (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {(team?.titles.get(person.id) ?? []).map((f) => (
+                          <Badge key={f} variant="secondary">{MEMBER_FUNCTION_LABEL[f] ?? f}</Badge>
+                        ))}
+                        {(team?.titles.get(person.id) ?? []).length === 0 ? (
+                          <Badge variant="outline">Membre du Bureau</Badge>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {person.pro?.company_name ? (
                       <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                         <Briefcase className="size-3.5" /> {person.pro.company_name}
