@@ -51,6 +51,9 @@ import {
 const HandHeart = HandHeartIcon;
 import { ExternalLink, Megaphone } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { showTreasurerShortcut } from "@/lib/bureau-team";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -203,7 +206,22 @@ export function AppShell({
   actions?: ReactNode;
   children: ReactNode;
 }) {
-  const { profile, isBureau, isPro, signOut } = useAuth();
+  const { profile, isBureau, isPro, signOut, user } = useAuth();
+  // Fonctions associatives actives de la personne connectée (RLS : soi-même).
+  const { data: myFunctions = [] } = useQuery({
+    queryKey: ["my-functions", user?.id],
+    enabled: Boolean(user?.id) && isBureau,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("member_functions")
+        .select("function_type")
+        .eq("user_id", user!.id)
+        .eq("active", true);
+      return (data ?? []).map((f) => f.function_type);
+    },
+  });
+  const isTreasurer = showTreasurerShortcut({ isBureau, functionTypes: myFunctions });
   useApplyPreferences();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -243,7 +261,7 @@ export function AppShell({
   }, [pathname]);
 
   const dock = isBureau
-    ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/loyalty", label: "Mon pass", icon: QrCode }, { to: "/member", label: "Mon espace", icon: UserRound }]
+    ? [{ to: "/admin", label: "Bureau", icon: LayoutDashboard }, isTreasurer ? { to: "/admin/suivi-financier", label: "Grand livre", icon: Euro } : { to: "/tasks", label: "Actions", icon: ListChecks }, { to: "/loyalty", label: "Mon pass", icon: QrCode }, { to: "/member", label: "Mon espace", icon: UserRound }]
     : isPro
       ? [{ to: "/espace-pro", label: "Espace pro", icon: Briefcase }, { to: "/espace-pro/chiens", label: "Chiens", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }]
       : [{ to: "/member", label: "Mon chien", icon: Heart }, { to: "/activities", label: "Sorties", icon: CalendarDays }, { to: "/loyalty", label: "Mon pass", icon: Stamp }, { to: "/projects", label: "Projets", icon: FolderKanban }];
@@ -300,6 +318,11 @@ export function AppShell({
           <Link to="/loyalty" className="mb-5 flex min-h-11 items-center gap-3 rounded-md border border-sidebar-border px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none">
             <QrCode className="size-4" aria-hidden="true" /> Mon pass
           </Link>
+          {isTreasurer ? (
+            <Link to="/admin/suivi-financier" className="-mt-3 mb-5 flex min-h-11 items-center gap-3 rounded-md border border-sidebar-border px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none">
+              <Euro className="size-4" aria-hidden="true" /> Comptabilité & Grand livre
+            </Link>
+          ) : null}
           <nav aria-label="Navigation des pages" className="space-y-5">
             <div className="space-y-1">{pillars.map((g) => renderPillar(g))}</div>
 
@@ -381,6 +404,7 @@ export function AppShell({
               </SheetHeader>
               <nav aria-label="Navigation mobile" className="space-y-6 p-4">
                 <Link to="/loyalty" className="flex min-h-11 items-center gap-3 rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent"><QrCode className="size-4" aria-hidden="true" /> Mon pass</Link>
+                {isTreasurer ? <Link to="/admin/suivi-financier" className="flex min-h-11 items-center gap-3 rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent"><Euro className="size-4" aria-hidden="true" /> Comptabilité & Grand livre</Link> : null}
                 <div className="space-y-1">{pillars.map((g) => renderPillar(g, true))}</div>
                 <Link to="/" search={{ vitrine: 1 }} className="flex min-h-11 items-center gap-3 px-3 text-sm hover:underline"><Globe className="size-4" aria-hidden="true" /> Voir la vitrine</Link>
                 <Button
