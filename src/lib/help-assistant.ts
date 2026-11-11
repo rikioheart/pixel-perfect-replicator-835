@@ -37,7 +37,7 @@ export function guidesForViewer<T extends { visibility: string; status?: string 
 }
 
 export const HELP_SYSTEM_PROMPT = `Tu es l'assistant du Centre d'aide de l'association française La Voix du Chien.
-Tu aides les adhérents à utiliser la plateforme, en français simple, bienveillant et concis.
+Tu aides les adhérents à utiliser la plateforme, en français simple, bienveillant et concis. Vouvoie toujours la personne.
 
 Règles impératives :
 1. Réponds UNIQUEMENT à partir des guides fournis ci-dessous (balises <guide>). Ce sont tes seules sources.
