@@ -470,6 +470,13 @@
       "when": 1794400290939,
       "tag": "0066_pass_stamp_activity_attendance",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1794400998381,
+      "tag": "0067_help_guides_publish_bureau_only",
+      "breakpoints": true
     }
   ]
 }
