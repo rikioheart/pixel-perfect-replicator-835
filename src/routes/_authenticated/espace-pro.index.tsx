@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { readQueue } from "@/lib/offline";
 import { ManualStampCard } from "@/components/ManualStampCard";
 import { InlineLoading } from "@/components/LoadingState";
+import { WelcomeBanner, useHouseholdDogNames } from "@/components/WelcomeGreeting";
+import { RecognitionCard } from "@/components/RecognitionCard";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/")({
   head: () => ({
@@ -29,7 +31,8 @@ export const Route = createFileRoute("/_authenticated/espace-pro/")({
 });
 
 function ProDashboard() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const dogNames = useHouseholdDogNames();
   const [pendingCount, setPendingCount] = useState(0);
   useEffect(() => {
     if (!user) return;
@@ -70,6 +73,7 @@ function ProDashboard() {
 
   return (
     <AppShell title="Espace professionnel" subtitle="Votre activité dans le réseau La Voix du Chien">
+      <WelcomeBanner name={profile?.first_name ?? profile?.display_name} dogNames={dogNames} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="panel space-y-2 p-4">
           <p className="text-xs text-muted-foreground">Ma carte</p>
@@ -127,6 +131,9 @@ function ProDashboard() {
             </ul>
           )}
         </section>
+      </div>
+      <div className="mt-6">
+        <RecognitionCard />
       </div>
     </AppShell>
   );

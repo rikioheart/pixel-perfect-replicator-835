@@ -246,10 +246,12 @@ function ProjectDetail() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>Avancement opérationnel</span>
+                <span>Tâches validées ensemble</span>
                 <span>{progress === null ? "—" : `${progress}%`}</span>
               </div>
-              <Progress value={progress ?? 0} aria-label="Avancement opérationnel" />
+              {progress === null ? null : (
+                <Progress tone="collective" value={progress} aria-label={`Tâches validées ensemble : ${doneCount} sur ${eligibleCount}`} />
+              )}
               <p className="mt-1 text-xs text-muted-foreground">
                 {progress === null
                   ? "Calculé automatiquement dès qu'une tâche existe."

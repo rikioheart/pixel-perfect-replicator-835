@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { buildGreeting, localDay, type Greeting } from "@/lib/greeting";
 
@@ -53,4 +55,22 @@ export function WelcomeBanner({
       ))}
     </section>
   );
+}
+
+/**
+ * Noms des chiens du foyer de la personne connectée : lecture directe de dogs, que la base limite au
+ * propriétaire et aux membres de son foyer. Jamais get_pro_dogs ni bureau_dogs (chiens d'autres foyers).
+ */
+export function useHouseholdDogNames(): string[] {
+  const { user } = useAuth();
+  const { data = [] } = useQuery({
+    queryKey: ["home-dog-names", user?.id],
+    enabled: Boolean(user?.id),
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data: dogs, error } = await supabase.from("dogs").select("name").is("archived_at", null).order("created_at");
+      return error ? [] : (dogs ?? []).map((d) => d.name);
+    },
+  });
+  return data;
 }

@@ -21,6 +21,7 @@ import { TASK_STATUS_LABEL, PROJECT_ROLE_LABEL, formatDate } from "@/lib/domain"
 import { profileCompletion } from "@/lib/home-config";
 import { isOverdueReservation } from "@/lib/role-home";
 import { RecognitionCard } from "@/components/RecognitionCard";
+import { useHouseholdDogNames } from "@/components/WelcomeGreeting";
 import { CollectiveProgress } from "@/components/CollectiveProgress";
 import { taskProgress } from "@/lib/archives";
 import { milestoneSummary } from "@/lib/project-followup";
@@ -123,16 +124,7 @@ function MemberDashboard() {
       return { tasks: t.data ?? [], milestones: m.data ?? [] };
     },
   });
-  // Noms des chiens du foyer, lus avec les droits de la personne (propriétaire ou foyer uniquement).
-  const { data: dogNames = [] } = useQuery({
-    queryKey: ["home-dog-names", user?.id],
-    enabled: Boolean(user?.id),
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data: dogs, error } = await supabase.from("dogs").select("name").is("archived_at", null).order("created_at");
-      return error ? [] : (dogs ?? []).map((d) => d.name);
-    },
-  });
+  const dogNames = useHouseholdDogNames();
   const showProfileCard = profileCompletion(profile).percent < 100;
 
   const roleLabel = memberRoleLabel({ isBureau, isPro });

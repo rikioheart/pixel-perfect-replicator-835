@@ -317,6 +317,12 @@ function MySpacePage() {
                 checked={preferences.show_association_updates}
                 onChange={(show_association_updates) => set({ show_association_updates })}
               />
+              <SwitchRow
+                label="Petites marques de reconnaissance"
+                hint="Un éclat doré quand un tampon est confirmé, et des remerciements sur votre accueil (premier coup de main validé par l'équipe, membre bienfaiteur reconnu par le Bureau). Visibles par vous seul, jamais comparés. Les animations suivent aussi vos réglages de mouvement."
+                checked={preferences.show_recognition}
+                onChange={(show_recognition) => set({ show_recognition })}
+              />
               <p className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
                 Notifications par e-mail : la plateforme n'en envoie pas pour l'instant. Ce réglage apparaîtra ici le jour où elles existeront.
               </p>
