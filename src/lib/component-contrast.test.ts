@@ -61,6 +61,7 @@ function checks(): Check[] {
     ["Menu : élément", "popover-foreground", "popover", TEXT],
     ["Menu : élément survolé", "accent-foreground", "accent", TEXT],
     ["Menu : sous-menu ouvert", "popover-foreground", "accent", TEXT],
+    ["Carte de choix survolée : détail", "muted-foreground", "accent", TEXT],
     ["Infobulle", "primary-foreground", "primary", TEXT],
     ["Onglets : onglet inactif", "muted-foreground", "muted", TEXT],
     ["Onglets : onglet actif", "foreground", "background", TEXT],
