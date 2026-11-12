@@ -47,6 +47,7 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-sage: var(--sage);
   --color-sage-soft: var(--sage-soft);
+  --color-sage-ink: var(--sage-ink);
   --color-ochre: var(--ochre);
   --color-ochre-soft: var(--ochre-soft);
   --color-primary-ink: var(--primary-ink);
@@ -171,6 +172,8 @@
   --gradient-signature: linear-gradient(135deg, var(--signature-from), var(--signature-to));
   --sage: oklch(0.7 0.06 145);
   --sage-soft: oklch(0.93 0.03 145);
+  /* Sauge des jauges collectives : remplissage lisible (3:1) sur la piste et sur la carte. */
+  --sage-ink: oklch(0.5 0.075 150);
   /* Illustrations canines (DogEmptyArt) : pelage fauve, décor sable/sauge/or, collier = signature. */
   --art-bg: oklch(0.93 0.025 80);
   --art-ground: oklch(0.86 0.035 78);
@@ -189,6 +192,7 @@
 .dark {
   --sage: oklch(0.6 0.06 145);
   --sage-soft: oklch(0.3 0.04 145);
+  --sage-ink: oklch(0.74 0.075 150);
   --art-bg: oklch(0.27 0.04 262);
   --art-ground: oklch(0.33 0.04 262);
   --art-coat: oklch(0.74 0.07 70);
@@ -538,3 +542,13 @@
   .border-primary { border-color: var(--primary-ink); }
   .fill-primary { fill: var(--primary-ink); }
 }
+
+/*
+ * Célébration d'un tampon confirmé : un éclat Or très bref autour du tampon, non bloquant.
+ * L'anneau est invisible par défaut : sans animation (mouvement réduit, mode épuré), il ne reste
+ * que la pastille statique et son texte.
+ */
+@keyframes lvdc-stamp-pop { 0% { transform: scale(0.7); opacity: 0; } 45% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes lvdc-stamp-ring { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.9); opacity: 0; } }
+.stamp-celebration .pop { animation: lvdc-stamp-pop 420ms ease-out both; }
+.stamp-celebration .ring { opacity: 0; border: 3px solid var(--gold); animation: lvdc-stamp-ring 800ms ease-out both; }
