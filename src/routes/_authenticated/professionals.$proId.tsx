@@ -53,7 +53,7 @@ function ProfessionalDetailPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pro_details")
-        .select("*, profiles(display_name, first_name, last_name, city, avatar_path)")
+        .select("*, profiles(display_name, first_name, last_name, avatar_path)")
         .eq("profile_id", proId)
         .maybeSingle();
       if (error) throw error;
