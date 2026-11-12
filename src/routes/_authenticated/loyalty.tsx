@@ -25,6 +25,7 @@ import { PassAccessPanel, PASS_ACCESS_KEY, fetchPassAccess } from "@/components/
 import { ManualStampCard } from "@/components/ManualStampCard";
 import { hasPersonalPass, showsActivationScreen, validatorSource } from "@/lib/pass-access";
 import { humanizeError } from "@/lib/user-messages";
+import { EmptyState } from "@/components/EmptyState";
 
 import { StampCelebration, useNewStampCelebration } from "@/components/StampCelebration";
 export const Route = createFileRoute("/_authenticated/loyalty")({
@@ -310,7 +311,7 @@ function LoyaltyPage() {
                       {tier.reached ? "Atteint" : `${tier.remaining} restant(s)`}
                     </Badge>
                   </div>
-                  <Progress value={tier.percent} />
+                  <Progress value={tier.percent} aria-label={`${tier.rule.reward_label ?? tier.rule.label ?? "Récompense"} : ${total} sur ${tier.threshold} tampons`} />
                   <p className="text-xs text-muted-foreground">
                     {total} / {tier.threshold} tampons
                   </p>
@@ -336,7 +337,11 @@ function LoyaltyPage() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           {stamps.length === 0 ? (
-            <p className="text-muted-foreground">Aucun tampon pour le moment.</p>
+            <EmptyState
+              art="playful"
+              title="Votre carte attend son premier tampon"
+              message="Il s'ajoutera lors de votre prochaine participation à une activité, une fois votre présence validée ou votre carte présentée."
+            />
           ) : (
             stamps.map((stamp) => (
               <div

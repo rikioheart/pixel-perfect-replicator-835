@@ -127,7 +127,7 @@ function AdminConsole() {
       <WelcomeBanner name={profile?.first_name ?? profile?.display_name} />
       <BureauConsoleTabs />
       <BureauQuickAccess ag={isError ? undefined : s ? s.ag : undefined} agError={isError} />
-      <PendingActionsStrip items={actions} loading={!data && !isError} />
+      <PendingActionsStrip items={actions} loading={!data && !isError} calmArt="resting" calmMessage="Tout est calme : rien n'attend une décision du Bureau pour le moment. Merci !" />
 
       <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
         <ShieldCheck className="size-4 shrink-0 text-primary" aria-hidden />

@@ -181,9 +181,9 @@ function DirectoryPage() {
         </div>
         {category !== "CHIENS" ? (
           <div className="space-y-1">
-            <Label className="text-xs">Département</Label>
+            <Label className="text-xs" htmlFor="dir-department">Département</Label>
             <Select value={department} onValueChange={setDepartment}>
-              <SelectTrigger>
+              <SelectTrigger id="dir-department" aria-label="Département">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
