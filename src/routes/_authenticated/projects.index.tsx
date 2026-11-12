@@ -103,7 +103,7 @@ function ProjectsPage() {
     >
       <div className="mb-5 flex flex-wrap gap-3">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-48" aria-label="Statut">
             <SelectValue placeholder="Statut" />
           </SelectTrigger>
           <SelectContent>
@@ -116,7 +116,7 @@ function ProjectsPage() {
           </SelectContent>
         </Select>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-56">
+          <SelectTrigger className="w-56" aria-label="Catégorie">
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent>

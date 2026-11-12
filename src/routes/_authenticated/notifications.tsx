@@ -159,7 +159,7 @@ function NotificationsPage() {
           className="w-56"
         />
         <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40" aria-label="Lues ou non lues">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -169,7 +169,7 @@ function NotificationsPage() {
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-60">
+          <SelectTrigger className="w-60" aria-label="Type de notification">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
