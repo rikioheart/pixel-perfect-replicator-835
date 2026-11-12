@@ -1,3 +1,4 @@
+import { humanizeError } from "@/lib/user-messages";
 /**
  * Cycle de vie des tâches (Lot 3). Miroir lisible de la règle de la base
  * (task_validator / guard_task_lifecycle) : l'interface n'est qu'un confort,
@@ -51,7 +52,7 @@ export function explainDbError(error: { message?: string; code?: string } | null
   if (error.code === "22007" || error.code === "22008" || /invalid input syntax for type date/i.test(msg)) {
     return "La date saisie n'est pas valide.";
   }
-  return msg || "Enregistrement impossible.";
+  return humanizeError(error, "Enregistrement impossible.");
 }
 
 /** Une mise à jour filtrée par les droits qui ne touche aucune ligne est un refus, pas un succès. */

@@ -38,7 +38,7 @@ const select = "h-10 w-full rounded-md border border-input bg-background px-2 te
 const emptyPerson = { first_name: "", last_name: "", birth_date: "", relation: "ENFANT" };
 
 function friendly(message: string) {
-  return message.includes("un seul foyer") ? "Cette personne fait déjà partie d'un autre foyer. Un membre n'appartient qu'à un seul foyer." : message;
+  return message.includes("un seul foyer") ? "Cette personne fait déjà partie d'un autre foyer. Un membre n'appartient qu'à un seul foyer." : humanizeError(message);
 }
 
 function PersonRow({ p, dogs, onChanged }: { p: HouseholdPerson; dogs: HouseholdBundle["dogs"]; onChanged: () => void }) {
