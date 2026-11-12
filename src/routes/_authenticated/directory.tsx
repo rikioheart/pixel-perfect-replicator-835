@@ -2,7 +2,7 @@ import { DirectoryTabs } from "@/components/DirectoryTabs";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, MapPin, Briefcase, Mail } from "lucide-react";
+import { Search, Briefcase, Mail } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
