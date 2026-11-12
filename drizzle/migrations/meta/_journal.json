@@ -484,6 +484,13 @@
       "when": 1794493213271,
       "tag": "0068_tighten_open_read_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1794493807251,
+      "tag": "0069_bureau_console_summary",
+      "breakpoints": true
     }
   ]
 }

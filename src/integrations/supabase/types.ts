@@ -4740,6 +4740,7 @@ export type Database = {
         Args: { _confirm: string; _profile_id: string; _reason: string }
         Returns: Json
       }
+      bureau_console_summary: { Args: never; Returns: Json }
       bureau_dog_full: { Args: { _user_id: string }; Returns: boolean }
       bureau_dogs: { Args: never; Returns: Json }
       bureau_has_permission: {
