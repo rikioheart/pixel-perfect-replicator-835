@@ -25,6 +25,8 @@ export type UserPreferences = {
   notify_reminders: boolean;
   notification_sound: boolean;
   show_association_updates: boolean;
+  /** Badges personnels et célébration des tampons (rien n'est stocké, rien n'est comparé). */
+  show_recognition: boolean;
   theme: string;
   signature: string;
 };
@@ -50,6 +52,7 @@ export const DEFAULT_PREFERENCES: Omit<UserPreferences, "user_id"> = {
   notify_reminders: true,
   notification_sound: false,
   show_association_updates: true,
+  show_recognition: true,
   theme: "SYSTEM",
   signature: "BORDEAUX",
 };

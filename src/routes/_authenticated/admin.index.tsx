@@ -17,6 +17,7 @@ import { Progress } from "@/components/ui/progress";
 import { PendingActionsStrip } from "@/components/PendingActionsStrip";
 import { BureauQuickAccess } from "@/components/BureauQuickAccess";
 import { InlineLoading } from "@/components/LoadingState";
+import { WelcomeBanner } from "@/components/WelcomeGreeting";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -51,7 +52,7 @@ const TONE_CLASS: Record<Tone, string> = {
 };
 
 function AdminConsole() {
-  const { isBureau, roles, loading } = useAuth();
+  const { isBureau, roles, loading, profile } = useAuth();
 
   // Synthèse uniquement (compteurs, pourcentages, totaux) : aucune ligne nominative d'un autre membre n'est chargée ici.
   const { data, isError } = useQuery({
@@ -123,6 +124,7 @@ function AdminConsole() {
 
   return (
     <AppShell title="Console du Bureau" subtitle="Le pilotage de l'association, en un coup d'œil">
+      <WelcomeBanner name={profile?.first_name ?? profile?.display_name} />
       <BureauConsoleTabs />
       <BureauQuickAccess ag={isError ? undefined : s ? s.ag : undefined} agError={isError} />
       <PendingActionsStrip items={actions} loading={!data && !isError} />

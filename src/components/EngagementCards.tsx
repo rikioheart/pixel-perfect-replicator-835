@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { profileCompletion, useLoyaltySnapshot } from "@/lib/home-config";
+import { StampCelebration, useNewStampCelebration } from "@/components/StampCelebration";
 
 /** Compteur de fidélité toujours visible, avec progression vers le palier suivant. */
 export function LoyaltyCardMini() {
@@ -12,9 +13,11 @@ export function LoyaltyCardMini() {
   const stamps = data?.stamps ?? 0;
   const next = data?.nextThreshold ?? null;
   const percent = next ? Math.min(100, Math.round((stamps / next) * 100)) : 100;
+  const celebration = useNewStampCelebration(user?.id, data?.stamps);
 
   return (
-    <div className="panel p-4">
+    <div className="panel relative p-4">
+      <StampCelebration show={celebration.show} label="Tampon confirmé, merci !" announce onDone={celebration.dismiss} />
       <div className="flex items-center justify-between text-muted-foreground">
         <span className="text-xs uppercase tracking-wide">Ma fidélité</span>
         <Stamp className="size-4" />

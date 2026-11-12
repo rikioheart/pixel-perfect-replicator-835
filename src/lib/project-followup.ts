@@ -63,3 +63,9 @@ export function canPublishToNews(c: { status: string; published_update_id?: stri
 export function teamCanEditCommunication(status: string) {
   return status === "DRAFT" || status === "IN_REVIEW";
 }
+
+/** Étapes franchies et prochaine étape non franchie (la plus proche datée, sinon la première sans date). */
+export function milestoneSummary<T extends Milestone>(list: T[]): { done: number; total: number; next: T | null } {
+  const sorted = sortMilestones(list);
+  return { done: list.filter((m) => m.done_at).length, total: list.length, next: sorted.find((m) => !m.done_at) ?? null };
+}

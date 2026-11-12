@@ -26,6 +26,7 @@ import { ManualStampCard } from "@/components/ManualStampCard";
 import { hasPersonalPass, showsActivationScreen, validatorSource } from "@/lib/pass-access";
 import { humanizeError } from "@/lib/user-messages";
 
+import { StampCelebration, useNewStampCelebration } from "@/components/StampCelebration";
 export const Route = createFileRoute("/_authenticated/loyalty")({
   head: () => ({
     meta: [
@@ -68,6 +69,8 @@ function LoyaltyPage() {
   const { data: card, isLoading, isError } = useQuery({
     queryKey: ["loyalty-card", user?.id],
     enabled: Boolean(user?.id),
+    // Pendant que le pass est présenté, le tampon confirmé apparaît de lui-même (lecture serveur uniquement).
+    refetchInterval: online ? 20_000 : false,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("loyalty_cards")
@@ -125,6 +128,7 @@ function LoyaltyPage() {
   });
 
   const total = card?.total_stamps ?? offlinePass?.total ?? 0;
+  const celebration = useNewStampCelebration(user?.id, card?.total_stamps);
   const filled = total % CARD_SIZE;
   const completed = Math.floor(total / CARD_SIZE);
   const grants = eligibleGrants(rules, profile?.membership_type ?? null);
@@ -157,7 +161,8 @@ function LoyaltyPage() {
       {access && showsActivationScreen(access) && <PassAccessPanel access={access} />}
       {access && validatorSource(access) === "BUREAU" && <div className="mb-4"><ManualStampCard /></div>}
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="relative lg:col-span-2">
+          <StampCelebration show={celebration.show} label="Tampon confirmé, merci !" announce onDone={celebration.dismiss} />
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
               <Stamp className="size-4" /> {total} tampon{total > 1 ? "s" : ""} cumulé

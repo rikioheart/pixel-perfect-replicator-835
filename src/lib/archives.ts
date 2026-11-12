@@ -23,6 +23,13 @@ export function splitArchive<T extends Parameters<typeof isPast>[0]>(items: T[],
  * Avancement opérationnel : part des tâches validées parmi les tâches éligibles, poids égal.
  * Sous-tâches comprises (chacune compte pour une) ; annulées, refusées et archivées exclues.
  */
+/** Tâches validées sur tâches comptées (annulées, refusées et archivées exclues) : même règle que operationalProgress. */
+export function taskProgress(tasks: { status: string }[]): { done: number; counted: number; percent: number | null } {
+  const counted = tasks.filter((t) => !["CANCELLED", "REJECTED", "ARCHIVED"].includes(t.status));
+  const done = counted.filter((t) => t.status === "COMPLETED" || t.status === "VALIDATED").length;
+  return { done, counted: counted.length, percent: counted.length ? Math.round((done / counted.length) * 100) : null };
+}
+
 export function operationalProgress(tasks: { status: string }[]): number | null {
   const eligible = tasks.filter((t) => !["CANCELLED", "REJECTED", "ARCHIVED"].includes(t.status));
   if (eligible.length === 0) return null;

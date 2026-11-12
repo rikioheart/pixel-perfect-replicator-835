@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Camera, ClipboardPaste, Search, Stamp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { StampCelebration } from "@/components/StampCelebration";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,12 +102,15 @@ export function ManualStampCard() {
     },
     onSuccess: (r) => {
       if(r.queued) { toast.info('Demande sauvegardée sur ce téléphone. Validation au retour du réseau.'); setReason(''); }
-      else if (r.awarded) { toast.success(r.attendance_synced ? "Tampon attribué et présence enregistrée sur l'activité. Le Bureau est informé." : "Tampon attribué, le Bureau est informé."); setReason(""); }
+      else if (r.awarded) { setCelebrate(true); toast.success(r.attendance_synced ? "Tampon attribué et présence enregistrée sur l'activité. Le Bureau est informé." : "Tampon attribué, le Bureau est informé."); setReason(""); }
       else toast.info(r.attendance_synced ? `${r.message ?? "Tampon déjà attribué."} La présence sur l'activité est à jour.` : (r.message ?? "Tampon déjà attribué."));
     },
     onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const [mediating, setMediating] = useState<string | null>(null);
+  // Célébration visuelle seulement : le message éphémère reste l'annonce, la logique du tampon est inchangée.
+  const [celebrate, setCelebrate] = useState(false);
+  const endCelebrate = useCallback(() => setCelebrate(false), []);
   /** Demande d'un jour passé ou refusée : transmise au Bureau, jamais transformée en tampon automatiquement. */
   const mediate = async (item: PendingStamp) => {
     if (!user) return;
@@ -143,7 +147,8 @@ export function ManualStampCard() {
   };
 
   return (
-    <section className="panel space-y-3 p-4 text-sm" aria-labelledby="ms-title">
+    <section className="panel relative space-y-3 p-4 text-sm" aria-labelledby="ms-title">
+      <StampCelebration show={celebrate} label="Tampon attribué" onDone={endCelebrate} />
       <h2 id="ms-title" className="flex items-center gap-2 font-display text-lg"><Stamp className="size-4" aria-hidden /> Valider un Pass Terrain</h2>
       <p className="text-xs text-muted-foreground">Scannez le pass d'un membre, collez ou saisissez son code. Un autre membre du Bureau est informé de chaque tampon.</p>
 

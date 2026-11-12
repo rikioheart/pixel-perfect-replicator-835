@@ -17,10 +17,14 @@ import { LoyaltyCardMini, ProfileCompletionCard } from "@/components/EngagementC
 import { PendingActionsStrip } from "@/components/PendingActionsStrip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { TASK_STATUS_LABEL, PROJECT_ROLE_LABEL, formatDate } from "@/lib/domain";
 import { profileCompletion } from "@/lib/home-config";
 import { isOverdueReservation } from "@/lib/role-home";
+import { RecognitionCard } from "@/components/RecognitionCard";
+import { useHouseholdDogNames } from "@/components/WelcomeGreeting";
+import { CollectiveProgress } from "@/components/CollectiveProgress";
+import { taskProgress } from "@/lib/archives";
+import { milestoneSummary } from "@/lib/project-followup";
 
 export const Route = createFileRoute("/_authenticated/member")({
   head: () => ({
@@ -106,6 +110,21 @@ function MemberDashboard() {
     .filter((p) => p.events?.start_date && p.events.start_date >= new Date().toISOString())
     .sort((a, b) => (a.events?.start_date ?? "").localeCompare(b.events?.start_date ?? ""));
   const memberships = data?.memberships ?? [];
+  const projectIds = memberships.map((m) => m.projects?.id).filter((id): id is string => Boolean(id)).sort();
+  // Avancement collectif : tâches et étapes lisibles selon les droits du projet (can_view_project).
+  const { data: progress } = useQuery({
+    queryKey: ["member-project-progress", projectIds.join(",")],
+    enabled: projectIds.length > 0,
+    queryFn: async () => {
+      const [t, m] = await Promise.all([
+        supabase.from("tasks").select("project_id, status").in("project_id", projectIds),
+        supabase.from("project_milestones").select("id, project_id, title, due_date, done_at").in("project_id", projectIds),
+      ]);
+      if (t.error || m.error) return null;
+      return { tasks: t.data ?? [], milestones: m.data ?? [] };
+    },
+  });
+  const dogNames = useHouseholdDogNames();
   const showProfileCard = profileCompletion(profile).percent < 100;
 
   const roleLabel = memberRoleLabel({ isBureau, isPro });
@@ -118,6 +137,7 @@ function MemberDashboard() {
       <div className="space-y-6">
         <HomeHero
           firstName={profile?.first_name ?? profile?.display_name ?? ""}
+          dogNames={dogNames}
           roleLabel={roleLabel}
           message={welcome}
         />
@@ -131,6 +151,8 @@ function MemberDashboard() {
           <HelpInvitation openCount={data?.openHelp ?? 0} />
           {showProfileCard ? <ProfileCompletionCard /> : null}
         </div>
+
+        <RecognitionCard />
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="min-w-0 space-y-6 lg:col-span-2">
@@ -206,7 +228,11 @@ function MemberDashboard() {
 
             {memberships.length > 0 ? (
               <div className="panel p-5">
-                <h2 className="mb-4 text-lg">Mes projets</h2>
+                <h2 className="text-lg">Mes projets</h2>
+                <p className="mb-4 mt-1 text-xs text-muted-foreground">
+                  Les jauges comptent les tâches validées par l'équipe sur les tâches du projet (annulées exclues).
+                  Elles ne mesurent ni le temps donné ni l'apport de chacun.
+                </p>
                 <div className="space-y-5">
                   {memberships.map((membership) =>
                     membership.projects ? (
@@ -223,7 +249,13 @@ function MemberDashboard() {
                             {PROJECT_ROLE_LABEL[membership.project_role] ?? membership.project_role}
                           </span>
                         </div>
-                        <Progress value={membership.projects.progress_percent ?? 0} />
+                        {progress ? (
+                          <CollectiveProgress
+                            title={membership.projects.title}
+                            tasks={taskProgress(progress.tasks.filter((t) => t.project_id === membership.projects!.id))}
+                            milestones={milestoneSummary(progress.milestones.filter((m) => m.project_id === membership.projects!.id))}
+                          />
+                        ) : null}
                       </div>
                     ) : null,
                   )}
