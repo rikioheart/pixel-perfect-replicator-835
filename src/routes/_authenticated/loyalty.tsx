@@ -162,7 +162,7 @@ function LoyaltyPage() {
       {access && validatorSource(access) === "BUREAU" && <div className="mb-4"><ManualStampCard /></div>}
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="relative lg:col-span-2">
-          <StampCelebration show={celebration.show} label="Nouveau tampon confirmé : merci de votre venue !" announce onDone={celebration.dismiss} />
+          <StampCelebration show={celebration.show} label="Tampon confirmé, merci !" announce onDone={celebration.dismiss} />
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
               <Stamp className="size-4" /> {total} tampon{total > 1 ? "s" : ""} cumulé
