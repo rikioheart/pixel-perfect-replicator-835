@@ -47,6 +47,8 @@ function checks(): Check[] {
       // Jauges
       ["Jauge (remplissage sur sa piste)", "primary-ink", "muted", UI],
       ["Jauge (remplissage sur la carte)", "primary-ink", base, UI],
+      ["Jauge collective sauge (sur sa piste)", "sage-ink", "muted", UI],
+      ["Jauge collective sauge (sur la carte)", "sage-ink", base, UI],
       // Focus
       ["Anneau de focus", "ring", base, UI],
       // Graphiques
@@ -82,6 +84,8 @@ function checks(): Check[] {
     ["Interrupteur actif (pastille)", "primary-foreground", "primary", UI],
     ["Interrupteur inactif (pastille)", "background", "muted-foreground", UI],
     ["Pastille du nombre de notifications", "primary-foreground", "primary", TEXT],
+    ["Célébration du tampon / reconnaissance : texte", "foreground", "gold-soft", TEXT],
+    ["Célébration du tampon / reconnaissance : pastille", "gold-foreground", "gold", UI],
   );
   return list;
 }
