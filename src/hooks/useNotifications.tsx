@@ -45,7 +45,7 @@ export function useNotifications() {
   }, [userId]);
 
   useEffect(() => {
-    resetChimeTracking();
+    resetChimeTracking(userId);
   }, [userId]);
 
   useEffect(() => {

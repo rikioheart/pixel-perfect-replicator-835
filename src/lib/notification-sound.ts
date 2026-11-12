@@ -21,8 +21,12 @@ export function newUnreadToChime(unreadIds: string[]): string[] {
   return fresh;
 }
 
-/** Réinitialise le suivi (changement de compte, tests). */
-export function resetChimeTracking() {
+let trackedUser: string | null = null;
+
+/** Repart de zéro quand le compte change (et dans les tests). */
+export function resetChimeTracking(userId: string | null = null) {
+  if (userId !== null && userId === trackedUser) return;
+  trackedUser = userId;
   announced.clear();
   primed = false;
 }
