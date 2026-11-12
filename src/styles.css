@@ -183,6 +183,8 @@
   --art-ink: oklch(0.25 0.045 265);
   --art-leaf: oklch(0.66 0.07 145);
   --art-sun: var(--gold);
+  /* Collier = couleur de la signature, toujours distinct du pelage (3:1). */
+  --art-collar: var(--primary);
   /* Ancien nom de l'or, conservé pour la vitrine publique. */
   --ochre: var(--gold);
   --ochre-soft: var(--gold-soft);
@@ -278,6 +280,7 @@
   --sidebar-primary: oklch(0.5 0.1 250);
   --signature-from: oklch(0.4 0.09 256);
   --signature-to: oklch(0.48 0.1 248);
+  --art-collar: oklch(0.4 0.09 256);
 }
 
 @layer base {
@@ -329,7 +332,7 @@
 .dog-art .s { fill: var(--art-shade); }
 .dog-art .m { fill: var(--art-light); }
 .dog-art .i { fill: var(--art-ink); }
-.dog-art .a { fill: var(--primary); }
+.dog-art .a { fill: var(--art-collar); }
 .dog-art .g { fill: var(--art-sun); }
 .dog-art .l { fill: var(--art-leaf); }
 .dog-art .k, .dog-art .gk, .dog-art .lk, .dog-art .t { fill: none; stroke-linecap: round; stroke-linejoin: round; }

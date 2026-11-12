@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { DogEmptyArt, type DogArt } from "@/components/DogEmptyArt";
 import { contrastRatio } from "./color-contrast";
-import { COMBOS, themeCss, tokens } from "./theme-css.test-helpers";
+import { WITH_CONTRAST, themeCss, tokens } from "./theme-css.test-helpers";
 
 const ARTS: DogArt[] = ["attentive", "resting", "playful"];
 const source = readFileSync(resolve(process.cwd(), "src/components/DogEmptyArt.tsx"), "utf8");
@@ -39,10 +39,11 @@ describe("DogEmptyArt", () => {
     expect(props["aria-hidden"]).toBeUndefined();
   });
 
-  for (const combo of COMBOS) {
-    it(`${combo.name} : yeux et truffe lisibles sur le pelage, silhouette visible sur la carte`, () => {
+  for (const combo of WITH_CONTRAST) {
+    it(`${combo.name} : yeux, truffe et collier lisibles sur le pelage, silhouette visible sur la carte`, () => {
       const { get } = tokens(combo);
       expect(contrastRatio(get("art-ink"), get("art-coat"))).toBeGreaterThanOrEqual(3);
+      expect(contrastRatio(get("art-collar"), get("art-coat"))).toBeGreaterThanOrEqual(3);
       expect(contrastRatio(get("art-coat"), get("card"))).toBeGreaterThanOrEqual(1.4);
     });
   }
