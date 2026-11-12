@@ -21,6 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { humanizeError } from "@/lib/user-messages";
+import { DogEmptyArt } from "@/components/DogEmptyArt";
+import { NotebookPen, QrCode, HeartHandshake } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -67,13 +69,14 @@ function AuthPage() {
       {!session && <section id="connexion" aria-labelledby="member-title" className="public-section scroll-mt-24 grid items-start gap-8 lg:grid-cols-2">
         <div>
           <p className="public-eyebrow mb-3">Adhérents et professionnels</p>
-          <h2 id="member-title">Votre espace membre</h2>
+          <h2 id="member-title">Heureux de vous accueillir</h2>
           <p className="mt-4 text-muted-foreground">Un seul accès pour suivre votre chien et participer à la vie de l’association.</p>
-          <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-            <li>• Le carnet de vie de votre chien</li>
-            <li>• Vos sorties, réservations et carte de fidélité</li>
-            <li>• Les projets, tâches et actualités de l’association</li>
+          <ul className="public-benefits text-sm text-muted-foreground">
+            <li><NotebookPen className="size-4" aria-hidden /><span><strong className="font-medium text-foreground">Le carnet de vie</strong> de votre chien, à votre rythme.</span></li>
+            <li><QrCode className="size-4" aria-hidden /><span><strong className="font-medium text-foreground">Le Pass Terrain</strong>, disponible même sans réseau.</span></li>
+            <li><HeartHandshake className="size-4" aria-hidden /><span><strong className="font-medium text-foreground">Une entraide simple</strong> : projets, sorties et vie de l’association.</span></li>
           </ul>
+          <DogEmptyArt art="attentive" className="mt-6 hidden h-28 w-auto lg:block" />
         </div>
         <div className="panel w-full p-5 sm:p-6">
           <GoogleSignInButton />
