@@ -5,7 +5,7 @@
 - [x] Lot 2 : Mes préférences en 4 familles avec aperçu ; texte jusqu'à 200 %, polices Atkinson/Lexend, interlignage, espacements, largeur de lecture ; modes épuré et focus ; vue par défaut réelle (Projets) ; rappels et son réellement appliqués ; contrastes AA contrôlés par composant
 - [x] Lot 3 : DogEmptyArt (3 chiens SVG) dans EmptyState selon le contexte ; états et messages humanisés ; messages anglais traduits
 - [x] Lot 4 : profil plus humain (avatar, présentation, compétences, disponibilités, préférences de contribution), visibilité par champ, aperçu « tel que les autres le voient » via la même fonction serveur que l annuaire
-- [ ] Lot 5 (en cours) : salutation saisonnière (chien du foyer seulement), accueils par rôle, célébration Or des tampons, jauges sauge expliquées, badges vérifiables et désactivables
+- [x] Lot 5 : salutation saisonnière (chien du foyer seulement), accueils par rôle, célébration Or des tampons, jauges sauge expliquées, badges vérifiables et désactivables
 
 ## Centre d'aide & assistant — demande du 11 nov.
 - [x] 13 guides officiels publiés avec leurs visibilités (ALL / PRO_BUREAU / BUREAU)
