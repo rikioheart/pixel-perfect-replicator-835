@@ -17,7 +17,7 @@ export function LoyaltyCardMini() {
 
   return (
     <div className="panel relative p-4">
-      <StampCelebration show={celebration.show} label="Nouveau tampon confirmé, merci d'être venu !" announce onDone={celebration.dismiss} />
+      <StampCelebration show={celebration.show} label="Nouveau tampon confirmé : merci de votre venue !" announce onDone={celebration.dismiss} />
       <div className="flex items-center justify-between text-muted-foreground">
         <span className="text-xs uppercase tracking-wide">Ma fidélité</span>
         <Stamp className="size-4" />
