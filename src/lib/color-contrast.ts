@@ -59,3 +59,27 @@ export function isExcludedHue({ l, c, h }: Oklch): boolean {
   if (l > 0.85) return true; // rose poudré / rosé pâle
   return l > 0.6 && c > 0.05; // rose, saumon
 }
+
+export type Rgb = [number, number, number];
+
+/** Superpose une couleur partiellement transparente sur un fond (mélange sRGB, comme le navigateur). */
+export function blend(top: Rgb, alpha: number, bottom: Rgb): Rgb {
+  return top.map((v, i) => v * alpha + (bottom[i] ?? 0) * (1 - alpha)) as Rgb;
+}
+
+/** sRGB d'une couleur OKLCH ; une couleur transparente est posée sur le fond fourni. */
+export function srgbOf(value: string, backdrop?: Rgb): Rgb {
+  const color = parseOklch(value);
+  if (!color) throw new Error(`Couleur illisible : ${value}`);
+  const rgb = oklchToSrgb(color);
+  if (color.alpha >= 1) return rgb;
+  if (!backdrop) throw new Error(`Couleur transparente sans fond : ${value}`);
+  return blend(rgb, color.alpha, backdrop);
+}
+
+/** Rapport de contraste WCAG entre deux couleurs sRGB. */
+export function contrastOfRgb(a: Rgb, b: Rgb): number {
+  const la = relativeLuminance(a);
+  const lb = relativeLuminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
