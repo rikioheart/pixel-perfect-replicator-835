@@ -81,7 +81,7 @@ function Page() {
             <input type="checkbox" checked={Boolean(hidden)} onChange={(e) => toggle.mutate(e.target.checked)} />
             Masquer pour moi les dossiers détaillés (je ne vois que les informations principales)
           </label>
-          {isLoading ? <LoadingState rows={3} /> : active.length === 0 ? <EmptyState title="Aucun chien" message="Aucun chien enregistré pour le moment." /> : (
+          {isLoading ? <LoadingState rows={3} /> : active.length === 0 ? <EmptyState art="resting" title="Aucun chien" message="Aucun chien enregistré pour le moment." /> : (
             <div className="grid gap-3 lg:grid-cols-2">{active.map((d) => <DogCard key={d.id} d={d} />)}</div>
           )}
           {archived.length > 0 && (
@@ -143,7 +143,7 @@ function HouseholdsTab({ dogs }: { dogs: BDog[] }) {
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["bureau-households"] });
   if (isLoading || !data) return <LoadingState rows={3} />;
-  if (data.households.length === 0) return <EmptyState title="Aucun foyer" message="Aucun foyer créé pour le moment." />;
+  if (data.households.length === 0) return <EmptyState art="resting" title="Aucun foyer" message="Aucun foyer créé pour le moment." />;
   const dup = membersInSeveralHouseholds(data.members);
   const removeMember = async (id: string, name: string, household: string) => {
     if (!window.confirm(`Retirer ${name} du foyer « ${household} » ? Ses chiens et son compte ne sont pas modifiés.`)) return;

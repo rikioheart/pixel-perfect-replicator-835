@@ -76,7 +76,7 @@ function ParticipationsPage() {
         <LoadingState label="Chargement des informations…" rows={4} />
       ) : items.length === 0 ? (
         <EmptyState
-          title="Aucune inscription pour l'instant"
+          art="resting" title="Aucune inscription pour l'instant"
           message="Inscrivez-vous à une balade, un atelier ou un événement pour les retrouver ici."
           action={
             <Link to="/activities" className="text-sm font-semibold text-primary hover:underline">

@@ -210,7 +210,7 @@ function FormsPage() {
       )}
 
       {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : forms.length === 0 ? (
-        <EmptyState title="Aucun formulaire" message={canCreate ? "Créez un premier formulaire ci-dessus." : "Aucun formulaire ouvert pour le moment."} />
+        <EmptyState art="attentive" title="Aucun formulaire" message={canCreate ? "Créez un premier formulaire ci-dessus." : "Aucun formulaire ouvert pour le moment."} />
       ) : (
         <div className="space-y-3">
           {forms.map((fm) => {

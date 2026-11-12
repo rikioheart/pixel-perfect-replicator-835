@@ -205,7 +205,7 @@ function DirectoryPage() {
             <p className="text-sm text-muted-foreground">Chargement de l'annuaire…</p>
           ) : filtered.length === 0 ? (
             <EmptyState
-              title="Aucun profil trouvé"
+              art="attentive" title="Aucun profil trouvé"
               message="Affinez votre recherche, ou invitez de nouveaux adhérents à rejoindre le réseau."
             />
           ) : (

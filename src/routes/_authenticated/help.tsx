@@ -327,7 +327,7 @@ function HelpCenterPage() {
 
           {filtered.length === 0 ? (
             <EmptyState
-              title="Aucun guide pour l'instant"
+              art="attentive" title="Aucun guide pour l'instant"
               message="Les guides expliquent comment utiliser chaque module. Chacun peut en proposer un."
             />
           ) : (
@@ -403,7 +403,7 @@ function HelpCenterPage() {
         </>
       ) : sheets.length === 0 ? (
         <EmptyState
-          title="Aucune fiche de poste"
+          art="attentive" title="Aucune fiche de poste"
           message="Une fiche de poste décrit le rôle d'un membre : responsabilités et actions du quotidien."
         />
       ) : (

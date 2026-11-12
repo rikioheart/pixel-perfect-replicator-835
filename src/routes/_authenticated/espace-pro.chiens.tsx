@@ -236,7 +236,7 @@ function ProDogsPage() {
   return (
     <AppShell title="Chiens accompagnés" subtitle="Seuls les chiens avec un accès partagé actif apparaissent ici">
       {isLoading ? <LoadingState rows={3} /> : dogs.length === 0 ? (
-        <EmptyState title="Aucun chien partagé" message="Quand un propriétaire vous ouvre l'accès à la fiche de son chien, elle apparaît ici avec les rubriques qu'il a choisies." />
+        <EmptyState art="attentive" title="Aucun chien partagé" message="Quand un propriétaire vous ouvre l'accès à la fiche de son chien, elle apparaît ici avec les rubriques qu'il a choisies." />
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">{dogs.map((d) => <DogCard key={d.id} dog={d} />)}</div>
       )}

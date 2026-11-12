@@ -172,7 +172,7 @@ function FormationsPage() {
         <p className="text-sm text-muted-foreground">Chargement des sessions…</p>
       ) : formations.length === 0 ? (
         <EmptyState
-          title="Aucune session programmée"
+          art="attentive" title="Aucune session programmée"
           message="Les prochaines formations et lives apparaîtront ici dès leur annonce."
         />
       ) : (

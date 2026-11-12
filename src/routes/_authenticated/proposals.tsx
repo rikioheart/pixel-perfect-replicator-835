@@ -135,7 +135,7 @@ function ProposalsPage() {
         <LoadingState label="Chargement des informations…" rows={4} />
       ) : rows.length === 0 ? (
         <EmptyState
-          title="Aucune proposition"
+          art="playful" title="Aucune proposition"
           message="Proposez un atelier, un service ou une idée : le Bureau vous répondra."
         />
       ) : (

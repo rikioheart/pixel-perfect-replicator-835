@@ -351,7 +351,7 @@ function ActivitiesPage() {
         <ArchiveToggle view={view} setView={setView} counts={splitArchive(activities)} pastLabel="Historique" />
         {(view === "current" ? splitArchive(activities).current : splitArchive(activities).past).length === 0 ? (
         <EmptyState
-          title="Aucune activité pour l'instant"
+          art="resting" title="Aucune activité pour l'instant"
           message="Les prochains ateliers et sorties s'afficheront ici dès que le Bureau les aura programmés."
         />
       ) : (

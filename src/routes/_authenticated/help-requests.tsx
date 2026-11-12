@@ -153,7 +153,7 @@ function HelpRequestsPage() {
 
       {items.length === 0 ? (
         <EmptyState
-          title="Aucune demande"
+          art="playful" title="Aucune demande"
           message="Utilisez « J'ai besoin d'aide » pour signaler un blocage ou proposer un coup de main."
         />
       ) : (

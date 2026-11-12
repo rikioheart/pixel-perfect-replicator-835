@@ -152,7 +152,7 @@ function CalendarPage() {
         <p className="text-sm text-muted-foreground" role="status">Chargement du calendrier…</p>
       ) : view === "list" ? (
         upcoming.length === 0 ? (
-          <EmptyState title="Rien de prévu pour l'instant" message="Dès qu'une activité, une réservation ou une échéance est planifiée, elle apparaît ici." />
+          <EmptyState art="resting" title="Rien de prévu pour l'instant" message="Dès qu'une activité, une réservation ou une échéance est planifiée, elle apparaît ici." />
         ) : (
           <div className="space-y-6">
             {upcoming.map(([date, list]) => (

@@ -112,7 +112,7 @@ export function DirectoryDogs({ search }: { search: string }) {
       {loading ? (
         <p role="status" className="text-sm text-muted-foreground">Chargement des fiches…</p>
       ) : shown.length === 0 ? (
-        <EmptyState title="Aucune fiche chien" message={rows.length === 0 ? "Aucun chien accessible pour votre profil." : "Aucun chien ne correspond à la recherche."} />
+        <EmptyState art="attentive" title="Aucune fiche chien" message={rows.length === 0 ? "Aucun chien accessible pour votre profil." : "Aucun chien ne correspond à la recherche."} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((d) => (

@@ -145,7 +145,7 @@ function ContestsPage() {
         <p className="text-sm text-muted-foreground">Chargement des concours…</p>
       ) : contests.length === 0 ? (
         <EmptyState
-          title="Aucun concours pour le moment"
+          art="playful" title="Aucun concours pour le moment"
           message="Les prochaines animations et concours de l'association s'afficheront ici."
         />
       ) : (

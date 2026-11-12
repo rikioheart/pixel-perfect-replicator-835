@@ -76,7 +76,7 @@ function CollabPage() {
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="space-y-3 lg:col-span-2">
           {isLoading ? <LoadingState rows={3} /> : rows.length === 0 ? (
-            <EmptyState title="Aucune collaboration" message="Ateliers co-animés, interventions, dons… ajoutez-les ici." />
+            <EmptyState art="playful" title="Aucune collaboration" message="Ateliers co-animés, interventions, dons… ajoutez-les ici." />
           ) : rows.map((c) => (
             <div key={c.id} className="panel flex items-start justify-between gap-3 p-4 text-sm">
               <div>

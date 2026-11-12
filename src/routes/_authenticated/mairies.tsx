@@ -157,7 +157,7 @@ function MairiesPage() {
         <LoadingState label="Chargement des informations…" rows={4} />
       ) : filtered.length === 0 ? (
         <EmptyState
-          title="Aucun contact institutionnel"
+          art="attentive" title="Aucun contact institutionnel"
           message="Ajoutez les mairies et collectivités avec lesquelles l'association échange."
         />
       ) : (

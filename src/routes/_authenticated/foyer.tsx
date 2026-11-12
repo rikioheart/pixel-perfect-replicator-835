@@ -259,7 +259,7 @@ function FoyerPage() {
     <AppShell title="Mon foyer" subtitle="Vos proches, vos chiens et la personne de référence de chacun"
       actions={households.length === 0 && !isLoading ? <Button size="sm" className="gap-2" onClick={() => setCreating(true)}><Plus className="size-4" aria-hidden /> Créer mon foyer</Button> : undefined}>
       {isLoading ? <LoadingState rows={3} /> : households.length === 0 ? (
-        <EmptyState title="Pas encore de foyer" message="Créez votre foyer pour inscrire en une fois vos proches et vos chiens. Vos chiens existants y seront rattachés." />
+        <EmptyState art="resting" title="Pas encore de foyer" message="Créez votre foyer pour inscrire en une fois vos proches et vos chiens. Vos chiens existants y seront rattachés." />
       ) : (
         <div className="space-y-4">
           {households.length > 1 && (

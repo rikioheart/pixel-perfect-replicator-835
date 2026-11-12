@@ -138,7 +138,7 @@ function ReimbursementsPage() {
             ))}
           </div>
           {rows.length === 0 ? (
-            <EmptyState title="Aucune demande" message="Vos demandes de remboursement apparaîtront ici une fois créées." />
+            <EmptyState art="resting" title="Aucune demande" message="Vos demandes de remboursement apparaîtront ici une fois créées." />
           ) : (
             <div className="space-y-3">
               {rows.map((item) => (

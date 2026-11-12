@@ -66,7 +66,7 @@ function JourneyPage() {
   return (
     <AppShell title="Mon parcours avec La Voix du Chien" subtitle="Votre chemin à vous — le carnet de vie de vos chiens reste dans leur dossier">
       {isLoading ? <LoadingState rows={4} /> : items.length === 0 ? (
-        <EmptyState title="Votre parcours commence" message="Vos activités, événements et contributions s'afficheront ici au fil du temps." />
+        <EmptyState art="attentive" title="Votre parcours commence" message="Vos activités, événements et contributions s'afficheront ici au fil du temps." />
       ) : (
         <ol className="relative space-y-4 border-l-2 border-border pl-6">
           {items.map((it, i) => (

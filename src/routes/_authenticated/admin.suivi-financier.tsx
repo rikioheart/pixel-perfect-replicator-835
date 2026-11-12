@@ -139,7 +139,7 @@ function Page() {
   };
 
   if (!rights.ready) return <AppShell title={TITLE}><p role="status" className="text-sm text-muted-foreground">Vérification de vos droits…</p></AppShell>;
-  if (!rights.viewGlobal) return <AppShell title={TITLE}><EmptyState title="Droit finances requis" message="Le grand livre est réservé aux membres du Bureau disposant du droit « consulter les finances globales »." /></AppShell>;
+  if (!rights.viewGlobal) return <AppShell title={TITLE}><EmptyState art="none" title="Droit finances requis" message="Le grand livre est réservé aux membres du Bureau disposant du droit « consulter les finances globales »." /></AppShell>;
   const money = (n: number) => (entries.isError ? "—" : `${n.toFixed(2)} €`);
 
   return (
@@ -198,7 +198,7 @@ function Page() {
         ))}
       </div>
       {entries.isError ? <p className="text-sm text-destructive">Opérations indisponibles (chargement ou droits).</p> : entries.isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
-        <EmptyState title="Aucune opération" message="Ajoutez une opération ou importez des adhésions HelloAsso." />
+        <EmptyState art="none" title="Aucune opération" message="Ajoutez une opération ou importez des adhésions HelloAsso." />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">

@@ -103,7 +103,7 @@ function AdminPros() {
         ))}
       </div>
       {isLoading ? <LoadingState rows={3} /> : shown.length === 0 ? (
-        <EmptyState title="Rien à traiter" message="Aucune carte dans cette catégorie." />
+        <EmptyState art="resting" title="Rien à traiter" message="Aucune carte dans cette catégorie." />
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {shown.map((c) => (

@@ -143,7 +143,7 @@ function AdvantagesPage() {
         <p className="text-sm text-muted-foreground">Chargement des avantages…</p>
       ) : advantages.length === 0 ? (
         <EmptyState
-          title="Aucun avantage pour l'instant"
+          art="attentive" title="Aucun avantage pour l'instant"
           message="Les avantages négociés avec nos partenaires apparaîtront ici."
         />
       ) : (

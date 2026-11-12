@@ -231,7 +231,7 @@ function EventsPage() {
         <ArchiveToggle view={view} setView={setView} counts={splitArchive(events)} pastLabel="Archives" />
         {(view === "current" ? splitArchive(events).current : splitArchive(events).past).length === 0 ? (
         <EmptyState
-          title="Pas encore d'événement"
+          art="resting" title="Pas encore d'événement"
           message="Les prochains temps forts de l'association apparaîtront ici."
         />
       ) : (
