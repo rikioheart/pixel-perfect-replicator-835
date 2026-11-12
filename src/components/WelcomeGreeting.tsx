@@ -24,14 +24,23 @@ export function useGreeting({
     if (!user?.id) return;
     const now = new Date();
     const key = `lvdc.greeted.${user.id}`;
-    let full = true;
+    let full = false; // sans stockage, rester sobre plutôt que répéter le message long
     try {
       full = localStorage.getItem(key) !== localDay(now);
-      localStorage.setItem(key, localDay(now));
     } catch {
-      full = false; // sans stockage, rester sobre plutôt que répéter le message long
+      /* stockage indisponible */
     }
     setState({ full, date: now });
+    if (!full) return;
+    // Le message n'est « vu » qu'après deux secondes d'affichage : un affichage fugace ne le consomme pas.
+    const seen = window.setTimeout(() => {
+      try {
+        localStorage.setItem(key, localDay(now));
+      } catch {
+        /* stockage indisponible */
+      }
+    }, 2000);
+    return () => window.clearTimeout(seen);
   }, [user?.id]);
   return buildGreeting({ name, dogNames, roleMessage, date: state?.date ?? new Date(0), full: state?.full ?? false });
 }
