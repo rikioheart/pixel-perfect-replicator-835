@@ -1,5 +1,12 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Refonte UX/UI — Lots 1 à 5 (cadrage du 12 nov.)
+- [x] Lot 1 : crème, sable, or ; signatures Bordeaux / Bleu nuit au choix dans Mes préférences ; plus aucun rose ; contrastes vérifiés par test
+- [ ] Lot 2 : préférences de lecture (polices, modes épuré et focus) — attend le feu vert
+- [ ] Lot 3 : états vides illustrés (chiens), messages humanisés — attend le feu vert
+- [ ] Lot 4 : profil enrichi (audit des règles d'accès d'abord) — attend le feu vert
+- [ ] Lot 5 : accueils vivants et célébrations douces — attend le feu vert
+
 ## Centre d'aide & assistant — demande du 11 nov.
 - [x] 13 guides officiels publiés avec leurs visibilités (ALL / PRO_BUREAU / BUREAU)
 - [x] Publication/modification/suppression réservées au Bureau (proposition adhérent = en attente)
