@@ -50,6 +50,7 @@
   --color-ochre: var(--ochre);
   --color-ochre-soft: var(--ochre-soft);
   --color-primary-ink: var(--primary-ink);
+  --color-primary-tint: var(--primary-tint);
   --color-cream: var(--cream);
   --color-sand: var(--sand);
   --color-sand-soft: var(--sand-soft);
@@ -111,6 +112,8 @@
   --primary: oklch(0.395 0.128 12);
   --primary-foreground: oklch(0.985 0.004 260);
   --primary-ink: var(--primary);
+  /* Fond teinté de marque (badges, éléments mis en avant) : jamais un bordeaux éclairci, qui serait rose. */
+  --primary-tint: var(--gold-soft);
 
   /* Vin rouge */
   --wine: oklch(0.47 0.152 14);
@@ -131,22 +134,23 @@
   --accent: var(--sand);
   --accent-foreground: var(--primary-ink);
 
-  --destructive: oklch(0.55 0.2 27);
+  --destructive: oklch(0.5 0.19 27);
   --destructive-foreground: oklch(0.985 0.004 260);
-  --success: oklch(0.5 0.07 145);
+  --success: oklch(0.46 0.08 145);
   --success-foreground: oklch(0.985 0.004 260);
   --warning: oklch(0.74 0.12 80);
   --warning-foreground: oklch(0.22 0.045 265);
 
   --border: oklch(0.88 0.02 70);
-  --input: oklch(0.88 0.02 70);
+  /* Contour des champs : 3:1 minimum sur crème et sur carte (WCAG 1.4.11). */
+  --input: oklch(0.6 0.02 70);
   --ring: var(--primary-ink);
 
   --chart-1: var(--primary);
   --chart-2: oklch(0.34 0.072 255);
   --chart-3: oklch(0.47 0.152 14);
   --chart-4: oklch(0.215 0.055 265);
-  --chart-5: var(--gold);
+  --chart-5: var(--gold-ink);
 
   --sidebar: oklch(0.215 0.055 265);
   --sidebar-foreground: oklch(0.93 0.01 260);
@@ -155,7 +159,8 @@
   --sidebar-accent: oklch(0.28 0.06 262);
   --sidebar-accent-foreground: oklch(0.97 0.008 260);
   --sidebar-border: oklch(0.3 0.05 262);
-  --sidebar-ring: oklch(0.47 0.152 14);
+  /* Focus dans le menu latéral bleu nuit : or, visible dans les deux signatures. */
+  --sidebar-ring: var(--gold);
 
   --gradient-night: linear-gradient(150deg, oklch(0.215 0.055 265), oklch(0.34 0.072 255));
   --gradient-wine: linear-gradient(135deg, oklch(0.395 0.128 12), oklch(0.47 0.152 14));
@@ -194,6 +199,7 @@
   --primary: oklch(0.47 0.13 18);
   --primary-foreground: oklch(0.97 0.012 85);
   --primary-ink: var(--gold-ink);
+  --primary-tint: oklch(0.3 0.045 75);
   --wine: oklch(0.55 0.16 14);
   --wine-foreground: oklch(0.98 0.004 260);
   --navy: oklch(0.16 0.04 265);
@@ -211,7 +217,7 @@
   --warning: oklch(0.74 0.12 80);
   --warning-foreground: oklch(0.18 0.04 265);
   --border: oklch(1 0 0 / 14%);
-  --input: oklch(1 0 0 / 22%);
+  --input: oklch(0.62 0.02 262);
   --ring: var(--primary-ink);
   --chart-1: oklch(0.58 0.15 24);
   --chart-2: oklch(0.72 0.09 240);
@@ -227,13 +233,13 @@
   --primary: oklch(0.33 0.08 258);
   --primary-foreground: oklch(0.97 0.012 85);
   --primary-ink: oklch(0.33 0.08 258);
+  --primary-tint: oklch(0.94 0.02 250);
   --secondary: oklch(0.395 0.128 12);
   --secondary-foreground: oklch(0.97 0.012 85);
   --ring: oklch(0.33 0.08 258);
   --chart-1: oklch(0.33 0.08 258);
   --chart-2: oklch(0.395 0.128 12);
   --sidebar-primary: oklch(0.5 0.1 250);
-  --sidebar-ring: oklch(0.5 0.1 250);
   --signature-from: oklch(0.36 0.085 258);
   --signature-to: oklch(0.46 0.1 250);
 }
@@ -241,6 +247,7 @@
   --primary: oklch(0.78 0.085 240);
   --primary-foreground: oklch(0.18 0.04 265);
   --primary-ink: oklch(0.78 0.085 240);
+  --primary-tint: oklch(0.3 0.05 255);
   --secondary: oklch(0.45 0.13 18);
   --secondary-foreground: oklch(0.97 0.012 85);
   --accent: oklch(0.3 0.06 255);
@@ -249,7 +256,6 @@
   --chart-1: oklch(0.78 0.085 240);
   --chart-2: oklch(0.58 0.15 24);
   --sidebar-primary: oklch(0.5 0.1 250);
-  --sidebar-ring: oklch(0.78 0.085 240);
   --signature-from: oklch(0.4 0.09 256);
   --signature-to: oklch(0.48 0.1 248);
 }
@@ -276,6 +282,7 @@
 @utility surface-night {
   background-image: var(--gradient-night);
   color: var(--color-navy-foreground);
+  --ring: var(--sidebar-ring);
 }
 
 @utility surface-signature {
@@ -323,8 +330,86 @@
 .prefs-reduced-motion *, .prefs-reduced-motion *::before, .prefs-reduced-motion *::after {
   animation: none !important; transition: none !important; scroll-behavior: auto !important;
 }
-.prefs-high-contrast { --muted-foreground: oklch(0.32 0.02 265); --border: oklch(0.5 0.02 265); }
-.dark.prefs-high-contrast { --muted-foreground: oklch(0.9 0.01 265); --border: oklch(0.7 0.02 265); }
+
+/*
+ * Préférences de lecture et de confort (espace membre seulement : classes posées sur <html> par
+ * useApplyPreferences, retirées sur la vitrine). Aucune ne masque une fonction ; elles ne font
+ * qu'ajuster la lecture et la mise en page.
+ */
+
+/* Contraste renforcé : jetons neutres renforcés (le texte courant vise 7:1), puis signatures. */
+.prefs-high-contrast {
+  --foreground: oklch(0.16 0.04 265);
+  --card-foreground: oklch(0.16 0.04 265);
+  --popover-foreground: oklch(0.16 0.04 265);
+  --muted-foreground: oklch(0.3 0.025 265);
+  --border: oklch(0.5 0.02 265);
+  --input: oklch(0.42 0.02 265);
+}
+.dark.prefs-high-contrast {
+  --foreground: oklch(0.985 0.004 260);
+  --card-foreground: oklch(0.985 0.004 260);
+  --popover-foreground: oklch(0.985 0.004 260);
+  --muted-foreground: oklch(0.9 0.01 265);
+  --border: oklch(0.7 0.02 265);
+  --input: oklch(0.8 0.02 262);
+}
+.dark.prefs-high-contrast:not(.sig-bleu-nuit) {
+  --primary: oklch(0.42 0.12 18);
+}
+.prefs-high-contrast :focus-visible { outline-width: 3px; }
+.prefs-high-contrast :is(main, [role="dialog"]) :is(p, li, dd) a:not([class*="bg-"]) { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Polices de lecture (chargées à la demande). Les titres suivent la police choisie pour rester cohérents. */
+.prefs-font-atkinson { --font-sans: "Atkinson Hyperlegible", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-display: var(--font-sans); }
+.prefs-font-lexend { --font-sans: "Lexend", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; --font-display: var(--font-sans); }
+:is(.prefs-font-atkinson, .prefs-font-lexend) :is(.font-sans, .font-display) { font-family: var(--font-sans); }
+
+/* Interlignage et espacement des lettres : appliqués à tout le texte (valeurs WCAG 1.4.12 au plus fort). */
+.prefs-line-relaxed body :not(h1, h2, h3, h4, svg, svg *) { line-height: 1.8 !important; }
+.prefs-line-relaxed body :is(h1, h2, h3, h4) { line-height: 1.45 !important; }
+.prefs-line-loose body :not(h1, h2, h3, h4, svg, svg *) { line-height: 2 !important; }
+.prefs-line-loose body :is(h1, h2, h3, h4) { line-height: 1.6 !important; }
+.prefs-letter-wide body * { letter-spacing: 0.05em !important; word-spacing: 0.08em !important; }
+.prefs-letter-wider body * { letter-spacing: 0.12em !important; word-spacing: 0.16em !important; }
+
+/* Espace entre les paragraphes et les listes. */
+.prefs-paragraph-wide :is(main, [role="dialog"]) :is(p, ul, ol, dl, blockquote) + :is(p, ul, ol, dl, blockquote) { margin-top: 1.25em !important; }
+.prefs-paragraph-wide :is(main, [role="dialog"]) :is(ul, ol) > li + li { margin-top: 0.5em; }
+
+/* Largeur de lecture : lignes de texte plus courtes, sans toucher aux cartes ni aux tableaux. */
+.prefs-measure-comfortable :is(main, [role="dialog"]) :is(p, li, dd, blockquote, figcaption) { max-width: 70ch; }
+.prefs-measure-narrow :is(main, [role="dialog"]) :is(p, li, dd, blockquote, figcaption) { max-width: 60ch; }
+
+/* Texte agrandi (125 % et plus) : rien n'est coupé, les grilles se replient selon la place réelle. */
+.prefs-text-large :is(main, header, [role="dialog"]) .truncate { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+.prefs-text-large :is(main, [role="dialog"]) :is(.line-clamp-1, .line-clamp-2, .line-clamp-3, .line-clamp-4) { display: block; -webkit-line-clamp: unset; overflow: visible; }
+.prefs-text-large button[role="combobox"] { height: auto; min-height: 2.75rem; white-space: normal; text-align: start; }
+.prefs-text-large button[role="combobox"] > span { display: block; -webkit-line-clamp: unset; overflow: visible; }
+.prefs-text-large :is(button, a)[class~="whitespace-nowrap"] { white-space: normal; height: auto; min-height: 2.25rem; }
+.prefs-text-large [role="tablist"] { height: auto; flex-wrap: wrap; }
+.prefs-text-large main .flex:not(.flex-col):not(.flex-nowrap):not(.overflow-x-auto):not([role="tablist"]) { flex-wrap: wrap; }
+.prefs-text-large :is(main, [role="dialog"]) :is(input, select, textarea, button, [role="combobox"]) { max-width: 100%; }
+.prefs-text-large :is(main, header, [role="dialog"]) :is(h1, h2, h3, h4, p, li, dd, dt, label, td, th) { overflow-wrap: anywhere; hyphens: auto; }
+.prefs-text-large main :is([class*="sm:grid-cols-"], [class*="md:grid-cols-"], [class*="lg:grid-cols-"], [class*="xl:grid-cols-"]) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)) !important;
+}
+.prefs-text-large main :is([class*="sm:grid-cols-"], [class*="md:grid-cols-"], [class*="lg:grid-cols-"], [class*="xl:grid-cols-"]) > [class*="col-span-"] { grid-column: 1 / -1 !important; }
+.prefs-text-xlarge main :is([class*="sm:grid-cols-"], [class*="md:grid-cols-"], [class*="lg:grid-cols-"], [class*="xl:grid-cols-"]) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)) !important;
+}
+
+/* Mode épuré : surfaces unies, sans ombres, illustrations décoratives ni animations. */
+.prefs-calm { --shadow-panel: none; }
+.prefs-calm :is(.shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl) { box-shadow: none !important; }
+.prefs-calm .surface-signature { background-image: none; background-color: var(--signature-from); }
+.prefs-calm .surface-night { background-image: none; background-color: var(--sidebar); }
+.prefs-calm [data-decorative] { display: none !important; }
+.prefs-calm *, .prefs-calm *::before, .prefs-calm *::after { animation: none !important; }
+.prefs-calm :is(main, [role="dialog"]) [class*="hover:-translate"]:hover, .prefs-calm :is(main, [role="dialog"]) [class*="hover:scale"]:hover { transform: none !important; }
+
+/* Mode focus : contenu centré ; la navigation reste disponible derrière le bouton « Menu ». */
+.prefs-focus #contenu-principal { width: 100%; max-width: 68rem; margin-inline: auto; }
 .public-cover { background: var(--navy); color: var(--navy-foreground); }
 .public-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, var(--navy), transparent 90%); opacity: .85; }
 .reading-space { line-height: 1.8; }

@@ -1,50 +1,7 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { contrastRatio, isExcludedHue, parseOklch } from "./color-contrast";
 import { SIGNATURES, signatureClass } from "./user-preferences";
-
-const css = readFileSync(resolve(process.cwd(), "src/styles.css"), "utf8");
-
-function block(selector: string): Record<string, string> {
-  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = css.match(new RegExp(`^${escaped} \\{([^}]*)\\}`, "m"));
-  if (!match) throw new Error(`Bloc introuvable : ${selector}`);
-  const vars: Record<string, string> = {};
-  for (const [, name, value] of (match[1] ?? "").matchAll(/--([\w-]+):\s*([^;]+);/g)) if (name && value) vars[name] = value.trim();
-  return vars;
-}
-
-type Combo = { name: string; selectors: string[] };
-const COMBOS: Combo[] = [
-  { name: "Bordeaux clair", selectors: [":root"] },
-  { name: "Bordeaux sombre", selectors: [":root", ".dark"] },
-  { name: "Bleu nuit clair", selectors: [":root", ".sig-bleu-nuit:not(.dark)"] },
-  { name: "Bleu nuit sombre", selectors: [":root", ".dark", ".sig-bleu-nuit.dark"] },
-];
-const WITH_CONTRAST: Combo[] = COMBOS.flatMap((combo) => [
-  combo,
-  {
-    name: `${combo.name} + contraste renforcé`,
-    selectors: [
-      ...combo.selectors,
-      ".prefs-high-contrast",
-      ...(combo.selectors.includes(".dark") ? [".dark.prefs-high-contrast"] : []),
-    ],
-  },
-]);
-
-function tokens(combo: Combo) {
-  const vars = Object.assign({}, ...combo.selectors.map(block)) as Record<string, string>;
-  const get = (name: string, depth = 0): string => {
-    const value = vars[name];
-    if (value === undefined) throw new Error(`${combo.name} : --${name} absent`);
-    const ref = value.match(/^var\(--([\w-]+)\)$/);
-    if (ref?.[1] && depth < 10) return get(ref[1], depth + 1);
-    return value;
-  };
-  return { vars, get };
-}
+import { COMBOS, WITH_CONTRAST, themeCss as css, tokens } from "./theme-css.test-helpers";
 
 // [texte, fond, minimum] — 4,5:1 pour le texte (AA), 3:1 pour l'anneau de focus.
 const PAIRS: [string, string, number][] = [

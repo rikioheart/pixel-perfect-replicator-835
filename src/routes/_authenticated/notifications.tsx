@@ -159,7 +159,7 @@ function NotificationsPage() {
           className="w-56"
         />
         <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40" aria-label="Lues ou non lues">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -169,7 +169,7 @@ function NotificationsPage() {
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-60">
+          <SelectTrigger className="w-60" aria-label="Type de notification">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -190,7 +190,7 @@ function NotificationsPage() {
       ) : (
         <div className="space-y-2">
           {filtered.map((notification) => (
-            <Card key={notification.id} className={cn(!notification.is_read && "border-primary/50")}>
+            <Card key={notification.id} className={cn(!notification.is_read && "border-l-4 border-l-primary-ink")}>
               <CardContent className="flex items-start gap-3 p-4 text-sm">
                 <BellRing
                   className={cn("mt-0.5 size-4", notification.is_read ? "text-muted-foreground" : "text-primary")}

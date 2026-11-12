@@ -21,7 +21,7 @@ export function HomeHero({
   return (
     <section className="panel overflow-hidden">
       {coverUrl ? (
-        <div className="relative h-40 w-full sm:h-52">
+        <div className="relative h-40 w-full sm:h-52" data-decorative>
           <img
             src={coverUrl}
             alt={coverCaption ?? "Photo de couverture de l'association"}

@@ -24,6 +24,7 @@ import {
   formatDate,
 } from "@/lib/domain";
 import { taskCounts } from "@/lib/project-followup";
+import { projectsViewFor, useUserPreferences } from "@/lib/user-preferences";
 
 export const Route = createFileRoute("/_authenticated/projects/")({
   head: () => ({
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/_authenticated/projects/")({
       { property: "og:title", content: "Projets — La Voix du Chien" },
       {
         property: "og:description",
-        content: "Vue liste et kanban des projets associatifs de La Voix du Chien.",
+        content: "Vue liste, cartes et kanban des projets associatifs de La Voix du Chien.",
       },
     ],
   }),
@@ -51,6 +52,10 @@ function ProjectsPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [editing, setEditing] = useState<ProjectRow | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
+  // Vue de départ = préférence « Affichage par défaut » ; le choix fait ici ne vaut que pour cette visite.
+  const { preferences } = useUserPreferences();
+  const [view, setView] = useState<string | null>(null);
+  const currentView = view ?? projectsViewFor(preferences.default_view);
 
   const { data: categories } = useQuery({
     queryKey: ["project-categories"],
@@ -98,7 +103,7 @@ function ProjectsPage() {
     >
       <div className="mb-5 flex flex-wrap gap-3">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-48" aria-label="Statut">
             <SelectValue placeholder="Statut" />
           </SelectTrigger>
           <SelectContent>
@@ -111,7 +116,7 @@ function ProjectsPage() {
           </SelectContent>
         </Select>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-56">
+          <SelectTrigger className="w-56" aria-label="Catégorie">
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent>
@@ -125,13 +130,35 @@ function ProjectsPage() {
         </Select>
       </div>
 
-      <Tabs defaultValue="list">
+      <Tabs value={currentView} onValueChange={setView}>
         <TabsList className="mb-4">
-          <TabsTrigger value="list">Liste</TabsTrigger>
-          <TabsTrigger value="kanban">Kanban</TabsTrigger>
+          <TabsTrigger value="LIST">Liste</TabsTrigger>
+          <TabsTrigger value="CARDS">Cartes</TabsTrigger>
+          <TabsTrigger value="KANBAN">Kanban</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="list">
+        <TabsContent value="LIST">
+          {filtered.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucun projet ne correspond aux filtres.</p>
+          ) : (
+            <ul className="divide-y divide-border rounded-xl border border-border bg-card">
+              {filtered.map((project) => (
+                <ProjectRowItem
+                  key={project.id}
+                  project={project}
+                  counts={counts?.get(project.id)}
+                  canEdit={isBureau}
+                  onEdit={() => {
+                    setEditing(project);
+                    setPanelOpen(true);
+                  }}
+                />
+              ))}
+            </ul>
+          )}
+        </TabsContent>
+
+        <TabsContent value="CARDS">
           {filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground">Aucun projet ne correspond aux filtres.</p>
           ) : (
@@ -152,7 +179,7 @@ function ProjectsPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="kanban">
+        <TabsContent value="KANBAN">
           <div className="grid gap-4 lg:grid-cols-5">
             {PROJECT_STATUSES.map((status) => (
               <div key={status} className="panel p-3">
@@ -203,6 +230,50 @@ type ProjectRow = {
   progress_percent: number;
   project_categories: { name: string } | null;
 };
+
+function ProjectRowItem({
+  project,
+  counts,
+  canEdit,
+  onEdit,
+}: {
+  project: ProjectRow;
+  counts?: { open: number; done: number } | undefined;
+  canEdit?: boolean;
+  onEdit?: () => void;
+}) {
+  const progress = project.progress_percent ?? 0;
+  return (
+    <li className="flex flex-wrap items-center gap-x-4 gap-y-2 p-3">
+      <div className="min-w-0 flex-1 basis-60">
+        <Link
+          to="/projects/$projectId"
+          params={{ projectId: project.id }}
+          className="font-medium underline-offset-4 hover:underline"
+        >
+          {project.title}
+        </Link>
+        <p className="text-xs text-muted-foreground">
+          {project.project_categories?.name ?? "Sans catégorie"} · {PRIORITY_LABEL[project.priority] ?? project.priority} ·{" "}
+          {formatDate(project.deadline)}
+        </p>
+      </div>
+      <Badge variant="outline">{PROJECT_STATUS_LABEL[project.status] ?? project.status}</Badge>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Progress value={progress} aria-label={`Avancement : ${progress} %`} className="w-20" />
+        <span>{progress} %</span>
+      </div>
+      <Link to="/tasks" search={{ projectId: project.id }} className="text-xs text-primary hover:underline">
+        {counts ? `${counts.open} tâche${counts.open > 1 ? "s" : ""} ouverte${counts.open > 1 ? "s" : ""}` : "Aucune tâche"}
+      </Link>
+      {canEdit ? (
+        <Button variant="ghost" size="icon" aria-label={`Modifier le projet ${project.title}`} className="min-h-9 min-w-9" onClick={onEdit}>
+          <Pencil className="size-4" />
+        </Button>
+      ) : null}
+    </li>
+  );
+}
 
 function ProjectCard({
   project,

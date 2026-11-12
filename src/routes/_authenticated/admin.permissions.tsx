@@ -386,7 +386,7 @@ function PermissionsPage() {
                                           }
                                           className={`rounded-full px-2 py-0.5 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                                             link.requires_professional
-                                              ? "bg-primary/10 text-primary"
+                                              ? "bg-primary-tint text-primary"
                                               : "text-muted-foreground hover:text-foreground"
                                           }`}
                                           aria-pressed={link.requires_professional}

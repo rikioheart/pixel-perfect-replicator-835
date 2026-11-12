@@ -20,7 +20,7 @@ export function LoyaltyCardMini() {
         <Stamp className="size-4" />
       </div>
       <p className="mt-2 font-display text-3xl">{stamps} tampons</p>
-      <Progress className="mt-3" value={percent} />
+      <Progress className="mt-3" value={percent} aria-label={`Progression vers le prochain palier : ${percent} %`} />
       <p className="mt-2 text-xs text-muted-foreground">
         {next
           ? `Encore ${next - stamps} tampon(s) avant « ${data?.nextReward ?? "le palier suivant"} »`
@@ -45,7 +45,7 @@ export function ProfileCompletionCard() {
         <UserRound className="size-4" />
       </div>
       <p className="mt-2 font-display text-3xl">{percent}%</p>
-      <Progress className="mt-3" value={percent} />
+      <Progress className="mt-3" value={percent} aria-label={`Profil complété à ${percent} %`} />
       <p className="mt-2 text-xs text-muted-foreground">
         {missing.length === 0
           ? "Votre fiche est complète, merci !"

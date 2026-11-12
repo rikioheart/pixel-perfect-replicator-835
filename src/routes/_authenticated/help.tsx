@@ -336,7 +336,7 @@ function HelpCenterPage() {
                 <article
                   key={item.id}
                   id={`guide-${item.id}`}
-                  className={`scroll-mt-24 rounded-xl border bg-card p-5 ${focusGuide === item.id ? "border-primary ring-2 ring-primary/40" : "border-border"}`}
+                  className={`scroll-mt-24 rounded-xl border bg-card p-5 ${focusGuide === item.id ? "border-primary ring-2 ring-primary-ink/40" : "border-border"}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>

@@ -304,7 +304,7 @@ function AccountsPanel({ accounts, loading, failed, from, to }: { accounts: Annu
     <section className="panel mb-6 space-y-4 p-5" aria-labelledby="accounts-title">
       <div className="flex flex-wrap items-center gap-2">
         <h2 id="accounts-title" className="flex flex-1 items-center gap-2 text-lg"><Landmark className="size-5 text-primary" aria-hidden /> Comptes de l'exercice</h2>
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${accounts.kind === "DEFICIT" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
+        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${accounts.kind === "DEFICIT" ? "bg-destructive/10 text-destructive" : "bg-primary-tint text-primary"}`}>
           {resultLabel(accounts)}
         </span>
       </div>

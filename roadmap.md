@@ -2,7 +2,7 @@
 
 ## Refonte UX/UI — Lots 1 à 5 (cadrage du 12 nov.)
 - [x] Lot 1 : crème, sable, or ; signatures Bordeaux / Bleu nuit au choix dans Mes préférences ; plus aucun rose ; contrastes vérifiés par test
-- [ ] Lot 2 : préférences de lecture (polices, modes épuré et focus) — attend le feu vert
+- [x] Lot 2 : Mes préférences en 4 familles avec aperçu ; texte jusqu'à 200 %, polices Atkinson/Lexend, interlignage, espacements, largeur de lecture ; modes épuré et focus ; vue par défaut réelle (Projets) ; rappels et son réellement appliqués ; contrastes AA contrôlés par composant
 - [ ] Lot 3 : états vides illustrés (chiens), messages humanisés — attend le feu vert
 - [ ] Lot 4 : profil enrichi (audit des règles d'accès d'abord) — attend le feu vert
 - [ ] Lot 5 : accueils vivants et célébrations douces — attend le feu vert

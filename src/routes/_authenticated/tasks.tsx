@@ -100,7 +100,7 @@ function TasksPage() {
     >
       <div className="mb-5 flex flex-wrap gap-3">
         <Select value={scope} onValueChange={(value) => setScope(value as "MINE" | "ALL")}>
-          <SelectTrigger className="w-52">
+          <SelectTrigger className="w-52" aria-label="Tâches affichées">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -125,7 +125,7 @@ function TasksPage() {
           </SelectContent>
         </Select>
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-52">
+          <SelectTrigger className="w-52" aria-label="Statut">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

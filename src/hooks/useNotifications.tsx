@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPreferences } from "@/lib/user-preferences";
+import { newUnreadToChime, playNotificationChime, resetChimeTracking } from "@/lib/notification-sound";
 
 export type AppNotification = {
   id: string;
@@ -18,6 +20,9 @@ export function useNotifications() {
   const userId = user?.id ?? null;
   const [items, setItems] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const { preferences } = useUserPreferences();
+  const soundOn = useRef(preferences.notification_sound);
+  soundOn.current = preferences.notification_sound;
 
   const refresh = useCallback(async () => {
     if (!userId) {
@@ -31,8 +36,16 @@ export function useNotifications() {
       .eq("recipient_id", userId)
       .order("created_at", { ascending: false })
       .limit(40);
-    setItems((data ?? []) as AppNotification[]);
+    const rows = (data ?? []) as AppNotification[];
+    setItems(rows);
     setLoading(false);
+    // Son facultatif : une seule fois par nouvelle notification non lue.
+    const fresh = newUnreadToChime(rows.filter((n) => !n.is_read).map((n) => n.id));
+    if (fresh.length > 0 && soundOn.current) playNotificationChime();
+  }, [userId]);
+
+  useEffect(() => {
+    resetChimeTracking(userId);
   }, [userId]);
 
   useEffect(() => {
