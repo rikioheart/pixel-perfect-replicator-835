@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { HandHeart, Plus, X } from "lucide-react";
+import { HandHeart } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ import {
 } from "@/lib/contributions";
 import { explainDbError } from "@/lib/task-lifecycle";
 import { fetchMySkills } from "@/lib/profile-details";
+import { SkillsEditor } from "@/components/SkillsEditor";
 
 export const Route = createFileRoute("/_authenticated/je-veux-aider")({
   head: () => ({
