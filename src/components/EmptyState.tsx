@@ -17,6 +17,7 @@ export function EmptyState({
         src={illustration}
         alt=""
         aria-hidden
+        data-decorative
         loading="lazy"
         width={992}
         height={672}
