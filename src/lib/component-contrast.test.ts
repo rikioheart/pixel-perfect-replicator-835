@@ -4,7 +4,7 @@
  * (ex. bouton survolé = bg-primary/90 posé sur le fond). Les états désactivés sont exemptés par WCAG.
  */
 import { describe, expect, it } from "vitest";
-import { WITH_CONTRAST, ratio, tokens, type Combo, type Surface } from "./theme-css.test-helpers";
+import { WITH_CONTRAST, ratio, tokens, type Surface } from "./theme-css.test-helpers";
 
 const TEXT = 4.5; // texte (WCAG 1.4.3)
 const UI = 3; // contours de champs, états, anneau de focus, jauges, graphiques (WCAG 1.4.11)
@@ -13,7 +13,7 @@ const over = (token: string, alpha: number, base: Surface): Surface => ({ token,
 
 type Check = [composant: string, avant: Surface, fond: Surface, minimum: number];
 
-function checks(combo: Combo): Check[] {
+function checks(): Check[] {
   const list: Check[] = [];
   for (const base of ["background", "card"] as const) {
     list.push(
@@ -35,7 +35,7 @@ function checks(combo: Combo): Check[] {
       ["Texte d'exemple (placeholder)", "muted-foreground", base, TEXT],
       ["Contour de champ", "input", base, UI],
       ["Case à cocher / bouton radio", "primary-ink", base, UI],
-      ["Interrupteur inactif (piste)", "input", base, UI],
+      ["Interrupteur inactif (piste)", "muted-foreground", base, UI],
       ["Interrupteur actif (contour)", "primary-ink", base, UI],
       // Messages d'erreur et alertes
       ["Message d'erreur", "destructive", base, TEXT],
@@ -76,7 +76,7 @@ function checks(combo: Combo): Check[] {
     ["Message éphémère : texte", "foreground", "background", TEXT],
     ["Message éphémère : détail", "muted-foreground", "background", TEXT],
     ["Interrupteur actif (pastille)", "primary-foreground", "primary", UI],
-    ["Interrupteur inactif (pastille)", combo.dark ? "foreground" : "background", "input", UI],
+    ["Interrupteur inactif (pastille)", "background", "muted-foreground", UI],
     ["Pastille du nombre de notifications", "primary-foreground", "primary", TEXT],
   );
   return list;
@@ -86,7 +86,7 @@ describe("Composants partagés : contrastes WCAG AA dans chaque état", () => {
   for (const combo of WITH_CONTRAST) {
     it(combo.name, () => {
       const { get } = tokens(combo);
-      const failures = checks(combo).flatMap(([name, fg, bg, min]) => {
+      const failures = checks().flatMap(([name, fg, bg, min]) => {
         const r = ratio(get, fg, bg);
         return r < min ? [`${name} (${JSON.stringify(fg)} sur ${JSON.stringify(bg)}) : ${r.toFixed(2)} < ${min}`] : [];
       });

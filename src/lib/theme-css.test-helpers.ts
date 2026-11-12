@@ -16,6 +16,11 @@ export function cssBlock(selector: string): Record<string, string> {
   return vars;
 }
 
+export function hasBlock(selector: string): boolean {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^${escaped} \\{`, "m").test(themeCss);
+}
+
 export type Combo = { name: string; selectors: string[]; dark: boolean; highContrast: boolean };
 
 export const COMBOS: Combo[] = [
@@ -26,15 +31,21 @@ export const COMBOS: Combo[] = [
 ];
 
 export const WITH_CONTRAST: Combo[] = COMBOS.flatMap((combo) => {
+  const bleuNuit = combo.selectors.some((sel) => sel.startsWith(".sig-bleu-nuit"));
   const hc = [".prefs-high-contrast"];
-  if (combo.dark) hc.push(".dark.prefs-high-contrast");
-  if (combo.selectors.includes(".sig-bleu-nuit:not(.dark)")) hc.push(".sig-bleu-nuit.prefs-high-contrast:not(.dark)");
-  if (combo.selectors.includes(".sig-bleu-nuit.dark")) hc.push(".sig-bleu-nuit.dark.prefs-high-contrast");
+  if (combo.dark) hc.push(".dark.prefs-high-contrast", bleuNuit ? ".sig-bleu-nuit.dark.prefs-high-contrast" : ".dark.prefs-high-contrast:not(.sig-bleu-nuit)");
+  else if (bleuNuit) hc.push(".sig-bleu-nuit.prefs-high-contrast:not(.dark)");
   return [combo, { ...combo, name: `${combo.name} + contraste renforcé`, selectors: [...combo.selectors, ...hc], highContrast: true }];
 });
 
+/** Blocs propres à une signature en contraste renforcé : facultatifs (absents si rien à ajuster). */
+const OPTIONAL_BLOCKS = new Set([".sig-bleu-nuit.dark.prefs-high-contrast", ".sig-bleu-nuit.prefs-high-contrast:not(.dark)"]);
+
 export function tokens(combo: Combo) {
-  const vars = Object.assign({}, ...combo.selectors.map(cssBlock)) as Record<string, string>;
+  const vars = Object.assign(
+    {},
+    ...combo.selectors.map((sel) => (OPTIONAL_BLOCKS.has(sel) && !hasBlock(sel) ? {} : cssBlock(sel))),
+  ) as Record<string, string>;
   const get = (name: string, depth = 0): string => {
     const value = vars[name];
     if (value === undefined) throw new Error(`${combo.name} : --${name} absent`);
