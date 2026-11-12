@@ -380,7 +380,7 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border bg-card px-6 py-5">
-          <div>
+          <div className="min-w-0">
             <h1 className="text-2xl">{title}</h1>
             {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
           </div>
