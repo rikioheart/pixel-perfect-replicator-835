@@ -288,7 +288,7 @@ function ProfilePage() {
               <Field id="pr-phone" label="Téléphone (privé)">
                 <Input id="pr-phone" type="tel" autoComplete="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
               </Field>
-              <Button variant="outline" className="w-full gap-2" onClick={() => setPreviewOpen(true)}>
+              <Button variant="outline" className="h-auto min-h-10 w-full gap-2 whitespace-normal py-2" onClick={() => setPreviewOpen(true)}>
                 <Eye className="size-4" aria-hidden /> Voir mon profil tel que les autres le voient
               </Button>
             </CardContent>
