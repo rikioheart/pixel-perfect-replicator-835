@@ -56,7 +56,6 @@ function WantToHelpPage() {
   const qc = useQueryClient();
 
   // --- Compétences du profil ---
-  const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const { data: mySkills } = useQuery({
     queryKey: ["my-skills", user?.id],
@@ -79,24 +78,6 @@ function WantToHelpPage() {
     },
     onError: (e: Error) => toast.error(explainDbError(e)),
   });
-
-  const addSkill = () => {
-    const value = skillInput.trim();
-    if (!value) return;
-    if (skills.some((s) => s.toLowerCase() === value.toLowerCase())) {
-      setSkillInput("");
-      return;
-    }
-    const next = [...skills, value];
-    setSkills(next);
-    setSkillInput("");
-    saveSkills.mutate(next);
-  };
-  const removeSkill = (value: string) => {
-    const next = skills.filter((s) => s !== value);
-    setSkills(next);
-    saveSkills.mutate(next);
-  };
 
   // --- Proposition d'aide ---
   const [type, setType] = useState("");
@@ -155,49 +136,19 @@ function WantToHelpPage() {
     >
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="panel space-y-3 p-5" aria-labelledby="skills-h">
-          <h2 id="skills-h" className="font-display text-lg">Mes compétences</h2>
+          <h2 id="skills-h" className="font-display text-lg">Mes compétences et centres d'intérêt</h2>
           <p className="text-sm text-muted-foreground">
-            Elles aident le Bureau et les coordinateurs à vous proposer ce qui vous correspond. Elles restent visibles des membres connectés.
+            Elles aident le Bureau et les coordinateurs à vous proposer ce qui vous correspond. Dans{" "}
+            <Link to="/profile" className="underline underline-offset-2">Mon profil</Link>, vous choisissez si les membres de l'annuaire les voient aussi.
           </p>
-          {skills.length > 0 ? (
-            <ul className="flex flex-wrap gap-2">
-              {skills.map((s) => (
-                <li key={s}>
-                  <Badge variant="secondary" className="gap-1 pr-1">
-                    {s}
-                    <button
-                      type="button"
-                      onClick={() => removeSkill(s)}
-                      className="rounded-full p-0.5 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      aria-label={`Retirer la compétence ${s}`}
-                    >
-                      <X className="size-3" aria-hidden />
-                    </button>
-                  </Badge>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">Aucune compétence indiquée pour l'instant.</p>
-          )}
-          <div className="flex gap-2">
-            <Input
-              value={skillInput}
-              onChange={(e) => setSkillInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addSkill();
-                }
-              }}
-              placeholder="Ex. couture, conduite, réseaux sociaux…"
-              aria-label="Nouvelle compétence"
-              maxLength={60}
-            />
-            <Button type="button" variant="outline" onClick={addSkill} disabled={!skillInput.trim() || saveSkills.isPending}>
-              <Plus className="size-4" aria-hidden /> Ajouter
-            </Button>
-          </div>
+          <SkillsEditor
+            value={skills}
+            disabled={saveSkills.isPending}
+            onChange={(next) => {
+              setSkills(next);
+              saveSkills.mutate(next);
+            }}
+          />
         </section>
 
         <section className="panel space-y-4 p-5" aria-labelledby="offer-h">
