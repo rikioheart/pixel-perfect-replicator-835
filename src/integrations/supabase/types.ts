@@ -4844,6 +4844,13 @@ export type Database = {
         Returns: boolean
       }
       entity_peek: { Args: { _id: string; _type: string }; Returns: Json }
+      formation_registration_counts: {
+        Args: never
+        Returns: {
+          formation_id: string
+          total: number
+        }[]
+      }
       get_pro_dogs: { Args: never; Returns: Json }
       get_public_home: { Args: never; Returns: Json }
       get_public_pro_page: { Args: { _slug: string }; Returns: Json }
