@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { contrastRatio, isExcludedHue, parseOklch } from "./color-contrast";
+import { SIGNATURES, signatureClass } from "./user-preferences";
 
 const css = readFileSync(resolve(process.cwd(), "src/styles.css"), "utf8");
 
@@ -10,7 +11,7 @@ function block(selector: string): Record<string, string> {
   const match = css.match(new RegExp(`^${escaped} \\{([^}]*)\\}`, "m"));
   if (!match) throw new Error(`Bloc introuvable : ${selector}`);
   const vars: Record<string, string> = {};
-  for (const [, name, value] of match[1].matchAll(/--([\w-]+):\s*([^;]+);/g)) vars[name] = value.trim();
+  for (const [, name, value] of (match[1] ?? "").matchAll(/--([\w-]+):\s*([^;]+);/g)) if (name && value) vars[name] = value.trim();
   return vars;
 }
 
@@ -39,7 +40,7 @@ function tokens(combo: Combo) {
     const value = vars[name];
     if (value === undefined) throw new Error(`${combo.name} : --${name} absent`);
     const ref = value.match(/^var\(--([\w-]+)\)$/);
-    if (ref && depth < 10) return get(ref[1], depth + 1);
+    if (ref?.[1] && depth < 10) return get(ref[1], depth + 1);
     return value;
   };
   return { vars, get };
@@ -116,5 +117,12 @@ describe("Thème : signatures distinctes", () => {
     const [bordeauxLight, bordeauxDark, nuitLight, nuitDark] = COMBOS.map((combo) => tokens(combo).get("primary"));
     expect(bordeauxLight).not.toBe(nuitLight);
     expect(bordeauxDark).not.toBe(nuitDark);
+  });
+
+  it("le choix enregistré pose la bonne classe : Bordeaux par défaut, Bleu nuit sur demande", () => {
+    expect(SIGNATURES.map((s) => s.value)).toEqual(["BORDEAUX", "BLEU_NUIT"]);
+    expect(signatureClass("BORDEAUX")).toBeNull();
+    expect(signatureClass("BLEU_NUIT")).toBe("sig-bleu-nuit");
+    expect(css).toContain(".sig-bleu-nuit:not(.dark) {");
   });
 });

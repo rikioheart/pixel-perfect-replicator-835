@@ -33,8 +33,8 @@ export function oklchToSrgb({ l, c, h }: Oklch): [number, number, number] {
 }
 
 export function relativeLuminance(rgb: [number, number, number]): number {
-  const [r, g, b] = rgb.map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const lin = (v: number) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
 }
 
 /** Rapport de contraste WCAG entre deux couleurs OKLCH opaques. */
