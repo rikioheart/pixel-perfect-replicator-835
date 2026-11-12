@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/forms")({
   head: () => ({
@@ -210,7 +211,7 @@ function FormsPage() {
       </section>
       )}
 
-      {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : forms.length === 0 ? (
+      {isLoading ? <InlineLoading /> : forms.length === 0 ? (
         <EmptyState art="attentive" title="Aucun formulaire" message={canCreate ? "Créez un premier formulaire ci-dessus." : "Aucun formulaire ouvert pour le moment."} />
       ) : (
         <div className="space-y-3">

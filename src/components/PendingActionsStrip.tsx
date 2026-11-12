@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, ChevronRight } from "lucide-react";
 import { pendingActions, type PendingAction } from "@/lib/role-home";
+import { InlineLoading } from "@/components/LoadingState";
 
 /**
  * « À traiter maintenant » : seules les files qui attendent une décision humaine, chacune vers son écran.
@@ -22,7 +23,7 @@ export function PendingActionsStrip({
     <section className="panel p-4" aria-labelledby="pending-actions-title">
       <h2 id="pending-actions-title" className="mb-3 font-display text-lg">{title}</h2>
       {loading ? (
-        <p className="text-sm text-muted-foreground">Chargement…</p>
+        <InlineLoading />
       ) : shown.length === 0 ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <CheckCircle2 className="size-4 text-primary" aria-hidden /> {calmMessage}

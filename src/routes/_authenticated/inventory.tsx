@@ -28,6 +28,7 @@ import {
   validateReservationDraft,
 } from "@/lib/inventory";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/inventory")({
   head: () => ({
@@ -376,7 +377,7 @@ function InventoryPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement de l'inventaire…</p>
+        <InlineLoading label="Chargement de l'inventaire…" />
       ) : filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground">{items.length === 0 ? "Aucune référence enregistrée." : "Aucune référence ne correspond à ce filtre."}</p>
       ) : (

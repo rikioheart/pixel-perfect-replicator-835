@@ -185,7 +185,7 @@ function NotificationsPage() {
       </div>
 
       {isLoading ? (
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       ) : filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground">Aucune notification pour ces critères.</p>
       ) : (

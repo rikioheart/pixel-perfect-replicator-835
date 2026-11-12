@@ -16,6 +16,7 @@ import { membershipStatus, parseConsoleSummary, pct, taskStatus, type Tone } fro
 import { Progress } from "@/components/ui/progress";
 import { PendingActionsStrip } from "@/components/PendingActionsStrip";
 import { BureauQuickAccess } from "@/components/BureauQuickAccess";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -118,7 +119,7 @@ function AdminConsole() {
   ];
 
   const unavailable = <p className="text-sm text-destructive">Indisponible pour le moment.</p>;
-  const pendingLoad = <p className="text-sm text-muted-foreground">Chargement…</p>;
+  const pendingLoad = <InlineLoading />;
 
   return (
     <AppShell title="Console du Bureau" subtitle="Le pilotage de l'association, en un coup d'œil">

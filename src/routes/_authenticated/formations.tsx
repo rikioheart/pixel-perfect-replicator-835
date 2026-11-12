@@ -27,6 +27,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/formations")({
   head: () => ({
@@ -170,7 +171,7 @@ function FormationsPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des sessions…</p>
+        <InlineLoading label="Chargement des sessions…" />
       ) : formations.length === 0 ? (
         <EmptyState
           art="attentive" title="Aucune session programmée"

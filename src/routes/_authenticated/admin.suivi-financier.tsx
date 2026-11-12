@@ -15,6 +15,7 @@ import { buildRows, toCsv, toTsv, parseHelloAssoCsv, EXPORT_COLUMNS } from "@/li
 import { LEDGER_CATEGORIES, categoryLabel } from "@/lib/annual-accounts";
 import { AccountingSplitsPanel } from "@/components/AccountingSplitsPanel";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 const TITLE = "Comptabilité & Grand livre";
 
@@ -198,7 +199,7 @@ function Page() {
             {k === "" ? "Tout" : k === "RECETTE" ? "Recettes" : k === "DEPENSE" ? "Dépenses" : STATUS_FR[k]}</Button>
         ))}
       </div>
-      {entries.isError ? <p className="text-sm text-destructive">Opérations indisponibles (chargement ou droits).</p> : entries.isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
+      {entries.isError ? <p className="text-sm text-destructive">Opérations indisponibles (chargement ou droits).</p> : entries.isLoading ? <InlineLoading /> : list.length === 0 ? (
         <EmptyState art="none" title="Aucune opération" message="Ajoutez une opération ou importez des adhésions HelloAsso." />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border">

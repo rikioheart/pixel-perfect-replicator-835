@@ -80,7 +80,7 @@ function ProfessionalDetailPage() {
   if (isLoading) {
     return (
       <AppShell title="Professionnel">
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       </AppShell>
     );
   }

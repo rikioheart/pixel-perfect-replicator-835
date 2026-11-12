@@ -26,6 +26,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/advantages")({
   head: () => ({
@@ -141,7 +142,7 @@ function AdvantagesPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des avantages…</p>
+        <InlineLoading label="Chargement des avantages…" />
       ) : advantages.length === 0 ? (
         <EmptyState
           art="attentive" title="Aucun avantage pour l'instant"

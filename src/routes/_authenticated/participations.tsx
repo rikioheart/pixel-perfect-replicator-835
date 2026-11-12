@@ -73,7 +73,7 @@ function ParticipationsPage() {
       subtitle="Vos inscriptions aux activités et événements, et votre présence enregistrée."
     >
       {isLoading ? (
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       ) : items.length === 0 ? (
         <EmptyState
           art="resting" title="Aucune inscription pour l'instant"

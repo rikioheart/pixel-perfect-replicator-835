@@ -133,7 +133,7 @@ function ProposalsPage() {
       }
     >
       {isLoading ? (
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       ) : rows.length === 0 ? (
         <EmptyState
           art="playful" title="Aucune proposition"

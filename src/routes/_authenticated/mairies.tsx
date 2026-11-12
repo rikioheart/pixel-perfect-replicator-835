@@ -155,7 +155,7 @@ function MairiesPage() {
       </div>
 
       {isLoading ? (
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       ) : filtered.length === 0 ? (
         <EmptyState
           art="attentive" title="Aucun contact institutionnel"

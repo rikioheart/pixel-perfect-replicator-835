@@ -20,6 +20,7 @@ import { ArchiveToggle } from "@/components/ArchiveToggle";
 import { ParentProjectSelect } from "@/components/ParentProjectSelect";
 import { useConfigOptions } from "@/lib/config-options";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/activities/")({
   head: () => ({
@@ -346,7 +347,7 @@ function ActivitiesPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des activités…</p>
+        <InlineLoading label="Chargement des activités…" />
       ) : (
         <>
         <ArchiveToggle view={view} setView={setView} counts={splitArchive(activities)} pastLabel="Historique" />

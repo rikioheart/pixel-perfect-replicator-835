@@ -18,6 +18,7 @@ import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
 import { ParentProjectSelect } from "@/components/ParentProjectSelect";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/events/")({
   head: () => ({
@@ -226,7 +227,7 @@ function EventsPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement du calendrier…</p>
+        <InlineLoading label="Chargement du calendrier…" />
       ) : (
         <>
         <ArchiveToggle view={view} setView={setView} counts={splitArchive(events)} pastLabel="Archives" />

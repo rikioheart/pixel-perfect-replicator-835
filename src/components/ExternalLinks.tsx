@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { defaultTitle, detectService, normalizeUrl, SERVICE_LABEL, type ServiceKey } from "@/lib/external-links";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export type LinkContext = "PROJECT" | "ACTIVITY" | "EVENT" | "TASK" | "RESERVATION" | "FORMATION" | "MEETING";
 
@@ -97,7 +98,7 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
         </form>
       )}
 
-      {isLoading ? <p role="status" className="mt-2 text-sm text-muted-foreground">Chargement…</p> : links.length === 0 ? (
+      {isLoading ? <InlineLoading /> : links.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">Aucun lien pour l'instant.</p>
       ) : (
         <ul className="mt-3 space-y-1.5">

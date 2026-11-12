@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/blog")({
   head: () => ({
@@ -207,7 +208,7 @@ function BlogPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des articles…</p>
+        <InlineLoading label="Chargement des articles…" />
       ) : posts.length === 0 ? (
         <p className="text-sm text-muted-foreground">Aucun article pour le moment.</p>
       ) : (

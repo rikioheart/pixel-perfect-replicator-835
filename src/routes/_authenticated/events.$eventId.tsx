@@ -106,7 +106,7 @@ function EventDetailPage() {
   if (isLoading) {
     return (
       <AppShell title="Événement">
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       </AppShell>
     );
   }

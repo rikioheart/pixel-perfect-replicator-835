@@ -94,7 +94,7 @@ function MemberDetailPage() {
   if (isLoading) {
     return (
       <AppShell title="Fiche adhérent">
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       </AppShell>
     );
   }
