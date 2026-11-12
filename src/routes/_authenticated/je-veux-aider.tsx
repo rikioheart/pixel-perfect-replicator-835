@@ -26,6 +26,7 @@ import {
   TIME_OPTIONS,
 } from "@/lib/contributions";
 import { explainDbError } from "@/lib/task-lifecycle";
+import { fetchMySkills } from "@/lib/profile-details";
 
 export const Route = createFileRoute("/_authenticated/je-veux-aider")({
   head: () => ({
@@ -60,13 +61,11 @@ function WantToHelpPage() {
   const { data: profile } = useQuery({
     queryKey: ["my-skills", user?.id],
     enabled: Boolean(user?.id),
-    queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("skills").eq("id", user!.id).maybeSingle();
-      return data;
-    },
+    // Compétences lues via profile_details (colonne protégée), même source que le profil.
+    queryFn: async () => ({ skills: await fetchMySkills(user!.id) }),
   });
   useEffect(() => {
-    if (profile) setSkills((profile.skills ?? []).filter((s: string) => s.trim()));
+    if (profile) setSkills(profile.skills);
   }, [profile]);
 
   const saveSkills = useMutation({
