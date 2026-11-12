@@ -27,7 +27,8 @@ export async function withContacts<T extends { id: string }>(rows: T[]): Promise
   const map = new Map(((contacts.data ?? []) as Contact[]).map((c) => [c.id, c]));
   return rows.map((r) => {
     const d = details.get(r.id);
-    const { id: _ignored, ...rest } = d ?? ({} as Partial<ProfileDetails>);
-    return { ...r, ...(d ? rest : {}), email: map.get(r.id)?.email ?? null, phone: map.get(r.id)?.phone ?? null };
+    const extra: Partial<ProfileDetails> = d ? { ...d } : {};
+    delete extra.id;
+    return { ...r, ...extra, email: map.get(r.id)?.email ?? null, phone: map.get(r.id)?.phone ?? null };
   });
 }
