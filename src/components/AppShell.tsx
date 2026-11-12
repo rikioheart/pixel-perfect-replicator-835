@@ -71,7 +71,7 @@ import {
 import { useExternalLinks } from "@/lib/home-config";
 import { isNavItemVisible } from "@/lib/nav-rules";
 import { FloatingHelpButton } from "@/components/FloatingHelpButton";
-import { useApplyPreferences } from "@/lib/user-preferences";
+import { useApplyPreferences, useUserPreferences, usesCompactNavigation } from "@/lib/user-preferences";
 import { OfflineStatus } from "@/components/OfflineStatus";
 import logoAsset from "@/assets/logo-lvdc.png.asset.json";
 import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
@@ -223,6 +223,9 @@ export function AppShell({
   });
   const isTreasurer = showTreasurerShortcut({ isBureau, functionTypes: myFunctions });
   useApplyPreferences();
+  const { preferences, save: savePreferences } = useUserPreferences();
+  // Mode focus ou texte très agrandi : le menu latéral se range derrière le bouton « Menu » (rien n'est retiré).
+  const compactNav = usesCompactNavigation(preferences);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -301,7 +304,7 @@ export function AppShell({
         ref={asideRef}
         onScroll={(e) => window.sessionStorage.setItem("lvdc.nav.scroll", String(e.currentTarget.scrollTop))}
         aria-label="Menu latéral"
-        className="surface-night sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto p-5 md:flex"
+        className={cn("surface-night sticky top-0 hidden h-dvh w-64 shrink-0 flex-col justify-between overflow-y-auto p-5", !compactNav && "md:flex")}
       >
         <div>
           <div className="flex items-center gap-3 pb-8">
@@ -383,14 +386,14 @@ export function AppShell({
           <div className="flex max-w-full flex-wrap items-center gap-2">
             {actions}
             <QuickCreateMenu />
-            <div className="hidden items-center gap-2 md:flex">
+            <div className={cn("hidden items-center gap-2", !compactNav && "md:flex")}>
             <GlobalSearch />
             <NotificationBell />
             </div>
           </div>
         </header>
 
-        <div className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-2 md:hidden">
+        <div className={cn("flex flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-4 py-2", !compactNav && "md:hidden")}>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2" aria-label="Ouvrir le menu principal">
@@ -421,6 +424,16 @@ export function AppShell({
             </SheetContent>
           </Sheet>
           
+          {preferences.focus_mode ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={() => savePreferences.mutate({ focus_mode: false })}
+            >
+              <Focus className="size-4" aria-hidden="true" /> Quitter le mode focus
+            </Button>
+          ) : null}
           <div className="flex items-center gap-1">
             <GlobalSearch />
             <NotificationBell />
