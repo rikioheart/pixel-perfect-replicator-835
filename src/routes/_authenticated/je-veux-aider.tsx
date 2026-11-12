@@ -58,15 +58,15 @@ function WantToHelpPage() {
   // --- Compétences du profil ---
   const [skillInput, setSkillInput] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
-  const { data: profile } = useQuery({
+  const { data: mySkills } = useQuery({
     queryKey: ["my-skills", user?.id],
     enabled: Boolean(user?.id),
     // Compétences lues via profile_details (colonne protégée), même source que le profil.
-    queryFn: async () => ({ skills: await fetchMySkills(user!.id) }),
+    queryFn: () => fetchMySkills(user!.id),
   });
   useEffect(() => {
-    if (profile) setSkills(profile.skills);
-  }, [profile]);
+    if (mySkills) setSkills(mySkills);
+  }, [mySkills]);
 
   const saveSkills = useMutation({
     mutationFn: async (next: string[]) => {

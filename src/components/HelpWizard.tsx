@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
 import { CONTRIBUTION_TYPES, CONTRIBUTION_TYPE_LABEL, TIME_OPTIONS } from "@/lib/contributions";
 import { humanizeError } from "@/lib/user-messages";
+import { fetchMySkills } from "@/lib/profile-details";
 
 const STEPS = ["Comment ?", "Quel projet ?", "Combien de temps ?", "Message"];
 
@@ -35,10 +36,7 @@ export function HelpWizard({ open, onOpenChange, projectId, presetType }: { open
   const { data: skills = [] } = useQuery({
     queryKey: ["my-skills", user?.id],
     enabled: open && Boolean(user?.id),
-    queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("skills").eq("id", user!.id).maybeSingle();
-      return (data?.skills ?? []).filter((s: string) => s.trim());
-    },
+    queryFn: () => fetchMySkills(user!.id),
   });
   useEffect(() => {
     if (open && skills.length > 0) setMessage((m) => m || `Mes compétences : ${skills.join(", ")}\n`);
