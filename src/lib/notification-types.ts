@@ -61,9 +61,17 @@ const LABELS: Record<string, string> = {
   CONTRIBUTION_UPDATE: "Réponse à votre proposition",
   MEMBER_PENDING: "Adhésion à valider",
   MEMBERSHIP_DECISION: "Décision d’adhésion",
+  TASK_DEADLINE: "Échéance proche",
+  ACTIVITY_REMINDER: "Rappel d’activité",
+  EVENT_REMINDER: "Rappel d’événement",
+  COMMUNICATION_REVIEW: "Communication à relire",
+  ACCOUNT_CLOSED: "Compte clôturé",
+  ACCOUNT_DELETED: "Compte supprimé",
+  ACCOUNT_DELETION_BLOCKED: "Suppression du compte à examiner",
   SYSTEM: "Système",
 };
 
 export function notificationLabel(kind: string): string {
-  return LABELS[kind] ?? kind;
+  // Jamais de code technique affiché : repli sur un libellé neutre.
+  return LABELS[kind] ?? "Information";
 }
