@@ -4650,6 +4650,7 @@ export type Database = {
           reading_width: string
           reduced_motion: boolean
           show_association_updates: boolean
+          show_recognition: boolean
           signature: string
           text_scale: number
           text_size: string
@@ -4675,6 +4676,7 @@ export type Database = {
           reading_width?: string
           reduced_motion?: boolean
           show_association_updates?: boolean
+          show_recognition?: boolean
           signature?: string
           text_scale?: number
           text_size?: string
@@ -4700,6 +4702,7 @@ export type Database = {
           reading_width?: string
           reduced_motion?: boolean
           show_association_updates?: boolean
+          show_recognition?: boolean
           signature?: string
           text_scale?: number
           text_size?: string

@@ -512,6 +512,13 @@
       "when": 1794502756897,
       "tag": "0072_profile_human_field_visibility",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1794503426462,
+      "tag": "0073_user_preferences_show_recognition",
+      "breakpoints": true
     }
   ]
 }
