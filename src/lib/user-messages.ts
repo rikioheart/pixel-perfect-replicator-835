@@ -35,7 +35,7 @@ const KNOWN: Array<[test: (msg: string, code: string) => boolean, text: string]>
   [(m) => /payload too large|file size|exceeded the maximum/i.test(m), "Ce fichier est trop volumineux."],
 ];
 
-const ENGLISH = /\b(the|failed|error|invalid|violates|denied|cannot|could not|unable|column|relation|function|does not|exist|unexpected|request|null|undefined|is not)\b/i;
+const ENGLISH = /\b(the|failed|error|invalid|violates|denied|cannot|could|unable|column|relation|function|does|exist|exists|unexpected|request|undefined|not|found|missing|required|must|should|please|only|expired|exceeded|limit|already|user|value|key|of|for|to|is|are|with)\b/i;
 const FRENCH = /[àâçéèêëîïôûùœ]|\b(vous|votre|impossible|veuillez|seul|seule|pas|une|des|est|cette|ce|déjà)\b/i;
 
 /** Un message rédigé en français (par exemple levé par une règle de la base) est montré tel quel. */
@@ -54,6 +54,8 @@ export function humanizeError(error: unknown, fallback: string = GENERIC_ERROR):
   const trimmed = message.trim();
   if (trimmed && isFrenchMessage(trimmed)) return trimmed;
   const known = KNOWN.find(([test]) => test(trimmed, code));
+  // Phrase courte sans aucun marqueur anglais ni code technique (ex. « Indiquez le motif. ») : déjà rédigée pour la personne.
+  if (!known && trimmed && !code && !ENGLISH.test(trimmed) && !/[_{}()[\]<>]|\d{3,}/.test(trimmed)) return trimmed;
   if (typeof console !== "undefined" && (trimmed || code)) console.warn("[erreur technique]", code || "-", trimmed);
   return known ? known[1] : fallback;
 }

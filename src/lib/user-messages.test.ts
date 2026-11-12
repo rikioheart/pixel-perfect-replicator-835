@@ -10,6 +10,16 @@ describe("humanizeError", () => {
     );
   });
 
+  it("garde les consignes françaises courtes, même sans accent", () => {
+    expect(humanizeError(new Error("Indiquez le motif."))).toBe("Indiquez le motif.");
+    expect(humanizeError(new Error("Connexion requise."))).toBe("Connexion requise.");
+  });
+
+  it("ne montre pas une courte erreur anglaise", () => {
+    expect(humanizeError(new Error("Bucket not found"))).toBe("Élément introuvable, ou il ne vous est pas accessible.");
+    expect(humanizeError(new Error("Cannot read properties of undefined"))).toBe(GENERIC_ERROR);
+  });
+
   it("traduit un refus de droits de la base", () => {
     expect(humanizeError({ code: "42501", message: "new row violates row-level security policy for table \"tasks\"" })).toBe(
       "Vous n'avez pas l'autorisation de faire cette action.",
