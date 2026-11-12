@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/professionals/$proId")({
   head: () => ({
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/professionals/$proId")({
   errorComponent: ({ error }) => (
     <AppShell title="Professionnel">
       <p role="alert" className="text-sm text-destructive">
-        {error instanceof Error ? error.message : "Erreur inattendue"}
+        {humanizeError(error, "Cette page n'a pas pu s'afficher. Réessayez dans un instant.")}
       </p>
     </AppShell>
   ),

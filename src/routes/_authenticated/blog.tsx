@@ -76,7 +76,7 @@ function BlogPage() {
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
     const path = `${kind}/${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error } = await supabase.storage.from("blog-media").upload(path, file, { contentType: file.type });
-    if (error) throw new Error(`Envoi du fichier impossible : ${error.message}`);
+    if (error) throw new Error(`Envoi du fichier impossible. ${humanizeError(error, "Réessayez dans un instant.")}`);
     return path;
   };
 

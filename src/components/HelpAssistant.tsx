@@ -8,6 +8,7 @@ import type { HelpAnswer } from "@/lib/help-assistant";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
+import { humanizeError } from "@/lib/user-messages";
 
 type Message = { role: "user" | "assistant"; content: string; meta?: Omit<HelpAnswer, "answer"> };
 
@@ -49,7 +50,7 @@ export default function HelpAssistant() {
         { role: "assistant", content: res.answer, meta: { covered: res.covered, guides: res.guides } },
       ]);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "L'assistant n'a pas pu répondre.");
+      setError(humanizeError(e, "L'assistant n'a pas pu répondre."));
     } finally {
       setPending(false);
     }
