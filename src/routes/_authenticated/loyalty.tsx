@@ -340,7 +340,7 @@ function LoyaltyPage() {
             <EmptyState
               art="playful"
               title="Votre carte attend son premier tampon"
-              message="Il arrivera à votre prochaine participation à une activité, sans rien à faire de votre côté."
+              message="Il s'ajoutera lors de votre prochaine participation à une activité, une fois votre présence validée ou votre carte présentée."
             />
           ) : (
             stamps.map((stamp) => (
