@@ -29,37 +29,37 @@ const numOrNull = (v: unknown): number | null => (v == null ? null : num(v));
 /** Ne conserve que les champs connus (liste blanche) : tout autre champ est ignoré. */
 export function parseConsoleSummary(raw: unknown): ConsoleSummary {
   const r = obj(raw);
-  const m = obj(r.members);
-  const t = obj(r.tasks);
-  const i = obj(r.inventory);
-  const ag = r.ag == null ? null : obj(r.ag);
-  const f = r.finance == null ? null : obj(r.finance);
+  const m = obj(r["members"]);
+  const t = obj(r["tasks"]);
+  const i = obj(r["inventory"]);
+  const ag = r["ag"] == null ? null : obj(r["ag"]);
+  const f = r["finance"] == null ? null : obj(r["finance"]);
   return {
     members: {
-      active: num(m.active),
-      activeParticuliers: num(m.active_particuliers),
-      activePros: num(m.active_pros),
-      pending: num(m.pending),
-      considered: num(m.considered),
+      active: num(m["active"]),
+      activeParticuliers: num(m["active_particuliers"]),
+      activePros: num(m["active_pros"]),
+      pending: num(m["pending"]),
+      considered: num(m["considered"]),
     },
     tasks: {
-      working: num(t.working),
-      assigned: num(t.assigned),
-      overdue: num(t.overdue),
-      toValidate: num(t.to_validate),
-      needsHelp: num(t.needs_help),
-      peopleInvolved: num(t.people_involved),
+      working: num(t["working"]),
+      assigned: num(t["assigned"]),
+      overdue: num(t["overdue"]),
+      toValidate: num(t["to_validate"]),
+      needsHelp: num(t["needs_help"]),
+      peopleInvolved: num(t["people_involved"]),
     },
-    offers: num(r.offers),
-    proProposals: num(r.pro_proposals),
-    inventory: { lowStock: num(i.low_stock), overdueLoans: num(i.overdue_loans) },
-    ag: ag ? { title: typeof ag.title === "string" ? ag.title : "Assemblée générale", counted: num(ag.counted) } : null,
+    offers: num(r["offers"]),
+    proProposals: num(r["pro_proposals"]),
+    inventory: { lowStock: num(i["low_stock"]), overdueLoans: num(i["overdue_loans"]) },
+    ag: ag ? { title: typeof ag["title"] === "string" ? ag["title"] : "Assemblée générale", counted: num(ag["counted"]) } : null,
     finance: f
       ? {
-          reimbPendingCount: numOrNull(f.reimb_pending_count),
-          reimbPendingAmount: numOrNull(f.reimb_pending_amount),
-          reimbApprovedAmount: numOrNull(f.reimb_approved_amount),
-          payoutsDueAmount: numOrNull(f.payouts_due_amount),
+          reimbPendingCount: numOrNull(f["reimb_pending_count"]),
+          reimbPendingAmount: numOrNull(f["reimb_pending_amount"]),
+          reimbApprovedAmount: numOrNull(f["reimb_approved_amount"]),
+          payoutsDueAmount: numOrNull(f["payouts_due_amount"]),
         }
       : null,
   };
