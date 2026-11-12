@@ -19,6 +19,7 @@ import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
 import { ParentProjectSelect } from "@/components/ParentProjectSelect";
 import { useConfigOptions } from "@/lib/config-options";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/activities/")({
   head: () => ({
@@ -118,7 +119,7 @@ function ActivitiesPage() {
       toast.success("Inscription enregistrée, en attente de confirmation.");
       void queryClient.invalidateQueries({ queryKey: ["participations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const unregister = useMutation({
@@ -130,7 +131,7 @@ function ActivitiesPage() {
       toast.success("Inscription annulée.");
       void queryClient.invalidateQueries({ queryKey: ["participations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const create = useMutation({
@@ -184,7 +185,7 @@ function ActivitiesPage() {
       });
       void queryClient.invalidateQueries({ queryKey: ["activities"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (

@@ -71,6 +71,7 @@ import {
   TASK_STATUSES,
   TASK_STATUS_LABEL,
 } from "@/lib/domain";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/mindmap")({
   head: () => ({
@@ -478,7 +479,7 @@ function MindmapPage() {
         .update({ parent_project_id: link.parentId })
         .eq("id", link.childId);
       if (error) {
-        toast.error(error.message);
+        toast.error(humanizeError(error));
         return;
       }
       await logAudit({
@@ -503,7 +504,7 @@ function MindmapPage() {
         .update({ project_id: link.parentId })
         .eq("id", link.childId);
       if (error) {
-        toast.error(error.message);
+        toast.error(humanizeError(error));
         return;
       }
       await logAudit({

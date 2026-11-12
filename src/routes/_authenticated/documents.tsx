@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/documents")({
   head: () => ({
@@ -106,7 +107,7 @@ function DocumentsPage() {
       setForm(EMPTY_DOC);
       void queryClient.invalidateQueries({ queryKey: ["documents"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const remove = useMutation({
@@ -118,7 +119,7 @@ function DocumentsPage() {
       toast.success("Document supprimé.");
       void queryClient.invalidateQueries({ queryKey: ["documents"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (

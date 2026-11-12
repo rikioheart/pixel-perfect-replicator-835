@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { humanizeError } from "@/lib/user-messages";
 
 export function AccountDeletionCard() {
   const { signOut } = useAuth();
@@ -48,7 +49,7 @@ export function AccountDeletionCard() {
         await signOut();
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Suppression impossible.");
+      toast.error(humanizeError(e, "Suppression impossible."));
     } finally {
       setBusy(false);
     }

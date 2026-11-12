@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { humanizeError } from "@/lib/user-messages";
 
 export type CommentEntity = "project" | "task" | "event" | "document" | "activity";
 
@@ -78,7 +79,7 @@ export function Comments({
       setBody("");
       void queryClient.invalidateQueries({ queryKey });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const remove = useMutation({
@@ -87,7 +88,7 @@ export function Comments({
       if (error) throw error;
     },
     onSuccess: () => void queryClient.invalidateQueries({ queryKey }),
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const nameOf = (row: CommentRow) =>

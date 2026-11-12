@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { humanizeError } from "@/lib/user-messages";
 
 const TITLE = "Remboursements & Notes de frais";
 
@@ -78,7 +79,7 @@ function FinancePage() {
       toast.success("Demande mise à jour.");
       void queryClient.invalidateQueries({ queryKey: ["reimbursements"] });
     },
-    onError: (error: Error) => { toast.error(error.message); void queryClient.invalidateQueries({ queryKey: ["reimbursements"] }); },
+    onError: (error: Error) => { toast.error(humanizeError(error)); void queryClient.invalidateQueries({ queryKey: ["reimbursements"] }); },
   });
 
   const rsum = summarizeReimbursements(reimbursements);

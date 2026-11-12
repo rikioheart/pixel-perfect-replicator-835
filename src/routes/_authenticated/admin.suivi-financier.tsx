@@ -14,6 +14,7 @@ import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { buildRows, toCsv, toTsv, parseHelloAssoCsv, EXPORT_COLUMNS } from "@/lib/finance-export";
 import { LEDGER_CATEGORIES, categoryLabel } from "@/lib/annual-accounts";
 import { AccountingSplitsPanel } from "@/components/AccountingSplitsPanel";
+import { humanizeError } from "@/lib/user-messages";
 
 const TITLE = "Comptabilité & Grand livre";
 
@@ -100,7 +101,7 @@ function Page() {
       const { error } = await supabase.from("finance_entries").update({ status }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: refresh, onError: (e: Error) => toast.error(e.message),
+    onSuccess: refresh, onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const resolve = useMutation({
     mutationFn: async (id: string) => {
@@ -108,7 +109,7 @@ function Page() {
       const { error } = await supabase.from("integration_events").update({ outcome: "RESOLVED", resolved_by: u.user?.id ?? null, resolved_at: new Date().toISOString() }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: refresh, onError: (e: Error) => toast.error(e.message),
+    onSuccess: refresh, onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const importHelloAsso = async (file: File) => {

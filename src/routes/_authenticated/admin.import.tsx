@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { importMembers } from "@/lib/member-import.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { BureauOnly } from "@/components/BureauOnly";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/import")({
   head: () => ({
@@ -164,7 +165,7 @@ function ImportPage() {
       queryClient.invalidateQueries({ queryKey: ["member-imports"] });
       queryClient.invalidateQueries({ queryKey: ["directory"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   if (!authLoading && !isBureau) return <BureauOnly title="Import d'adhérents" />;

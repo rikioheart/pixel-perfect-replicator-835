@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/formations")({
   head: () => ({
@@ -128,7 +129,7 @@ function FormationsPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["formations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const toggle = useMutation({
@@ -149,7 +150,7 @@ function FormationsPage() {
       toast.success(registered ? "Inscription confirmée." : "Inscription annulée.");
       queryClient.invalidateQueries({ queryKey: ["formations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const formations = data?.formations ?? [];

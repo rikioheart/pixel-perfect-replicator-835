@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { INDICATOR_FAMILY_LABEL } from "@/lib/dog-timeline";
 import { ageFrom, membersInSeveralHouseholds, personLabel, RELATION_LABEL } from "@/lib/household-people";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/chiens")({
   head: () => ({
@@ -63,7 +64,7 @@ function Page() {
   const toggle = useMutation({
     mutationFn: async (v: boolean) => { const { error } = await supabase.from("profiles").update({ hide_sensitive_dogs: v }).eq("id", user!.id); if (error) throw error; },
     onSuccess: () => { toast.success("Visibilité mise à jour."); void qc.invalidateQueries({ queryKey: ["hide-dogs"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   if (rolesReady && !isBureau) return <BureauOnly title="Foyers & chiens" />;
   const active = dogs.filter((d) => !d.archived_at);
@@ -148,7 +149,7 @@ function HouseholdsTab({ dogs }: { dogs: BDog[] }) {
   const removeMember = async (id: string, name: string, household: string) => {
     if (!window.confirm(`Retirer ${name} du foyer « ${household} » ? Ses chiens et son compte ne sont pas modifiés.`)) return;
     const { error } = await supabase.from("household_members").delete().eq("id", id);
-    if (error) toast.error(error.message); else { toast.success("Membre retiré de ce foyer."); void refresh(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Membre retiré de ce foyer."); void refresh(); }
   };
   return (
     <div className="space-y-3">
@@ -182,7 +183,7 @@ function HouseholdCard({ h, members, people, dogs, nameOf, dup, onRemove, onRena
   const rename = async () => {
     if (name.trim().length < 2 || name.trim() === h.name) return;
     const { error } = await supabase.from("households").update({ name: name.trim() }).eq("id", h.id);
-    if (error) toast.error(error.message); else { toast.success("Foyer renommé."); onRenamed(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Foyer renommé."); onRenamed(); }
   };
   return (
     <article className="panel space-y-3 p-4 text-sm">

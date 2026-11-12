@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
 import { CONTRIBUTION_TYPES, CONTRIBUTION_TYPE_LABEL, TIME_OPTIONS } from "@/lib/contributions";
+import { humanizeError } from "@/lib/user-messages";
 
 const STEPS = ["Comment ?", "Quel projet ?", "Combien de temps ?", "Message"];
 
@@ -63,7 +64,7 @@ export function HelpWizard({ open, onOpenChange, projectId, presetType }: { open
       if (error) throw error;
     },
     onSuccess: () => { setDone(true); void qc.invalidateQueries({ queryKey: ["contributions"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const choice = (active: boolean, onClick: () => void, label: string, key: string) => (

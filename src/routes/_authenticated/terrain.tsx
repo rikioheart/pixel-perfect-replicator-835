@@ -25,6 +25,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/terrain")({
   head: () => ({
@@ -110,7 +111,7 @@ function TerrainPage() {
       setResourceLocation("");
       void queryClient.invalidateQueries({ queryKey: ["terrain-resources"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const book = useMutation({
@@ -163,7 +164,7 @@ function TerrainPage() {
       setSelectedPros([]);
       void queryClient.invalidateQueries({ queryKey: ["terrain-reservations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const decide = useMutation({
@@ -183,7 +184,7 @@ function TerrainPage() {
       toast.success("Décision enregistrée.");
       void queryClient.invalidateQueries({ queryKey: ["terrain-reservations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const cancel = useMutation({
@@ -195,7 +196,7 @@ function TerrainPage() {
       toast.success("Réservation annulée.");
       void queryClient.invalidateQueries({ queryKey: ["terrain-reservations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (

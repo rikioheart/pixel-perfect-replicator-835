@@ -15,6 +15,7 @@ import { SidePanel } from "@/components/SidePanel";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { PRO_STATUS_LABEL } from "@/lib/pro-card";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/pros")({
   head: () => ({
@@ -74,7 +75,7 @@ function AdminPros() {
       });
     },
     onSuccess: () => { toast.success("Statut mis à jour."); setEdit(null); void qc.invalidateQueries({ queryKey: ["admin-pro-cards"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const saveInternal = useMutation({
@@ -87,7 +88,7 @@ function AdminPros() {
       if (error) throw error;
     },
     onSuccess: () => toast.success("Données internes enregistrées."),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   if (!isBureau) return <BureauOnly title="Fiches professionnelles" />;

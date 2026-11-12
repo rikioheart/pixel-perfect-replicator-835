@@ -20,6 +20,7 @@ import {
 import { NOTIFICATION_TYPES, notificationLabel } from "@/lib/notification-types";
 import { cn } from "@/lib/utils";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
 
 
 export const Route = createFileRoute("/_authenticated/notifications")({
@@ -86,7 +87,7 @@ function NotificationsPage() {
       toast.success("Toutes les notifications sont lues.");
       invalidate();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const toggleRead = useMutation({
@@ -98,7 +99,7 @@ function NotificationsPage() {
       if (error) throw error;
     },
     onSuccess: invalidate,
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const remove = useMutation({
@@ -107,7 +108,7 @@ function NotificationsPage() {
       if (error) throw error;
     },
     onSuccess: invalidate,
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const unread = notifications.filter((n) => !n.is_read).length;

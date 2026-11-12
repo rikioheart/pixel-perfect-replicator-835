@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/blog")({
   head: () => ({
@@ -109,7 +110,7 @@ function BlogPage() {
       void queryClient.invalidateQueries({ queryKey: ["public-platform-articles"] });
       void queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const publish = useMutation({
@@ -124,7 +125,7 @@ function BlogPage() {
       toast.success("Article publié.");
       void queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (

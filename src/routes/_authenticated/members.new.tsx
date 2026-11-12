@@ -9,6 +9,7 @@ import { MemberForm } from "@/components/MemberForm";
 import { useAuth } from "@/hooks/useAuth";
 import { emptyMemberForm } from "@/lib/member-schema";
 import { createMember } from "@/lib/members.functions";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/members/new")({
   head: () => ({
@@ -69,7 +70,7 @@ function NewMemberPage() {
               toast.success("Adhérent créé.");
               void navigate({ to: "/members/$memberId", params: { memberId: result.id } });
             } catch (error) {
-              toast.error(error instanceof Error ? error.message : "Création impossible.");
+              toast.error(humanizeError(error, "Création impossible."));
             }
           }}
         />

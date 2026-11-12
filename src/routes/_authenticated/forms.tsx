@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/forms")({
   head: () => ({
@@ -117,7 +118,7 @@ function FormsPage() {
       if (error) throw error;
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["forms"] }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   // Suppression réservée au Bureau (RLS forms_delete) ; les réponses liées partent avec le formulaire.
   const remove = useMutation({
@@ -140,7 +141,7 @@ function FormsPage() {
       setOpenId(null);
       void qc.invalidateQueries({ queryKey: ["forms"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const review = useMutation({
     mutationFn: async ({ id, match_status }: { id: string; match_status: string }) => {
@@ -148,7 +149,7 @@ function FormsPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Rapprochement enregistré."); void qc.invalidateQueries({ queryKey: ["form-responses"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   return (

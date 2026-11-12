@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { logAudit } from "@/lib/mindmap-actions";
 import { slugify } from "@/lib/domain";
 import { fetchConfigOptions, type ConfigOption } from "@/lib/config-options";
+import { humanizeError } from "@/lib/user-messages";
 
 /**
  * Éditeur d'une famille d'options (Bureau) : ajout, renommage, ordre manuel, désactivation.
@@ -56,7 +57,7 @@ export function ConfigOptionsEditor({ family, addPlaceholder = "Ex. Référent b
       toast.success("Option ajoutée.");
       await invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const updateOption = useMutation({
@@ -74,7 +75,7 @@ export function ConfigOptionsEditor({ family, addPlaceholder = "Ex. Référent b
       });
     },
     onSuccess: invalidate,
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const deleteOption = useMutation({
@@ -96,7 +97,7 @@ export function ConfigOptionsEditor({ family, addPlaceholder = "Ex. Référent b
       await invalidate();
     },
     onError: (e: Error) => {
-      if (e.message !== "__cancel") toast.error(e.message);
+      if (e.message !== "__cancel") toast.error(humanizeError(e));
     },
   });
 

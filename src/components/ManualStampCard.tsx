@@ -11,6 +11,7 @@ import { useOnline, readQueue, saveQueue, parisDay, canAutoSync, needsMediation,
 import { normalizePassInput } from "@/lib/pass-code";
 import { PassScanner } from "@/components/PassScanner";
 import { filterByName } from "@/lib/name-search";
+import { humanizeError } from "@/lib/user-messages";
 
 type Opt = { id: string; name: string };
 type Identified = { id: string; name: string; total: number; status: string; canReceive: boolean; isSelf: boolean };
@@ -103,7 +104,7 @@ export function ManualStampCard() {
       else if (r.awarded) { toast.success(r.attendance_synced ? "Tampon attribué et présence enregistrée sur l'activité. Le Bureau est informé." : "Tampon attribué, le Bureau est informé."); setReason(""); }
       else toast.info(r.attendance_synced ? `${r.message ?? "Tampon déjà attribué."} La présence sur l'activité est à jour.` : (r.message ?? "Tampon déjà attribué."));
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const [mediating, setMediating] = useState<string | null>(null);
   /** Demande d'un jour passé ou refusée : transmise au Bureau, jamais transformée en tampon automatiquement. */
@@ -113,7 +114,7 @@ export function ManualStampCard() {
     setMediating(item.id);
     const { data: res, error } = await supabase.rpc('submit_offline_stamp_mediation', { _local_id: item.id, _member_id: item.member, _bureau_id: item.bureau, _reason: item.reason, _offline_day: item.day });
     setMediating(null);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(humanizeError(error)); return; }
     saveQueue(user.id, readQueue(user.id).filter(i => i.id !== item.id));
     toast.success((res as { submitted?: boolean })?.submitted ? 'Demande transmise au Bureau pour médiation. Aucun tampon n’est ajouté avant sa décision.' : 'Cette demande avait déjà été transmise au Bureau.');
   };
@@ -126,7 +127,7 @@ export function ManualStampCard() {
     setResolving(true);
     const { data: res, error } = await supabase.rpc("resolve_member_from_qr", { _scanned_code: code });
     setResolving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(humanizeError(error)); return; }
     const r = res as { found: boolean; reason?: string; member_id?: string; display_name?: string; total_stamps?: number; membership_status?: string; can_receive_stamps?: boolean; is_self?: boolean };
     if (!r.found) {
       toast.error(r.reason === "AMBIGUOUS" ? "Plusieurs pass correspondent : scannez le QR ou saisissez le code complet." : "Aucun pass ne correspond à ce code.");

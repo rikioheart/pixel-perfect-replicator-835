@@ -17,6 +17,7 @@ import { SidePanel } from "@/components/SidePanel";
 import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
 import { ParentProjectSelect } from "@/components/ParentProjectSelect";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/events/")({
   head: () => ({
@@ -101,7 +102,7 @@ function EventsPage() {
       setOpen(false);
       void queryClient.invalidateQueries({ queryKey: ["events"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (

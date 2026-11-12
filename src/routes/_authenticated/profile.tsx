@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MEMBERSHIP_TYPE_LABEL } from "@/lib/members";
 import { AccountDeletionCard } from "@/components/AccountDeletionCard";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -87,7 +88,7 @@ function ProfilePage() {
       toast.success("Profil mis à jour.");
       await refresh();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (

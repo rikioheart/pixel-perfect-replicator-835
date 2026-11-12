@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/partners")({
   head: () => ({
@@ -81,7 +82,7 @@ function PartnersPage() {
       setForm({ name: "", type: "ENTREPRISE", contact: "", website_url: "", advantages: "", promo_code: "" });
       void queryClient.invalidateQueries({ queryKey: ["partners"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (

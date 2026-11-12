@@ -22,6 +22,7 @@ import { updateMember } from "@/lib/members.functions";
 import { LoadingState } from "@/components/LoadingState";
 import { BureauCloseAccountCard } from "@/components/BureauCloseAccountCard";
 import { useSensitiveRights } from "@/lib/permissions";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/members/$memberId")({
   head: () => ({
@@ -307,7 +308,7 @@ function BureauEditor({
             toast.success("Fiche adhérent mise à jour.");
             onSaved();
           } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Enregistrement impossible.");
+            toast.error(humanizeError(error, "Enregistrement impossible."));
           }
         }}
       />

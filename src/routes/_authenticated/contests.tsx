@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/contests")({
   head: () => ({
@@ -124,7 +125,7 @@ function ContestsPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["contests"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const contests = data ?? [];

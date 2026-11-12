@@ -17,6 +17,7 @@ import { RegistrationWizard } from "@/components/RegistrationWizard";
 import { SpotsBadge, useSpots, ExperienceSections } from "@/components/ExperienceBits";
 import { DOG_POLICY_LABEL } from "@/lib/pro-card";
 import { useConfigOptions } from "@/lib/config-options";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/activities/$activityId")({
   head: () => ({
@@ -73,7 +74,7 @@ function ActivityDetail() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Inscription annulée."); void qc.invalidateQueries({ queryKey: ["participations"] }); void qc.invalidateQueries({ queryKey: ["spots"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   if (isLoading) return <AppShell title="Activité"><LoadingState rows={4} /></AppShell>;

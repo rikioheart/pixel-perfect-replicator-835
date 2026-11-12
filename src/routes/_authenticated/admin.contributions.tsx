@@ -14,6 +14,7 @@ import { SidePanel } from "@/components/SidePanel";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { CONTRIBUTION_STATUS_LABEL, CONTRIBUTION_TYPE_LABEL } from "@/lib/contributions";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/contributions")({
   head: () => ({
@@ -64,7 +65,7 @@ function AdminContributions() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Proposition mise à jour."); setSel(null); void qc.invalidateQueries({ queryKey: ["contributions"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const createTask = useMutation({
@@ -84,7 +85,7 @@ function AdminContributions() {
       void qc.invalidateQueries({ queryKey: ["contribution-tasks"] });
       void qc.invalidateQueries({ queryKey: ["contributions"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const { data: linkedTasks = [] } = useQuery({
@@ -115,7 +116,7 @@ function AdminContributions() {
       void qc.invalidateQueries({ queryKey: ["project-open-tasks"] });
       void qc.invalidateQueries({ queryKey: ["contributions"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   if (!isBureau) return <BureauOnly title="Propositions d'aide" />;

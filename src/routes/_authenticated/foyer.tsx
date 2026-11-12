@@ -18,6 +18,7 @@ import { useMyHouseholds, type HouseholdBundle, type HouseholdPerson } from "@/l
 import { ageFrom, cleanHouseholdName, householdNameOptions, personLabel, RELATION_LABEL } from "@/lib/household-people";
 import { DogProfiles } from "@/components/DogProfiles";
 import { DogFilePanel } from "@/components/DogFile";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/foyer")({
   head: () => ({
@@ -50,13 +51,13 @@ function PersonRow({ p, dogs, onChanged }: { p: HouseholdPerson; dogs: Household
     const { error } = await supabase.from("household_children").update({
       first_name: f.first_name.trim(), last_name: f.last_name.trim() || null, birth_date: f.birth_date || null, relation: f.relation,
     }).eq("id", p.id);
-    if (error) toast.error(error.message); else { toast.success("Personne mise à jour."); setEditing(false); onChanged(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Personne mise à jour."); setEditing(false); onChanged(); }
   };
   const remove = async () => {
     const warn = entrusted.length ? `\n${entrusted.map((d) => d.name).join(", ")} reviendra sous votre responsabilité.` : "";
     if (!window.confirm(`Retirer ${personLabel(p)} du foyer ?${warn}`)) return;
     const { error } = await supabase.from("household_children").delete().eq("id", p.id);
-    if (error) toast.error(error.message); else { toast.success("Personne retirée du foyer."); onChanged(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Personne retirée du foyer."); onChanged(); }
   };
   if (editing) {
     return (
@@ -116,7 +117,7 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
       household_id: h.id, first_name: person.first_name.trim(), last_name: person.last_name.trim() || null,
       birth_date: person.birth_date || null, relation: person.relation,
     });
-    if (error) toast.error(error.message); else { toast.success("Personne ajoutée au foyer."); setPerson(emptyPerson); setAdding(false); void refresh(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Personne ajoutée au foyer."); setPerson(emptyPerson); setAdding(false); void refresh(); }
   };
 
   return (
@@ -252,7 +253,7 @@ function FoyerPage() {
       if (orphanDogs.length) await supabase.from("dogs").update({ household_id: data.id }).in("id", orphanDogs.map((d) => d.id));
     },
     onSuccess: () => { setCreating(false); toast.success("Foyer créé."); void qc.invalidateQueries({ queryKey: ["my-households"] }); void qc.invalidateQueries({ queryKey: ["orphan-dogs"] }); void qc.invalidateQueries({ queryKey: ["my-dogs"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   return (

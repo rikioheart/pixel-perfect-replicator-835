@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatParisDateTime, fromParisInput, toParisInput } from "@/lib/places";
 import { DecisionToTask } from "@/components/DecisionToTask";
 import { DecisionToCommunication } from "@/components/DecisionToCommunication";
+import { humanizeError } from "@/lib/user-messages";
 
 const KINDS = [
   { code: "AG", label: "Assemblée générale" },
@@ -55,7 +56,7 @@ export function GovernanceRegister() {
       void qc.invalidateQueries({ queryKey: ["governance-records"] });
       void qc.invalidateQueries({ queryKey: ["ag-records"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const list = data.filter((r) => filter === "ALL" || r.kind === filter);

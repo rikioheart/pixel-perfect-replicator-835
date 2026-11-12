@@ -44,6 +44,7 @@ import {
   type ProjectEditValues,
   type UndoableAction,
 } from "@/lib/mindmap-actions";
+import { humanizeError } from "@/lib/user-messages";
 
 
 export type PanelProject = {
@@ -157,7 +158,7 @@ export function ProjectDetailPanel({
       };
       const { error } = await supabase.from("projects").update(payload).eq("id", project.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(humanizeError(error));
         return;
       }
       await logAudit({
@@ -204,7 +205,7 @@ export function ProjectDetailPanel({
         .maybeSingle();
       const { error } = await supabase.from("projects").delete().eq("id", project.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(humanizeError(error));
         return;
       }
       await logAudit({

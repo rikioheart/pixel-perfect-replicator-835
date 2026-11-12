@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/advantages")({
   head: () => ({
@@ -107,7 +108,7 @@ function AdvantagesPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["advantages"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const claim = useMutation({
@@ -121,7 +122,7 @@ function AdvantagesPage() {
       toast.success("C'est réservé ! Le Bureau est prévenu.");
       queryClient.invalidateQueries({ queryKey: ["advantages"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const advantages = data?.advantages ?? [];

@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { LoadingState } from "@/components/LoadingState";
 import { ProQrCard } from "@/components/ProQrCard";
 import { PRO_STATUS_LABEL, completion, slugify } from "@/lib/pro-card";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/carte")({
   head: () => ({
@@ -131,7 +132,7 @@ function ProCardPage() {
       toast.success(submit ? "Carte envoyée au Bureau pour validation." : "Carte enregistrée.");
       void queryClient.invalidateQueries({ queryKey: ["my-pro-card"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const pct = completion({ display_name: form.display_name, logo_url: form.logo_url, specialties: form.specialties.split(",").filter((s) => s.trim()), sector: form.sector, description: form.description, website_url: form.website_url, public_email: form.public_email, public_phone: form.public_phone });

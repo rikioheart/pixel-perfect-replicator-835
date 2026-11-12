@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -106,7 +107,7 @@ function GoogleSignInButton() {
       redirect_uri: window.location.origin,
     });
     setBusy(false);
-    if (result.error) toast.error(result.error.message);
+    if (result.error) toast.error(humanizeError(result.error));
     // If redirected, the browser navigates away; nothing else to do.
   };
 
@@ -178,7 +179,7 @@ function SignInForm() {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin,
     });
-    if (error) toast.error(error.message);
+    if (error) toast.error(humanizeError(error));
     else toast.success("E-mail de réinitialisation envoyé.");
   };
 

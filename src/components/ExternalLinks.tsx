@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { defaultTitle, detectService, normalizeUrl, SERVICE_LABEL, type ServiceKey } from "@/lib/external-links";
+import { humanizeError } from "@/lib/user-messages";
 
 export type LinkContext = "PROJECT" | "ACTIVITY" | "EVENT" | "TASK" | "RESERVATION" | "FORMATION" | "MEETING";
 
@@ -64,7 +65,7 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
       if (error) throw error;
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: key }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const preview = normalizeUrl(url);

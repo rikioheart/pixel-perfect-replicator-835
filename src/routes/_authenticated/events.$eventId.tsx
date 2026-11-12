@@ -18,6 +18,7 @@ import { LoadingState } from "@/components/LoadingState";
 import { useState } from "react";
 import { RegistrationWizard } from "@/components/RegistrationWizard";
 import { ExperienceSections, SpotsBadge, useSpots } from "@/components/ExperienceBits";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   head: () => ({
@@ -99,7 +100,7 @@ function EventDetailPage() {
       if (mine) toast.success("Inscription annulée.");
       void queryClient.invalidateQueries({ queryKey: ["event-participations", eventId] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   if (isLoading) {

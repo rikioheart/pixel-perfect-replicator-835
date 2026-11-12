@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/reimbursements")({
   head: () => ({
@@ -103,7 +104,7 @@ function ReimbursementsPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["reimbursements"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const rows = data ?? [];

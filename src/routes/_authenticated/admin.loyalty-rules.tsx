@@ -27,6 +27,7 @@ import {
   recomputeLoyaltyAll,
   type LoyaltyRule,
 } from "@/lib/loyalty-rules";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/loyalty-rules")({
   head: () => ({
@@ -119,7 +120,7 @@ function LoyaltyRulesPage() {
       toast.success("Règle ajoutée.");
       await invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const update = useMutation({
@@ -136,7 +137,7 @@ function LoyaltyRulesPage() {
       });
     },
     onSuccess: invalidate,
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const recompute = useMutation({
@@ -149,7 +150,7 @@ function LoyaltyRulesPage() {
       );
       await queryClient.invalidateQueries();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const remove = useMutation({
@@ -168,7 +169,7 @@ function LoyaltyRulesPage() {
       toast.success("Règle supprimée.");
       await invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   if (!isBureau) {

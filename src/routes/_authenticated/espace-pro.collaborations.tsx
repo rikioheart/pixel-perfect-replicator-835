@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/collaborations")({
   head: () => ({
@@ -54,7 +55,7 @@ function CollabPage() {
       if (error) throw error;
     },
     onSuccess: () => { setForm({ title: "", description: "", happened_on: "", is_public: false }); toast.success("Collaboration ajoutée."); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const toggle = useMutation({
     mutationFn: async ({ id, is_public }: { id: string; is_public: boolean }) => {

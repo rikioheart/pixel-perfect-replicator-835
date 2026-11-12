@@ -14,6 +14,7 @@ import { SidePanel } from "@/components/SidePanel";
 import { UpdatesWall } from "@/components/UpdatesWall";
 import { HelpWizard } from "@/components/HelpWizard";
 import { UPDATE_KINDS } from "@/lib/contributions";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/avancees")({
   head: () => ({
@@ -46,7 +47,7 @@ function WallPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Actualité publiée."); setOpen(false); setForm({ kind: "PROJET", title: "", body: "", is_public: false }); void qc.invalidateQueries({ queryKey: ["association-updates"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   return (

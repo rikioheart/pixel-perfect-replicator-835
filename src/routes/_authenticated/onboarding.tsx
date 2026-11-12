@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { profileCompletion } from "@/lib/home-config";
 import { needsAccountChoice } from "@/lib/account-choice";
 import { AccountChoiceStep } from "@/components/AccountChoiceStep";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -123,7 +124,7 @@ function OnboardingPage() {
       await refresh();
       toast.success("Étape enregistrée, merci !");
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const current = STEPS[step] ?? STEPS[0];

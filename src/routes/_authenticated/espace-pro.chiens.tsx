@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { useProOptions } from "@/lib/pro-card";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/chiens")({
   head: () => ({
@@ -84,7 +85,7 @@ function ReferentShare({ dog }: { dog: ProDog }) {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Partage effectué."); setContext(""); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const revoke = useMutation({
     mutationFn: async (id: string) => {
@@ -92,7 +93,7 @@ function ReferentShare({ dog }: { dog: ProDog }) {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Partage retiré."); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const allowed = (k: string) => dog.perms[k as keyof ProDog["perms"]] && ((k !== "goals" && k !== "observations") || dog.can_share_followup);
   return (
@@ -139,7 +140,7 @@ function DogCard({ dog }: { dog: ProDog }) {
       if (error) throw error;
     },
     onSuccess: () => { setObs(""); toast.success("Observation ajoutée."); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const addGoal = useMutation({
     mutationFn: async () => {
@@ -148,7 +149,7 @@ function DogCard({ dog }: { dog: ProDog }) {
       if (error) throw error;
     },
     onSuccess: () => { setGoal(""); toast.success("Objectif ajouté."); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   return (
