@@ -432,8 +432,14 @@ function AvatarField({
   const [busy, setBusy] = useState(false);
 
   const replace = async (file: File) => {
-    if (!AVATAR_TYPES.includes(file.type)) return toast.error("Choisissez une image JPG, PNG ou WebP.");
-    if (file.size > AVATAR_MAX) return toast.error("Cette image dépasse 2 Mo. Essayez une version plus légère.");
+    if (!AVATAR_TYPES.includes(file.type)) {
+      toast.error("Choisissez une image JPG, PNG ou WebP.");
+      return;
+    }
+    if (file.size > AVATAR_MAX) {
+      toast.error("Cette image dépasse 2 Mo. Essayez une version plus légère.");
+      return;
+    }
     setBusy(true);
     try {
       const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
