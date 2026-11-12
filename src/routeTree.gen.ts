@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as ArticlesRouteImport } from './routes/articles'
 import { Route as AssociationRouteImport } from './routes/association'
+import { Route as ReinitialiserMotDePasseRouteImport } from './routes/reinitialiser-mot-de-passe'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AuthenticatedAdvantagesRouteImport } from './routes/_authenticated/advantages'
 import { Route as AuthenticatedAvanceesRouteImport } from './routes/_authenticated/avancees'
@@ -104,6 +105,11 @@ const ArticlesRoute = ArticlesRouteImport.update({
 const AssociationRoute = AssociationRouteImport.update({
   id: '/association',
   path: '/association',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReinitialiserMotDePasseRoute = ReinitialiserMotDePasseRouteImport.update({
+  id: '/reinitialiser-mot-de-passe',
+  path: '/reinitialiser-mot-de-passe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -476,6 +482,7 @@ export interface FileRoutesByFullPath {
   '/agenda': typeof AgendaRoute
   '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
+  '/reinitialiser-mot-de-passe': typeof ReinitialiserMotDePasseRoute
   '/services': typeof ServicesRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/avancees': typeof AuthenticatedAvanceesRoute
@@ -549,6 +556,7 @@ export interface FileRoutesByTo {
   '/agenda': typeof AgendaRoute
   '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
+  '/reinitialiser-mot-de-passe': typeof ReinitialiserMotDePasseRoute
   '/services': typeof ServicesRoute
   '/advantages': typeof AuthenticatedAdvantagesRoute
   '/avancees': typeof AuthenticatedAvanceesRoute
@@ -623,6 +631,7 @@ export interface FileRoutesById {
   '/agenda': typeof AgendaRoute
   '/articles': typeof ArticlesRoute
   '/association': typeof AssociationRoute
+  '/reinitialiser-mot-de-passe': typeof ReinitialiserMotDePasseRoute
   '/services': typeof ServicesRoute
   '/_authenticated/advantages': typeof AuthenticatedAdvantagesRoute
   '/_authenticated/avancees': typeof AuthenticatedAvanceesRoute
@@ -698,6 +707,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/articles'
     | '/association'
+    | '/reinitialiser-mot-de-passe'
     | '/services'
     | '/advantages'
     | '/avancees'
@@ -771,6 +781,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/articles'
     | '/association'
+    | '/reinitialiser-mot-de-passe'
     | '/services'
     | '/advantages'
     | '/avancees'
@@ -844,6 +855,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/articles'
     | '/association'
+    | '/reinitialiser-mot-de-passe'
     | '/services'
     | '/_authenticated/advantages'
     | '/_authenticated/avancees'
@@ -919,6 +931,7 @@ export interface RootRouteChildren {
   AgendaRoute: typeof AgendaRoute
   ArticlesRoute: typeof ArticlesRoute
   AssociationRoute: typeof AssociationRoute
+  ReinitialiserMotDePasseRoute: typeof ReinitialiserMotDePasseRoute
   ServicesRoute: typeof ServicesRoute
   FormulaireFormIdRoute: typeof FormulaireFormIdRoute
   PartageTokenRoute: typeof PartageTokenRoute
@@ -961,6 +974,13 @@ declare module '@tanstack/react-router' {
       path: '/association'
       fullPath: '/association'
       preLoaderRoute: typeof AssociationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reinitialiser-mot-de-passe': {
+      id: '/reinitialiser-mot-de-passe'
+      path: '/reinitialiser-mot-de-passe'
+      fullPath: '/reinitialiser-mot-de-passe'
+      preLoaderRoute: typeof ReinitialiserMotDePasseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -1588,6 +1608,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgendaRoute: AgendaRoute,
   ArticlesRoute: ArticlesRoute,
   AssociationRoute: AssociationRoute,
+  ReinitialiserMotDePasseRoute: ReinitialiserMotDePasseRoute,
   ServicesRoute: ServicesRoute,
   FormulaireFormIdRoute: FormulaireFormIdRoute,
   PartageTokenRoute: PartageTokenRoute,

@@ -19,3 +19,14 @@ export function readRecoveryHash(hash: string): { kind: 'recovery' | 'error' | '
   if (params.get('type') === 'recovery' && params.get('access_token')) return { kind: 'recovery', expired: false };
   return { kind: 'none', expired: false };
 }
+
+/** Vrai si la session vient d'un lien de réinitialisation (méthode « recovery » inscrite dans le jeton). */
+export function tokenFromRecovery(accessToken: string): boolean {
+  try {
+    const part = accessToken.split('.')[1] ?? '';
+    const json = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '='))) as { amr?: Array<{ method?: string }> };
+    return (json.amr ?? []).some((entry) => entry.method === 'recovery');
+  } catch {
+    return false;
+  }
+}

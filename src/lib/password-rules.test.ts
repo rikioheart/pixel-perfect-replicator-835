@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkNewPassword, readRecoveryHash } from './password-rules';
+import { checkNewPassword, readRecoveryHash, tokenFromRecovery } from './password-rules';
 
 describe('nouveau mot de passe', () => {
   it('refuse moins de 8 caractères', () => {
@@ -22,5 +22,15 @@ describe('lien reçu par e-mail', () => {
   });
   it('ignore une adresse sans lien', () => {
     expect(readRecoveryHash('').kind).toBe('none');
+  });
+});
+
+describe('session de réinitialisation', () => {
+  const token = (amr: unknown) => `h.${btoa(JSON.stringify({ amr })).replace(/=+$/, '')}.s`;
+  it('reconnaît une session ouverte par le lien', () => {
+    expect(tokenFromRecovery(token([{ method: 'recovery' }]))).toBe(true);
+  });
+  it('refuse une session ouverte par mot de passe', () => {
+    expect(tokenFromRecovery(token([{ method: 'password' }]))).toBe(false);
   });
 });

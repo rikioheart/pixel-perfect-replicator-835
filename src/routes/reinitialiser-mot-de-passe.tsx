@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useOnline } from '@/lib/offline';
 import { humanizeError } from '@/lib/user-messages';
-import { PASSWORD_MIN_LENGTH, checkNewPassword, readRecoveryHash } from '@/lib/password-rules';
+import { PASSWORD_MIN_LENGTH, checkNewPassword, readRecoveryHash, tokenFromRecovery } from '@/lib/password-rules';
 
 export const Route = createFileRoute('/reinitialiser-mot-de-passe')({
   head: () => ({
@@ -53,7 +53,7 @@ function ResetPasswordPage() {
     };
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session) return;
-      if (event === 'PASSWORD_RECOVERY' || (hint.kind === 'recovery' && event !== 'SIGNED_OUT')) accept(session.user.id);
+      if (event === 'PASSWORD_RECOVERY' || tokenFromRecovery(session.access_token)) accept(session.user.id);
       else if (sessionStorage.getItem(RECOVERY_KEY) === session.user.id) accept(session.user.id);
     });
     // Sans lien valide, on n'attend pas indéfiniment.

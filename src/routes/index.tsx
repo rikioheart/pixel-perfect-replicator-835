@@ -180,7 +180,7 @@ function SignInForm() {
       return;
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin,
+      redirectTo: `${window.location.origin}/reinitialiser-mot-de-passe`,
     });
     if (error) toast.error(humanizeError(error));
     else toast.success("E-mail de réinitialisation envoyé.");
