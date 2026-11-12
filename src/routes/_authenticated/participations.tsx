@@ -89,7 +89,7 @@ function ParticipationsPage() {
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/40"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary-ink"
             >
               <div>
                 <EntityPeek type="participation" id={item.id}>

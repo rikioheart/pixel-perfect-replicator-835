@@ -26,7 +26,9 @@ function checks(): Check[] {
       ["Badge principal survolé", "primary-foreground", over("primary", 0.8, base), TEXT],
       ["Badge danger survolé", "destructive-foreground", over("destructive", 0.8, base), TEXT],
       ["Badge secondaire survolé", "secondary-foreground", over("secondary", 0.8, base), TEXT],
-      ["Badge d'état « en cours »", "primary-ink", over("primary", 0.1, base), TEXT],
+      ["Badge d'état « en cours »", "primary-ink", "primary-tint", TEXT],
+      ["Élément mis en avant : texte", "foreground", "primary-tint", TEXT],
+      ["Élément mis en avant : détail", "muted-foreground", "primary-tint", TEXT],
       ["Badge d'état « terminé »", "success", over("success", 0.15, base), TEXT],
       ["Badge d'état « à valider »", "foreground", over("warning", 0.25, base), TEXT],
       ["Badge d'état « bloqué »", "destructive", over("destructive", 0.1, base), TEXT],
@@ -40,10 +42,11 @@ function checks(): Check[] {
       // Messages d'erreur et alertes
       ["Message d'erreur", "destructive", base, TEXT],
       // Notifications
-      ["Notification non lue (texte secondaire)", "muted-foreground", over("primary", 0.05, base), TEXT],
+      
       ["Notification non lue (repère)", "primary-ink", base, UI],
       // Jauges
-      ["Jauge (remplissage sur sa piste)", "primary-ink", over("primary-ink", 0.2, base), UI],
+      ["Jauge (remplissage sur sa piste)", "primary-ink", "muted", UI],
+      ["Jauge (remplissage sur la carte)", "primary-ink", base, UI],
       // Focus
       ["Anneau de focus", "ring", base, UI],
       // Graphiques

@@ -90,7 +90,7 @@ export function NotificationBell() {
                   onClick={() => void openNotification(notification)}
                   className={cn(
                     "w-full rounded-lg border p-3 text-left transition-colors hover:bg-muted",
-                    notification.is_read ? "border-border bg-card" : "border-l-4 border-border border-l-primary-ink bg-primary/5",
+                    notification.is_read ? "border-border bg-card" : "border-l-4 border-border border-l-primary-ink bg-primary-tint",
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">

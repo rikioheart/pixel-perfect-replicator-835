@@ -50,6 +50,7 @@
   --color-ochre: var(--ochre);
   --color-ochre-soft: var(--ochre-soft);
   --color-primary-ink: var(--primary-ink);
+  --color-primary-tint: var(--primary-tint);
   --color-cream: var(--cream);
   --color-sand: var(--sand);
   --color-sand-soft: var(--sand-soft);
@@ -111,6 +112,8 @@
   --primary: oklch(0.395 0.128 12);
   --primary-foreground: oklch(0.985 0.004 260);
   --primary-ink: var(--primary);
+  /* Fond teinté de marque (badges, éléments mis en avant) : jamais un bordeaux éclairci, qui serait rose. */
+  --primary-tint: var(--gold-soft);
 
   /* Vin rouge */
   --wine: oklch(0.47 0.152 14);
@@ -196,6 +199,7 @@
   --primary: oklch(0.47 0.13 18);
   --primary-foreground: oklch(0.97 0.012 85);
   --primary-ink: var(--gold-ink);
+  --primary-tint: oklch(0.3 0.045 75);
   --wine: oklch(0.55 0.16 14);
   --wine-foreground: oklch(0.98 0.004 260);
   --navy: oklch(0.16 0.04 265);
@@ -229,6 +233,7 @@
   --primary: oklch(0.33 0.08 258);
   --primary-foreground: oklch(0.97 0.012 85);
   --primary-ink: oklch(0.33 0.08 258);
+  --primary-tint: oklch(0.94 0.02 250);
   --secondary: oklch(0.395 0.128 12);
   --secondary-foreground: oklch(0.97 0.012 85);
   --ring: oklch(0.33 0.08 258);
@@ -242,6 +247,7 @@
   --primary: oklch(0.78 0.085 240);
   --primary-foreground: oklch(0.18 0.04 265);
   --primary-ink: oklch(0.78 0.085 240);
+  --primary-tint: oklch(0.3 0.05 255);
   --secondary: oklch(0.45 0.13 18);
   --secondary-foreground: oklch(0.97 0.012 85);
   --accent: oklch(0.3 0.06 255);

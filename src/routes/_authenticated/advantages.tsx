@@ -175,7 +175,7 @@ function AdvantagesPage() {
                 </p>
                 <div className="mt-4 flex-1" />
                 {mine ? (
-                  <p className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm font-semibold">
+                  <p className="rounded-lg border border-primary-ink bg-primary-tint p-3 text-sm font-semibold">
                     Réservé{item.promo_code ? ` · code ${item.promo_code}` : ""}
                   </p>
                 ) : (

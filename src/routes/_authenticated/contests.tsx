@@ -159,7 +159,7 @@ function ContestsPage() {
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1">
                     <Trophy className="size-3.5" /> {TYPE_LABEL[item.type] ?? item.type}
                   </span>
-                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">
+                  <span className="rounded-full bg-primary-tint px-2.5 py-1 text-primary">
                     {STATUS_LABEL[item.status] ?? item.status}
                   </span>
                 </div>

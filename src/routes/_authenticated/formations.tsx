@@ -187,7 +187,7 @@ function FormationsPage() {
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1">
                     <GraduationCap className="size-3.5" /> {FORMAT_LABEL[item.format] ?? item.format}
                   </span>
-                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">
+                  <span className="rounded-full bg-primary-tint px-2.5 py-1 text-primary">
                     {STATUS_LABEL[item.status] ?? item.status}
                   </span>
                 </div>

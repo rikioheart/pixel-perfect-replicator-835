@@ -25,8 +25,8 @@ export type MindmapNode =
 
 const statusTone: Record<string, string> = {
   COMPLETED: "bg-success/15 text-success",
-  ACTIVE: "bg-primary/10 text-primary",
-  IN_PROGRESS: "bg-primary/10 text-primary",
+  ACTIVE: "bg-primary-tint text-primary",
+  IN_PROGRESS: "bg-primary-tint text-primary",
   PENDING_VALIDATION: "bg-warning/25 text-foreground",
   BLOCKED: "bg-destructive/10 text-destructive",
   ON_HOLD: "bg-muted text-muted-foreground",
