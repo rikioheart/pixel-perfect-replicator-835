@@ -370,7 +370,7 @@ function PreviewPanel() {
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: (id: string, hintId?: string) => ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string | undefined; children: (id: string, hintId?: string) => ReactNode }) {
   const id = useId();
   const hintId = hint ? `${id}-hint` : undefined;
   return (
@@ -394,7 +394,7 @@ function SelectField({
   onChange,
 }: {
   label: string;
-  hint?: string;
+  hint?: string | undefined;
   value: string;
   options: [string, string][];
   onChange: (value: string) => void;
