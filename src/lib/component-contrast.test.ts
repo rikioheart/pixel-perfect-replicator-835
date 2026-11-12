@@ -4,7 +4,7 @@
  * (ex. bouton survolé = bg-primary/90 posé sur le fond). Les états désactivés sont exemptés par WCAG.
  */
 import { describe, expect, it } from "vitest";
-import { WITH_CONTRAST, ratio, tokens, type Surface } from "./theme-css.test-helpers";
+import { WITH_CONTRAST, cssBlock, ratio, tokens, type Surface } from "./theme-css.test-helpers";
 
 const TEXT = 4.5; // texte (WCAG 1.4.3)
 const UI = 3; // contours de champs, états, anneau de focus, jauges, graphiques (WCAG 1.4.11)
@@ -120,4 +120,20 @@ describe("Contraste renforcé : niveau supérieur réellement atteint", () => {
       expect(failures).toEqual([]);
     });
   }
+});
+
+// Les tests fusionnent les blocs dans l'ordre : on vérifie que cet ordre reflète bien la cascade CSS réelle.
+
+describe("Contraste renforcé : cascade CSS fidèle aux tests", () => {
+  it("chaque jeton renforcé du thème clair est redéfini pour le thème sombre", () => {
+    const light = Object.keys(cssBlock(".prefs-high-contrast"));
+    const dark = Object.keys(cssBlock(".dark.prefs-high-contrast"));
+    expect(light.filter((name) => !dark.includes(name))).toEqual([]);
+  });
+
+  it("la signature Bleu nuit claire ne redéfinit aucun jeton renforcé (elle l'emporterait sinon)", () => {
+    const reinforced = Object.keys(cssBlock(".prefs-high-contrast"));
+    const bleuNuit = Object.keys(cssBlock(".sig-bleu-nuit:not(.dark)"));
+    expect(reinforced.filter((name) => bleuNuit.includes(name))).toEqual([]);
+  });
 });
