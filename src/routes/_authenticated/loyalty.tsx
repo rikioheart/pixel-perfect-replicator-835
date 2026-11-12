@@ -311,7 +311,7 @@ function LoyaltyPage() {
                       {tier.reached ? "Atteint" : `${tier.remaining} restant(s)`}
                     </Badge>
                   </div>
-                  <Progress value={tier.percent} />
+                  <Progress value={tier.percent} aria-label={`${tier.rule.reward_label ?? tier.rule.label ?? "Récompense"} : ${total} sur ${tier.threshold} tampons`} />
                   <p className="text-xs text-muted-foreground">
                     {total} / {tier.threshold} tampons
                   </p>
