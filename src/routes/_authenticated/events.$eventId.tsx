@@ -47,7 +47,7 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
   ),
   notFoundComponent: () => (
     <AppShell title="Événement">
-      <p className="text-sm text-muted-foreground">Événement introuvable.</p>
+      <p className="text-sm text-muted-foreground">Cet événement est introuvable : il a peut-être été retiré, ou il ne vous est pas accessible.</p>
     </AppShell>
   ),
 });
@@ -114,7 +114,7 @@ function EventDetailPage() {
   if (!event) {
     return (
       <AppShell title="Événement">
-        <p className="text-sm text-muted-foreground">Événement introuvable.</p>
+        <p className="text-sm text-muted-foreground">Cet événement est introuvable : il a peut-être été retiré, ou il ne vous est pas accessible.</p>
       </AppShell>
     );
   }

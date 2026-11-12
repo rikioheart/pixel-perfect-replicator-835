@@ -39,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/professionals/$proId")({
   ),
   notFoundComponent: () => (
     <AppShell title="Professionnel">
-      <p className="text-sm text-muted-foreground">Professionnel introuvable.</p>
+      <p className="text-sm text-muted-foreground">Cette fiche professionnelle est introuvable : elle a peut-être été retirée, ou elle ne vous est pas accessible.</p>
     </AppShell>
   ),
 });
@@ -88,7 +88,7 @@ function ProfessionalDetailPage() {
   if (!pro) {
     return (
       <AppShell title="Professionnel">
-        <p className="text-sm text-muted-foreground">Professionnel introuvable.</p>
+        <p className="text-sm text-muted-foreground">Cette fiche professionnelle est introuvable : elle a peut-être été retirée, ou elle ne vous est pas accessible.</p>
       </AppShell>
     );
   }
