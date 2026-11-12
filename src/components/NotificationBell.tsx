@@ -90,11 +90,14 @@ export function NotificationBell() {
                   onClick={() => void openNotification(notification)}
                   className={cn(
                     "w-full rounded-lg border p-3 text-left transition-colors hover:bg-muted",
-                    notification.is_read ? "border-border bg-card" : "border-primary/40 bg-primary/5",
+                    notification.is_read ? "border-border bg-card" : "border-l-4 border-border border-l-primary-ink bg-primary/5",
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium">{notification.title}</p>
+                    <p className="text-sm font-medium">
+                      {notification.is_read ? null : <span className="sr-only">Non lue : </span>}
+                      {notification.title}
+                    </p>
                     <span className="shrink-0 text-[11px] text-muted-foreground">
                       {formatWhen(notification.created_at)}
                     </span>
