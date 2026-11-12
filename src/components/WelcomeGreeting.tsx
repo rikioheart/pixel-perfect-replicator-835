@@ -17,7 +17,7 @@ export function useGreeting({
   name: string | null | undefined;
   dogNames?: (string | null | undefined)[] | undefined;
   roleMessage?: string | undefined;
-}): Greeting {
+}): Greeting & { full: boolean } {
   const { user } = useAuth();
   const [state, setState] = useState<{ full: boolean; date: Date } | null>(null);
   useEffect(() => {
@@ -42,7 +42,8 @@ export function useGreeting({
     }, 2000);
     return () => window.clearTimeout(seen);
   }, [user?.id]);
-  return buildGreeting({ name, dogNames, roleMessage, date: state?.date ?? new Date(0), full: state?.full ?? false });
+  const full = state?.full ?? false;
+  return { ...buildGreeting({ name, dogNames, roleMessage, date: state?.date ?? new Date(0), full }), full };
 }
 
 /** Bandeau de bienvenue compact (espace pro, Console) : sans photo ni lien, juste la salutation. */
@@ -56,6 +57,8 @@ export function WelcomeBanner({
   roleMessage?: string | undefined;
 }) {
   const greeting = useGreeting({ name, dogNames, roleMessage });
+  // Après la première visite du jour : une simple ligne, sans encadré qui répéterait la page.
+  if (!greeting.full) return <p className="mb-3 text-sm text-muted-foreground">{greeting.title}.</p>;
   return (
     <section className="mb-4 rounded-xl border border-border bg-card px-5 py-4" aria-label="Bienvenue">
       <h2 className="font-display text-xl">{greeting.title}</h2>
