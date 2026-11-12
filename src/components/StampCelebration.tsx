@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Stamp } from "lucide-react";
 import { useUserPreferences } from "@/lib/user-preferences";
 import { isNewStamp } from "@/lib/recognition";
@@ -61,5 +61,6 @@ export function useNewStampCelebration(userId: string | undefined, serverTotal: 
       /* pas de stockage : pas de célébration */
     }
   }, [userId, serverTotal]);
-  return { show, dismiss: () => setShow(false) };
+  const dismiss = useCallback(() => setShow(false), []);
+  return { show, dismiss };
 }

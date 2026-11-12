@@ -1,20 +1,25 @@
 import { Sparkles, ExternalLink } from "lucide-react";
 import logoMark from "@/assets/logo-lvdc-mark.png.asset.json";
 import { useHomeMedia, useExternalLinks } from "@/lib/home-config";
+import { useGreeting } from "@/components/WelcomeGreeting";
 
 /**
  * Bandeau d'accueil chaleureux : logo de l'association, photo de couverture
- * choisie par le Bureau, message de bienvenue personnalisé et « À la une ».
+ * choisie par le Bureau, salutation du jour (saison, chiens du foyer) et « À la une ».
  */
 export function HomeHero({
   firstName,
+  dogNames,
   roleLabel,
   message,
 }: {
   firstName: string;
+  /** Chiens du foyer lus avec les droits de la personne connectée (jamais d'autres sources). */
+  dogNames?: (string | null | undefined)[];
   roleLabel: string;
   message: string;
 }) {
+  const greeting = useGreeting({ name: firstName, dogNames, roleMessage: message });
   const { coverUrl, coverCaption, highlight } = useHomeMedia();
   const links = useExternalLinks();
 
@@ -40,8 +45,10 @@ export function HomeHero({
         />
         <div className="min-w-0 flex-1">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">{roleLabel}</p>
-          <h2 className="font-display text-2xl">Bonjour {firstName || "à vous"} 👋</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{message}</p>
+          <h2 className="font-display text-2xl">{greeting.title}</h2>
+          {greeting.lines.map((line) => (
+            <p key={line} className="mt-1 text-sm text-muted-foreground">{line}</p>
+          ))}
         </div>
       </div>
 
