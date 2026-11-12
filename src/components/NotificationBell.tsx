@@ -81,7 +81,8 @@ export function NotificationBell() {
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-16 text-center text-sm text-muted-foreground">
                 <HeartHandshake className="size-8 opacity-40" />
-                Aucune notification pour le moment.
+                <span className="font-medium text-foreground">Tout est calme</span>
+                <span>Aucune notification pour l'instant.</span>
               </div>
             ) : (
               notifications.map((notification) => (
