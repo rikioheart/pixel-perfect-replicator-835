@@ -3446,10 +3446,15 @@ export type Database = {
         Row: {
           access_level: string
           account_choice_at: string | null
+          availability: string[]
+          availability_visibility: string
           avatar_path: string | null
           bio: string | null
+          bio_visibility: string
           city: string | null
+          collaboration_modes: string[]
           contact_preference: string
+          contribution_types: string[]
           created_at: string
           deleted_at: string | null
           department: string | null
@@ -3460,6 +3465,7 @@ export type Database = {
           id: string
           involvement_level: string | null
           last_name: string | null
+          location_visibility: string
           membership_date: string | null
           membership_status: string
           membership_type: string
@@ -3467,16 +3473,22 @@ export type Database = {
           phone: string | null
           public_visibility: boolean
           skills: string[]
+          skills_visibility: string
           statutory_category: string
           updated_at: string
         }
         Insert: {
           access_level?: string
           account_choice_at?: string | null
+          availability?: string[]
+          availability_visibility?: string
           avatar_path?: string | null
           bio?: string | null
+          bio_visibility?: string
           city?: string | null
+          collaboration_modes?: string[]
           contact_preference?: string
+          contribution_types?: string[]
           created_at?: string
           deleted_at?: string | null
           department?: string | null
@@ -3487,6 +3499,7 @@ export type Database = {
           id: string
           involvement_level?: string | null
           last_name?: string | null
+          location_visibility?: string
           membership_date?: string | null
           membership_status?: string
           membership_type?: string
@@ -3494,16 +3507,22 @@ export type Database = {
           phone?: string | null
           public_visibility?: boolean
           skills?: string[]
+          skills_visibility?: string
           statutory_category?: string
           updated_at?: string
         }
         Update: {
           access_level?: string
           account_choice_at?: string | null
+          availability?: string[]
+          availability_visibility?: string
           avatar_path?: string | null
           bio?: string | null
+          bio_visibility?: string
           city?: string | null
+          collaboration_modes?: string[]
           contact_preference?: string
+          contribution_types?: string[]
           created_at?: string
           deleted_at?: string | null
           department?: string | null
@@ -3514,6 +3533,7 @@ export type Database = {
           id?: string
           involvement_level?: string | null
           last_name?: string | null
+          location_visibility?: string
           membership_date?: string | null
           membership_status?: string
           membership_type?: string
@@ -3521,6 +3541,7 @@ export type Database = {
           phone?: string | null
           public_visibility?: boolean
           skills?: string[]
+          skills_visibility?: string
           statutory_category?: string
           updated_at?: string
         }
@@ -4812,6 +4833,7 @@ export type Database = {
         Args: { _activity_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_avatar: { Args: { _owner: string }; Returns: boolean }
       can_view_comment_target: {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
@@ -4866,6 +4888,26 @@ export type Database = {
       delete_inventory_item: {
         Args: { _inventory_id: string }
         Returns: undefined
+      }
+      directory_profiles: {
+        Args: { _as_member?: boolean; _ids?: string[] }
+        Returns: {
+          availability: string[]
+          avatar_path: string
+          bio: string
+          city: string
+          collaboration_modes: string[]
+          contribution_types: string[]
+          department: string
+          display_name: string
+          first_name: string
+          id: string
+          last_name: string
+          membership_status: string
+          membership_type: string
+          public_visibility: boolean
+          skills: string[]
+        }[]
       }
       dog_section_visible: {
         Args: { _dog_id: string; _section: string; _user_id: string }
@@ -5046,6 +5088,23 @@ export type Database = {
           email: string
           id: string
           phone: string
+        }[]
+      }
+      profile_details: {
+        Args: { _ids: string[] }
+        Returns: {
+          availability: string[]
+          availability_visibility: string
+          bio: string
+          bio_visibility: string
+          city: string
+          collaboration_modes: string[]
+          contribution_types: string[]
+          department: string
+          id: string
+          location_visibility: string
+          skills: string[]
+          skills_visibility: string
         }[]
       }
       publish_communication: { Args: { _id: string }; Returns: string }

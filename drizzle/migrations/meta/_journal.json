@@ -505,6 +505,13 @@
       "when": 1794500612499,
       "tag": "0071_user_preferences_reading_comfort",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1794502756897,
+      "tag": "0072_profile_human_field_visibility",
+      "breakpoints": true
     }
   ]
 }
