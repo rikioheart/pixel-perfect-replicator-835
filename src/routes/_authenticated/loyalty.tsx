@@ -25,6 +25,7 @@ import { PassAccessPanel, PASS_ACCESS_KEY, fetchPassAccess } from "@/components/
 import { ManualStampCard } from "@/components/ManualStampCard";
 import { hasPersonalPass, showsActivationScreen, validatorSource } from "@/lib/pass-access";
 import { humanizeError } from "@/lib/user-messages";
+import { EmptyState } from "@/components/EmptyState";
 
 import { StampCelebration, useNewStampCelebration } from "@/components/StampCelebration";
 export const Route = createFileRoute("/_authenticated/loyalty")({
@@ -336,7 +337,11 @@ function LoyaltyPage() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           {stamps.length === 0 ? (
-            <p className="text-muted-foreground">Aucun tampon pour le moment.</p>
+            <EmptyState
+              art="playful"
+              title="Votre carte attend son premier tampon"
+              message="Il arrivera à votre prochaine participation à une activité, sans rien à faire de votre côté."
+            />
           ) : (
             stamps.map((stamp) => (
               <div

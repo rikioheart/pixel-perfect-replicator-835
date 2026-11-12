@@ -2,21 +2,24 @@ import { Link } from "@tanstack/react-router";
 import { CheckCircle2, ChevronRight } from "lucide-react";
 import { pendingActions, type PendingAction } from "@/lib/role-home";
 import { InlineLoading } from "@/components/LoadingState";
+import { DogEmptyArt, type DogArt } from "@/components/DogEmptyArt";
 
 /**
  * « À traiter maintenant » : seules les files qui attendent une décision humaine, chacune vers son écran.
- * Rien à traiter = une phrase calme, pas une grille de zéros.
+ * Rien à traiter = une phrase calme, pas une grille de zéros ; `calmArt` y ajoute un petit chien (décoratif).
  */
 export function PendingActionsStrip({
   title = "À traiter maintenant",
   items,
   loading = false,
   calmMessage = "Rien n'attend votre décision pour le moment. Merci !",
+  calmArt,
 }: {
   title?: string;
   items: PendingAction[];
   loading?: boolean;
   calmMessage?: string;
+  calmArt?: DogArt;
 }) {
   const shown = pendingActions(items);
   return (
@@ -25,9 +28,12 @@ export function PendingActionsStrip({
       {loading ? (
         <InlineLoading />
       ) : shown.length === 0 ? (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CheckCircle2 className="size-4 text-primary" aria-hidden /> {calmMessage}
-        </p>
+        <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+          {calmArt ? <DogEmptyArt art={calmArt} className="h-auto w-32 shrink-0" /> : null}
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="size-4 shrink-0 text-primary" aria-hidden /> {calmMessage}
+          </p>
+        </div>
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {shown.map((item) => {
