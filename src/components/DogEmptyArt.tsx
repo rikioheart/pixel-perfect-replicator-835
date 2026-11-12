@@ -19,7 +19,7 @@ const SCENES: Record<DogArt, string> = {
 
 const BACKDROP = '<ellipse class="bg" cx="100" cy="76" rx="90" ry="60"/><ellipse class="gr" cx="100" cy="125" rx="66" ry="6"/>';
 
-export function DogEmptyArt({ art, label, className }: { art: DogArt; label?: string; className?: string }) {
+export function DogEmptyArt({ art, label, className }: { art: DogArt; label?: string | undefined; className?: string | undefined }) {
   return (
     <svg
       viewBox="0 0 200 140"
