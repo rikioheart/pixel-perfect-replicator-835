@@ -477,6 +477,13 @@
       "when": 1794400998381,
       "tag": "0067_help_guides_publish_bureau_only",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1794493213271,
+      "tag": "0068_tighten_open_read_policies",
+      "breakpoints": true
     }
   ]
 }

@@ -88,12 +88,19 @@ function FormationsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["formations"],
+    enabled: Boolean(user?.id),
     queryFn: async () => {
-      const [formations, registrations] = await Promise.all([
+      // Inscriptions : seulement les miennes ; nombre d'inscrits via une fonction sans identités.
+      const [formations, mine, counts] = await Promise.all([
         supabase.from("formations").select("*").order("date", { ascending: true }),
-        supabase.from("formation_registrations").select("formation_id, user_id"),
+        supabase.from("formation_registrations").select("formation_id").eq("user_id", user!.id),
+        supabase.rpc("formation_registration_counts"),
       ]);
-      return { formations: formations.data ?? [], registrations: registrations.data ?? [] };
+      return {
+        formations: formations.data ?? [],
+        mine: new Set((mine.data ?? []).map((r) => r.formation_id)),
+        counts: new Map((counts.data ?? []).map((c) => [c.formation_id, c.total])),
+      };
     },
   });
 
@@ -146,7 +153,8 @@ function FormationsPage() {
   });
 
   const formations = data?.formations ?? [];
-  const registrations = data?.registrations ?? [];
+  const mine = data?.mine ?? new Set<string>();
+  const counts = data?.counts ?? new Map<string, number>();
 
   return (
     <AppShell
@@ -170,9 +178,9 @@ function FormationsPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {formations.map((item) => {
-            const people = registrations.filter((r) => r.formation_id === item.id);
-            const registered = people.some((r) => r.user_id === user?.id);
-            const full = item.capacity != null && people.length >= item.capacity && !registered;
+            const registeredCount = counts.get(item.id) ?? 0;
+            const registered = mine.has(item.id);
+            const full = item.capacity != null && registeredCount >= item.capacity && !registered;
             return (
               <article key={item.id} className="min-w-0 rounded-xl border border-border bg-card p-5">
                 <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
@@ -206,7 +214,7 @@ function FormationsPage() {
                     {registered ? "Annuler mon inscription" : full ? "Complet" : "Je m'inscris"}
                   </Button>
                   <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Users className="size-3.5" /> {people.length}
+                    <Users className="size-3.5" /> {registeredCount}
                     {item.capacity != null ? ` / ${item.capacity}` : ""} inscrit(s)
                   </span>
                   {registered && item.live_link ? (
