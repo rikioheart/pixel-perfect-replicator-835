@@ -46,7 +46,7 @@ export function HomeHero({
       </div>
 
       {highlight ? (
-        <div className="surface-wine flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
+        <div className="surface-signature flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
           <Sparkles className="size-4 shrink-0" />
           <span className="font-medium">À la une cette semaine :</span>
           <span className="opacity-90">{highlight.title}</span>

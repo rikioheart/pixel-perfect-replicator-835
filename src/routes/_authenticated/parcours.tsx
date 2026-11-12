@@ -71,7 +71,7 @@ function JourneyPage() {
         <ol className="relative space-y-4 border-l-2 border-border pl-6">
           {items.map((it, i) => (
             <li key={i} className="relative">
-              <span className="absolute -left-[33px] flex size-6 items-center justify-center rounded-full surface-wine" aria-hidden>
+              <span className="absolute -left-[33px] flex size-6 items-center justify-center rounded-full surface-signature" aria-hidden>
                 <it.icon className="size-3.5" />
               </span>
               <p className="text-xs text-muted-foreground">{new Date(it.date).toLocaleDateString("fr-FR", { dateStyle: "long" })}</p>
