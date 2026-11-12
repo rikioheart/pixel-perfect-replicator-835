@@ -15,8 +15,8 @@ export function useGreeting({
   roleMessage,
 }: {
   name: string | null | undefined;
-  dogNames?: (string | null | undefined)[];
-  roleMessage?: string;
+  dogNames?: (string | null | undefined)[] | undefined;
+  roleMessage?: string | undefined;
 }): Greeting {
   const { user } = useAuth();
   const [state, setState] = useState<{ full: boolean; date: Date } | null>(null);
@@ -43,8 +43,8 @@ export function WelcomeBanner({
   roleMessage,
 }: {
   name: string | null | undefined;
-  dogNames?: (string | null | undefined)[];
-  roleMessage?: string;
+  dogNames?: (string | null | undefined)[] | undefined;
+  roleMessage?: string | undefined;
 }) {
   const greeting = useGreeting({ name, dogNames, roleMessage });
   return (

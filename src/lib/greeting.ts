@@ -55,10 +55,10 @@ export function buildGreeting({
   roleMessage,
 }: {
   name: string | null | undefined;
-  dogNames?: (string | null | undefined)[];
+  dogNames?: (string | null | undefined)[] | undefined;
   date: Date;
   full: boolean;
-  roleMessage?: string;
+  roleMessage?: string | undefined;
 }): Greeting {
   const who = (name ?? "").trim();
   if (!full) return { title: who ? `Bonjour ${who}` : "Bonjour", lines: roleMessage ? [roleMessage] : [] };
