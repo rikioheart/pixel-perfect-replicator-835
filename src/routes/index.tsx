@@ -168,7 +168,7 @@ function SignInForm() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) toast.error(/invalid login credentials/i.test(error.message) ? "E-mail ou mot de passe incorrect." : /email not confirmed/i.test(error.message) ? "Confirmez d’abord votre adresse e-mail (lien reçu par e-mail)." : error.message);
+    if (error) toast.error(/invalid login credentials/i.test(error.message) ? "E-mail ou mot de passe incorrect." : /email not confirmed/i.test(error.message) ? "Confirmez d’abord votre adresse e-mail (lien reçu par e-mail)." : humanizeError(error));
   };
 
   const resetPassword = async () => {
@@ -246,7 +246,7 @@ function SignUpForm() {
     });
     setBusy(false);
     if (error) {
-      toast.error(/already registered|already exists/i.test(error.message) ? "Un compte existe déjà avec cet e-mail. Connectez-vous ou réinitialisez votre mot de passe." : error.message);
+      toast.error(/already registered|already exists/i.test(error.message) ? "Un compte existe déjà avec cet e-mail. Connectez-vous ou réinitialisez votre mot de passe." : humanizeError(error));
       return;
     }
     if (!data.user) {

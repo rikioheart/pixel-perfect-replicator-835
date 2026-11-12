@@ -94,7 +94,7 @@ function Page() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Opération enregistrée."); setF(EMPTY); refresh(); },
-    onError: (e: Error) => toast.error(e.message.includes("duplicate") ? "Déjà suivi (pas de doublon)." : e.message.includes("row-level") ? "Droit « finances » requis." : e.message),
+    onError: (e: Error) => toast.error(e.message.includes("duplicate") ? "Déjà suivi (pas de doublon)." : e.message.includes("row-level") ? "Droit « finances » requis." : humanizeError(e)),
   });
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {

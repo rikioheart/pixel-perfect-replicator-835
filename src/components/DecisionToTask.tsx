@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { MemberPicker } from "@/components/MemberPicker";
 import { formatParisDateTime } from "@/lib/places";
 import { decisionTaskMarker } from "@/lib/governance";
+import { humanizeError } from "@/lib/user-messages";
 
 type Record = { id: string; title: string; decisions: string | null; follow_up: string | null; meeting_at: string | null; meeting_date: string };
 
@@ -73,7 +74,7 @@ export function DecisionToTask({ record }: { record: Record }) {
       void qc.invalidateQueries({ queryKey: ["decision-tasks", record.id] });
       void qc.invalidateQueries({ queryKey: ["tasks"] });
     },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous n'avez pas le droit de créer cette tâche." : e.message),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous n'avez pas le droit de créer cette tâche." : humanizeError(e)),
   });
 
   if (!record.decisions?.trim()) return null;

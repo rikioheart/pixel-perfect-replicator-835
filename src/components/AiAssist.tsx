@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { runAiAssist } from "@/lib/ai-assist.functions";
+import { humanizeError } from "@/lib/user-messages";
 
 type Action = "SUMMARY" | "REPLY" | "INCONSISTENCIES" | "MINUTES";
 const LABEL: Record<Action, string> = {
@@ -29,7 +30,7 @@ export function AiAssist({ type, id, actions = ["SUMMARY", "REPLY", "INCONSISTEN
     try {
       const r = await run({ data: { action: a, type, id } });
       setText(r.text); setProposal(r.text);
-    } catch (e) { toast.error((e as Error).message); setOpen(false); }
+    } catch (e) { toast.error(humanizeError(e)); setOpen(false); }
     finally { setBusy(false); }
   };
   const decide = async (status: "VALIDATED" | "REJECTED") => {

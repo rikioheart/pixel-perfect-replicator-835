@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { decisionTaskMarker } from "@/lib/governance";
 import { formatParisDateTime } from "@/lib/places";
+import { humanizeError } from "@/lib/user-messages";
 
 type Rec = { id: string; title: string; decisions: string | null; meeting_at: string | null; meeting_date: string };
 
@@ -43,7 +44,7 @@ export function DecisionToCommunication({ record }: { record: Rec }) {
       void qc.invalidateQueries({ queryKey: ["decision-comms", record.id] });
       void qc.invalidateQueries({ queryKey: ["bureau-communications"] });
     },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Réservé au Bureau." : e.message),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Réservé au Bureau." : humanizeError(e)),
   });
 
   if (!record.decisions?.trim()) return null;

@@ -57,7 +57,7 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
       if (error) throw error;
     },
     onSuccess: () => { setUrl(""); setLabel(""); setAdding(false); toast.success("Lien ajouté."); void qc.invalidateQueries({ queryKey: key }); },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous ne pouvez pas ajouter de lien ici." : e.message),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous ne pouvez pas ajouter de lien ici." : humanizeError(e)),
   });
   const remove = useMutation({
     mutationFn: async (id: string) => {
