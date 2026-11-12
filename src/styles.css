@@ -6,7 +6,10 @@
 
 /*
  * La Voix du Chien — design system
- * Palette : bordeaux / vin rouge / bleu nuit / bleu marine / blanc
+ * Deux signatures : Bordeaux (par défaut) et Bleu nuit (classe .sig-bleu-nuit, espace membre).
+ * Palette partagée : Crème, Sable, Vert sauge, Or. Aucune teinte rose, mauve, magenta ou fuchsia
+ * (vérifié par src/lib/theme-tokens.test.ts, avec les contrastes WCAG AA).
+ * --primary = remplissage de marque (boutons) ; --primary-ink = marque en texte, icône ou contour.
  */
 
 @theme inline {
@@ -46,6 +49,19 @@
   --color-sage-soft: var(--sage-soft);
   --color-ochre: var(--ochre);
   --color-ochre-soft: var(--ochre-soft);
+  --color-primary-ink: var(--primary-ink);
+  --color-cream: var(--cream);
+  --color-sand: var(--sand);
+  --color-sand-soft: var(--sand-soft);
+  --color-sand-foreground: var(--sand-foreground);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-gold-ink: var(--gold-ink);
+  --color-brand-bordeaux: var(--brand-bordeaux);
+  --color-brand-nuit: var(--brand-nuit);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-sand: var(--brand-sand);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -68,7 +84,22 @@
 :root {
   --radius: 0.85rem;
 
-  --background: oklch(0.955 0.014 75);
+  /* Palette partagée */
+  --cream: oklch(0.955 0.014 80);
+  --sand: oklch(0.915 0.03 78);
+  --sand-soft: oklch(0.935 0.018 78);
+  --sand-foreground: oklch(0.25 0.045 265);
+  --gold: oklch(0.76 0.125 80);
+  --gold-soft: oklch(0.95 0.04 85);
+  --gold-foreground: oklch(0.22 0.045 265);
+  --gold-ink: oklch(0.5 0.1 68);
+  /* Couleurs fixes des deux signatures (aperçus du choix, jamais adaptées au thème) */
+  --brand-bordeaux: oklch(0.395 0.128 12);
+  --brand-nuit: oklch(0.33 0.08 258);
+  --brand-cream: oklch(0.955 0.014 80);
+  --brand-sand: oklch(0.915 0.03 78);
+
+  --background: var(--cream);
   --foreground: oklch(0.25 0.045 265);
 
   --card: oklch(1 0 0);
@@ -79,6 +110,7 @@
   /* Bordeaux */
   --primary: oklch(0.395 0.128 12);
   --primary-foreground: oklch(0.985 0.004 260);
+  --primary-ink: var(--primary);
 
   /* Vin rouge */
   --wine: oklch(0.47 0.152 14);
@@ -92,11 +124,12 @@
   --secondary: oklch(0.34 0.072 255);
   --secondary-foreground: oklch(0.97 0.008 260);
 
-  --muted: oklch(0.93 0.016 75);
+  --muted: var(--sand-soft);
   --muted-foreground: oklch(0.46 0.03 262);
 
-  --accent: oklch(0.93 0.025 30);
-  --accent-foreground: oklch(0.395 0.128 12);
+  /* Survol / sélection : sable (plus de fond rosé). */
+  --accent: var(--sand);
+  --accent-foreground: var(--primary-ink);
 
   --destructive: oklch(0.55 0.2 27);
   --destructive-foreground: oklch(0.985 0.004 260);
@@ -107,13 +140,13 @@
 
   --border: oklch(0.88 0.02 70);
   --input: oklch(0.88 0.02 70);
-  --ring: oklch(0.395 0.128 12);
+  --ring: var(--primary-ink);
 
-  --chart-1: oklch(0.395 0.128 12);
+  --chart-1: var(--primary);
   --chart-2: oklch(0.34 0.072 255);
   --chart-3: oklch(0.47 0.152 14);
   --chart-4: oklch(0.215 0.055 265);
-  --chart-5: oklch(0.72 0.14 75);
+  --chart-5: var(--gold);
 
   --sidebar: oklch(0.215 0.055 265);
   --sidebar-foreground: oklch(0.93 0.01 260);
@@ -126,27 +159,41 @@
 
   --gradient-night: linear-gradient(150deg, oklch(0.215 0.055 265), oklch(0.34 0.072 255));
   --gradient-wine: linear-gradient(135deg, oklch(0.395 0.128 12), oklch(0.47 0.152 14));
+  /* Bandeau de signature (élément actif du menu, accueil) : texte crème sur les deux teintes. */
+  --signature-from: oklch(0.395 0.128 12);
+  --signature-to: oklch(0.47 0.152 14);
+  --signature-foreground: oklch(0.97 0.012 85);
+  --gradient-signature: linear-gradient(135deg, var(--signature-from), var(--signature-to));
   --sage: oklch(0.7 0.06 145);
   --sage-soft: oklch(0.93 0.03 145);
-  --ochre: oklch(0.74 0.12 80);
-  --ochre-soft: oklch(0.95 0.04 85);
+  /* Ancien nom de l'or, conservé pour la vitrine publique. */
+  --ochre: var(--gold);
+  --ochre-soft: var(--gold-soft);
   --shadow-panel: 0 1px 2px oklch(0.22 0.045 265 / 0.06), 0 12px 32px -18px oklch(0.22 0.045 265 / 0.35);
 }
 
 .dark {
   --sage: oklch(0.6 0.06 145);
   --sage-soft: oklch(0.3 0.04 145);
-  --ochre: oklch(0.7 0.11 80);
-  --ochre-soft: oklch(0.32 0.05 80);
+  --cream: oklch(0.26 0.03 75);
+  --sand: oklch(0.31 0.035 75);
+  --sand-soft: oklch(0.27 0.03 75);
+  --sand-foreground: oklch(0.96 0.006 260);
+  --gold: oklch(0.76 0.12 80);
+  --gold-soft: oklch(0.32 0.05 80);
+  --gold-foreground: oklch(0.18 0.04 265);
+  --gold-ink: oklch(0.82 0.11 82);
   --background: oklch(0.18 0.04 265);
   --foreground: oklch(0.96 0.006 260);
   --card: oklch(0.225 0.05 265);
   --card-foreground: oklch(0.96 0.006 260);
   --popover: oklch(0.225 0.05 265);
   --popover-foreground: oklch(0.96 0.006 260);
-  /* Bordeaux éclairci : lisible en texte sur fond nuit (≥ 5:1), texte nuit sur les boutons. */
-  --primary: oklch(0.72 0.12 12);
-  --primary-foreground: oklch(0.18 0.04 265);
+  /* Signature Bordeaux en sombre : un bordeaux clair devient rose, donc les boutons restent
+     bordeaux (texte crème) et la marque en texte/icône passe à l'or. */
+  --primary: oklch(0.47 0.13 18);
+  --primary-foreground: oklch(0.97 0.012 85);
+  --primary-ink: var(--gold-ink);
   --wine: oklch(0.55 0.16 14);
   --wine-foreground: oklch(0.98 0.004 260);
   --navy: oklch(0.16 0.04 265);
@@ -165,14 +212,46 @@
   --warning-foreground: oklch(0.18 0.04 265);
   --border: oklch(1 0 0 / 14%);
   --input: oklch(1 0 0 / 22%);
-  --ring: oklch(0.72 0.12 12);
-  --chart-1: oklch(0.72 0.12 12);
+  --ring: var(--primary-ink);
+  --chart-1: oklch(0.58 0.15 24);
   --chart-2: oklch(0.72 0.09 240);
   --chart-3: oklch(0.74 0.1 145);
   --chart-4: oklch(0.8 0.11 80);
-  --chart-5: oklch(0.7 0.08 300);
+  --chart-5: oklch(0.82 0.04 75);
   --shadow-panel: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 32px -18px oklch(0 0 0 / 0.6);
   color-scheme: dark;
+}
+
+/* Signature Bleu nuit : le bleu nuit mène, le bordeaux devient la couleur complémentaire. */
+.sig-bleu-nuit:not(.dark) {
+  --primary: oklch(0.33 0.08 258);
+  --primary-foreground: oklch(0.97 0.012 85);
+  --primary-ink: oklch(0.33 0.08 258);
+  --secondary: oklch(0.395 0.128 12);
+  --secondary-foreground: oklch(0.97 0.012 85);
+  --ring: oklch(0.33 0.08 258);
+  --chart-1: oklch(0.33 0.08 258);
+  --chart-2: oklch(0.395 0.128 12);
+  --sidebar-primary: oklch(0.5 0.1 250);
+  --sidebar-ring: oklch(0.5 0.1 250);
+  --signature-from: oklch(0.36 0.085 258);
+  --signature-to: oklch(0.46 0.1 250);
+}
+.sig-bleu-nuit.dark {
+  --primary: oklch(0.78 0.085 240);
+  --primary-foreground: oklch(0.18 0.04 265);
+  --primary-ink: oklch(0.78 0.085 240);
+  --secondary: oklch(0.45 0.13 18);
+  --secondary-foreground: oklch(0.97 0.012 85);
+  --accent: oklch(0.3 0.06 255);
+  --accent-foreground: oklch(0.96 0.006 260);
+  --ring: oklch(0.78 0.085 240);
+  --chart-1: oklch(0.78 0.085 240);
+  --chart-2: oklch(0.58 0.15 24);
+  --sidebar-primary: oklch(0.5 0.1 250);
+  --sidebar-ring: oklch(0.78 0.085 240);
+  --signature-from: oklch(0.4 0.09 256);
+  --signature-to: oklch(0.48 0.1 248);
 }
 
 @layer base {
@@ -197,6 +276,11 @@
 @utility surface-night {
   background-image: var(--gradient-night);
   color: var(--color-navy-foreground);
+}
+
+@utility surface-signature {
+  background-image: var(--gradient-signature);
+  color: var(--signature-foreground);
 }
 
 @utility surface-wine {
@@ -328,4 +412,12 @@
   --success-text: hsl(140 70% 78%);
   --error-text: hsl(0 100% 86%);
   --warning-text: hsl(45 100% 78%);
+}
+
+/* La marque en texte, icône ou contour suit --primary-ink : identique à --primary, sauf en
+   signature Bordeaux sombre où le bordeaux clair serait rose (voir les tokens plus haut). */
+@layer utilities {
+  .text-primary, .hover\:text-primary:hover, .focus\:text-primary:focus { color: var(--primary-ink); }
+  .border-primary { border-color: var(--primary-ink); }
+  .fill-primary { fill: var(--primary-ink); }
 }

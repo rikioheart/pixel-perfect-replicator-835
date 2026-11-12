@@ -11,7 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUserPreferences, TEXT_SIZES, DEFAULT_VIEWS, THEMES } from "@/lib/user-preferences";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
+import { useUserPreferences, TEXT_SIZES, DEFAULT_VIEWS, THEMES, SIGNATURES } from "@/lib/user-preferences";
 
 export const Route = createFileRoute("/_authenticated/my-space")({
   head: () => ({
@@ -73,6 +75,49 @@ function MySpacePage() {
               </SelectContent>
             </Select>
           </div>
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-medium leading-none">Signature de couleur</legend>
+            <p className="text-sm text-muted-foreground">
+              Elle s'applique au thème clair comme au thème sombre.
+            </p>
+            <RadioGroup
+              value={preferences.signature}
+              onValueChange={(value) => save.mutate({ signature: value })}
+              className="grid gap-3 sm:grid-cols-2"
+            >
+              {SIGNATURES.map((option) => {
+                const selected = preferences.signature === option.value;
+                return (
+                  <Label
+                    key={option.value}
+                    htmlFor={`signature-${option.value}`}
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-lg border bg-card p-3 font-normal transition-colors hover:bg-accent",
+                      selected && "border-primary",
+                    )}
+                  >
+                    <RadioGroupItem id={`signature-${option.value}`} value={option.value} className="mt-1" />
+                    <span className="min-w-0 space-y-2">
+                      <span className="block font-medium text-foreground">{option.label}</span>
+                      <span className="block text-xs text-muted-foreground">{option.hint}</span>
+                      <span className="flex gap-1.5" aria-hidden>
+                        <span
+                          className={cn(
+                            "size-6 rounded-full border",
+                            option.value === "BLEU_NUIT" ? "bg-brand-nuit" : "bg-brand-bordeaux",
+                          )}
+                        />
+                        <span className="size-6 rounded-full border bg-brand-cream" />
+                        <span className="size-6 rounded-full border bg-brand-sand" />
+                        <span className="size-6 rounded-full border bg-sage" />
+                        <span className="size-6 rounded-full border bg-gold" />
+                      </span>
+                    </span>
+                  </Label>
+                );
+              })}
+            </RadioGroup>
+          </fieldset>
           <div className="space-y-2">
             <Label>Taille du texte</Label>
             <Select

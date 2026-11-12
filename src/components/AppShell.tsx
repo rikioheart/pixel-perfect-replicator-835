@@ -277,7 +277,7 @@ export function AppShell({
         className={cn(
           "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-200 motion-reduce:transition-none",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
-          active ? "surface-wine" : mobile ? "hover:bg-accent" : "hover:bg-sidebar-accent",
+          active ? "surface-signature" : mobile ? "hover:bg-accent" : "hover:bg-sidebar-accent",
         )}
       >
         <group.icon className="size-4" aria-hidden="true" />

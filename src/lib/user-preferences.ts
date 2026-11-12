@@ -16,6 +16,7 @@ export type UserPreferences = {
   theme: string;
   comfortable_spacing: boolean;
   notification_sound: boolean;
+  signature: string;
 };
 
 const DEFAULTS: Omit<UserPreferences, "user_id"> = {
@@ -30,6 +31,7 @@ const DEFAULTS: Omit<UserPreferences, "user_id"> = {
   theme: "SYSTEM",
   comfortable_spacing: false,
   notification_sound: false,
+  signature: "BORDEAUX",
 };
 
 export const TEXT_SIZES: [string, string][] = [
@@ -43,6 +45,17 @@ export const THEMES: [string, string][] = [
   ["LIGHT", "Clair"],
   ["DARK", "Sombre"],
 ];
+
+/** Signature visuelle de l'espace membre, indépendante du thème clair/sombre. */
+export const SIGNATURES: { value: string; label: string; hint: string }[] = [
+  { value: "BORDEAUX", label: "Bordeaux", hint: "Chaleureux, la couleur historique de l'association" },
+  { value: "BLEU_NUIT", label: "Bleu nuit", hint: "Plus calme, le bordeaux en touche complémentaire" },
+];
+
+/** Classe posée sur le document pour une signature (aucune pour Bordeaux, la signature par défaut). */
+export function signatureClass(signature: string): string | null {
+  return signature === "BLEU_NUIT" ? "sig-bleu-nuit" : null;
+}
 
 export const DEFAULT_VIEWS: [string, string][] = [
   ["LIST", "Liste"],
@@ -80,10 +93,10 @@ export function useUserPreferences() {
   return { preferences: query.data ?? { user_id: user?.id ?? "", ...DEFAULTS }, isLoading: query.isLoading, save };
 }
 
-/** Applique les préférences d'accessibilité sur le document (taille, contraste, animations). */
+/** Applique les préférences sur le document (taille, contraste, animations, thème, signature). */
 export function useApplyPreferences() {
   const { preferences } = useUserPreferences();
-  const { text_size, high_contrast, reduced_motion, theme, comfortable_spacing } = preferences;
+  const { text_size, high_contrast, reduced_motion, theme, comfortable_spacing, signature } = preferences;
 
   useEffect(() => {
     const root = document.documentElement;
@@ -93,15 +106,16 @@ export function useApplyPreferences() {
     root.classList.toggle("prefs-high-contrast", high_contrast);
     root.classList.toggle("prefs-reduced-motion", reduced_motion);
     root.classList.toggle("prefs-comfortable", comfortable_spacing);
+    root.classList.toggle("sig-bleu-nuit", signatureClass(signature) === "sig-bleu-nuit");
     apply();
     media.addEventListener("change", apply);
     // Les réglages ne valent que pour l'espace membre : la page publique garde son rendu.
     return () => {
       media.removeEventListener("change", apply);
-      root.classList.remove("dark", "prefs-high-contrast", "prefs-reduced-motion", "prefs-comfortable");
+      root.classList.remove("dark", "prefs-high-contrast", "prefs-reduced-motion", "prefs-comfortable", "sig-bleu-nuit");
       root.style.fontSize = "";
     };
-  }, [text_size, high_contrast, reduced_motion, theme, comfortable_spacing]);
+  }, [text_size, high_contrast, reduced_motion, theme, comfortable_spacing, signature]);
 }
 
 /** Thème effectif : choix explicite, sinon réglage de l'appareil. */

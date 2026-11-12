@@ -4622,6 +4622,7 @@ export type Database = {
           notify_reminders: boolean
           reduced_motion: boolean
           show_association_updates: boolean
+          signature: string
           text_size: string
           theme: string
           updated_at: string
@@ -4638,6 +4639,7 @@ export type Database = {
           notify_reminders?: boolean
           reduced_motion?: boolean
           show_association_updates?: boolean
+          signature?: string
           text_size?: string
           theme?: string
           updated_at?: string
@@ -4654,6 +4656,7 @@ export type Database = {
           notify_reminders?: boolean
           reduced_motion?: boolean
           show_association_updates?: boolean
+          signature?: string
           text_size?: string
           theme?: string
           updated_at?: string
