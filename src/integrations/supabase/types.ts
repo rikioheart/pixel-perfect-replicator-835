@@ -4612,51 +4612,75 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          calm_mode: boolean
           comfortable_spacing: boolean
           created_at: string
           default_view: string
+          focus_mode: boolean
+          font_family: string
           high_contrast: boolean
+          letter_spacing: string
+          line_spacing: string
           notification_sound: boolean
           notify_email: boolean
           notify_in_app: boolean
           notify_reminders: boolean
+          paragraph_spacing: string
+          reading_width: string
           reduced_motion: boolean
           show_association_updates: boolean
           signature: string
+          text_scale: number
           text_size: string
           theme: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          calm_mode?: boolean
           comfortable_spacing?: boolean
           created_at?: string
           default_view?: string
+          focus_mode?: boolean
+          font_family?: string
           high_contrast?: boolean
+          letter_spacing?: string
+          line_spacing?: string
           notification_sound?: boolean
           notify_email?: boolean
           notify_in_app?: boolean
           notify_reminders?: boolean
+          paragraph_spacing?: string
+          reading_width?: string
           reduced_motion?: boolean
           show_association_updates?: boolean
           signature?: string
+          text_scale?: number
           text_size?: string
           theme?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          calm_mode?: boolean
           comfortable_spacing?: boolean
           created_at?: string
           default_view?: string
+          focus_mode?: boolean
+          font_family?: string
           high_contrast?: boolean
+          letter_spacing?: string
+          line_spacing?: string
           notification_sound?: boolean
           notify_email?: boolean
           notify_in_app?: boolean
           notify_reminders?: boolean
+          paragraph_spacing?: string
+          reading_width?: string
           reduced_motion?: boolean
           show_association_updates?: boolean
           signature?: string
+          text_scale?: number
           text_size?: string
           theme?: string
           updated_at?: string
