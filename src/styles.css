@@ -415,4 +415,5 @@
 @layer utilities {
   .text-primary, .hover\:text-primary:hover, .focus\:text-primary:focus { color: var(--primary-ink); }
   .border-primary { border-color: var(--primary-ink); }
+  .fill-primary { fill: var(--primary-ink); }
 }
