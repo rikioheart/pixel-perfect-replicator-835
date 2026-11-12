@@ -42,7 +42,7 @@ function PublicForm() {
     },
   });
 
-  if (isLoading) return <main className="mx-auto max-w-xl p-6" role="status">Chargement…</main>;
+  if (isLoading) return <main className="mx-auto max-w-xl p-6" role="status">Un instant, nous ouvrons le formulaire…</main>;
   if (!form) return (
     <main className="mx-auto max-w-xl p-6">
       <h1 className="font-display text-2xl font-bold">Formulaire indisponible</h1>

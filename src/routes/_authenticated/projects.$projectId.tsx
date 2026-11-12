@@ -164,7 +164,7 @@ function ProjectDetail() {
 
   if (!project) {
     return (
-      <AppShell title="Projet" subtitle="Chargement…">
+      <AppShell title="Projet" subtitle="Un instant, nous ouvrons le projet…">
         <p className="text-sm text-muted-foreground">Projet introuvable ou accès restreint.</p>
       </AppShell>
     );

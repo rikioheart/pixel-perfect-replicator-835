@@ -105,7 +105,7 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <div className="grid gap-3 md:grid-cols-3">
-          {isPending ? <p className="text-muted-foreground">Chargement des fiches…</p> : isError ? <p role="alert">Les fiches ne sont pas disponibles pour le moment.</p> : dogs.length === 0 ? (
+          {isPending ? <p role="status" className="text-muted-foreground">Chargement des fiches…</p> : isError ? <p role="alert">Les fiches ne sont pas disponibles pour le moment.</p> : dogs.length === 0 ? (
             <p className="text-muted-foreground">Aucune fiche chien active.</p>
           ) : (
             dogs.map((item) => (

@@ -273,7 +273,7 @@ function Block({
       </CardHeader>
       <CardContent className="max-h-72 space-y-2 overflow-y-auto text-sm">
         {list === undefined ? (
-          <p className="text-muted-foreground">Chargement…</p>
+          <p role="status" className="text-muted-foreground">Un instant…</p>
         ) : list === null ? (
           <p className="text-destructive">Indisponible (chargement ou droits).</p>
         ) : list.length === 0 ? (

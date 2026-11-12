@@ -49,7 +49,7 @@ export function EntityPeek({ type, id, children, block }: { type: PeekType; id: 
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72 text-sm">
-        {q.isLoading ? <p className="text-muted-foreground">Chargement…</p> : !q.data ? (
+        {q.isLoading ? <p role="status" className="text-muted-foreground">Un instant…</p> : !q.data ? (
           <p className="text-muted-foreground">Informations non disponibles pour vous.</p>
         ) : (
           <div className="space-y-2">
