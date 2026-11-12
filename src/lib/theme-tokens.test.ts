@@ -113,8 +113,8 @@ describe("Thème : aucune teinte rose, mauve, magenta ou fuchsia", () => {
 
 describe("Thème : signatures distinctes", () => {
   it("Bordeaux et Bleu nuit ont chacun leur couleur principale, en clair comme en sombre", () => {
-    const primary = (combo: Combo) => tokens(combo).get("primary");
-    expect(primary(COMBOS[0])).not.toBe(primary(COMBOS[2]));
-    expect(primary(COMBOS[1])).not.toBe(primary(COMBOS[3]));
+    const [bordeauxLight, bordeauxDark, nuitLight, nuitDark] = COMBOS.map((combo) => tokens(combo).get("primary"));
+    expect(bordeauxLight).not.toBe(nuitLight);
+    expect(bordeauxDark).not.toBe(nuitDark);
   });
 });
