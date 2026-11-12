@@ -131,22 +131,23 @@
   --accent: var(--sand);
   --accent-foreground: var(--primary-ink);
 
-  --destructive: oklch(0.55 0.2 27);
+  --destructive: oklch(0.5 0.19 27);
   --destructive-foreground: oklch(0.985 0.004 260);
-  --success: oklch(0.5 0.07 145);
+  --success: oklch(0.46 0.08 145);
   --success-foreground: oklch(0.985 0.004 260);
   --warning: oklch(0.74 0.12 80);
   --warning-foreground: oklch(0.22 0.045 265);
 
   --border: oklch(0.88 0.02 70);
-  --input: oklch(0.88 0.02 70);
+  /* Contour des champs : 3:1 minimum sur crème et sur carte (WCAG 1.4.11). */
+  --input: oklch(0.6 0.02 70);
   --ring: var(--primary-ink);
 
   --chart-1: var(--primary);
   --chart-2: oklch(0.34 0.072 255);
   --chart-3: oklch(0.47 0.152 14);
   --chart-4: oklch(0.215 0.055 265);
-  --chart-5: var(--gold);
+  --chart-5: var(--gold-ink);
 
   --sidebar: oklch(0.215 0.055 265);
   --sidebar-foreground: oklch(0.93 0.01 260);
@@ -155,7 +156,8 @@
   --sidebar-accent: oklch(0.28 0.06 262);
   --sidebar-accent-foreground: oklch(0.97 0.008 260);
   --sidebar-border: oklch(0.3 0.05 262);
-  --sidebar-ring: oklch(0.47 0.152 14);
+  /* Focus dans le menu latéral bleu nuit : or, visible dans les deux signatures. */
+  --sidebar-ring: var(--gold);
 
   --gradient-night: linear-gradient(150deg, oklch(0.215 0.055 265), oklch(0.34 0.072 255));
   --gradient-wine: linear-gradient(135deg, oklch(0.395 0.128 12), oklch(0.47 0.152 14));
@@ -211,7 +213,7 @@
   --warning: oklch(0.74 0.12 80);
   --warning-foreground: oklch(0.18 0.04 265);
   --border: oklch(1 0 0 / 14%);
-  --input: oklch(1 0 0 / 22%);
+  --input: oklch(0.62 0.02 262);
   --ring: var(--primary-ink);
   --chart-1: oklch(0.58 0.15 24);
   --chart-2: oklch(0.72 0.09 240);
@@ -233,7 +235,6 @@
   --chart-1: oklch(0.33 0.08 258);
   --chart-2: oklch(0.395 0.128 12);
   --sidebar-primary: oklch(0.5 0.1 250);
-  --sidebar-ring: oklch(0.5 0.1 250);
   --signature-from: oklch(0.36 0.085 258);
   --signature-to: oklch(0.46 0.1 250);
 }
@@ -249,7 +250,6 @@
   --chart-1: oklch(0.78 0.085 240);
   --chart-2: oklch(0.58 0.15 24);
   --sidebar-primary: oklch(0.5 0.1 250);
-  --sidebar-ring: oklch(0.78 0.085 240);
   --signature-from: oklch(0.4 0.09 256);
   --signature-to: oklch(0.48 0.1 248);
 }
@@ -276,6 +276,7 @@
 @utility surface-night {
   background-image: var(--gradient-night);
   color: var(--color-navy-foreground);
+  --ring: var(--sidebar-ring);
 }
 
 @utility surface-signature {
