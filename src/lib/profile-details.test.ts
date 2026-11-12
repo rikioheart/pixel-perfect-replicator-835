@@ -15,7 +15,7 @@ const migration = readFileSync("drizzle/migrations/0072_profile_human_field_visi
 const checkList = (column: string) => {
   const m = migration.match(new RegExp(`${column}\\s*<@\\s*ARRAY\\[([^\\]]+)\\]`, "i"));
   if (!m) throw new Error(`liste ${column} introuvable`);
-  return [...m[1].matchAll(/'([A-Z_]+)'/g)].map((x) => x[1]).sort();
+  return [...(m[1] ?? "").matchAll(/'([A-Z_]+)'/g)].map((x) => x[1]).sort();
 };
 const codes = (opts: [string, string][]) => opts.map(([c]) => c).sort();
 
