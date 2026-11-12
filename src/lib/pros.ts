@@ -1,13 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-/** URL affichable d'une photo de profil (chemin de stockage ou URL complète). */
-export function avatarUrl(path: string | null | undefined) {
-  if (!path) return null;
-  if (path.startsWith("http")) return path;
-  return supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
-}
-
 /**
  * Professionnels les plus actifs du mois : nombre d'activités et d'événements
  * auxquels ils sont rattachés sur le mois en cours.

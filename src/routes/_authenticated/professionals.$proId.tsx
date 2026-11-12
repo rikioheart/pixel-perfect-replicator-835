@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Briefcase, Globe, MapPin, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { avatarUrl, useActiveProsOfMonth } from "@/lib/pros";
+import { useActiveProsOfMonth } from "@/lib/pros";
+import { fetchDirectoryProfiles, signedAvatarUrl, type DirectoryProfile } from "@/lib/profile-details";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,11 +54,16 @@ function ProfessionalDetailPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pro_details")
-        .select("*, profiles(display_name, first_name, last_name, city, avatar_path)")
+        .select("*, profiles(display_name, first_name, last_name, avatar_path)")
         .eq("profile_id", proId)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return data;
+      // Ville : seulement si la personne la rend visible (projection de l'annuaire, droits appliqués par la base).
+      // Photo : URL signée du bucket privé, accordée ou non par la base.
+      const [listed] = await fetchDirectoryProfiles({ ids: [proId] }).catch(() => [] as DirectoryProfile[]);
+      const photo = await signedAvatarUrl(data.profiles?.avatar_path);
+      return { ...data, photo, profiles: data.profiles ? { ...data.profiles, city: listed?.city ?? null } : null };
     },
   });
 
@@ -102,7 +108,7 @@ function ProfessionalDetailPage() {
     phone: string | null;
     avatar_path: string | null;
   } | null;
-  const photo = avatarUrl(profile?.avatar_path);
+  const photo = pro.photo;
   const isActiveThisMonth = Boolean(topPros?.get(pro.profile_id));
   const socials = (pro.social_links ?? {}) as Record<string, string>;
 

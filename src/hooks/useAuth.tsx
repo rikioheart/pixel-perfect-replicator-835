@@ -17,6 +17,15 @@ export type Profile = {
   city: string | null;
   department: string | null;
   bio: string | null;
+  avatar_path?: string | null;
+  skills?: string[];
+  availability?: string[];
+  collaboration_modes?: string[];
+  contribution_types?: string[];
+  bio_visibility?: "MEMBERS" | "PRIVATE";
+  location_visibility?: "MEMBERS" | "PRIVATE";
+  skills_visibility?: "MEMBERS" | "PRIVATE";
+  availability_visibility?: "MEMBERS" | "PRIVATE";
   public_visibility: boolean;
   account_choice_at?: string | null;
   deleted_at?: string | null;
