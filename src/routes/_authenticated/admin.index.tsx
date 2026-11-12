@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { CalendarClock, CalendarRange, ChevronRight, Compass, Euro, FolderKanban, Users } from "lucide-react";
+import { CalendarClock, CalendarRange, ChevronRight, Compass, Euro, FolderKanban, ShieldCheck, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useSensitiveRights } from "@/lib/permissions";
 import { AppShell } from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { AG_CONVOCATION_DAYS, AG_QUORUM, convocationDeadline, isInAgMonth, nextAgYear } from "@/lib/statutes";
@@ -12,10 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/domain";
 import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
-import { euro, summarizePayouts, summarizeReimbursements } from "@/lib/finance-status";
+import { euro } from "@/lib/finance-status";
+import { membershipStatus, parseConsoleSummary, pct, taskStatus, type Tone } from "@/lib/console-summary";
+import { Progress } from "@/components/ui/progress";
 import { PendingActionsStrip } from "@/components/PendingActionsStrip";
 import { BureauQuickAccess } from "@/components/BureauQuickAccess";
-import { isOverdueReservation } from "@/lib/role-home";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -42,51 +42,33 @@ type Res<T> = { data: T[] | null; error: unknown };
 /** null = requête refusée ou en échec : affiché « — », jamais un faux zéro. */
 const rows = <T,>(r: Res<T>): T[] | null => (r.error ? null : (r.data ?? []));
 
+const TONE_CLASS: Record<Tone, string> = {
+  ok: "border-transparent bg-success text-success-foreground hover:bg-success",
+  warn: "border-transparent bg-warning text-warning-foreground hover:bg-warning",
+  alert: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive",
+  calm: "border-transparent bg-muted text-muted-foreground hover:bg-muted",
+};
+
 function AdminConsole() {
   const { isBureau, roles, loading } = useAuth();
-  const rights = useSensitiveRights();
-  const canReimb = rights.viewGlobal || rights.validateReimbursements || rights.markPaid;
 
-  const { data } = useQuery({
+  // Synthèse uniquement (compteurs, pourcentages, totaux) : aucune ligne nominative d'un autre membre n'est chargée ici.
+  const { data, isError } = useQuery({
     queryKey: ["admin-dashboard"],
     enabled: isBureau,
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const [profiles, tasks, events, activities, proposals, inventory, offers, loans] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, first_name, last_name, membership_type, membership_status"),
-        supabase.from("tasks").select("id, title, status, priority, needs_help, is_volunteer_task, deadline, assigned_user_id, submitted_at").not("status", "in", "(COMPLETED,ARCHIVED)"),
+      const [summary, events, activities] = await Promise.all([
+        supabase.rpc("bureau_console_summary"),
         supabase.from("events").select("id, title, start_date, event_type").gte("start_date", today).order("start_date").limit(6),
         supabase.from("activities").select("id, title, date, type").gte("date", today).order("date").limit(6),
-        supabase.from("professional_proposals").select("id, title, type, submitted_by").eq("status", "PENDING"),
-        supabase.from("inventory").select("id, name, quantity, alert_threshold, location"),
-        supabase.from("contributions").select("id", { count: "exact", head: true }).in("status", ["PROPOSED", "DISCUSSION"]),
-        supabase.from("inventory_reservations").select("status, end_date").eq("status", "ACTIVE").lt("end_date", today),
       ]);
+      if (summary.error) throw new Error(summary.error.message);
       return {
-        profiles: rows(profiles),
-        tasks: rows(tasks),
+        summary: parseConsoleSummary(summary.data),
         events: rows(events),
         activities: rows(activities),
-        proposals: rows(proposals),
-        inventory: rows(inventory),
-        offers: offers.error ? null : (offers.count ?? 0),
-        overdueLoans: loans.error ? null : (loans.data ?? []).filter((r) => isOverdueReservation(r, today)).length,
       };
-    },
-  });
-
-  // Synthèse financière : chargée seulement avec un droit financier explicite. Sources distinctes, jamais additionnées.
-  const finance = useQuery({
-    queryKey: ["admin-dashboard-finance", rights.viewGlobal, canReimb],
-    enabled: rights.ready && (rights.viewGlobal || canReimb),
-    queryFn: async () => {
-      const [reimb, acc] = await Promise.all([
-        canReimb ? supabase.from("reimbursements").select("amount, status") : Promise.resolve({ data: null, error: "no-right" }),
-        rights.viewGlobal
-          ? supabase.from("accounting").select("professional_share, professional_paid_at").gt("professional_share", 0).not("professional_id", "is", null)
-          : Promise.resolve({ data: null, error: "no-right" }),
-      ]);
-      return { reimb: rows(reimb as Res<{ amount: number; status: string }>), acc: rows(acc as Res<{ professional_share: number; professional_paid_at: string | null }>) };
     },
   });
 
@@ -103,53 +85,28 @@ function AdminConsole() {
     );
   }
 
-  const profiles = data?.profiles;
-  const nameOf = (id?: string | null) => {
-    if (!id) return "Non attribué";
-    const p = profiles?.find((x) => x.id === id);
-    return p?.display_name || [p?.first_name, p?.last_name].filter(Boolean).join(" ") || "Membre";
-  };
-  const tasks = data?.tasks;
-  const toValidate = tasks?.filter((t) => t.status === "PENDING_VALIDATION") ?? null;
-  const helpNeeded = tasks?.filter((t) => t.needs_help) ?? null;
-  const inProgress = tasks?.filter((t) => t.status === "IN_PROGRESS" || t.status === "TODO") ?? null;
-  const lowStock = data?.inventory?.filter((i) => i.quantity <= i.alert_threshold) ?? null;
+  const s = data?.summary;
+  const fin = s?.finance ?? null;
   const upcoming = [
     ...(data?.events ?? []).map((e) => ({ id: e.id, title: e.title, date: e.start_date, kind: e.event_type, to: `/events/${e.id}` })),
     ...(data?.activities ?? []).map((a) => ({ id: a.id, title: a.title, date: a.date, kind: a.type, to: `/activities/${a.id}` })),
   ].sort((a, b) => String(a.date).localeCompare(String(b.date))).slice(0, 8);
-
-  const fin = finance.data;
-  const rsum = fin?.reimb ? summarizeReimbursements(fin.reimb) : null;
-  const psum = fin?.acc ? summarizePayouts(fin.acc) : null;
-  const pendingCount = fin?.reimb?.filter((r) => r.status === "PENDING").length;
-  const money = (v: number | undefined) => (v == null || finance.isError ? "—" : euro(v));
-  const len = (list: unknown[] | null | undefined) => (list == null ? null : list.length);
+  const money = (v: number | null | undefined) => (v == null ? "—" : euro(v));
+  const n = (v: number | undefined) => (isError ? null : v ?? 0);
 
   // Alertes : uniquement ce qui attend une décision ; chaque ligne mène à l'écran qui la traite.
   const actions = [
-    { key: "members", label: "Adhésions à valider", count: len(profiles?.filter((p) => p.membership_status === "PENDING")), to: "/admin/gouvernance" },
-    { key: "tasks", label: "Tâches en attente de clôture", count: len(toValidate), to: "/admin/validation" },
-    { key: "offers", label: "Propositions d'aide à orienter", count: data ? data.offers : 0, to: "/admin/contributions" },
-    { key: "loans", label: "Matériel non rendu", count: data ? data.overdueLoans : 0, to: "/inventory" },
-    { key: "stock", label: "Stocks sous le seuil d'alerte", count: len(lowStock), to: "/inventory" },
-    ...(canReimb ? [{ key: "reimb", label: "Remboursements à décider", count: finance.isError ? null : finance.data ? (pendingCount ?? null) : 0, to: "/finance" }] : []),
-    { key: "proposals", label: "Propositions des professionnels", count: len(data?.proposals), to: "/proposals" },
-    { key: "help", label: "Besoins d'aide signalés", count: len(helpNeeded), to: "/help-requests" },
+    { key: "members", label: "Adhésions à valider", count: n(s?.members.pending), to: "/admin/gouvernance" },
+    { key: "tasks", label: "Tâches en attente de clôture", count: n(s?.tasks.toValidate), to: "/admin/validation" },
+    { key: "offers", label: "Propositions d'aide à orienter", count: n(s?.offers), to: "/admin/contributions" },
+    { key: "loans", label: "Matériel non rendu", count: n(s?.inventory.overdueLoans), to: "/inventory" },
+    { key: "stock", label: "Stocks sous le seuil d'alerte", count: n(s?.inventory.lowStock), to: "/inventory" },
+    ...(fin && fin.reimbPendingCount != null
+      ? [{ key: "reimb", label: "Remboursements à décider", count: fin.reimbPendingCount, to: "/finance" }]
+      : []),
+    { key: "proposals", label: "Propositions des professionnels", count: n(s?.proProposals), to: "/proposals" },
+    { key: "help", label: "Besoins d'aide signalés", count: n(s?.tasks.needsHelp), to: "/help-requests" },
   ];
-
-  // « Qui fait quoi » compact : une ligne par personne, nombre de tâches et la plus proche échéance.
-  const whoDoesWhat = inProgress
-    ? [...inProgress.reduce((map, t) => {
-        const key = t.assigned_user_id ?? "";
-        const entry = map.get(key) ?? { id: key, count: 0, next: t };
-        entry.count += 1;
-        if (t.deadline && (!entry.next.deadline || t.deadline < entry.next.deadline)) entry.next = t;
-        map.set(key, entry);
-        return map;
-      }, new Map<string, { id: string; count: number; next: (typeof inProgress)[number] }>()).values()]
-        .sort((a, b) => b.count - a.count)
-    : null;
 
   const shortcuts = [
     { label: "Besoins de décision", to: "/admin/gouvernance" },
@@ -160,47 +117,93 @@ function AdminConsole() {
     { label: "Paramètres", to: "/admin/settings" },
   ];
 
+  const unavailable = <p className="text-sm text-destructive">Indisponible pour le moment.</p>;
+  const pendingLoad = <p className="text-sm text-muted-foreground">Chargement…</p>;
+
   return (
     <AppShell title="Console du Bureau" subtitle="Le pilotage de l'association, en un coup d'œil">
       <BureauConsoleTabs />
-      <BureauQuickAccess />
-      <PendingActionsStrip items={actions} loading={!data} />
+      <BureauQuickAccess ag={isError ? undefined : s ? s.ag : undefined} agError={isError} />
+      <PendingActionsStrip items={actions} loading={!data && !isError} />
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        {rights.viewGlobal || canReimb ? (
+      <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+        <ShieldCheck className="size-4 shrink-0 text-primary" aria-hidden />
+        Cette console n'affiche que des statuts, des pourcentages et des totaux : aucune donnée personnelle d'un membre.
+      </p>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <Card className="min-w-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="size-4 text-primary" aria-hidden />Adhésions
+              {s ? <StatusBadge {...membershipStatus(s.members)} /> : null}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {isError ? unavailable : !s ? pendingLoad : (
+              <>
+                <Gauge
+                  label="Adhésions actives"
+                  value={pct(s.members.active, s.members.considered)}
+                  detail={`${s.members.active} sur ${s.members.considered}`}
+                />
+                <Row main="Particuliers actifs" right={String(s.members.activeParticuliers)} />
+                <Row main="Professionnels bienfaiteurs actifs" right={String(s.members.activePros)} />
+                <Row main="Demandes en attente" right={String(s.members.pending)} to="/admin/gouvernance" />
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="min-w-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <FolderKanban className="size-4 text-primary" aria-hidden />Tâches & engagement
+              {s ? <StatusBadge {...taskStatus(s.tasks)} /> : null}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {isError ? unavailable : !s ? pendingLoad : (
+              <>
+                <Gauge
+                  label="Tâches en cours confiées à quelqu'un"
+                  value={pct(s.tasks.assigned, s.tasks.working)}
+                  detail={`${s.tasks.assigned} sur ${s.tasks.working}`}
+                />
+                <Row
+                  main="Tâches en retard"
+                  right={s.tasks.working ? `${s.tasks.overdue} (${pct(s.tasks.overdue, s.tasks.working)} %)` : "0"}
+                  to="/tasks"
+                />
+                <Row main="Personnes impliquées" right={String(s.tasks.peopleInvolved)} />
+                <Row main="Besoins d'aide signalés" right={String(s.tasks.needsHelp)} to="/help-requests" />
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {fin ? (
           <Card className="min-w-0">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base"><Euro className="size-4 text-primary" aria-hidden />Montants en attente de versement</CardTitle>
-              <p className="text-xs text-muted-foreground">Deux sources distinctes, jamais additionnées.</p>
+              <p className="text-xs text-muted-foreground">Totaux seulement. Deux sources distinctes, jamais additionnées.</p>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              {canReimb ? (
+              {fin.reimbPendingCount != null ? (
                 <>
-                  <Row main="Remboursements à décider" sub={pendingCount == null ? undefined : `${pendingCount} demande(s)`} right={money(rsum?.pending)} to="/finance" />
-                  <Row main="Remboursements approuvés, à payer" right={money(rsum?.approved)} to="/finance" />
+                  <Row main="Remboursements à décider" sub={`${fin.reimbPendingCount} demande(s)`} right={money(fin.reimbPendingAmount)} to="/finance" />
+                  <Row main="Remboursements approuvés, à payer" right={money(fin.reimbApprovedAmount)} to="/finance" />
                 </>
               ) : null}
-              {rights.viewGlobal ? (
-                <Row main="Reversements professionnels à payer" right={money(psum?.due)} to="/admin/suivi-financier" />
+              {fin.payoutsDueAmount != null ? (
+                <Row main="Reversements professionnels à payer" right={money(fin.payoutsDueAmount)} to="/admin/suivi-financier" />
               ) : null}
             </CardContent>
           </Card>
         ) : null}
 
-        <Block icon={CalendarRange} title="Prochains rendez-vous" list={data ? upcoming : null} emptyLabel="Aucun événement ni activité programmé." badge={false}>
+        <Block icon={CalendarRange} title="Prochains rendez-vous" list={data ? upcoming : isError ? null : undefined} emptyLabel="Aucun événement ni activité programmé." badge={false}>
           {upcoming.map((u) => <Row key={u.id} main={u.title} sub={`${u.kind} · ${u.date ? formatDate(u.date) : "date à définir"}`} to={u.to} />)}
-        </Block>
-
-        <Block icon={Users} title="Qui fait quoi ?" hint="Tâches en cours, par personne." list={whoDoesWhat} emptyLabel="Aucune tâche en cours." badge={false}>
-          {whoDoesWhat?.slice(0, 8).map((w) => (
-            <Row
-              key={w.id || "none"}
-              main={nameOf(w.id || null)}
-              sub={`${w.next.title}${w.count > 1 ? ` et ${w.count - 1} autre(s)` : ""}`}
-              right={w.next.deadline ? formatDate(w.next.deadline) : `${w.count} tâche(s)`}
-              to="/tasks"
-            />
-          ))}
         </Block>
 
         <Card className="min-w-0">
@@ -208,9 +211,9 @@ function AdminConsole() {
             <CardTitle className="flex items-center gap-2 text-base"><Compass className="size-4 text-primary" aria-hidden />Raccourcis</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
-            {shortcuts.map((s) => (
-              <Link key={s.to} to={s.to} className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-border px-3 py-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                <span className="truncate">{s.label}</span>
+            {shortcuts.map((sc) => (
+              <Link key={sc.to} to={sc.to} className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-border px-3 py-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <span className="truncate">{sc.label}</span>
                 <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
               </Link>
             ))}
@@ -220,6 +223,23 @@ function AdminConsole() {
 
       <AgReminder />
     </AppShell>
+  );
+}
+
+function StatusBadge({ label, tone }: { label: string; tone: Tone }) {
+  return <Badge className={`ml-auto shrink-0 ${TONE_CLASS[tone]}`}>{label}</Badge>;
+}
+
+function Gauge({ label, value, detail }: { label: string; value: number | null; detail: string }) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="font-medium">{label}</span>
+        <span className="font-display text-xl">{value == null ? "—" : `${value} %`}</span>
+      </div>
+      <Progress value={value ?? 0} aria-label={`${label} : ${value == null ? "aucune donnée" : `${value} %`}`} className="h-2" />
+      <p className="text-xs text-muted-foreground">{detail}</p>
+    </div>
   );
 }
 
