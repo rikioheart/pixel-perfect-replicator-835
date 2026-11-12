@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { withContacts } from "@/lib/profile-columns";
+import { fetchDirectoryProfiles } from "@/lib/profile-details";
+import { UserAvatar } from "@/components/UserAvatar";
+import { ProfileExtras } from "@/components/ProfileExtras";
 import { useAuth } from "@/hooks/useAuth";
 import { EntityPeek } from "@/components/EntityPeek";
 import { DirectoryDogs } from "@/components/DirectoryDogs";
@@ -61,21 +64,19 @@ function DirectoryPage() {
   const [department, setDepartment] = useState("ALL");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["directory"],
+    queryKey: ["directory", isBureau],
     queryFn: async () => {
+      // Projection unique de l'annuaire : la base n'envoie que les champs que chacun a rendus visibles.
       const [profiles, pros] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select(
-            "id, display_name, first_name, last_name, city, department, bio, membership_type, membership_status, public_visibility",
-          )
-          .eq("membership_status", "ACTIVE")
-          .order("display_name", { ascending: true }),
+        fetchDirectoryProfiles(),
         supabase.from("pro_details").select("profile_id, company_name, professional_category, website_url"),
       ]);
       const proMap = new Map((pros.data ?? []).map((p) => [p.profile_id, p]));
-      return (await withContacts(profiles.data ?? [])).map((p) => ({
+      const contacts = isBureau ? await withContacts(profiles.map((p) => ({ id: p.id }))) : [];
+      const emailOf = new Map(contacts.map((c) => [c.id, c.email]));
+      return profiles.map((p) => ({
         ...p,
+        email: emailOf.get(p.id) ?? null,
         pro: proMap.get(p.id) ?? null,
       }));
     },
@@ -141,7 +142,7 @@ function DirectoryPage() {
       if (!term) return true;
       return `${person.display_name ?? ""} ${person.city ?? ""} ${person.pro?.company_name ?? ""} ${
         person.pro?.professional_category ?? ""
-      } ${person.bio ?? ""}`
+      } ${person.bio ?? ""} ${person.skills.join(" ")}`
         .toLowerCase()
         .includes(term);
     });
@@ -217,9 +218,12 @@ function DirectoryPage() {
                 const personProjects = projectsOf.get(person.id) ?? [];
                 return (
                   <article key={person.id} className="rounded-xl border border-border bg-card p-5">
-                    <h2 className="font-display text-base font-bold">
-                      <EntityPeek type={person.pro ? "professional" : "person"} id={person.id}>{name}</EntityPeek>
-                    </h2>
+                    <div className="flex items-center gap-3">
+                      <UserAvatar path={person.avatar_path} person={person} className="size-11" />
+                      <h2 className="min-w-0 font-display text-base font-bold">
+                        <EntityPeek type={person.pro ? "professional" : "person"} id={person.id}>{name}</EntityPeek>
+                      </h2>
+                    </div>
                     {category === "BUREAU" ? (
                       <div className="mt-1 flex flex-wrap gap-1">
                         {(team?.titles.get(person.id) ?? []).map((f) => (
@@ -242,6 +246,7 @@ function DirectoryPage() {
                       </p>
                     ) : null}
                     {person.bio ? <p className="mt-3 line-clamp-3 text-sm">{person.bio}</p> : null}
+                    <ProfileExtras person={person} />
                     {personProjects.length > 0 ? (
                       <ul aria-label="Projets" className="mt-3 flex flex-wrap gap-1.5">
                         {personProjects.slice(0, 3).map((p) => (
