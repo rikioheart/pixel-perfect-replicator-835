@@ -19,7 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { withContacts } from "@/lib/profile-columns";
 import { fetchDirectoryProfiles } from "@/lib/profile-details";
 import { UserAvatar } from "@/components/UserAvatar";
-import { ProfileExtras } from "@/components/ProfileExtras";
+import { MemberSummary } from "@/components/MemberSummary";
 import { useAuth } from "@/hooks/useAuth";
 import { EntityPeek } from "@/components/EntityPeek";
 import { DirectoryDogs } from "@/components/DirectoryDogs";
@@ -240,13 +240,7 @@ function DirectoryPage() {
                         {person.pro.professional_category ? ` · ${person.pro.professional_category}` : ""}
                       </p>
                     ) : null}
-                    {person.city || person.department ? (
-                      <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <MapPin className="size-3.5" /> {[person.city, person.department].filter(Boolean).join(" · ")}
-                      </p>
-                    ) : null}
-                    {person.bio ? <p className="mt-3 line-clamp-3 text-sm">{person.bio}</p> : null}
-                    <ProfileExtras person={person} />
+                    <MemberSummary person={person} />
                     {personProjects.length > 0 ? (
                       <ul aria-label="Projets" className="mt-3 flex flex-wrap gap-1.5">
                         {personProjects.slice(0, 3).map((p) => (
