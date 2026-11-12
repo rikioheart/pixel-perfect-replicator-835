@@ -531,7 +531,7 @@
 .public-benefits svg { flex-shrink: 0; margin-top: .15rem; color: var(--primary-ink); }
 @media (max-width: 1023px) { .public-site .public-discovery { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 639px) { .public-site .public-discovery { grid-template-columns: 1fr; gap: .5rem; } .public-site #connexion { padding: 1.25rem; } }
-.public-site .public-page-intro { background: color-mix(in oklch, var(--ochre) 14%, var(--card)); color: var(--foreground); padding: 4rem var(--gutter) 3rem; margin-bottom: 2.5rem; border-radius: 0 0 50% 50% / 0 0 10% 10%; }
+.public-site .public-page-intro { background: var(--sand-soft); color: var(--foreground); padding: 4rem var(--gutter) 3rem; margin-bottom: 2.5rem; border-radius: 0 0 50% 50% / 0 0 10% 10%; }
 .public-site .public-page-intro h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 600; }
 .public-site .public-section:last-child { border-bottom: 0; }
 .public-site .public-main > section + section, .public-site .public-main > div + section { margin-top: 1.5rem; }

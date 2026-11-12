@@ -2,41 +2,34 @@ import { Link } from '@tanstack/react-router';
 import logoMark from '@/assets/logo-lvdc-mark.png.asset.json';
 import { Button } from '@/components/ui/button';
 import { ZONES } from '@/lib/site-content';
-import { useState } from 'react';
-import { Menu, X, LogIn, ArrowLeft } from 'lucide-react';
+import { LogIn, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { CONTACT_EMAIL, SOCIAL_LINKS } from '@/lib/contact';
 
 const NAV = [
   { to: '/', label: 'Accueil' },
-  { to: '/professionnels', label: 'Partenaires' },
 ] as const;
 
 export function PublicHeader() {
-  const [open, setOpen] = useState(false);
   const link = 'public-nav-link';
   const { session } = useAuth();
   return (
     <header className="public-header">
       <a href="#contenu" className="public-skip">Aller au contenu</a>
       <div className="public-header-inner">
-        <Link to="/" className="flex min-w-0 items-center gap-3" onClick={() => setOpen(false)}>
+        <Link to="/" className="flex min-w-0 items-center gap-3">
           <img src={logoMark.url} alt="Logo La Voix du Chien" className="size-12 shrink-0 rounded-full object-contain" />
           <span className="font-display text-sm leading-snug sm:text-base">La Voix du Chien<span className="block font-sans text-xs text-muted-foreground">Le chien au cœur</span></span>
         </Link>
-        <nav aria-label="Pages du site" className="hidden items-center gap-1 xl:flex">
+        <nav aria-label="Pages du site" className="hidden items-center gap-1 md:flex">
           {NAV.map((n) => <Link key={n.to} to={n.to} className={link}>{n.label}</Link>)}
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">
           {session
-            ? <Button asChild variant="outline" size="sm" className="public-member-button"><Link to="/member" onClick={() => setOpen(false)}><ArrowLeft aria-hidden /><span className="hidden sm:inline">Retour à mon espace</span><span className="sm:hidden">Mon espace</span></Link></Button>
-            : <Button asChild variant="outline" size="sm" className="public-member-button"><Link to="/" hash="connexion" onClick={() => setOpen(false)}><LogIn aria-hidden /><span className="hidden sm:inline">Espace membres</span><span className="sm:hidden">Connexion</span></Link></Button>}
-          <Button variant="ghost" size="icon" className="xl:hidden" aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={open} aria-controls="public-mobile-nav" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
+            ? <Button asChild variant="outline" size="sm" className="public-member-button"><Link to="/member"><ArrowLeft aria-hidden /><span className="hidden sm:inline">Retour à mon espace</span><span className="sm:hidden">Mon espace</span></Link></Button>
+            : <Button asChild variant="outline" size="sm" className="public-member-button"><Link to="/" hash="connexion"><LogIn aria-hidden /><span className="hidden sm:inline">Espace membres</span><span className="sm:hidden">Connexion</span></Link></Button>}
         </div>
       </div>
-      {open && <nav id="public-mobile-nav" aria-label="Pages du site sur mobile" className="public-mobile-nav xl:hidden" onKeyDown={e => { if (e.key === 'Escape') setOpen(false); }}>
-        {NAV.map(n => <Link key={n.to} to={n.to} className={link} onClick={() => setOpen(false)}>{n.label}</Link>)}
-      </nav>}
     </header>
   );
 }
