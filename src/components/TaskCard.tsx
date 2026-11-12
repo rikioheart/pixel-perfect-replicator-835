@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -122,7 +123,7 @@ export function TaskCard({
         }
       }
       if (await setStatus("PENDING_VALIDATION")) {
-        toast.success("Tâche envoyée pour validation.");
+        toast.success("Merci ! La tâche est envoyée pour validation.");
         setSubmitting(false);
         setComment("");
         setProofUrl("");
@@ -143,7 +144,7 @@ export function TaskCard({
         comment: decisionComment,
         actorId: currentUserId || null,
       });
-      toast.success(decision === "APPROVED" ? "Tâche validée." : "Tâche renvoyée avec votre commentaire.");
+      toast.success(decision === "APPROVED" ? "Tâche validée. Merci pour ce suivi !" : "Tâche renvoyée avec votre commentaire, pour la reprendre ensemble.");
       setDecisionComment("");
       onChanged();
     } catch (error) {
@@ -209,6 +210,20 @@ export function TaskCard({
         <p className="rounded-md bg-muted p-2 text-xs">Retour du responsable : {task.rejection_reason}</p>
       ) : null}
 
+      {task.status === "BLOCKED" ? (
+        <p className="rounded-md border-l-4 border-l-warning bg-muted p-2 text-xs">
+          Cette tâche est en pause, cela arrive. Expliquez ce qui bloque dans les commentaires, ou{" "}
+          <Link to="/help-requests" className="font-medium underline underline-offset-2">
+            demandez un coup de main
+          </Link>
+          {" "}: quelqu'un pourra vous épauler.
+        </p>
+      ) : null}
+
+      {task.status === "COMPLETED" ? (
+        <p className="rounded-md border-l-4 border-l-success bg-muted p-2 text-xs">Tâche terminée et validée. Merci pour ce coup de main !</p>
+      ) : null}
+
       {canAct ? (
         <div className="flex flex-wrap gap-2">
           {task.status === "TODO" ? (
@@ -222,14 +237,20 @@ export function TaskCard({
                 Soumettre pour validation
               </Button>
               {task.status !== "BLOCKED" ? (
-                <Button size="sm" variant="outline" onClick={() => setStatus("BLOCKED")}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    if (await setStatus("BLOCKED")) toast.success("C'est noté : la tâche est en pause. Dites ce qui bloque pour qu'on puisse vous aider.");
+                  }}
+                >
                   Signaler un blocage
                 </Button>
               ) : null}
             </>
           ) : null}
           {task.status === "PENDING_VALIDATION" && !canValidate ? (
-            <p className="text-xs text-muted-foreground">En attente de la validation du responsable du projet ou du Bureau.</p>
+            <p className="text-xs text-muted-foreground">Merci ! Votre travail attend maintenant la validation du responsable du projet ou du Bureau.</p>
           ) : null}
         </div>
       ) : null}

@@ -129,7 +129,7 @@ function AdminContributions() {
         <Button size="sm" variant={tab === "closed" ? "default" : "outline"} aria-pressed={tab === "closed"} onClick={() => setTab("closed")}>Terminées / annulées</Button>
       </div>
       {isLoading ? <LoadingState rows={3} /> : shown.length === 0 ? (
-        <EmptyState art="playful" title="Rien à traiter" message="Les propositions « Je veux aider » arriveront ici." />
+        <EmptyState art="playful" title="Tout est à jour" message="Les nouvelles propositions « Je veux aider » arriveront ici." />
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {shown.map((r) => (
