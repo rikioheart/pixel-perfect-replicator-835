@@ -5,6 +5,7 @@ import { Link } from '@tanstack/react-router';
 import { ArrowRight, ExternalLink, Globe, HeartHandshake, MapPin, Search, X } from 'lucide-react';
 import { publicPartnersOptions } from '@/lib/public-partners.queries';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/EmptyState';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -30,7 +31,7 @@ export function PublicPartnerDirectory({ showTitle = true }: { showTitle?: boole
       </div>
       <div className="mb-3 flex items-center justify-between gap-2"><p role="status" aria-live="polite" className="text-sm text-muted-foreground">{filtered.length} partenaire{filtered.length > 1 ? 's' : ''}</p>{(term || job !== 'all' || place !== 'all') && <Button variant="ghost" size="sm" onClick={() => { setTerm(''); setJob('all'); setPlace('all'); }}><X aria-hidden />Effacer</Button>}</div>
     </>}
-    {data.unavailable ? <p role="status" className="py-4 text-sm text-muted-foreground">L’annuaire est momentanément indisponible.</p> : !data.pros.length ? <p className="py-4 text-sm text-muted-foreground">Les partenaires apparaîtront ici après validation et choix de publication de leur profil.</p> : !filtered.length ? <p className="py-4 text-sm text-muted-foreground">Aucun partenaire ne correspond à votre recherche.</p> : <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{filtered.map(p => <article key={p.slug} className="flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-card p-4">
+    {data.unavailable ? <p role="status" className="py-4 text-sm text-muted-foreground">L’annuaire est momentanément indisponible.</p> : !data.pros.length ? <EmptyState art="attentive" title="L’annuaire se prépare" message="Les partenaires apparaîtront ici après validation par l’association et avec leur accord de publication." /> : !filtered.length ? <EmptyState art="attentive" title="Aucun partenaire trouvé" message="Essayez un autre mot ou un autre département." /> : <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{filtered.map(p => <article key={p.slug} className="flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-card p-4">
       <h3 className="break-words text-base leading-snug">{p.name}</h3>
       {(p.sector || p.specialties.length > 0) && <p className="line-clamp-2 text-sm text-muted-foreground">{[...new Set([p.sector, ...p.specialties].filter(Boolean))].slice(0, 2).join(' · ')}</p>}
       {p.city && <p className="flex items-start gap-2 text-sm text-muted-foreground"><MapPin className="mt-0.5 size-4 shrink-0" aria-hidden /><span>{p.city}</span></p>}
