@@ -460,7 +460,6 @@
 .public-nav-link:hover { background: var(--accent); }
 .public-nav-link.active { color: var(--primary-ink); text-decoration: underline; text-underline-offset: 7px; }
 .public-member-button { border-color: var(--primary-ink); color: var(--primary-ink); }
-.public-mobile-nav { padding: .5rem 1.25rem 1rem; border-top: 1px solid var(--border); }
 .public-skip { position: absolute; left: 1rem; top: -100px; background: var(--card); color: var(--foreground); padding: .6rem; z-index: 100; }
 .public-skip:focus { top: 1rem; }
 .public-footer { background: var(--navy); color: var(--navy-foreground); margin-top: 4rem; }
