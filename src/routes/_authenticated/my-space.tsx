@@ -478,7 +478,7 @@ function ChoiceCards({
 }) {
   const hintId = `${name}-hint`;
   return (
-    <fieldset className="space-y-2">
+    <fieldset className="min-w-0 space-y-2">
       <legend className="text-sm font-medium leading-none">{legend}</legend>
       {hint ? (
         <p id={hintId} className="text-sm text-muted-foreground">

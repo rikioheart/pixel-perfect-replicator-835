@@ -388,6 +388,8 @@
 .prefs-text-large button[role="combobox"] > span { display: block; -webkit-line-clamp: unset; overflow: visible; }
 .prefs-text-large :is(button, a)[class~="whitespace-nowrap"] { white-space: normal; height: auto; min-height: 2.25rem; }
 .prefs-text-large [role="tablist"] { height: auto; flex-wrap: wrap; }
+.prefs-text-large main .flex:not(.flex-col):not(.flex-nowrap):not(.overflow-x-auto):not([role="tablist"]) { flex-wrap: wrap; }
+.prefs-text-large :is(main, [role="dialog"]) :is(input, select, textarea, button, [role="combobox"]) { max-width: 100%; }
 .prefs-text-large :is(main, [role="dialog"]) :is(h1, h2, h3, h4, p, li, dd, dt, label, td, th) { overflow-wrap: anywhere; }
 .prefs-text-large main :is([class*="sm:grid-cols-"], [class*="md:grid-cols-"], [class*="lg:grid-cols-"], [class*="xl:grid-cols-"]) {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)) !important;
