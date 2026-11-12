@@ -60,6 +60,8 @@
   --color-gold-ink: var(--gold-ink);
   --color-brand-bordeaux: var(--brand-bordeaux);
   --color-brand-nuit: var(--brand-nuit);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-sand: var(--brand-sand);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -94,6 +96,8 @@
   /* Couleurs fixes des deux signatures (aperçus du choix, jamais adaptées au thème) */
   --brand-bordeaux: oklch(0.395 0.128 12);
   --brand-nuit: oklch(0.33 0.08 258);
+  --brand-cream: oklch(0.955 0.014 80);
+  --brand-sand: oklch(0.915 0.03 78);
 
   --background: var(--cream);
   --foreground: oklch(0.25 0.045 265);
@@ -187,7 +191,7 @@
   --popover-foreground: oklch(0.96 0.006 260);
   /* Signature Bordeaux en sombre : un bordeaux clair devient rose, donc les boutons restent
      bordeaux (texte crème) et la marque en texte/icône passe à l'or. */
-  --primary: oklch(0.5 0.15 20);
+  --primary: oklch(0.47 0.13 18);
   --primary-foreground: oklch(0.97 0.012 85);
   --primary-ink: var(--gold-ink);
   --wine: oklch(0.55 0.16 14);

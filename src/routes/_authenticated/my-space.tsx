@@ -107,8 +107,8 @@ function MySpacePage() {
                             option.value === "BLEU_NUIT" ? "bg-brand-nuit" : "bg-brand-bordeaux",
                           )}
                         />
-                        <span className="size-6 rounded-full border bg-cream" />
-                        <span className="size-6 rounded-full border bg-sand" />
+                        <span className="size-6 rounded-full border bg-brand-cream" />
+                        <span className="size-6 rounded-full border bg-brand-sand" />
                         <span className="size-6 rounded-full border bg-sage" />
                         <span className="size-6 rounded-full border bg-gold" />
                       </span>
