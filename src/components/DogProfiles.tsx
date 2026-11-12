@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { splitArchivedDogs } from "@/lib/dog-archive";
+import { humanizeError } from "@/lib/user-messages";
 
 const emptyDog = { name: "", breed: "", birth_date: "", character: "", needs: "", household_id: "" };
 export function DogProfiles({ households, onOpen }: { households: { id: string; name: string }[]; onOpen: (id: string) => void }) {
@@ -41,7 +42,7 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
       if (error) throw error;
     },
     onSuccess: async () => { toast.success("Chien ajouté."); setDogOpen(false); setDog(emptyDog); await refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   // Archivage non destructif : historiques, tampons et participations conservés.
   const setArchived = useMutation({
@@ -53,7 +54,7 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
       return input.archive;
     },
     onSuccess: async (archive) => { toast.success(archive ? "Fiche archivée. Son historique est conservé." : "Fiche réactivée."); setArchiving(null); setReason(""); await refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   return (
       <Card className="mt-4">
@@ -104,7 +105,7 @@ export function DogProfiles({ households, onOpen }: { households: { id: string; 
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <div className="grid gap-3 md:grid-cols-3">
-          {isPending ? <p className="text-muted-foreground">Chargement des fiches…</p> : isError ? <p role="alert">Les fiches ne sont pas disponibles pour le moment.</p> : dogs.length === 0 ? (
+          {isPending ? <p role="status" className="text-muted-foreground">Chargement des fiches…</p> : isError ? <p role="alert">Les fiches ne sont pas disponibles pour le moment.</p> : dogs.length === 0 ? (
             <p className="text-muted-foreground">Aucune fiche chien active.</p>
           ) : (
             dogs.map((item) => (

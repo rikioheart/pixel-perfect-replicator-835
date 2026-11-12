@@ -12,6 +12,7 @@ import { AgAttendance } from "@/components/AgAttendance";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/domain";
 import { contributionBucket, priorityOf, sortGov, type GovBucket, type GovItem } from "@/lib/governance";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/admin/gouvernance")({
   head: () => ({
@@ -145,7 +146,7 @@ function GovernancePage() {
 
       <AgAttendance />
 
-      {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : (
+      {isLoading ? <InlineLoading /> : (
         <div className="grid gap-5 xl:grid-cols-3">
           {BUCKETS.map((b) => {
             const list = sorted.filter((i) => i.bucket === b.code);

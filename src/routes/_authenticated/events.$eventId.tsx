@@ -18,6 +18,7 @@ import { LoadingState } from "@/components/LoadingState";
 import { useState } from "react";
 import { RegistrationWizard } from "@/components/RegistrationWizard";
 import { ExperienceSections, SpotsBadge, useSpots } from "@/components/ExperienceBits";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   head: () => ({
@@ -40,13 +41,13 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
   errorComponent: ({ error }) => (
     <AppShell title="Événement">
       <p role="alert" className="text-sm text-destructive">
-        {error instanceof Error ? error.message : "Erreur inattendue"}
+        {humanizeError(error, "Cette page n'a pas pu s'afficher. Réessayez dans un instant.")}
       </p>
     </AppShell>
   ),
   notFoundComponent: () => (
     <AppShell title="Événement">
-      <p className="text-sm text-muted-foreground">Événement introuvable.</p>
+      <p className="text-sm text-muted-foreground">Cet événement est introuvable : il a peut-être été retiré, ou il ne vous est pas accessible.</p>
     </AppShell>
   ),
 });
@@ -99,13 +100,13 @@ function EventDetailPage() {
       if (mine) toast.success("Inscription annulée.");
       void queryClient.invalidateQueries({ queryKey: ["event-participations", eventId] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   if (isLoading) {
     return (
       <AppShell title="Événement">
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       </AppShell>
     );
   }
@@ -113,7 +114,7 @@ function EventDetailPage() {
   if (!event) {
     return (
       <AppShell title="Événement">
-        <p className="text-sm text-muted-foreground">Événement introuvable.</p>
+        <p className="text-sm text-muted-foreground">Cet événement est introuvable : il a peut-être été retiré, ou il ne vous est pas accessible.</p>
       </AppShell>
     );
   }

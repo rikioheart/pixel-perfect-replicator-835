@@ -27,6 +27,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/forms")({
   head: () => ({
@@ -109,7 +111,7 @@ function FormsPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Formulaire créé (brouillon)."); setF(EMPTY); setQs(START); void qc.invalidateQueries({ queryKey: ["forms"] }); },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous n'avez pas le droit de créer ce formulaire." : e.message),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous n'avez pas le droit de créer ce formulaire." : humanizeError(e)),
   });
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -117,7 +119,7 @@ function FormsPage() {
       if (error) throw error;
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["forms"] }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   // Suppression réservée au Bureau (RLS forms_delete) ; les réponses liées partent avec le formulaire.
   const remove = useMutation({
@@ -140,7 +142,7 @@ function FormsPage() {
       setOpenId(null);
       void qc.invalidateQueries({ queryKey: ["forms"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const review = useMutation({
     mutationFn: async ({ id, match_status }: { id: string; match_status: string }) => {
@@ -148,7 +150,7 @@ function FormsPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Rapprochement enregistré."); void qc.invalidateQueries({ queryKey: ["form-responses"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   return (
@@ -209,8 +211,8 @@ function FormsPage() {
       </section>
       )}
 
-      {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : forms.length === 0 ? (
-        <EmptyState title="Aucun formulaire" message={canCreate ? "Créez un premier formulaire ci-dessus." : "Aucun formulaire ouvert pour le moment."} />
+      {isLoading ? <InlineLoading /> : forms.length === 0 ? (
+        <EmptyState art="attentive" title="Aucun formulaire" message={canCreate ? "Créez un premier formulaire ci-dessus." : "Aucun formulaire ouvert pour le moment."} />
       ) : (
         <div className="space-y-3">
           {forms.map((fm) => {

@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { defaultTitle, detectService, normalizeUrl, SERVICE_LABEL, type ServiceKey } from "@/lib/external-links";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export type LinkContext = "PROJECT" | "ACTIVITY" | "EVENT" | "TASK" | "RESERVATION" | "FORMATION" | "MEETING";
 
@@ -56,7 +58,7 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
       if (error) throw error;
     },
     onSuccess: () => { setUrl(""); setLabel(""); setAdding(false); toast.success("Lien ajouté."); void qc.invalidateQueries({ queryKey: key }); },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous ne pouvez pas ajouter de lien ici." : e.message),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous ne pouvez pas ajouter de lien ici." : humanizeError(e)),
   });
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -64,7 +66,7 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
       if (error) throw error;
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: key }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const preview = normalizeUrl(url);
@@ -96,7 +98,7 @@ export function ExternalLinks({ contextType, contextId, title = "Ressources et l
         </form>
       )}
 
-      {isLoading ? <p role="status" className="mt-2 text-sm text-muted-foreground">Chargement…</p> : links.length === 0 ? (
+      {isLoading ? <InlineLoading /> : links.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">Aucun lien pour l'instant.</p>
       ) : (
         <ul className="mt-3 space-y-1.5">

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/professionals/$proId")({
   head: () => ({
@@ -32,13 +33,13 @@ export const Route = createFileRoute("/_authenticated/professionals/$proId")({
   errorComponent: ({ error }) => (
     <AppShell title="Professionnel">
       <p role="alert" className="text-sm text-destructive">
-        {error instanceof Error ? error.message : "Erreur inattendue"}
+        {humanizeError(error, "Cette page n'a pas pu s'afficher. Réessayez dans un instant.")}
       </p>
     </AppShell>
   ),
   notFoundComponent: () => (
     <AppShell title="Professionnel">
-      <p className="text-sm text-muted-foreground">Professionnel introuvable.</p>
+      <p className="text-sm text-muted-foreground">Cette fiche professionnelle est introuvable : elle a peut-être été retirée, ou elle ne vous est pas accessible.</p>
     </AppShell>
   ),
 });
@@ -79,7 +80,7 @@ function ProfessionalDetailPage() {
   if (isLoading) {
     return (
       <AppShell title="Professionnel">
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       </AppShell>
     );
   }
@@ -87,7 +88,7 @@ function ProfessionalDetailPage() {
   if (!pro) {
     return (
       <AppShell title="Professionnel">
-        <p className="text-sm text-muted-foreground">Professionnel introuvable.</p>
+        <p className="text-sm text-muted-foreground">Cette fiche professionnelle est introuvable : elle a peut-être été retirée, ou elle ne vous est pas accessible.</p>
       </AppShell>
     );
   }

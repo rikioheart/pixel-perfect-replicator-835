@@ -13,6 +13,7 @@ import { bilanCsv, periodPresets, statSections, type BureauStats, type StatSecti
 import { agResolutions, annualAccounts, euroFr, resultLabel, type AnnualAccounts } from "@/lib/annual-accounts";
 import { useSensitiveRights } from "@/lib/permissions";
 import { AG_QUORUM } from "@/lib/statutes";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/statistics")({
   head: () => ({
@@ -185,7 +186,7 @@ function StatisticsPage() {
 
       {rights.viewGlobal ? <AccountsPanel accounts={accounts} loading={ledger.isLoading} failed={ledger.isError} from={range.from} to={range.to} /> : null}
 
-      {error ? <p className="text-sm text-destructive">{(error as Error).message}</p> : null}
+      {error ? <p className="text-sm text-destructive">{humanizeError(error, "Les statistiques n'ont pas pu être chargées. Réessayez dans un instant.")}</p> : null}
       {isLoading || !data ? (
         <p className="text-sm text-muted-foreground">Calcul des statistiques en cours…</p>
       ) : (

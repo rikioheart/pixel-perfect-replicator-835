@@ -19,6 +19,8 @@ import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
 import { ParentProjectSelect } from "@/components/ParentProjectSelect";
 import { useConfigOptions } from "@/lib/config-options";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/activities/")({
   head: () => ({
@@ -118,7 +120,7 @@ function ActivitiesPage() {
       toast.success("Inscription enregistrée, en attente de confirmation.");
       void queryClient.invalidateQueries({ queryKey: ["participations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const unregister = useMutation({
@@ -130,7 +132,7 @@ function ActivitiesPage() {
       toast.success("Inscription annulée.");
       void queryClient.invalidateQueries({ queryKey: ["participations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const create = useMutation({
@@ -184,7 +186,7 @@ function ActivitiesPage() {
       });
       void queryClient.invalidateQueries({ queryKey: ["activities"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (
@@ -345,13 +347,13 @@ function ActivitiesPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des activités…</p>
+        <InlineLoading label="Chargement des activités…" />
       ) : (
         <>
         <ArchiveToggle view={view} setView={setView} counts={splitArchive(activities)} pastLabel="Historique" />
         {(view === "current" ? splitArchive(activities).current : splitArchive(activities).past).length === 0 ? (
         <EmptyState
-          title="Aucune activité pour l'instant"
+          art="resting" title="Aucune activité pour l'instant"
           message="Les prochains ateliers et sorties s'afficheront ici dès que le Bureau les aura programmés."
         />
       ) : (

@@ -171,6 +171,15 @@
   --gradient-signature: linear-gradient(135deg, var(--signature-from), var(--signature-to));
   --sage: oklch(0.7 0.06 145);
   --sage-soft: oklch(0.93 0.03 145);
+  /* Illustrations canines (DogEmptyArt) : pelage fauve, décor sable/sauge/or, collier = signature. */
+  --art-bg: oklch(0.93 0.025 80);
+  --art-ground: oklch(0.86 0.035 78);
+  --art-coat: oklch(0.8 0.075 70);
+  --art-shade: oklch(0.64 0.08 60);
+  --art-light: oklch(0.97 0.014 85);
+  --art-ink: oklch(0.25 0.045 265);
+  --art-leaf: oklch(0.66 0.07 145);
+  --art-sun: var(--gold);
   /* Ancien nom de l'or, conservé pour la vitrine publique. */
   --ochre: var(--gold);
   --ochre-soft: var(--gold-soft);
@@ -180,6 +189,13 @@
 .dark {
   --sage: oklch(0.6 0.06 145);
   --sage-soft: oklch(0.3 0.04 145);
+  --art-bg: oklch(0.27 0.04 262);
+  --art-ground: oklch(0.33 0.04 262);
+  --art-coat: oklch(0.74 0.07 70);
+  --art-shade: oklch(0.58 0.075 60);
+  --art-light: oklch(0.93 0.015 85);
+  --art-ink: oklch(0.2 0.04 265);
+  --art-leaf: oklch(0.6 0.065 145);
   --cream: oklch(0.26 0.03 75);
   --sand: oklch(0.31 0.035 75);
   --sand-soft: oklch(0.27 0.03 75);
@@ -301,6 +317,22 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-panel);
 }
+
+/* Scènes DogEmptyArt : classes courtes pour garder le dessin léger, aucune animation. */
+.dog-art .bg { fill: var(--art-bg); }
+.dog-art .gr { fill: var(--art-ground); }
+.dog-art .c { fill: var(--art-coat); }
+.dog-art .s { fill: var(--art-shade); }
+.dog-art .m { fill: var(--art-light); }
+.dog-art .i { fill: var(--art-ink); }
+.dog-art .a { fill: var(--primary); }
+.dog-art .g { fill: var(--art-sun); }
+.dog-art .l { fill: var(--art-leaf); }
+.dog-art .k, .dog-art .gk, .dog-art .lk, .dog-art .t { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.dog-art .k { stroke: var(--art-ink); stroke-width: 1.8; }
+.dog-art .gk { stroke: var(--art-sun); stroke-width: 2.4; }
+.dog-art .lk { stroke: var(--art-leaf); stroke-width: 2.4; }
+.dog-art .t { stroke: var(--art-coat); stroke-width: 8; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

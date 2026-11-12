@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { canToggleValidator, hasPersonalPass, needsPersonalPassActivation, validatorSource, type PassAccess } from "@/lib/pass-access";
+import { humanizeError } from "@/lib/user-messages";
 
 export const PASS_ACCESS_KEY = ["pass-access"] as const;
 
@@ -43,7 +44,7 @@ export function PassAccessPanel({ access }: { access: PassAccess }) {
         ? (input.active ? "Votre pass personnel est activé." : "Votre pass personnel est désactivé.")
         : (input.active ? "Vous pouvez maintenant valider les pass des membres." : "Statut valideur suspendu."));
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Action impossible."),
+    onError: (e) => toast.error(humanizeError(e, "Action impossible.")),
   });
 
   return (

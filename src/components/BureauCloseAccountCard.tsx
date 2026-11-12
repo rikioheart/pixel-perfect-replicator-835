@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { humanizeError } from "@/lib/user-messages";
 
 /** Départ sans démarche du membre : le Bureau clôture le compte, avec motif et confirmation. */
 export function BureauCloseAccountCard({ memberId, memberName }: { memberId: string; memberName: string }) {
@@ -31,7 +32,7 @@ export function BureauCloseAccountCard({ memberId, memberName }: { memberId: str
       void qc.invalidateQueries({ queryKey: ["member", memberId] });
       void qc.invalidateQueries({ queryKey: ["members"] });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Clôture impossible.");
+      toast.error(humanizeError(e, "Clôture impossible."));
     } finally {
       setBusy(false);
     }

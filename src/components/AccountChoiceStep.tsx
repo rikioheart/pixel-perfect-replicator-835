@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { isValidSiret } from "@/lib/account-choice";
+import { humanizeError } from "@/lib/user-messages";
 
 /** Première étape d'un compte en attente : choisir son parcours. Aucun droit n'est accordé ici. */
 export function AccountChoiceStep({ onDone }: { onDone: () => Promise<void> }) {
@@ -30,7 +31,7 @@ export function AccountChoiceStep({ onDone }: { onDone: () => Promise<void> }) {
         : { _type: type },
     );
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(humanizeError(error));
     toast.success("Merci ! Votre demande est transmise au Bureau.");
     await onDone();
     return undefined;

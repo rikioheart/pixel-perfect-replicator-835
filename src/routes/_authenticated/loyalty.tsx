@@ -24,6 +24,7 @@ import { useOnline, readOfflinePass, type OfflinePass } from '@/lib/offline';
 import { PassAccessPanel, PASS_ACCESS_KEY, fetchPassAccess } from "@/components/PassAccessPanel";
 import { ManualStampCard } from "@/components/ManualStampCard";
 import { hasPersonalPass, showsActivationScreen, validatorSource } from "@/lib/pass-access";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/loyalty")({
   head: () => ({
@@ -141,7 +142,7 @@ function LoyaltyPage() {
           : "Recalcul terminé : votre carte était déjà à jour.",
       );
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Recalcul impossible.");
+      toast.error(humanizeError(error, "Recalcul impossible."));
     } finally {
       setRecomputing(false);
     }

@@ -18,6 +18,7 @@ import { useMyHouseholds, type HouseholdBundle, type HouseholdPerson } from "@/l
 import { ageFrom, cleanHouseholdName, householdNameOptions, personLabel, RELATION_LABEL } from "@/lib/household-people";
 import { DogProfiles } from "@/components/DogProfiles";
 import { DogFilePanel } from "@/components/DogFile";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/foyer")({
   head: () => ({
@@ -37,7 +38,7 @@ const select = "h-10 w-full rounded-md border border-input bg-background px-2 te
 const emptyPerson = { first_name: "", last_name: "", birth_date: "", relation: "ENFANT" };
 
 function friendly(message: string) {
-  return message.includes("un seul foyer") ? "Cette personne fait déjà partie d'un autre foyer. Un membre n'appartient qu'à un seul foyer." : message;
+  return message.includes("un seul foyer") ? "Cette personne fait déjà partie d'un autre foyer. Un membre n'appartient qu'à un seul foyer." : humanizeError(message);
 }
 
 function PersonRow({ p, dogs, onChanged }: { p: HouseholdPerson; dogs: HouseholdBundle["dogs"]; onChanged: () => void }) {
@@ -50,13 +51,13 @@ function PersonRow({ p, dogs, onChanged }: { p: HouseholdPerson; dogs: Household
     const { error } = await supabase.from("household_children").update({
       first_name: f.first_name.trim(), last_name: f.last_name.trim() || null, birth_date: f.birth_date || null, relation: f.relation,
     }).eq("id", p.id);
-    if (error) toast.error(error.message); else { toast.success("Personne mise à jour."); setEditing(false); onChanged(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Personne mise à jour."); setEditing(false); onChanged(); }
   };
   const remove = async () => {
     const warn = entrusted.length ? `\n${entrusted.map((d) => d.name).join(", ")} reviendra sous votre responsabilité.` : "";
     if (!window.confirm(`Retirer ${personLabel(p)} du foyer ?${warn}`)) return;
     const { error } = await supabase.from("household_children").delete().eq("id", p.id);
-    if (error) toast.error(error.message); else { toast.success("Personne retirée du foyer."); onChanged(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Personne retirée du foyer."); onChanged(); }
   };
   if (editing) {
     return (
@@ -116,7 +117,7 @@ function HouseholdCard({ h }: { h: HouseholdBundle }) {
       household_id: h.id, first_name: person.first_name.trim(), last_name: person.last_name.trim() || null,
       birth_date: person.birth_date || null, relation: person.relation,
     });
-    if (error) toast.error(error.message); else { toast.success("Personne ajoutée au foyer."); setPerson(emptyPerson); setAdding(false); void refresh(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Personne ajoutée au foyer."); setPerson(emptyPerson); setAdding(false); void refresh(); }
   };
 
   return (
@@ -252,14 +253,14 @@ function FoyerPage() {
       if (orphanDogs.length) await supabase.from("dogs").update({ household_id: data.id }).in("id", orphanDogs.map((d) => d.id));
     },
     onSuccess: () => { setCreating(false); toast.success("Foyer créé."); void qc.invalidateQueries({ queryKey: ["my-households"] }); void qc.invalidateQueries({ queryKey: ["orphan-dogs"] }); void qc.invalidateQueries({ queryKey: ["my-dogs"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   return (
     <AppShell title="Mon foyer" subtitle="Vos proches, vos chiens et la personne de référence de chacun"
       actions={households.length === 0 && !isLoading ? <Button size="sm" className="gap-2" onClick={() => setCreating(true)}><Plus className="size-4" aria-hidden /> Créer mon foyer</Button> : undefined}>
       {isLoading ? <LoadingState rows={3} /> : households.length === 0 ? (
-        <EmptyState title="Pas encore de foyer" message="Créez votre foyer pour inscrire en une fois vos proches et vos chiens. Vos chiens existants y seront rattachés." />
+        <EmptyState art="resting" title="Pas encore de foyer" message="Créez votre foyer pour inscrire en une fois vos proches et vos chiens. Vos chiens existants y seront rattachés." />
       ) : (
         <div className="space-y-4">
           {households.length > 1 && (

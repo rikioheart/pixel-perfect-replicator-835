@@ -14,6 +14,8 @@ import { BureauConsoleTabs } from "@/components/BureauConsoleTabs";
 import { buildRows, toCsv, toTsv, parseHelloAssoCsv, EXPORT_COLUMNS } from "@/lib/finance-export";
 import { LEDGER_CATEGORIES, categoryLabel } from "@/lib/annual-accounts";
 import { AccountingSplitsPanel } from "@/components/AccountingSplitsPanel";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 const TITLE = "Comptabilité & Grand livre";
 
@@ -93,14 +95,14 @@ function Page() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Opération enregistrée."); setF(EMPTY); refresh(); },
-    onError: (e: Error) => toast.error(e.message.includes("duplicate") ? "Déjà suivi (pas de doublon)." : e.message.includes("row-level") ? "Droit « finances » requis." : e.message),
+    onError: (e: Error) => toast.error(e.message.includes("duplicate") ? "Déjà suivi (pas de doublon)." : e.message.includes("row-level") ? "Droit « finances » requis." : humanizeError(e)),
   });
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { error } = await supabase.from("finance_entries").update({ status }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: refresh, onError: (e: Error) => toast.error(e.message),
+    onSuccess: refresh, onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const resolve = useMutation({
     mutationFn: async (id: string) => {
@@ -108,7 +110,7 @@ function Page() {
       const { error } = await supabase.from("integration_events").update({ outcome: "RESOLVED", resolved_by: u.user?.id ?? null, resolved_at: new Date().toISOString() }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: refresh, onError: (e: Error) => toast.error(e.message),
+    onSuccess: refresh, onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const importHelloAsso = async (file: File) => {
@@ -139,7 +141,7 @@ function Page() {
   };
 
   if (!rights.ready) return <AppShell title={TITLE}><p role="status" className="text-sm text-muted-foreground">Vérification de vos droits…</p></AppShell>;
-  if (!rights.viewGlobal) return <AppShell title={TITLE}><EmptyState title="Droit finances requis" message="Le grand livre est réservé aux membres du Bureau disposant du droit « consulter les finances globales »." /></AppShell>;
+  if (!rights.viewGlobal) return <AppShell title={TITLE}><EmptyState art="none" title="Droit finances requis" message="Le grand livre est réservé aux membres du Bureau disposant du droit « consulter les finances globales »." /></AppShell>;
   const money = (n: number) => (entries.isError ? "—" : `${n.toFixed(2)} €`);
 
   return (
@@ -197,8 +199,8 @@ function Page() {
             {k === "" ? "Tout" : k === "RECETTE" ? "Recettes" : k === "DEPENSE" ? "Dépenses" : STATUS_FR[k]}</Button>
         ))}
       </div>
-      {entries.isError ? <p className="text-sm text-destructive">Opérations indisponibles (chargement ou droits).</p> : entries.isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
-        <EmptyState title="Aucune opération" message="Ajoutez une opération ou importez des adhésions HelloAsso." />
+      {entries.isError ? <p className="text-sm text-destructive">Opérations indisponibles (chargement ou droits).</p> : entries.isLoading ? <InlineLoading /> : list.length === 0 ? (
+        <EmptyState art="none" title="Aucune opération" message="Ajoutez une opération ou importez des adhésions HelloAsso." />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">

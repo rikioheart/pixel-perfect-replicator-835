@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/collaborations")({
   head: () => ({
@@ -54,7 +55,7 @@ function CollabPage() {
       if (error) throw error;
     },
     onSuccess: () => { setForm({ title: "", description: "", happened_on: "", is_public: false }); toast.success("Collaboration ajoutée."); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const toggle = useMutation({
     mutationFn: async ({ id, is_public }: { id: string; is_public: boolean }) => {
@@ -76,7 +77,7 @@ function CollabPage() {
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="space-y-3 lg:col-span-2">
           {isLoading ? <LoadingState rows={3} /> : rows.length === 0 ? (
-            <EmptyState title="Aucune collaboration" message="Ateliers co-animés, interventions, dons… ajoutez-les ici." />
+            <EmptyState art="playful" title="Aucune collaboration" message="Ateliers co-animés, interventions, dons… ajoutez-les ici." />
           ) : rows.map((c) => (
             <div key={c.id} className="panel flex items-start justify-between gap-3 p-4 text-sm">
               <div>

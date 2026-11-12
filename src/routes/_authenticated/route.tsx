@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/rea
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { needsAccountChoice } from "@/lib/account-choice";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
@@ -32,7 +33,7 @@ function AuthenticatedLayout() {
   if (loading || !session || (mustChoose && pathname !== "/onboarding")) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Chargement de votre espace…</p>
+        <InlineLoading label="Chargement de votre espace…" />
       </div>
     );
   }

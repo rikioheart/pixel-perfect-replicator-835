@@ -23,6 +23,7 @@ import { DirectoryDogs } from "@/components/DirectoryDogs";
 import { Badge } from "@/components/ui/badge";
 import { EXECUTIVE_FUNCTIONS, bureauTeamIds } from "@/lib/bureau-team";
 import { MEMBER_FUNCTION_LABEL } from "@/lib/members";
+import { InlineLoading } from "@/components/LoadingState";
 
 type DirectoryVue = "pros" | "chiens" | "bureau";
 
@@ -202,10 +203,10 @@ function DirectoryPage() {
       ) : (
         <>
           {isLoading || (category === "BUREAU" && !team) ? (
-            <p className="text-sm text-muted-foreground">Chargement de l'annuaire…</p>
+            <InlineLoading label="Chargement de l'annuaire…" />
           ) : filtered.length === 0 ? (
             <EmptyState
-              title="Aucun profil trouvé"
+              art="attentive" title="Aucun profil trouvé"
               message="Affinez votre recherche, ou invitez de nouveaux adhérents à rejoindre le réseau."
             />
           ) : (

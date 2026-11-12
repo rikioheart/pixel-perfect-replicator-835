@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/domain";
 import { useSensitiveRights } from "@/lib/permissions";
 import { membershipDecisionMessage, type MembershipDecisionResult } from "@/lib/membership-decision";
+import { humanizeError } from "@/lib/user-messages";
 
 /**
  * File unique des adhésions en attente. La décision passe par decide_membership :
@@ -41,7 +42,7 @@ export function PendingMembersQueue() {
       void qc.invalidateQueries({ queryKey: ["admin-dashboard"] });
     },
     onError: (e: Error) => {
-      toast.error(e.message);
+      toast.error(humanizeError(e));
       void qc.invalidateQueries({ queryKey: ["pending-members"] });
     },
   });

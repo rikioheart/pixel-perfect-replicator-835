@@ -12,6 +12,7 @@ import { generateTeamAdvice, type Recommendation } from "@/lib/team-advisor.func
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/advisor")({
   head: () => ({
@@ -81,7 +82,7 @@ function AdvisorPage() {
       toast.success("Recommandations prêtes.");
       void queryClient.invalidateQueries({ queryKey: ["team-advices"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const remove = useMutation({

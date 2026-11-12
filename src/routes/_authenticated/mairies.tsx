@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/mairies")({
   head: () => ({
@@ -101,7 +102,7 @@ function MairiesPage() {
       setForm(EMPTY);
       void queryClient.invalidateQueries({ queryKey: ["mairies"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const remove = useMutation({
@@ -113,7 +114,7 @@ function MairiesPage() {
       toast.success("Contact supprimé.");
       void queryClient.invalidateQueries({ queryKey: ["mairies"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   if (!loading && !isBureau) return <BureauOnly title="Mairies & institutions" />;
@@ -154,10 +155,10 @@ function MairiesPage() {
       </div>
 
       {isLoading ? (
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       ) : filtered.length === 0 ? (
         <EmptyState
-          title="Aucun contact institutionnel"
+          art="attentive" title="Aucun contact institutionnel"
           message="Ajoutez les mairies et collectivités avec lesquelles l'association échange."
         />
       ) : (

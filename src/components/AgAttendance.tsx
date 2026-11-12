@@ -11,6 +11,7 @@ import { memberFullName } from "@/lib/members";
 import { filterByName } from "@/lib/name-search";
 import { formatParisDateTime } from "@/lib/places";
 import { AG_QUORUM, agTally, type AgAttendanceStatus } from "@/lib/statutes";
+import { humanizeError } from "@/lib/user-messages";
 
 const STATUS_LABEL: Record<AgAttendanceStatus, string> = {
   PRESENT: "Présent",
@@ -125,7 +126,7 @@ export function AgAttendance() {
       if (error) throw error;
     },
     onSuccess: refresh,
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const byMember = useMemo(() => new Map(rows.map((r) => [r.member_id, r])), [rows]);

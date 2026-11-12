@@ -267,7 +267,7 @@ function WantToHelpPage() {
         <h2 id="my-offers-h" className="font-display text-lg">Mes propositions</h2>
         {myOffers.length === 0 ? (
           <EmptyState
-            title="Aucune proposition pour l'instant"
+            art="playful" title="Aucune proposition pour l'instant"
             message="Vos propositions d'aide apparaîtront ici, avec leur avancement."
           />
         ) : (

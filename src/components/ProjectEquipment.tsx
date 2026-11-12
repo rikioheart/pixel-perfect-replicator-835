@@ -9,12 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RESERVATION_STATUS_LABEL, validateReservationDraft } from "@/lib/inventory";
+import { humanizeError } from "@/lib/user-messages";
 
 const SELECT = "h-10 w-full rounded-md border border-input bg-background px-3 text-sm";
 const today = () => new Date().toISOString().slice(0, 10);
 const fmt = (d: string | null) => (d ? new Date(`${d}T12:00:00`).toLocaleDateString("fr-FR") : "sans fin");
 const errText = (e: Error) =>
-  e.message.includes("row-level") || e.message.includes("permission") ? "Action non autorisée pour votre profil." : e.message;
+  e.message.includes("row-level") || e.message.includes("permission") ? "Action non autorisée pour votre profil." : humanizeError(e);
 
 /**
  * Matériel d'un projet, depuis sa fiche : réservations en cours et réservation rapide.

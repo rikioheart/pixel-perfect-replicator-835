@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
+import { humanizeError } from "@/lib/user-messages";
 
 type Target = {
   activityId?: string;
@@ -77,7 +78,7 @@ export function RegistrationWizard({ open, onOpenChange, target }: { open: boole
       void qc.invalidateQueries({ queryKey: ["spots"] });
       void qc.invalidateQueries({ queryKey: ["event-participations"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const canNext =

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { readQueue } from "@/lib/offline";
 import { ManualStampCard } from "@/components/ManualStampCard";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/")({
   head: () => ({
@@ -105,7 +106,7 @@ function ProDashboard() {
             <CalendarDays className="size-4 text-primary" aria-hidden /> Mes prochaines activités
           </h2>
           {data === undefined ? (
-            <p className="text-sm text-muted-foreground">Chargement…</p>
+            <InlineLoading />
           ) : data.activities.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               Aucune activité à venir où vous intervenez. Elles apparaîtront ici dès qu'un responsable vous y associe.

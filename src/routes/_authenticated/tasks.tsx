@@ -18,6 +18,8 @@ import { Pencil } from "lucide-react";
 import { TaskPanel, type TaskPanelValue } from "@/components/panels/TaskPanel";
 import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
 import { canValidateTask } from "@/lib/task-lifecycle";
+import { EmptyState } from "@/components/EmptyState";
+import { LoadingState } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
@@ -139,8 +141,18 @@ function TasksPage() {
         </Select>
       </div>
 
-      {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucune tâche à afficher.</p>
+      {tasks === undefined ? (
+        <LoadingState rows={3} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          art="playful"
+          title={status === "ALL" ? "Aucune tâche pour l'instant" : "Aucune tâche dans ce statut"}
+          message={
+            status === "ALL"
+              ? "Les tâches qui vous sont confiées, ou que vous suivez, apparaîtront ici."
+              : "Choisissez un autre statut pour retrouver vos autres tâches."
+          }
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {filtered.map((task) => (

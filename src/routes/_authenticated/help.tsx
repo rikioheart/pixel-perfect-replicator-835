@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
 
 // Chargé seulement à l'ouverture de l'onglet : la page des guides reste légère.
 const HelpAssistant = lazy(() => import("@/components/HelpAssistant"));
@@ -187,7 +188,7 @@ function HelpCenterPage() {
       setGuide(null);
       queryClient.invalidateQueries({ queryKey: ["help-guides"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const reviewGuide = useMutation({
@@ -202,7 +203,7 @@ function HelpCenterPage() {
       toast.success("Guide mis à jour.");
       queryClient.invalidateQueries({ queryKey: ["help-guides"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const removeGuide = useMutation({
@@ -215,7 +216,7 @@ function HelpCenterPage() {
       toast.success("Guide supprimé.");
       queryClient.invalidateQueries({ queryKey: ["help-guides"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const saveSheet = useMutation({
@@ -245,7 +246,7 @@ function HelpCenterPage() {
       });
       queryClient.invalidateQueries({ queryKey: ["job-sheets"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (
@@ -327,7 +328,7 @@ function HelpCenterPage() {
 
           {filtered.length === 0 ? (
             <EmptyState
-              title="Aucun guide pour l'instant"
+              art="attentive" title="Aucun guide pour l'instant"
               message="Les guides expliquent comment utiliser chaque module. Chacun peut en proposer un."
             />
           ) : (
@@ -403,7 +404,7 @@ function HelpCenterPage() {
         </>
       ) : sheets.length === 0 ? (
         <EmptyState
-          title="Aucune fiche de poste"
+          art="attentive" title="Aucune fiche de poste"
           message="Une fiche de poste décrit le rôle d'un membre : responsabilités et actions du quotidien."
         />
       ) : (

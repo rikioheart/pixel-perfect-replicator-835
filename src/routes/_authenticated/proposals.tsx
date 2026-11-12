@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SidePanel } from "@/components/SidePanel";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/proposals")({
   head: () => ({
@@ -99,7 +100,7 @@ function ProposalsPage() {
       setForm({ type: "ATELIER", title: "", description: "" });
       void queryClient.invalidateQueries({ queryKey: ["professional-proposals"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const decide = useMutation({
@@ -118,7 +119,7 @@ function ProposalsPage() {
       setComment("");
       void queryClient.invalidateQueries({ queryKey: ["professional-proposals"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (
@@ -132,10 +133,10 @@ function ProposalsPage() {
       }
     >
       {isLoading ? (
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       ) : rows.length === 0 ? (
         <EmptyState
-          title="Aucune proposition"
+          art="playful" title="Aucune proposition"
           message="Proposez un atelier, un service ou une idée : le Bureau vous répondra."
         />
       ) : (

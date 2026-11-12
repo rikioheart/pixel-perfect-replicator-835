@@ -1,11 +1,14 @@
 import { cn } from "@/lib/utils";
 
+/** Libellé commun : court, rassurant, annoncé aux lecteurs d'écran. */
+export const DEFAULT_LOADING_LABEL = "Un instant, nous rassemblons les informations…";
+
 /**
  * État de chargement cohérent et accessible : annoncé aux lecteurs d'écran
  * via role="status", visuellement représenté par des lignes grisées.
  */
 export function LoadingState({
-  label = "Chargement en cours…",
+  label = DEFAULT_LOADING_LABEL,
   rows = 3,
   className,
 }: {
@@ -28,7 +31,7 @@ export function LoadingState({
 }
 
 /** Variante compacte, pour les zones en ligne (listes courtes, panneaux). */
-export function InlineLoading({ label = "Chargement en cours…" }: { label?: string }) {
+export function InlineLoading({ label = DEFAULT_LOADING_LABEL }: { label?: string }) {
   return (
     <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
       {label}

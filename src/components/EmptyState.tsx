@@ -1,28 +1,25 @@
 import type { ReactNode } from "react";
-import illustration from "@/assets/illustration-empty.jpg";
+import { DogEmptyArt, type DogArt } from "@/components/DogEmptyArt";
 
-/** État vide chaleureux : une illustration douce et un encouragement, jamais une page blanche. */
+/**
+ * État vide chaleureux : un petit chien dessiné et un encouragement, jamais une page blanche.
+ * `art` suit le contexte : "attentive" pour une recherche ou une ressource, "resting" pour un
+ * espace calme ou tout traité, "playful" pour les idées et l'entraide, "none" sans dessin.
+ */
 export function EmptyState({
   title,
   message,
   action,
+  art = "attentive",
 }: {
   title: string;
   message: string;
   action?: ReactNode;
+  art?: DogArt | "none";
 }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-card/60 px-6 py-8 text-center">
-      <img
-        src={illustration}
-        alt=""
-        aria-hidden
-        data-decorative
-        loading="lazy"
-        width={992}
-        height={672}
-        className="h-auto w-full max-w-[220px] rounded-lg mix-blend-multiply"
-      />
+      {art === "none" ? null : <DogEmptyArt art={art} className="h-auto w-full max-w-[200px]" />}
       <p className="font-display text-base">{title}</p>
       <p className="max-w-sm text-sm text-muted-foreground">{message}</p>
       {action}

@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatParisDateTime, fromParisInput, toParisInput } from "@/lib/places";
 import { DecisionToTask } from "@/components/DecisionToTask";
 import { DecisionToCommunication } from "@/components/DecisionToCommunication";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 const KINDS = [
   { code: "AG", label: "Assemblée générale" },
@@ -55,7 +57,7 @@ export function GovernanceRegister() {
       void qc.invalidateQueries({ queryKey: ["governance-records"] });
       void qc.invalidateQueries({ queryKey: ["ag-records"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const list = data.filter((r) => filter === "ALL" || r.kind === filter);
@@ -87,7 +89,7 @@ export function GovernanceRegister() {
         </form>
       ) : null}
 
-      {isLoading ? <p role="status" className="text-sm text-muted-foreground">Chargement…</p> : isError ? (
+      {isLoading ? <InlineLoading /> : isError ? (
         <div role="alert" className="panel flex flex-wrap items-center gap-3 p-4 text-sm">
           <span>Le registre n'a pas pu être chargé. Vérifiez votre connexion ou vos droits Bureau.</span>
           <Button size="sm" variant="outline" onClick={() => void refetch()}>Réessayer</Button>

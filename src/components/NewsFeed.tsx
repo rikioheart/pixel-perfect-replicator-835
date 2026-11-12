@@ -25,7 +25,7 @@ export function NewsFeed() {
       </div>
       {items.length === 0 ? (
         <EmptyState
-          title="Le fil se remplira vite"
+          art="attentive" title="Le fil se remplira vite"
           message="Dès qu'un article est publié, un événement programmé ou un membre accueilli, tout apparaît ici."
         />
       ) : (

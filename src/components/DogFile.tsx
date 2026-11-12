@@ -17,6 +17,7 @@ import {
   activeAccesses, availablePros, hasAnySection, INDICATOR_CATEGORY_LABEL, sectionsSummary,
   SHARE_PRESETS, SHARE_SECTIONS, shareResultMessage, type AccessRow, type SharePerms,
 } from "@/lib/dog-sharing";
+import { humanizeError } from "@/lib/user-messages";
 
 export type DogFileTab = "fiche" | "reperes" | "carnet" | "pros";
 
@@ -101,7 +102,7 @@ function ProfileTab({ dog }: { dog: DogRow }) {
       if (error) throw error;
     },
     onSuccess: async () => { toast.success("Fiche enregistrée."); await refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   return (
     <form className="space-y-4 pt-3 text-sm" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
@@ -172,12 +173,12 @@ function IndicatorsTab({ dogId }: { dogId: string }) {
       if (error) throw error;
     },
     onSuccess: async () => { setN({ ...n, label: "", note: "" }); await done("Repère ajouté."); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const remove = useMutation({
     mutationFn: async (id: string) => { const { error } = await supabase.from("dog_indicators").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => done("Repère retiré."),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   return (
     <div className="space-y-4 pt-3 text-sm">
@@ -248,7 +249,7 @@ function JournalTab({ dogId }: { dogId: string }) {
       if (error) throw error;
     },
     onSuccess: async () => { setObs(""); await done("Ajouté au carnet."); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const addGoal = useMutation({
     mutationFn: async () => {
@@ -257,7 +258,7 @@ function JournalTab({ dogId }: { dogId: string }) {
       if (error) throw error;
     },
     onSuccess: async () => { setGoal(""); await done("Objectif ajouté."); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const setStatus = useMutation({
     mutationFn: async (v: { id: string; status: string }) => {
@@ -265,7 +266,7 @@ function JournalTab({ dogId }: { dogId: string }) {
       if (error) throw error;
     },
     onSuccess: () => done("Objectif mis à jour."),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   return (
     <div className="space-y-5 pt-3 text-sm">
@@ -334,7 +335,7 @@ function AccessEditor({ access, name, onDone }: { access: FullAccess; name: stri
       if (error) throw error;
     },
     onSuccess: () => { toast.success(`Accès de ${name} mis à jour.`); onDone(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   return (
     <div className="mt-2 space-y-2 rounded-md bg-muted/40 p-2">
@@ -398,12 +399,12 @@ function ProsTab({ dogId }: { dogId: string }) {
       return res as unknown as { shared: string[]; skipped: string[] };
     },
     onSuccess: async (res) => { toast.success(shareResultMessage(res, nameOf)); setChosen([]); setContext(""); await refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const revoke = useMutation({
     mutationFn: async (id: string) => { const { error } = await supabase.rpc("revoke_dog_access", { _access_id: id }); if (error) throw error; },
     onSuccess: async () => { toast.success("Accès retiré, ainsi que les partages qui en découlent."); await refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const updateDog = useMutation({
     mutationFn: async (patch: { private_sections?: string[]; referent_can_share_followup?: boolean }) => {
@@ -411,7 +412,7 @@ function ProsTab({ dogId }: { dogId: string }) {
       if (error) throw error;
     },
     onSuccess: async () => { toast.success("Préférence enregistrée."); await refresh(); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const toggleRef = useMutation({
     mutationFn: async (proId: string) => {
@@ -422,7 +423,7 @@ function ProsTab({ dogId }: { dogId: string }) {
       if (error) throw error;
     },
     onSuccess: () => refresh(),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const privateSections = data?.dog?.private_sections ?? [];
   const presetId = SHARE_PRESETS.find((p) => SHARE_SECTIONS.every(([k]) => p.perms[k] === perms[k]))?.id;

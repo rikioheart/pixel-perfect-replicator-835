@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { humanizeError } from "@/lib/user-messages";
 
 /**
  * Répartition des recettes (association / professionnels) et reversements aux pros : circuit « accounting »,
@@ -52,7 +53,7 @@ export function AccountingSplitsPanel() {
       if (error) throw new Error(financeErrorMessage(error.message));
     },
     onSuccess: () => { toast.success("Reversement mis à jour."); void qc.invalidateQueries({ queryKey: ["accounting"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   const addLine = useMutation({
     mutationFn: async () => {
@@ -71,7 +72,7 @@ export function AccountingSplitsPanel() {
       setLine({ label: "", gross_revenue: "0", association_share: "0", professional_share: "0" });
       void qc.invalidateQueries({ queryKey: ["accounting"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
 
   const totals = rows.reduce((t, r) => ({ gross: t.gross + Number(r.gross_revenue), asso: t.asso + Number(r.association_share), pro: t.pro + Number(r.professional_share) }), { gross: 0, asso: 0, pro: 0 });

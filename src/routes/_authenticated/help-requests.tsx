@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/help-requests")({
   head: () => ({
@@ -104,7 +105,7 @@ function HelpRequestsPage() {
       setSkills("");
       queryClient.invalidateQueries({ queryKey: ["help-requests"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const update = useMutation({
@@ -122,7 +123,7 @@ function HelpRequestsPage() {
       setResponse("");
       queryClient.invalidateQueries({ queryKey: ["help-requests"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const current = items.find((item) => item.id === answering);
@@ -153,7 +154,7 @@ function HelpRequestsPage() {
 
       {items.length === 0 ? (
         <EmptyState
-          title="Aucune demande"
+          art="playful" title="Aucune demande"
           message="Utilisez « J'ai besoin d'aide » pour signaler un blocage ou proposer un coup de main."
         />
       ) : (

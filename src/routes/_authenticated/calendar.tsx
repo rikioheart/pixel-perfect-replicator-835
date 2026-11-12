@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { EntityPeek, type PeekType } from "@/components/EntityPeek";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/calendar")({
   head: () => ({
@@ -149,10 +150,10 @@ function CalendarPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground" role="status">Chargement du calendrier…</p>
+        <InlineLoading label="Chargement du calendrier…" />
       ) : view === "list" ? (
         upcoming.length === 0 ? (
-          <EmptyState title="Rien de prévu pour l'instant" message="Dès qu'une activité, une réservation ou une échéance est planifiée, elle apparaît ici." />
+          <EmptyState art="resting" title="Rien de prévu pour l'instant" message="Dès qu'une activité, une réservation ou une échéance est planifiée, elle apparaît ici." />
         ) : (
           <div className="space-y-6">
             {upcoming.map(([date, list]) => (

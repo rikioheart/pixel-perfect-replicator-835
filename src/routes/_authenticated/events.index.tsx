@@ -17,6 +17,8 @@ import { SidePanel } from "@/components/SidePanel";
 import { splitArchive } from "@/lib/archives";
 import { ArchiveToggle } from "@/components/ArchiveToggle";
 import { ParentProjectSelect } from "@/components/ParentProjectSelect";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/events/")({
   head: () => ({
@@ -101,7 +103,7 @@ function EventsPage() {
       setOpen(false);
       void queryClient.invalidateQueries({ queryKey: ["events"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (
@@ -225,13 +227,13 @@ function EventsPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement du calendrier…</p>
+        <InlineLoading label="Chargement du calendrier…" />
       ) : (
         <>
         <ArchiveToggle view={view} setView={setView} counts={splitArchive(events)} pastLabel="Archives" />
         {(view === "current" ? splitArchive(events).current : splitArchive(events).past).length === 0 ? (
         <EmptyState
-          title="Pas encore d'événement"
+          art="resting" title="Pas encore d'événement"
           message="Les prochains temps forts de l'association apparaîtront ici."
         />
       ) : (

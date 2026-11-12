@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/advantages")({
   head: () => ({
@@ -107,7 +109,7 @@ function AdvantagesPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["advantages"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const claim = useMutation({
@@ -121,7 +123,7 @@ function AdvantagesPage() {
       toast.success("C'est réservé ! Le Bureau est prévenu.");
       queryClient.invalidateQueries({ queryKey: ["advantages"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const advantages = data?.advantages ?? [];
@@ -140,10 +142,10 @@ function AdvantagesPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des avantages…</p>
+        <InlineLoading label="Chargement des avantages…" />
       ) : advantages.length === 0 ? (
         <EmptyState
-          title="Aucun avantage pour l'instant"
+          art="attentive" title="Aucun avantage pour l'instant"
           message="Les avantages négociés avec nos partenaires apparaîtront ici."
         />
       ) : (

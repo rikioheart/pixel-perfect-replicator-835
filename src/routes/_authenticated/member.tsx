@@ -138,7 +138,7 @@ function MemberDashboard() {
               <h2 className="mb-4 text-lg">Mes prochaines sorties</h2>
               {upcoming.length === 0 && (data?.activities ?? []).length === 0 ? (
                 <EmptyState
-                  title="Aucune date prévue"
+                  art="resting" title="Aucune date prévue"
                   message="Les prochaines balades, ateliers et événements apparaîtront ici dès leur ouverture."
                   action={
                     <Button asChild size="sm" variant="outline">

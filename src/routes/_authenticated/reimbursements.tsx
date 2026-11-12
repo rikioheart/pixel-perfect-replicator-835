@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/reimbursements")({
   head: () => ({
@@ -103,7 +105,7 @@ function ReimbursementsPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["reimbursements"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const rows = data ?? [];
@@ -122,7 +124,7 @@ function ReimbursementsPage() {
       {isError ? (
         <p className="panel p-4 text-sm text-destructive">Impossible de charger vos demandes pour le moment. Réessayez plus tard.</p>
       ) : isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des demandes…</p>
+        <InlineLoading label="Chargement des demandes…" />
       ) : (
         <>
           <div className="mb-5 grid gap-3 sm:grid-cols-3">
@@ -138,7 +140,7 @@ function ReimbursementsPage() {
             ))}
           </div>
           {rows.length === 0 ? (
-            <EmptyState title="Aucune demande" message="Vos demandes de remboursement apparaîtront ici une fois créées." />
+            <EmptyState art="resting" title="Aucune demande" message="Vos demandes de remboursement apparaîtront ici une fois créées." />
           ) : (
             <div className="space-y-3">
               {rows.map((item) => (

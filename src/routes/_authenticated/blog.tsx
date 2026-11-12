@@ -20,6 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/blog")({
   head: () => ({
@@ -75,7 +77,7 @@ function BlogPage() {
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
     const path = `${kind}/${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const { error } = await supabase.storage.from("blog-media").upload(path, file, { contentType: file.type });
-    if (error) throw new Error(`Envoi du fichier impossible : ${error.message}`);
+    if (error) throw new Error(`Envoi du fichier impossible. ${humanizeError(error, "Réessayez dans un instant.")}`);
     return path;
   };
 
@@ -109,7 +111,7 @@ function BlogPage() {
       void queryClient.invalidateQueries({ queryKey: ["public-platform-articles"] });
       void queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const publish = useMutation({
@@ -124,7 +126,7 @@ function BlogPage() {
       toast.success("Article publié.");
       void queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   return (
@@ -206,7 +208,7 @@ function BlogPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des articles…</p>
+        <InlineLoading label="Chargement des articles…" />
       ) : posts.length === 0 ? (
         <p className="text-sm text-muted-foreground">Aucun article pour le moment.</p>
       ) : (

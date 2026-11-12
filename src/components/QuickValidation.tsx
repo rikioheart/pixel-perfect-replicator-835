@@ -10,6 +10,7 @@ import {
   decideTaskValidation,
   type ValidationDecision,
 } from "@/lib/validation-actions";
+import { humanizeError } from "@/lib/user-messages";
 
 type QuickValidationItem = {
   id: string;
@@ -42,7 +43,7 @@ export function QuickValidationRow({ task }: { task: QuickValidationItem }) {
       setComment("");
       await queryClient.invalidateQueries();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Décision impossible.");
+      toast.error(humanizeError(error, "Décision impossible."));
     } finally {
       setBusy(null);
     }

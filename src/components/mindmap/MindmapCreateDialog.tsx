@@ -28,6 +28,7 @@ import {
   slugify,
 } from "@/lib/domain";
 import { logAudit, type UndoableAction } from "@/lib/mindmap-actions";
+import { humanizeError } from "@/lib/user-messages";
 
 
 export const ROOT_ID = "root";
@@ -109,7 +110,7 @@ export function MindmapCreateDialog({
           .select("id")
           .single();
         if (error) {
-          toast.error(error.message);
+          toast.error(humanizeError(error));
           return;
         }
         if (created) {
@@ -154,7 +155,7 @@ export function MindmapCreateDialog({
           status: "TODO",
         }).select("id").single();
         if (error) {
-          toast.error(error.message);
+          toast.error(humanizeError(error));
           return;
         }
         await logAudit({

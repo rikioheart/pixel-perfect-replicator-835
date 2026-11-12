@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { INDICATOR_FAMILY_LABEL } from "@/lib/dog-timeline";
 import { ageFrom, membersInSeveralHouseholds, personLabel, RELATION_LABEL } from "@/lib/household-people";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/chiens")({
   head: () => ({
@@ -63,7 +64,7 @@ function Page() {
   const toggle = useMutation({
     mutationFn: async (v: boolean) => { const { error } = await supabase.from("profiles").update({ hide_sensitive_dogs: v }).eq("id", user!.id); if (error) throw error; },
     onSuccess: () => { toast.success("Visibilité mise à jour."); void qc.invalidateQueries({ queryKey: ["hide-dogs"] }); },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(humanizeError(e)),
   });
   if (rolesReady && !isBureau) return <BureauOnly title="Foyers & chiens" />;
   const active = dogs.filter((d) => !d.archived_at);
@@ -81,7 +82,7 @@ function Page() {
             <input type="checkbox" checked={Boolean(hidden)} onChange={(e) => toggle.mutate(e.target.checked)} />
             Masquer pour moi les dossiers détaillés (je ne vois que les informations principales)
           </label>
-          {isLoading ? <LoadingState rows={3} /> : active.length === 0 ? <EmptyState title="Aucun chien" message="Aucun chien enregistré pour le moment." /> : (
+          {isLoading ? <LoadingState rows={3} /> : active.length === 0 ? <EmptyState art="resting" title="Aucun chien" message="Les chiens apparaîtront ici dès que leurs foyers les auront enregistrés." /> : (
             <div className="grid gap-3 lg:grid-cols-2">{active.map((d) => <DogCard key={d.id} d={d} />)}</div>
           )}
           {archived.length > 0 && (
@@ -143,12 +144,12 @@ function HouseholdsTab({ dogs }: { dogs: BDog[] }) {
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["bureau-households"] });
   if (isLoading || !data) return <LoadingState rows={3} />;
-  if (data.households.length === 0) return <EmptyState title="Aucun foyer" message="Aucun foyer créé pour le moment." />;
+  if (data.households.length === 0) return <EmptyState art="resting" title="Aucun foyer" message="Les foyers apparaîtront ici dès que les membres les auront créés." />;
   const dup = membersInSeveralHouseholds(data.members);
   const removeMember = async (id: string, name: string, household: string) => {
     if (!window.confirm(`Retirer ${name} du foyer « ${household} » ? Ses chiens et son compte ne sont pas modifiés.`)) return;
     const { error } = await supabase.from("household_members").delete().eq("id", id);
-    if (error) toast.error(error.message); else { toast.success("Membre retiré de ce foyer."); void refresh(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Membre retiré de ce foyer."); void refresh(); }
   };
   return (
     <div className="space-y-3">
@@ -182,7 +183,7 @@ function HouseholdCard({ h, members, people, dogs, nameOf, dup, onRemove, onRena
   const rename = async () => {
     if (name.trim().length < 2 || name.trim() === h.name) return;
     const { error } = await supabase.from("households").update({ name: name.trim() }).eq("id", h.id);
-    if (error) toast.error(error.message); else { toast.success("Foyer renommé."); onRenamed(); }
+    if (error) toast.error(humanizeError(error)); else { toast.success("Foyer renommé."); onRenamed(); }
   };
   return (
     <article className="panel space-y-3 p-4 text-sm">

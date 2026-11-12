@@ -47,6 +47,7 @@ import {
   defaultState,
   sortRoles,
 } from "@/lib/permission-defaults";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/permissions")({
   head: () => ({
@@ -126,7 +127,7 @@ function PermissionsPage() {
       }
     },
     onSuccess: refresh,
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const toggleScope = useMutation({
@@ -143,7 +144,7 @@ function PermissionsPage() {
       if (error) throw new Error(error.message);
     },
     onSuccess: refresh,
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const reset = useMutation({
@@ -197,7 +198,7 @@ function PermissionsPage() {
       setResetRole(null);
       refresh();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const linkMap = useMemo(

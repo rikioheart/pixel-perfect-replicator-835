@@ -20,6 +20,8 @@ import {
 import { NOTIFICATION_TYPES, notificationLabel } from "@/lib/notification-types";
 import { cn } from "@/lib/utils";
 import { LoadingState } from "@/components/LoadingState";
+import { humanizeError } from "@/lib/user-messages";
+import { EmptyState } from "@/components/EmptyState";
 
 
 export const Route = createFileRoute("/_authenticated/notifications")({
@@ -86,7 +88,7 @@ function NotificationsPage() {
       toast.success("Toutes les notifications sont lues.");
       invalidate();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const toggleRead = useMutation({
@@ -98,7 +100,7 @@ function NotificationsPage() {
       if (error) throw error;
     },
     onSuccess: invalidate,
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const remove = useMutation({
@@ -107,7 +109,7 @@ function NotificationsPage() {
       if (error) throw error;
     },
     onSuccess: invalidate,
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const unread = notifications.filter((n) => !n.is_read).length;
@@ -184,9 +186,21 @@ function NotificationsPage() {
       </div>
 
       {isLoading ? (
-        <LoadingState label="Chargement des informations…" rows={4} />
+        <LoadingState rows={4} />
       ) : filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucune notification pour ces critères.</p>
+        notifications.length === 0 ? (
+          <EmptyState
+            art="resting"
+            title="Tout est calme"
+            message="Aucune notification pour l'instant. Réponses, validations et rappels qui vous concernent arriveront ici."
+          />
+        ) : (
+          <EmptyState
+            art="attentive"
+            title="Rien pour ces filtres"
+            message="Aucune notification ne correspond à ces critères. Élargissez les filtres pour retrouver les autres."
+          />
+        )
       ) : (
         <div className="space-y-2">
           {filtered.map((notification) => (

@@ -226,7 +226,7 @@ function Photos({ projectId, canManage }: { projectId: string; canManage: boolea
   return (
     <div className="space-y-4 text-sm">
       {photos.length === 0 ? (
-        <p className="text-muted-foreground">Aucune photo partagée pour ce projet.</p>
+        <p className="text-muted-foreground">Aucune photo pour l'instant : un souvenir de terrain fera plaisir à toute l'équipe.</p>
       ) : (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {photos.map((p) => (
@@ -261,10 +261,16 @@ function Rex({ project, canManage, onPatch }: { project: Project; canManage: boo
     ["rex_advice", "Conseils pour la prochaine fois"],
   ] as const;
   if (!canManage && fields.every(([k]) => !project[k])) {
-    return <p className="text-sm text-muted-foreground">Le bilan sera partagé par l'équipe du projet.</p>;
+    return <p className="text-sm text-muted-foreground">Le retour d'expérience sera partagé ici par l'équipe du projet.</p>;
   }
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="space-y-3">
+      {canManage ? (
+        <p className="text-sm text-muted-foreground">
+          Quelques lignes suffisent pour garder la mémoire du projet, sans chercher de coupable. Chaque champ s'enregistre quand vous le quittez.
+        </p>
+      ) : null}
+      <div className="grid gap-3 sm:grid-cols-3">
       {fields.map(([k, l]) => (
         <div key={k}>
           <Label htmlFor={`rex-${k}`} className="text-xs">{l}</Label>
@@ -275,6 +281,7 @@ function Rex({ project, canManage, onPatch }: { project: Project; canManage: boo
           )}
         </div>
       ))}
+      </div>
     </div>
   );
 }

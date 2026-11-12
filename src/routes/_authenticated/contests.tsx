@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/contests")({
   head: () => ({
@@ -124,7 +126,7 @@ function ContestsPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["contests"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const contests = data ?? [];
@@ -142,10 +144,10 @@ function ContestsPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des concours…</p>
+        <InlineLoading label="Chargement des concours…" />
       ) : contests.length === 0 ? (
         <EmptyState
-          title="Aucun concours pour le moment"
+          art="playful" title="Aucun concours pour le moment"
           message="Les prochaines animations et concours de l'association s'afficheront ici."
         />
       ) : (

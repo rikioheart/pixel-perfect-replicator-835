@@ -44,6 +44,8 @@ import {
   type ProjectEditValues,
   type UndoableAction,
 } from "@/lib/mindmap-actions";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 
 export type PanelProject = {
@@ -157,7 +159,7 @@ export function ProjectDetailPanel({
       };
       const { error } = await supabase.from("projects").update(payload).eq("id", project.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(humanizeError(error));
         return;
       }
       await logAudit({
@@ -204,7 +206,7 @@ export function ProjectDetailPanel({
         .maybeSingle();
       const { error } = await supabase.from("projects").delete().eq("id", project.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(humanizeError(error));
         return;
       }
       await logAudit({
@@ -527,7 +529,7 @@ export function ProjectDetailPanel({
 
               <TabsContent value="history" className="mt-5 space-y-3">
                 {history.isLoading ? (
-                  <p className="text-sm text-muted-foreground">Chargement de l'historique…</p>
+                  <InlineLoading label="Chargement de l'historique…" />
                 ) : (history.data ?? []).length === 0 ? (
                   <p className="text-sm text-muted-foreground">
                     Aucune action enregistrée pour ce projet (ou historique réservé au Bureau).

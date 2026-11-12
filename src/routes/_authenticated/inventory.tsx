@@ -27,6 +27,8 @@ import {
   validateItemDraft,
   validateReservationDraft,
 } from "@/lib/inventory";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/inventory")({
   head: () => ({
@@ -55,7 +57,7 @@ const SELECT = "h-10 w-full rounded-md border border-input bg-background px-3 te
 const today = () => new Date().toISOString().slice(0, 10);
 const fmtDate = (d: string | null) => (d ? new Date(`${d}T12:00:00`).toLocaleDateString("fr-FR") : "sans fin");
 const errText = (e: Error) =>
-  e.message.includes("row-level") || e.message.includes("permission") ? "Action non autorisée pour votre profil." : e.message;
+  e.message.includes("row-level") || e.message.includes("permission") ? "Action non autorisée pour votre profil." : humanizeError(e);
 
 type Item = {
   id: string; name: string; category: string | null; quantity: number; alert_threshold: number; location: string | null;
@@ -375,7 +377,7 @@ function InventoryPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement de l'inventaire…</p>
+        <InlineLoading label="Chargement de l'inventaire…" />
       ) : filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground">{items.length === 0 ? "Aucune référence enregistrée." : "Aucune référence ne correspond à ce filtre."}</p>
       ) : (

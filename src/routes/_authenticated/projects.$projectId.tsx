@@ -60,6 +60,7 @@ import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
 import { ProjectEquipment } from "@/components/ProjectEquipment";
 import { ProjectCommunications } from "@/components/ProjectCommunications";
 import { ProjectFollowUp } from "@/components/ProjectFollowUp";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -163,7 +164,7 @@ function ProjectDetail() {
 
   if (!project) {
     return (
-      <AppShell title="Projet" subtitle="Chargement…">
+      <AppShell title="Projet" subtitle="Un instant, nous ouvrons le projet…">
         <p className="text-sm text-muted-foreground">Projet introuvable ou accès restreint.</p>
       </AppShell>
     );
@@ -529,7 +530,7 @@ function NewTaskDialog({
       created_by: userId,
     });
     if (error) {
-      toast.error(error.message);
+      toast.error(humanizeError(error));
       return;
     }
     toast.success("Tâche créée.");

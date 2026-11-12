@@ -44,6 +44,7 @@ import {
   needsBureauRole,
   reconnectHint,
 } from "@/lib/bureau-team";
+import { humanizeError } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/admin/roles")({
   head: () => ({
@@ -326,7 +327,7 @@ function RolesPage() {
       invalidate();
       setPending(null);
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   if (!isBureau) {
@@ -850,7 +851,7 @@ function MemberLevels({
   const save = async (patch: { access_level?: string; involvement_level?: string }) => {
     const { error } = await supabase.from("profiles").update(patch).eq("id", memberId);
     if (error) {
-      toast.error(error.message);
+      toast.error(humanizeError(error));
       return;
     }
     await logAudit({

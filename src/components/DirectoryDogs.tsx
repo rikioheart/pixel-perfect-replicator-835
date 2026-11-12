@@ -9,6 +9,7 @@ import { DOG_SOURCE_LABEL, dogSourcesFor, type DogSource } from "@/lib/directory
 import { EntityPeek } from "@/components/EntityPeek";
 import { EmptyState } from "@/components/EmptyState";
 import { Badge } from "@/components/ui/badge";
+import { InlineLoading } from "@/components/LoadingState";
 
 type Row = { id: string; name: string; breed: string | null; context: string | null; source: DogSource; archived: boolean };
 
@@ -110,9 +111,9 @@ export function DirectoryDogs({ search }: { search: string }) {
         </div>
       ) : null}
       {loading ? (
-        <p role="status" className="text-sm text-muted-foreground">Chargement des fiches…</p>
+        <InlineLoading label="Chargement des fiches…" />
       ) : shown.length === 0 ? (
-        <EmptyState title="Aucune fiche chien" message={rows.length === 0 ? "Aucun chien accessible pour votre profil." : "Aucun chien ne correspond à la recherche."} />
+        <EmptyState art="attentive" title="Aucune fiche chien" message={rows.length === 0 ? "Aucun chien accessible pour votre profil." : "Aucun chien ne correspond à la recherche."} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((d) => (

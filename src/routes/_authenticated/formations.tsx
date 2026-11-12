@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { humanizeError } from "@/lib/user-messages";
+import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/formations")({
   head: () => ({
@@ -128,7 +130,7 @@ function FormationsPage() {
       setForm(EMPTY);
       queryClient.invalidateQueries({ queryKey: ["formations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const toggle = useMutation({
@@ -149,7 +151,7 @@ function FormationsPage() {
       toast.success(registered ? "Inscription confirmée." : "Inscription annulée.");
       queryClient.invalidateQueries({ queryKey: ["formations"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => toast.error(humanizeError(error)),
   });
 
   const formations = data?.formations ?? [];
@@ -169,10 +171,10 @@ function FormationsPage() {
       }
     >
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement des sessions…</p>
+        <InlineLoading label="Chargement des sessions…" />
       ) : formations.length === 0 ? (
         <EmptyState
-          title="Aucune session programmée"
+          art="attentive" title="Aucune session programmée"
           message="Les prochaines formations et lives apparaîtront ici dès leur annonce."
         />
       ) : (
