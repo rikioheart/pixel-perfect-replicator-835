@@ -8,6 +8,7 @@ import { useCoordinatedProjects } from "@/hooks/useCoordinatedProjects";
 import { AppShell } from "@/components/AppShell";
 import { HomeHero } from "@/components/HomeHero";
 import { MyDogHome } from "@/components/MyDogHome";
+import { FirstStepsCard, useFirstSteps } from "@/components/FirstStepsCard";
 import { memberRoleLabel } from "@/lib/dog-timeline";
 import { NewsFeed } from "@/components/NewsFeed";
 import { UpdatesWall } from "@/components/UpdatesWall";
@@ -127,6 +128,8 @@ function MemberDashboard() {
   const dogNames = useHouseholdDogNames();
   const showProfileCard = profileCompletion(profile).percent < 100;
 
+  const particulier = isParticulierView({ isBureau, isPro });
+  const firstSteps = useFirstSteps(particulier);
   const roleLabel = memberRoleLabel({ isBureau, isPro });
   const welcome = isParticulierView({ isBureau, isPro })
     ? "Votre compagnon, votre pass et vos prochaines sorties."
@@ -142,7 +145,12 @@ function MemberDashboard() {
           message={welcome}
         />
 
-        {user ? <MyDogHome userId={user.id} hideWhenEmpty={!isParticulierView({ isBureau, isPro })} /> : null}
+        {firstSteps.state.visible ? (
+          <FirstStepsCard state={firstSteps.state} data={firstSteps.data} onDismiss={firstSteps.dismiss} />
+        ) : null}
+
+        {/* Le parcours d'accueil propose déjà de présenter le chien : pas de second encart vide. */}
+        {user ? <MyDogHome userId={user.id} hideWhenEmpty={!particulier || firstSteps.state.visible} /> : null}
 
         <CoordinatorInbox userId={user?.id} />
 

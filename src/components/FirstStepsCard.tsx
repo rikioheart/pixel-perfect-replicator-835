@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -208,7 +208,7 @@ export function FirstStepsCard({ state, data, onDismiss }: {
   );
 }
 
-function StepTitle({ done, number, icon, children }: { done: boolean; number: number; icon: React.ReactNode; children: React.ReactNode }) {
+function StepTitle({ done, number, icon, children }: { done: boolean; number: number; icon: ReactNode; children: ReactNode }) {
   return (
     <h3 className="flex items-center gap-2 text-sm font-semibold">
       <span
