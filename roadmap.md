@@ -4,7 +4,8 @@
 - [x] Compte association = Bureau de secours (actif, rôles Bureau + Fondateur, fonction Fondateur) ; reprend les 5 projets et 8 tâches de démo
 - [x] Marie Berrier : rôle et fonction Fondateur ajoutés
 - [x] Demande d'aide « pâtes » et réponse « oreille de porc » supprimées
-- [x] Comptes démo bureau@/membre@/pro@ désactivés et connexion bloquée (historique conservé)
+- [x] Comptes démo bureau@/membre@/pro@ supprimés entièrement avec tout ce qui leur était lié (projets/tâches repris par l'association conservés)
+- [ ] 11 fiches personnes de test (« Essai … », « Vérif Attente », tmp.prob@) restées d'anciens essais — attend l'accord de l'utilisateur pour suppression
 - [x] Compte rikioheart@gmail.com supprimé entièrement à la demande de son titulaire (plus de Président enregistré)
 - [x] Contrôle d'intégrité de la base ; 354 tests OK
 
