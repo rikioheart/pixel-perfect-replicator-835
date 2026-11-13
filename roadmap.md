@@ -2,11 +2,11 @@
 
 ## Préparation mise en ligne — comptes et données de test (13 nov.)
 - [x] Compte association = Bureau de secours (actif, rôles Bureau + Fondateur, fonction Fondateur) ; reprend les 5 projets et 8 tâches de démo
-- [x] rikioheart@gmail.com configuré (Président + Fondateur)
 - [x] Marie Berrier : rôle et fonction Fondateur ajoutés
 - [x] Demande d'aide « pâtes » et réponse « oreille de porc » supprimées
 - [x] Comptes démo bureau@/membre@/pro@ désactivés et connexion bloquée (historique conservé)
-- [ ] Supprimer entièrement le compte rikioheart@gmail.com (nouvelle demande) — attend confirmation, car elle annule la configuration Président faite juste avant
+- [x] Compte rikioheart@gmail.com supprimé entièrement à la demande de son titulaire (plus de Président enregistré)
+- [x] Contrôle d'intégrité de la base ; 354 tests OK
 
 ## Refonte UX/UI — Lots 1 à 5 (cadrage du 12 nov.)
 - [x] Lot 1 : crème, sable, or ; signatures Bordeaux / Bleu nuit au choix dans Mes préférences ; plus aucun rose ; contrastes vérifiés par test
