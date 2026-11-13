@@ -5,7 +5,11 @@
 - [x] Marie Berrier : rôle et fonction Fondateur ajoutés
 - [x] Demande d'aide « pâtes » et réponse « oreille de porc » supprimées
 - [x] Comptes démo bureau@/membre@/pro@ supprimés entièrement avec tout ce qui leur était lié (projets/tâches repris par l'association conservés)
-- [ ] 11 fiches personnes de test (« Essai … », « Vérif Attente », tmp.prob@) restées d'anciens essais — attend l'accord de l'utilisateur pour suppression
+- [ ] Supprimer les 11 fiches personnes de test orphelines (accord donné)
+
+## Ton et accueil — demande du 13 nov.
+- [ ] Harmoniser le ton des alertes : messages techniques → formulations bienveillantes et humaines
+- [ ] Parcours « Mon premier chien & sortie » pour le nouvel adhérent particulier
 - [x] Compte rikioheart@gmail.com supprimé entièrement à la demande de son titulaire (plus de Président enregistré)
 - [x] Contrôle d'intégrité de la base ; 354 tests OK
 
