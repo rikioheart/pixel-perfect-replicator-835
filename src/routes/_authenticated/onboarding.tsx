@@ -104,7 +104,7 @@ function OnboardingPage() {
     mutationFn: async () => {
       if (form.first_name.trim().length < 2) throw new Error("Le prénom est obligatoire.");
       if (form.phone && !/^[0-9+\s.-]{6,20}$/.test(form.phone))
-        throw new Error("Numéro de téléphone invalide.");
+        throw new Error("Ce numéro de téléphone ne semble pas complet. Pouvez-vous le vérifier ?");
       const { error } = await supabase
         .from("profiles")
         .update({

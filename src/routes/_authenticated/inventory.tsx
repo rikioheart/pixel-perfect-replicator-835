@@ -27,7 +27,7 @@ import {
   validateItemDraft,
   validateReservationDraft,
 } from "@/lib/inventory";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, NOT_ALLOWED } from "@/lib/user-messages";
 import { InlineLoading } from "@/components/LoadingState";
 
 export const Route = createFileRoute("/_authenticated/inventory")({
@@ -57,7 +57,7 @@ const SELECT = "h-10 w-full rounded-md border border-input bg-background px-3 te
 const today = () => new Date().toISOString().slice(0, 10);
 const fmtDate = (d: string | null) => (d ? new Date(`${d}T12:00:00`).toLocaleDateString("fr-FR") : "sans fin");
 const errText = (e: Error) =>
-  e.message.includes("row-level") || e.message.includes("permission") ? "Action non autorisée pour votre profil." : humanizeError(e);
+  e.message.includes("row-level") || e.message.includes("permission") ? NOT_ALLOWED : humanizeError(e);
 
 type Item = {
   id: string; name: string; category: string | null; quantity: number; alert_threshold: number; location: string | null;

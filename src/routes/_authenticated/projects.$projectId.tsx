@@ -190,7 +190,7 @@ function ProjectDetail() {
       return;
     }
     if (!data || data.length === 0) {
-      toast.error("Modification refusée : seuls le responsable du projet et le Bureau peuvent la faire.");
+      toast.error("Cette modification est réservée au responsable du projet et au Bureau.");
       return;
     }
     await queryClient.invalidateQueries({ queryKey: ["project", projectId] });
@@ -399,7 +399,7 @@ function ProjectDetail() {
                   <Label htmlFor="pj-email" className="text-xs">E-mail de contact (facultatif)</Label>
                   <Input id="pj-email" type="email" placeholder="ex. référent ou association" defaultValue={project.contact_email ?? ""} onBlur={(e) => {
                     const v = e.target.value.trim();
-                    if (v && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast.error("E-mail invalide"); return; }
+                    if (v && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { toast.error("Cette adresse e-mail ne semble pas complète. Pouvez-vous la vérifier ?"); return; }
                     if (v !== (project.contact_email ?? "")) updateProject({ contact_email: v || null });
                   }} />
                 </div>

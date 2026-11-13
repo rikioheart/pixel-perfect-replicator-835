@@ -23,7 +23,7 @@ import {
   PROJECT_STATUS_LABEL,
   slugify,
 } from "@/lib/domain";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 
 export type ProjectPanelValue = {
   id?: string;
@@ -162,7 +162,7 @@ export function ProjectPanel({
       onSaved?.();
       onOpenChange(false);
     } catch (error) {
-      toast.error(humanizeError(error, "Enregistrement impossible."));
+      toast.error(humanizeError(error, couldNot("enregistrer vos changements")));
     } finally {
       setSaving(false);
     }

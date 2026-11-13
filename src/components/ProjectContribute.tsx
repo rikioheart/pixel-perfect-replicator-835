@@ -74,7 +74,7 @@ export function ProjectContribute({ projectId, canModerate = false }: { projectI
       return;
     }
     if (!data || data.length === 0) {
-      toast.error("Action refusée : réservée au coordinateur du projet et au Bureau.");
+      toast.error("Cette action est réservée au coordinateur du projet et au Bureau.");
       return;
     }
     toast.success(

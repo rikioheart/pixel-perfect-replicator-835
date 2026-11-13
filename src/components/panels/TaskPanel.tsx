@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { PRIORITIES, PRIORITY_LABEL, TASK_STATUSES, TASK_STATUS_LABEL } from "@/lib/domain";
 import { editableStatuses, emptyToNull, explainDbError, NO_ROW_UPDATED } from "@/lib/task-lifecycle";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 
 export type TaskPanelValue = {
   id?: string;
@@ -117,7 +117,7 @@ export function TaskPanel({
       onSaved?.();
       onOpenChange(false);
     } catch (error) {
-      toast.error(humanizeError(error, "Enregistrement impossible."));
+      toast.error(humanizeError(error, couldNot("enregistrer vos changements")));
     } finally {
       setSaving(false);
     }

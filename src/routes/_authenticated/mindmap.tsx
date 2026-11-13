@@ -71,7 +71,7 @@ import {
   TASK_STATUSES,
   TASK_STATUS_LABEL,
 } from "@/lib/domain";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/mindmap")({
   head: () => ({
@@ -382,7 +382,7 @@ function MindmapPage() {
         userId: user?.id ?? null,
       });
       if (!result.ok) {
-        toast.error(result.error ?? "Enregistrement impossible.");
+        toast.error(result.error ?? couldNot("enregistrer la disposition"));
         return;
       }
       setLayoutDirty(false);
@@ -396,7 +396,7 @@ function MindmapPage() {
   const handleResetLayout = async () => {
     const result = await resetMindmapLayout(layout?.id ?? null);
     if (!result.ok) {
-      toast.error(result.error ?? "Réinitialisation impossible.");
+      toast.error(result.error ?? couldNot("revenir à la disposition d'origine"));
       return;
     }
     toast.success("Disposition automatique rétablie.");
@@ -538,7 +538,7 @@ function MindmapPage() {
     try {
       const result = await undoAction(lastAction, user?.id ?? null);
       if (!result.ok) {
-        toast.error(result.error ?? "Annulation impossible.");
+        toast.error(result.error ?? couldNot("annuler la dernière modification"));
         return;
       }
       setUndoStack((stack) => stack.slice(0, -1));
