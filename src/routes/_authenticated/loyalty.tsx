@@ -24,7 +24,7 @@ import { useOnline, readOfflinePass, type OfflinePass } from '@/lib/offline';
 import { PassAccessPanel, PASS_ACCESS_KEY, fetchPassAccess } from "@/components/PassAccessPanel";
 import { ManualStampCard } from "@/components/ManualStampCard";
 import { hasPersonalPass, showsActivationScreen, validatorSource } from "@/lib/pass-access";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 import { EmptyState } from "@/components/EmptyState";
 
 import { StampCelebration, useNewStampCelebration } from "@/components/StampCelebration";
@@ -147,7 +147,7 @@ function LoyaltyPage() {
           : "Recalcul terminé : votre carte était déjà à jour.",
       );
     } catch (error) {
-      toast.error(humanizeError(error, "Recalcul impossible."));
+      toast.error(humanizeError(error, couldNot("recalculer les tampons")));
     } finally {
       setRecomputing(false);
     }

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate, PRIORITY_LABEL } from "@/lib/domain";
 import { VALIDATION_COMMENT_MIN, decideTaskValidation } from "@/lib/validation-actions";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 
 
 export const Route = createFileRoute("/_authenticated/admin/validation")({
@@ -66,7 +66,7 @@ function ValidationPage() {
       toast.success(approve ? "Tâche validée." : "Tâche renvoyée au membre.");
       await queryClient.invalidateQueries();
     } catch (error) {
-      toast.error(humanizeError(error, "Décision impossible."));
+      toast.error(humanizeError(error, couldNot("enregistrer cette décision")));
     }
   };
 

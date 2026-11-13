@@ -44,7 +44,7 @@ export function DecisionToCommunication({ record }: { record: Rec }) {
       void qc.invalidateQueries({ queryKey: ["decision-comms", record.id] });
       void qc.invalidateQueries({ queryKey: ["bureau-communications"] });
     },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Réservé au Bureau." : humanizeError(e)),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Cette action est réservée au Bureau." : humanizeError(e)),
   });
 
   if (!record.decisions?.trim()) return null;

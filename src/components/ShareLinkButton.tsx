@@ -106,7 +106,7 @@ export function ShareLinkButton({
       toast.success("Lien désactivé.");
       void queryClient.invalidateQueries({ queryKey });
     },
-    onError: () => toast.error("Désactivation impossible : ce lien ne vous appartient pas."),
+    onError: () => toast.error("Seule la personne qui a créé ce lien peut le désactiver."),
   });
 
   return (

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { couldNot } from "@/lib/user-messages";
 
 type Kind = "project" | "activity" | "event";
 
@@ -36,7 +37,7 @@ export function LinkedMairies({ type, id }: { type: Kind; id: string }) {
       if (error) throw error;
     },
     onSuccess: () => { setPick(""); qc.invalidateQueries({ queryKey: key }); toast.success("Établissement identifié"); },
-    onError: () => toast.error("Ajout impossible"),
+    onError: () => toast.error(couldNot("ajouter cette mairie")),
   });
   const remove = useMutation({
     mutationFn: async (linkId: string) => {

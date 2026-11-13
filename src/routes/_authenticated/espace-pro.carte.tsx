@@ -16,7 +16,7 @@ import { Progress } from "@/components/ui/progress";
 import { LoadingState } from "@/components/LoadingState";
 import { ProQrCard } from "@/components/ProQrCard";
 import { PRO_STATUS_LABEL, completion, slugify } from "@/lib/pro-card";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 
 export const Route = createFileRoute("/_authenticated/espace-pro/carte")({
   head: () => ({
@@ -199,7 +199,7 @@ function ProCardPage() {
                     .update({ public_listing: e.target.checked })
                     .eq("id", card.id);
                   if (error) {
-                    toast.error("Impossible d'enregistrer ce choix.");
+                    toast.error(couldNot("enregistrer ce choix"));
                     return;
                   }
                   toast.success(e.target.checked ? "Vous apparaissez sur la page publique." : "Vous n'apparaissez plus sur la page publique.");

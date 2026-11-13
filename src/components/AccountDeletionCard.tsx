@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 
 export function AccountDeletionCard() {
   const { signOut } = useAuth();
@@ -49,7 +49,7 @@ export function AccountDeletionCard() {
         await signOut();
       }
     } catch (e) {
-      toast.error(humanizeError(e, "Suppression impossible."));
+      toast.error(humanizeError(e, couldNot("traiter votre demande de suppression")));
     } finally {
       setBusy(false);
     }

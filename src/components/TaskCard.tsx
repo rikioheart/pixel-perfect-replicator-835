@@ -14,7 +14,7 @@ import { decideTaskValidation, VALIDATION_COMMENT_MIN } from "@/lib/validation-a
 import { Comments } from "@/components/Comments";
 import { ExternalLinks } from "@/components/ExternalLinks";
 import { canAddTaskRex, REX_FIELDS, type RexField } from "@/lib/role-home";
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 
 export type TaskRow = {
   id: string;
@@ -148,7 +148,7 @@ export function TaskCard({
       setDecisionComment("");
       onChanged();
     } catch (error) {
-      toast.error(humanizeError(error, "Décision impossible."));
+      toast.error(humanizeError(error, couldNot("enregistrer cette décision")));
     } finally {
       setBusy(false);
     }

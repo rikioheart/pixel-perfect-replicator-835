@@ -1,4 +1,4 @@
-import { humanizeError } from "@/lib/user-messages";
+import { humanizeError, couldNot } from "@/lib/user-messages";
 /**
  * Cycle de vie des tâches (Lot 3). Miroir lisible de la règle de la base
  * (task_validator / guard_task_lifecycle) : l'interface n'est qu'un confort,
@@ -44,20 +44,20 @@ export function openTasksBeforeClosure<T extends { status: string }>(tasks: T[])
 
 /** Rend lisible une erreur de la base, sans jamais la transformer en faux succès. */
 export function explainDbError(error: { message?: string; code?: string } | null | undefined): string {
-  if (!error) return "Enregistrement impossible.";
+  if (!error) return couldNot("enregistrer vos changements");
   const msg = error.message ?? "";
   if (error.code === "42501" || /row-level security|permission denied/i.test(msg)) {
-    return "Vous n'avez pas le droit de faire cette modification.";
+    return "Cette modification est réservée à d'autres responsables. Le Bureau ou le coordinateur du projet peut vous aider.";
   }
   if (error.code === "22007" || error.code === "22008" || /invalid input syntax for type date/i.test(msg)) {
     return "La date saisie n'est pas valide.";
   }
-  return humanizeError(error, "Enregistrement impossible.");
+  return humanizeError(error, couldNot("enregistrer vos changements"));
 }
 
 /** Une mise à jour filtrée par les droits qui ne touche aucune ligne est un refus, pas un succès. */
 export const NO_ROW_UPDATED =
-  "Modification refusée : vous n'avez pas les droits sur cette tâche, ou elle a été supprimée.";
+  "Ce changement n'a pas pu être pris en compte : la tâche a peut-être été retirée, ou elle relève d'autres responsables.";
 
 /** Chaîne vide → null pour les champs facultatifs (dates, affectation). */
 export function emptyToNull(value: string | null | undefined): string | null {

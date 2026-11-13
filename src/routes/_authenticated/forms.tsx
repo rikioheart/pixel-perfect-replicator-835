@@ -111,7 +111,7 @@ function FormsPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Formulaire créé (brouillon)."); setF(EMPTY); setQs(START); void qc.invalidateQueries({ queryKey: ["forms"] }); },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous n'avez pas le droit de créer ce formulaire." : humanizeError(e)),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "La création de formulaires est réservée au Bureau et aux professionnels validés." : humanizeError(e)),
   });
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {

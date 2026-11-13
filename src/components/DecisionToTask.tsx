@@ -74,7 +74,7 @@ export function DecisionToTask({ record }: { record: Record }) {
       void qc.invalidateQueries({ queryKey: ["decision-tasks", record.id] });
       void qc.invalidateQueries({ queryKey: ["tasks"] });
     },
-    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Vous n'avez pas le droit de créer cette tâche." : humanizeError(e)),
+    onError: (e: Error) => toast.error(e.message.includes("row-level") ? "Créer cette tâche est réservé aux responsables du projet et au Bureau." : humanizeError(e)),
   });
 
   if (!record.decisions?.trim()) return null;

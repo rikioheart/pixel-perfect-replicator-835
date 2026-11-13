@@ -12,7 +12,7 @@ export function PlaceInfo({ location, address }: { location?: string | null; add
       await navigator.clipboard.writeText(target);
       toast.success("Adresse copiée");
     } catch {
-      toast.error("Copie impossible sur cet appareil");
+      toast.error("La copie n'a pas fonctionné sur cet appareil : vous pouvez sélectionner le texte à la main.");
     }
   };
   return (
