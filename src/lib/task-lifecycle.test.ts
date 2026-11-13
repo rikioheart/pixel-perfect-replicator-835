@@ -67,7 +67,7 @@ describe("sauvegarde", () => {
   it("une date saisie est conservée", () => expect(emptyToNull("2026-11-02")).toBe("2026-11-02"));
   it("un refus de droits est expliqué clairement", () => {
     expect(explainDbError({ code: "42501", message: "new row violates row-level security policy" })).toBe(
-      "Vous n'avez pas le droit de faire cette modification.",
+      "Cette modification est réservée à d'autres responsables. Le Bureau ou le coordinateur du projet peut vous aider.",
     );
   });
   it("le message métier de la base est conservé", () => {
