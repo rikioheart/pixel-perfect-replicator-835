@@ -20,8 +20,12 @@ export type FirstStepsState = {
   total: number;
 };
 
-/** Statuts d'inscription qui comptent comme « première sortie » (une annulation ne compte pas). */
-export const COUNTED_OUTING_STATUSES = ["PENDING", "REGISTERED", "CONFIRMED", "WAITLIST", "ATTENDED"] as const;
+/** Une inscription annulée ou refusée ne compte pas comme « première sortie ». */
+const NOT_COUNTED = new Set(["ANNULE", "CANCELLED", "REFUSE", "REFUSED"]);
+
+export function countOutings(statuses: Array<string | null | undefined>): number {
+  return statuses.filter((s) => !NOT_COUNTED.has(String(s ?? "").toUpperCase())).length;
+}
 
 export function firstStepsState(input: FirstStepsInput): FirstStepsState {
   const dogDone = input.dogCount > 0;

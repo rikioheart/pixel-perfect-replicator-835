@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultHouseholdName, firstStepsState } from "./first-steps";
+import { countOutings, defaultHouseholdName, firstStepsState } from "./first-steps";
 
 const base = { isParticulier: true, membershipStatus: "ACTIVE", dogCount: 0, outingCount: 0, dismissed: false };
 
@@ -31,5 +31,10 @@ describe("parcours « Mon premier chien & sortie »", () => {
   it("propose un nom de foyer à partir du prénom", () => {
     expect(defaultHouseholdName("Marie")).toBe("Foyer de Marie");
     expect(defaultHouseholdName("  ")).toBe("Mon foyer");
+  });
+
+  it("une inscription annulée ou refusée ne compte pas comme première sortie", () => {
+    expect(countOutings(["CANCELLED", "ANNULE", "REFUSE"])).toBe(0);
+    expect(countOutings(["PENDING", "CANCELLED"])).toBe(1);
   });
 });
