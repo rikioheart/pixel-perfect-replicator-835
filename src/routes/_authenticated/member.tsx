@@ -9,6 +9,7 @@ import { AppShell } from "@/components/AppShell";
 import { HomeHero } from "@/components/HomeHero";
 import { MyDogHome } from "@/components/MyDogHome";
 import { FirstStepsCard, useFirstSteps } from "@/components/FirstStepsCard";
+import { FirstStepsDemo } from "@/components/FirstStepsDemo";
 import { memberRoleLabel } from "@/lib/dog-timeline";
 import { NewsFeed } from "@/components/NewsFeed";
 import { UpdatesWall } from "@/components/UpdatesWall";
@@ -147,6 +148,15 @@ function MemberDashboard() {
 
         {firstSteps.state.visible ? (
           <FirstStepsCard state={firstSteps.state} data={firstSteps.data} onDismiss={firstSteps.dismiss} />
+        ) : null}
+
+        {isBureau ? (
+          <div className="panel flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
+            <p className="text-muted-foreground">
+              Voir l'accueil d'un nouvel adhérent particulier, avec un compte d'essai fictif et sans rien enregistrer.
+            </p>
+            <FirstStepsDemo />
+          </div>
         ) : null}
 
         {/* Le parcours d'accueil propose déjà de présenter le chien : pas de second encart vide. */}
