@@ -45,10 +45,3 @@ export function defaultHouseholdName(firstName: string | null | undefined): stri
   const name = (firstName ?? "").replace(/\s+/g, " ").trim();
   return name.length >= 1 ? `Foyer de ${name}`.slice(0, 60) : "Mon foyer";
 }
-
-export type DogDraft = { name: string; breed: string; birth_date: string };
-
-/** Message bienveillant si le nom du compagnon est trop court, sinon null. */
-export function dogNameProblem(name: string): string | null {
-  return name.trim().length < 2 ? "Indiquez le nom de votre compagnon (2 lettres au moins)." : null;
-}
