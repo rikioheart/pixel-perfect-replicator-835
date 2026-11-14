@@ -1,6 +1,6 @@
 /**
- * Parcours « Mon premier chien & sortie » du nouvel adhérent particulier.
- * Les étapes se déduisent uniquement des données réelles (chien enregistré, inscription à une sortie) :
+ * Parcours « Mon premier chien » du nouvel adhérent particulier.
+ * L'étape se déduit uniquement des données réelles (chien enregistré) :
  * rien n'est stocké en plus, sauf le choix « Plus tard » mémorisé sur l'appareil.
  */
 
@@ -8,32 +8,22 @@ export type FirstStepsInput = {
   isParticulier: boolean;
   membershipStatus: string | null | undefined;
   dogCount: number;
-  outingCount: number;
   dismissed: boolean;
 };
 
 export type FirstStepsState = {
   visible: boolean;
   dogDone: boolean;
-  outingDone: boolean;
   doneCount: number;
   total: number;
 };
 
-/** Une inscription annulée ou refusée ne compte pas comme « première sortie ». */
-const NOT_COUNTED = new Set(["ANNULE", "CANCELLED", "REFUSE", "REFUSED"]);
-
-export function countOutings(statuses: Array<string | null | undefined>): number {
-  return statuses.filter((s) => !NOT_COUNTED.has(String(s ?? "").toUpperCase())).length;
-}
-
 export function firstStepsState(input: FirstStepsInput): FirstStepsState {
   const dogDone = input.dogCount > 0;
-  const outingDone = input.outingCount > 0;
-  const doneCount = Number(dogDone) + Number(outingDone);
+  const doneCount = Number(dogDone);
   const visible =
-    input.isParticulier && input.membershipStatus === "ACTIVE" && !input.dismissed && doneCount < 2;
-  return { visible, dogDone, outingDone, doneCount, total: 2 };
+    input.isParticulier && input.membershipStatus === "ACTIVE" && !input.dismissed && doneCount < 1;
+  return { visible, dogDone, doneCount, total: 1 };
 }
 
 export function firstStepsStorageKey(userId: string): string {

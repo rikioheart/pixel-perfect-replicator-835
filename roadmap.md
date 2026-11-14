@@ -9,7 +9,7 @@
 
 ## Ton et accueil — demande du 13 nov.
 - [x] Ton des alertes harmonisé (traductions d'erreurs, « … impossible » remplacés, refus de droits orientés vers le Bureau)
-- [x] Parcours « Mon premier chien & sortie » sur l'accueil du particulier actif (tests des règles OK)
+- [x] Parcours « Mon premier chien » sur l'accueil du particulier actif (tests des règles OK)
 - [ ] Essai réel du parcours avec un compte particulier actif sans chien (aucun compte d'essai disponible dans la base réelle)
 - [x] Compte rikioheart@gmail.com supprimé entièrement à la demande de son titulaire (plus de Président enregistré)
 - [x] Contrôle d'intégrité de la base ; 354 tests OK
