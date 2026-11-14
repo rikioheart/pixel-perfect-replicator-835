@@ -226,7 +226,7 @@ export function FirstStepsView({
               <p className="text-muted-foreground">
                 {dogName ? `Une belle occasion de rencontrer d'autres binômes avec ${dogName} :` : "Une belle occasion de faire connaissance :"}
               </p>
-              <div className="rounded-md bg-secondary/60 p-3">
+              <div className="rounded-md bg-muted p-3">
                 <p className="font-medium">{next.title}</p>
                 <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   <span>{formatDate(next.date)}</span>
