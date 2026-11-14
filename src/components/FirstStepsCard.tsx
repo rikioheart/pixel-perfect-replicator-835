@@ -1,21 +1,17 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CalendarDays, Check, Dog, MapPin } from "lucide-react";
+import { Check, Dog } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyHouseholds } from "@/lib/households";
-import { formatDate } from "@/lib/domain";
-import { countOutings, defaultHouseholdName, firstStepsState, firstStepsStorageKey, type FirstStepsState } from "@/lib/first-steps";
+import { defaultHouseholdName, firstStepsState, firstStepsStorageKey, type FirstStepsState } from "@/lib/first-steps";
 import { couldNot, humanizeError } from "@/lib/user-messages";
 import { DogEmptyArt } from "@/components/DogEmptyArt";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-
-type NextActivity = { id: string; title: string; date: string | null; location: string | null };
 
 /** Données réelles du parcours, lues avec les droits de la personne connectée. */
 export function useFirstSteps(isParticulier: boolean) {
@@ -31,18 +27,8 @@ export function useFirstSteps(isParticulier: boolean) {
     queryKey: ["first-steps", user?.id],
     enabled,
     queryFn: async () => {
-      const nowIso = new Date().toISOString();
-      const [dogs, parts, next] = await Promise.all([
-        supabase.from("dogs").select("id, name").eq("owner_id", user!.id).is("archived_at", null).order("created_at"),
-        supabase.from("participations").select("registration_status").eq("user_id", user!.id),
-        supabase.from("activities").select("id, title, date, location").gte("date", nowIso)
-          .not("status", "in", "(DRAFT,CANCELLED)").order("date", { ascending: true }).limit(1),
-      ]);
-      return {
-        dogs: dogs.data ?? [],
-        outingCount: countOutings((parts.data ?? []).map((p) => p.registration_status)),
-        next: ((next.data ?? [])[0] ?? null) as NextActivity | null,
-      };
+      const dogs = await supabase.from("dogs").select("id, name").eq("owner_id", user!.id).is("archived_at", null).order("created_at");
+      return { dogs: dogs.data ?? [] };
     },
   });
 
@@ -50,7 +36,6 @@ export function useFirstSteps(isParticulier: boolean) {
     isParticulier,
     membershipStatus: profile?.membership_status,
     dogCount: data?.dogs.length ?? 0,
-    outingCount: data?.outingCount ?? 0,
     dismissed,
   });
   const dismiss = () => {
@@ -61,12 +46,12 @@ export function useFirstSteps(isParticulier: boolean) {
 }
 
 /**
- * « Mon premier chien & sortie » : deux petits pas pour le nouvel adhérent particulier,
- * présenter son compagnon puis découvrir sa première sortie. Aucune étape n'est obligatoire.
+ * « Mon premier chien » : un petit pas pour le nouvel adhérent particulier,
+ * présenter son compagnon. Rien n'est obligatoire.
  */
 export function FirstStepsCard({ state, data, onDismiss }: {
   state: FirstStepsState;
-  data: { dogs: { id: string; name: string }[]; next: NextActivity | null } | undefined;
+  data: { dogs: { id: string; name: string }[] } | undefined;
   onDismiss: () => void;
 }) {
   const { user, profile } = useAuth();
@@ -114,7 +99,7 @@ export function FirstStepsCard({ state, data, onDismiss }: {
             {firstName ? `Bienvenue parmi nous, ${firstName} !` : "Bienvenue parmi nous !"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Deux petits pas pour bien commencer, à votre rythme. Rien n'est obligatoire.
+            Un petit pas pour bien commencer, à votre rythme. Rien n'est obligatoire.
           </p>
           <div className="mt-3 flex items-center gap-3">
             <Progress value={percent} className="max-w-48" aria-label={`Premiers pas : ${state.doneCount} sur ${state.total}`} />
@@ -123,7 +108,7 @@ export function FirstStepsCard({ state, data, onDismiss }: {
         </div>
       </div>
 
-      <ol className="grid gap-3 p-5 pt-2 md:grid-cols-2">
+      <ol className="grid gap-3 p-5 pt-2">
         <li className="rounded-lg border border-border bg-card p-4">
           <StepTitle done={state.dogDone} number={1} icon={<Dog className="size-4" aria-hidden />}>
             Présenter mon compagnon
@@ -161,42 +146,6 @@ export function FirstStepsCard({ state, data, onDismiss }: {
                 {addDog.isPending ? "Enregistrement…" : "Présenter mon chien"}
               </Button>
             </form>
-          )}
-        </li>
-
-        <li className="rounded-lg border border-border bg-card p-4">
-          <StepTitle done={state.outingDone} number={2} icon={<CalendarDays className="size-4" aria-hidden />}>
-            Ma première sortie
-          </StepTitle>
-          {state.outingDone ? (
-            <p className="mt-2 text-sm text-muted-foreground">
-              Votre première inscription est enregistrée. Le Bureau vous confirmera votre place.
-            </p>
-          ) : data?.next ? (
-            <div className="mt-3 space-y-3 text-sm">
-              <p className="text-muted-foreground">
-                {dogName ? `Une belle occasion de rencontrer d'autres binômes avec ${dogName} :` : "Une belle occasion de faire connaissance :"}
-              </p>
-              <div className="rounded-md bg-secondary/60 p-3">
-                <p className="font-medium">{data.next.title}</p>
-                <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span>{formatDate(data.next.date)}</span>
-                  <span className="inline-flex items-center gap-1"><MapPin className="size-3" aria-hidden />{data.next.location ?? "Lieu précisé bientôt"}</span>
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm">
-                  <Link to="/activities/$activityId" params={{ activityId: data.next.id }}>Découvrir et m'inscrire</Link>
-                </Button>
-                <Button asChild size="sm" variant="ghost">
-                  <Link to="/activities">Voir toutes les sorties</Link>
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              Aucune sortie n'est ouverte pour l'instant. Elles apparaîtront ici dès leur ouverture, nous avons hâte de vous y retrouver.
-            </p>
           )}
         </li>
       </ol>
