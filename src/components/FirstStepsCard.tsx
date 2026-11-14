@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyHouseholds } from "@/lib/households";
 import { formatDate } from "@/lib/domain";
-import { countOutings, defaultHouseholdName, firstStepsState, firstStepsStorageKey, type FirstStepsState } from "@/lib/first-steps";
+import { countOutings, defaultHouseholdName, dogNameProblem, firstStepsState, firstStepsStorageKey, type DogDraft, type FirstStepsState } from "@/lib/first-steps";
 import { couldNot, humanizeError } from "@/lib/user-messages";
 import { DogEmptyArt } from "@/components/DogEmptyArt";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 
-type NextActivity = { id: string; title: string; date: string | null; location: string | null };
+export type NextActivity = { id: string; title: string; date: string | null; location: string | null };
 
 /** Données réelles du parcours, lues avec les droits de la personne connectée. */
 export function useFirstSteps(isParticulier: boolean) {
@@ -63,6 +63,7 @@ export function useFirstSteps(isParticulier: boolean) {
 /**
  * « Mon premier chien & sortie » : deux petits pas pour le nouvel adhérent particulier,
  * présenter son compagnon puis découvrir sa première sortie. Aucune étape n'est obligatoire.
+ * Version réelle : écrit dans la base avec les droits de la personne connectée.
  */
 export function FirstStepsCard({ state, data, onDismiss }: {
   state: FirstStepsState;
@@ -72,16 +73,13 @@ export function FirstStepsCard({ state, data, onDismiss }: {
   const { user, profile } = useAuth();
   const qc = useQueryClient();
   const { data: households = [] } = useMyHouseholds(user?.id);
-  const [dog, setDog] = useState({ name: "", breed: "", birth_date: "" });
-  const firstName = profile?.first_name ?? profile?.display_name ?? "";
   const household = households[0] ?? null;
-  const dogName = data?.dogs[0]?.name ?? "";
-  const percent = Math.round((state.doneCount / state.total) * 100);
 
   const addDog = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (dog: DogDraft) => {
+      const problem = dogNameProblem(dog.name);
+      if (problem) throw new Error(problem);
       const name = dog.name.trim();
-      if (name.length < 2) throw new Error("Indiquez le nom de votre compagnon (2 lettres au moins).");
       let householdId = household?.id ?? null;
       if (!householdId) {
         const { data: created, error } = await supabase.from("households")
@@ -98,12 +96,63 @@ export function FirstStepsCard({ state, data, onDismiss }: {
     },
     onSuccess: async (name) => {
       toast.success(`Bienvenue à ${name} ! Sa fiche est prête.`);
-      setDog({ name: "", breed: "", birth_date: "" });
       await Promise.all(["first-steps", "my-dogs", "my-dog-home", "my-households", "orphan-dogs", "home-dog-names"]
         .map((key) => qc.invalidateQueries({ queryKey: [key] })));
     },
     onError: (e: Error) => toast.error(humanizeError(e, couldNot("enregistrer votre compagnon"))),
   });
+
+  const next = data?.next ?? null;
+  return (
+    <FirstStepsView
+      state={state}
+      firstName={profile?.first_name ?? profile?.display_name ?? ""}
+      dogName={data?.dogs[0]?.name ?? ""}
+      hasHousehold={Boolean(household)}
+      next={next}
+      addingDog={addDog.isPending}
+      onAddDog={(dog) => addDog.mutateAsync(dog).then(() => true, () => false)}
+      outingActions={next ? (
+        <>
+          <Button asChild size="sm">
+            <Link to="/activities/$activityId" params={{ activityId: next.id }}>Découvrir et m'inscrire</Link>
+          </Button>
+          <Button asChild size="sm" variant="ghost">
+            <Link to="/activities">Voir toutes les sorties</Link>
+          </Button>
+        </>
+      ) : null}
+      onDismiss={onDismiss}
+    />
+  );
+}
+
+/**
+ * Affichage commun du parcours, partagé par la version réelle et la démonstration
+ * pour que le Bureau voie exactement ce que verra un nouvel adhérent.
+ */
+export function FirstStepsView({
+  state, firstName, dogName, hasHousehold, next, addingDog, onAddDog, outingActions, onDismiss,
+  dismissLabel = "Je regarderai plus tard", outingDoneText = "Votre première inscription est enregistrée. Le Bureau vous confirmera votre place.",
+}: {
+  state: FirstStepsState;
+  firstName: string;
+  dogName: string;
+  hasHousehold: boolean;
+  next: NextActivity | null;
+  addingDog: boolean;
+  /** Renvoie true quand le chien est enregistré, pour vider le formulaire. */
+  onAddDog: (dog: DogDraft) => Promise<boolean>;
+  outingActions: ReactNode;
+  onDismiss: () => void;
+  dismissLabel?: string;
+  outingDoneText?: string;
+}) {
+  const [dog, setDog] = useState<DogDraft>({ name: "", breed: "", birth_date: "" });
+  const percent = Math.round((state.doneCount / state.total) * 100);
+  const submit = async () => {
+    if (await onAddDog(dog)) setDog({ name: "", breed: "", birth_date: "" });
+  };
 
   return (
     <section className="panel overflow-hidden" aria-labelledby="first-steps-title">
@@ -134,7 +183,7 @@ export function FirstStepsCard({ state, data, onDismiss }: {
               Vous retrouverez sa fiche juste en dessous.
             </p>
           ) : (
-            <form className="mt-3 space-y-3" onSubmit={(e) => { e.preventDefault(); addDog.mutate(); }}>
+            <form className="mt-3 space-y-3" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
               <div>
                 <Label htmlFor="fs-dog-name">Son nom</Label>
                 <Input id="fs-dog-name" value={dog.name} autoComplete="off" required minLength={2}
@@ -152,13 +201,13 @@ export function FirstStepsCard({ state, data, onDismiss }: {
                     onChange={(e) => setDog({ ...dog, birth_date: e.target.value })} />
                 </div>
               </div>
-              {!household ? (
+              {!hasHousehold ? (
                 <p className="text-xs text-muted-foreground">
                   Nous créons aussi votre foyer, pour pouvoir l'inscrire aux sorties. Vous pourrez le compléter dans « Mon foyer ».
                 </p>
               ) : null}
-              <Button type="submit" size="sm" disabled={addDog.isPending}>
-                {addDog.isPending ? "Enregistrement…" : "Présenter mon chien"}
+              <Button type="submit" size="sm" disabled={addingDog}>
+                {addingDog ? "Enregistrement…" : "Présenter mon chien"}
               </Button>
             </form>
           )}
@@ -170,28 +219,21 @@ export function FirstStepsCard({ state, data, onDismiss }: {
           </StepTitle>
           {state.outingDone ? (
             <p className="mt-2 text-sm text-muted-foreground">
-              Votre première inscription est enregistrée. Le Bureau vous confirmera votre place.
+              {outingDoneText}
             </p>
-          ) : data?.next ? (
+          ) : next ? (
             <div className="mt-3 space-y-3 text-sm">
               <p className="text-muted-foreground">
                 {dogName ? `Une belle occasion de rencontrer d'autres binômes avec ${dogName} :` : "Une belle occasion de faire connaissance :"}
               </p>
               <div className="rounded-md bg-secondary/60 p-3">
-                <p className="font-medium">{data.next.title}</p>
+                <p className="font-medium">{next.title}</p>
                 <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span>{formatDate(data.next.date)}</span>
-                  <span className="inline-flex items-center gap-1"><MapPin className="size-3" aria-hidden />{data.next.location ?? "Lieu précisé bientôt"}</span>
+                  <span>{formatDate(next.date)}</span>
+                  <span className="inline-flex items-center gap-1"><MapPin className="size-3" aria-hidden />{next.location ?? "Lieu précisé bientôt"}</span>
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm">
-                  <Link to="/activities/$activityId" params={{ activityId: data.next.id }}>Découvrir et m'inscrire</Link>
-                </Button>
-                <Button asChild size="sm" variant="ghost">
-                  <Link to="/activities">Voir toutes les sorties</Link>
-                </Button>
-              </div>
+              <div className="flex flex-wrap gap-2">{outingActions}</div>
             </div>
           ) : (
             <p className="mt-2 text-sm text-muted-foreground">
@@ -202,7 +244,7 @@ export function FirstStepsCard({ state, data, onDismiss }: {
       </ol>
 
       <div className="flex justify-end px-5 pb-4">
-        <Button variant="ghost" size="sm" onClick={onDismiss}>Je regarderai plus tard</Button>
+        <Button variant="ghost" size="sm" onClick={onDismiss}>{dismissLabel}</Button>
       </div>
     </section>
   );
