@@ -14,6 +14,12 @@
 - [x] Compte rikioheart@gmail.com supprimé entièrement à la demande de son titulaire (plus de Président enregistré)
 - [x] Contrôle d'intégrité de la base ; 354 tests OK
 
+## Parcours bêta — demande du 15 nov.
+- [ ] Étape « Présenter mon compagnon » : texte d'accueil concis + accès direct au formulaire
+- [ ] Tests : le module disparaît après le premier chien, reste accessible après « Plus tard »
+- [ ] Créer deux comptes d'essai (particulier + professionnel) pour les parcours bêta
+- [ ] Tests automatisés : chaque compte d'essai n'accède qu'aux fonctions de son profil
+
 ## Refonte UX/UI — Lots 1 à 5 (cadrage du 12 nov.)
 - [x] Lot 1 : crème, sable, or ; signatures Bordeaux / Bleu nuit au choix dans Mes préférences ; plus aucun rose ; contrastes vérifiés par test
 - [x] Lot 2 : Mes préférences en 4 familles avec aperçu ; texte jusqu'à 200 %, polices Atkinson/Lexend, interlignage, espacements, largeur de lecture ; modes épuré et focus ; vue par défaut réelle (Projets) ; rappels et son réellement appliqués ; contrastes AA contrôlés par composant
