@@ -55,8 +55,11 @@ def common_denials(label, tok, me, other):
     """Ce qu'aucun des deux comptes ne doit pouvoir faire : tout ce qui relève du Bureau ou d'autrui."""
     check(f"{label} : n'est pas Bureau", rpc(tok, "is_bureau", {"_user_id": me}).json() is False)
     for fn, args in [("bureau_console_summary", {}), ("bureau_statistics", {"_from": "2026-01-01", "_to": "2026-12-31"}),
-                     ("bureau_dogs", {}), ("list_bureau_members", {})]:
+                     ("bureau_dogs", {})]:
         check(f"{label} : console Bureau refusée ({fn})", denied(rpc(tok, fn, args)), body(rpc(tok, fn, args)))
+    # « Équipe du Bureau » de l'annuaire : visible par les membres, mais seulement les noms.
+    r = rpc(tok, "list_bureau_members")
+    check(f"{label} : l'équipe du Bureau n'expose que les noms", r.status_code == 200 and all(set(x) <= {"id", "name"} for x in rows(r)), body(r))
     for table in ["audit_logs", "accounting", "finance_entries", "governance_records", "professional_internal_details",
                   "member_imports", "integration_events", "user_permission_overrides", "delegations"]:
         r = sel(tok, f"{table}?select=id&limit=5")
@@ -122,8 +125,12 @@ check("Particulier : ne peut pas créer de formulaire", ok, body(r))
 r = ins(P_TOK, "pro_details", {"profile_id": P, "company_name": "essai-acces"})
 ok = r.status_code >= 400
 if not ok:
-    for x in rows(r): delete(P_TOK, f"pro_details?id=eq.{x['id']}")
+    print("      ⚠ ligne d'essai créée dans pro_details (suppression réservée au Bureau) : à retirer", [x["id"] for x in rows(r)])
 check("Particulier : ne peut pas se créer une fiche professionnelle", ok, body(r))
+r = patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": True})
+ok = r.status_code >= 400 or not rows(r) or rows(r)[0].get("can_grant_stamps") is False
+if not ok: patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": False})
+check("Pro : ne peut pas s'accorder lui-même le droit de délivrer des tampons", ok, body(r))
 common_denials("Particulier", P_TOK, P, R)
 
 print("— Compte d'essai professionnel —")
@@ -143,7 +150,7 @@ r = ins(R_TOK, "forms", {"title": "essai-acces", "purpose": "essai", "data_usage
 ok = r.status_code >= 400
 if not ok:
     for x in rows(r): delete(R_TOK, f"forms?id=eq.{x['id']}")
-check("Pro sans fiche validée par le Bureau : ne peut pas créer de formulaire", ok, body(r))
+check("Pro actif : peut préparer un formulaire (brouillon supprimé aussitôt)", not ok and rows(r)[0]["status"] == "DRAFT", body(r))
 r = patch(R_TOK, f"professional_public_profile?profile_id=eq.{R}", {"status": "ACTIVE"})
 check("Pro : ne peut pas valider lui-même sa fiche publique", r.status_code >= 400 or not rows(r), body(r))
 common_denials("Pro", R_TOK, R, P)
