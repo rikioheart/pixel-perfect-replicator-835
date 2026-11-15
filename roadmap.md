@@ -10,15 +10,17 @@
 ## Ton et accueil — demande du 13 nov.
 - [x] Ton des alertes harmonisé (traductions d'erreurs, « … impossible » remplacés, refus de droits orientés vers le Bureau)
 - [x] Parcours « Mon premier chien » sur l'accueil du particulier actif (tests des règles OK)
-- [ ] Essai réel du parcours avec un compte particulier actif sans chien (aucun compte d'essai disponible dans la base réelle)
+- [x] Essai réel du parcours avec le compte particulier d'essai (affichage, « Plus tard », rappel ; enregistrement du chien laissé à Aurélien)
 - [x] Compte rikioheart@gmail.com supprimé entièrement à la demande de son titulaire (plus de Président enregistré)
 - [x] Contrôle d'intégrité de la base ; 354 tests OK
 
 ## Parcours bêta — demande du 15 nov.
-- [ ] Étape « Présenter mon compagnon » : texte d'accueil concis + accès direct au formulaire
-- [ ] Tests : le module disparaît après le premier chien, reste accessible après « Plus tard »
-- [ ] Créer deux comptes d'essai (particulier + professionnel) pour les parcours bêta
-- [ ] Tests automatisés : chaque compte d'essai n'accède qu'aux fonctions de son profil
+- [x] Étape « Présenter mon compagnon » : texte d'accueil concis + accès direct au formulaire
+- [x] Tests : le module disparaît après le premier chien, reste accessible après « Plus tard »
+- [x] Créer deux comptes d'essai (particulier + professionnel) pour les parcours bêta
+- [x] Tests automatisés : chaque compte d'essai n'accède qu'aux fonctions de son profil
+- [x] Donner à Aurélien l'accès aux deux comptes d'essai
+- [ ] Fiche pro : un particulier peut se créer une fiche pro, un pro peut cocher lui-même « délivre des tampons » (affichage seulement) — correction en attente de l'accord d'Aurélien
 
 ## Refonte UX/UI — Lots 1 à 5 (cadrage du 12 nov.)
 - [x] Lot 1 : crème, sable, or ; signatures Bordeaux / Bleu nuit au choix dans Mes préférences ; plus aucun rose ; contrastes vérifiés par test
