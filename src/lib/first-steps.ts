@@ -1,7 +1,11 @@
 /**
  * Parcours « Mon premier chien » du nouvel adhérent particulier.
- * L'étape se déduit uniquement des données réelles (chien enregistré) :
+ * L'affichage se déduit uniquement des données réelles (chien enregistré) :
  * rien n'est stocké en plus, sauf le choix « Plus tard » mémorisé sur l'appareil.
+ *
+ * - « full »     : l'invitation complète avec le formulaire ouvert ;
+ * - « reminder » : après « Plus tard », un rappel discret qui permet de rouvrir le formulaire ;
+ * - « hidden »   : dès que le premier chien est enregistré (ou si la personne n'est pas concernée).
  */
 
 export type FirstStepsInput = {
@@ -11,19 +15,19 @@ export type FirstStepsInput = {
   dismissed: boolean;
 };
 
+export type FirstStepsDisplay = "full" | "reminder" | "hidden";
+
 export type FirstStepsState = {
+  display: FirstStepsDisplay;
   visible: boolean;
   dogDone: boolean;
-  doneCount: number;
-  total: number;
 };
 
 export function firstStepsState(input: FirstStepsInput): FirstStepsState {
   const dogDone = input.dogCount > 0;
-  const doneCount = Number(dogDone);
-  const visible =
-    input.isParticulier && input.membershipStatus === "ACTIVE" && !input.dismissed && doneCount < 1;
-  return { visible, dogDone, doneCount, total: 1 };
+  const concerned = input.isParticulier && input.membershipStatus === "ACTIVE";
+  const display: FirstStepsDisplay = !concerned || dogDone ? "hidden" : input.dismissed ? "reminder" : "full";
+  return { display, visible: display !== "hidden", dogDone };
 }
 
 export function firstStepsStorageKey(userId: string): string {

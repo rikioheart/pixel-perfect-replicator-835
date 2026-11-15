@@ -146,7 +146,7 @@ function MemberDashboard() {
         />
 
         {firstSteps.state.visible ? (
-          <FirstStepsCard state={firstSteps.state} data={firstSteps.data} onDismiss={firstSteps.dismiss} />
+          <FirstStepsCard state={firstSteps.state} onDismiss={firstSteps.dismiss} onReopen={firstSteps.reopen} />
         ) : null}
 
         {/* Le parcours d'accueil propose déjà de présenter le chien : pas de second encart vide. */}
