@@ -1,7 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, Dog } from "lucide-react";
+import { Dog } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyHouseholds } from "@/lib/households";
@@ -11,7 +11,6 @@ import { DogEmptyArt } from "@/components/DogEmptyArt";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 
 /** Données réelles du parcours, lues avec les droits de la personne connectée. */
 export function useFirstSteps(isParticulier: boolean) {
@@ -42,26 +41,42 @@ export function useFirstSteps(isParticulier: boolean) {
     if (user?.id) { try { window.localStorage.setItem(firstStepsStorageKey(user.id), "1"); } catch { /* appareil sans stockage */ } }
     setDismissed(true);
   };
-  return { state: { ...state, visible: state.visible && !isLoading && Boolean(data) }, data, dismiss };
+  const reopen = () => {
+    if (user?.id) { try { window.localStorage.removeItem(firstStepsStorageKey(user.id)); } catch { /* appareil sans stockage */ } }
+    setDismissed(false);
+  };
+  const ready = !isLoading && Boolean(data);
+  return {
+    state: { ...state, visible: state.visible && ready, display: ready ? state.display : "hidden" as const },
+    data, dismiss, reopen,
+  };
 }
 
 /**
  * « Mon premier chien » : un petit pas pour le nouvel adhérent particulier,
  * présenter son compagnon. Rien n'est obligatoire.
  */
-export function FirstStepsCard({ state, data, onDismiss }: {
+/**
+ * « Mon premier chien » : une invitation courte, avec le formulaire d'ajout
+ * directement ouvert. Après « Plus tard », un rappel discret permet d'y revenir.
+ */
+export function FirstStepsCard({ state, onDismiss, onReopen }: {
   state: FirstStepsState;
-  data: { dogs: { id: string; name: string }[] } | undefined;
   onDismiss: () => void;
+  onReopen: () => void;
 }) {
   const { user, profile } = useAuth();
   const qc = useQueryClient();
   const { data: households = [] } = useMyHouseholds(user?.id);
   const [dog, setDog] = useState({ name: "", breed: "", birth_date: "" });
+  const [focusName, setFocusName] = useState(false);
+  const nameRef = useRef<HTMLInputElement>(null);
   const firstName = profile?.first_name ?? profile?.display_name ?? "";
   const household = households[0] ?? null;
-  const dogName = data?.dogs[0]?.name ?? "";
-  const percent = Math.round((state.doneCount / state.total) * 100);
+
+  useEffect(() => {
+    if (focusName && state.display === "full") { nameRef.current?.focus(); setFocusName(false); }
+  }, [focusName, state.display]);
 
   const addDog = useMutation({
     mutationFn: async () => {
@@ -90,85 +105,63 @@ export function FirstStepsCard({ state, data, onDismiss }: {
     onError: (e: Error) => toast.error(humanizeError(e, couldNot("enregistrer votre compagnon"))),
   });
 
+  if (state.display === "reminder") {
+    return (
+      <section className="panel flex flex-wrap items-center gap-3 p-4" aria-label="Présenter mon compagnon">
+        <Dog className="size-5 shrink-0 text-primary" aria-hidden />
+        <p className="min-w-0 flex-1 text-sm text-muted-foreground">
+          Quand vous le souhaitez, présentez-nous votre compagnon.
+        </p>
+        <Button size="sm" variant="outline" onClick={() => { onReopen(); setFocusName(true); }}>
+          Présenter mon compagnon
+        </Button>
+      </section>
+    );
+  }
+
   return (
     <section className="panel overflow-hidden" aria-labelledby="first-steps-title">
-      <div className="flex flex-wrap items-center gap-4 p-5 pb-3">
-        <DogEmptyArt art="playful" className="hidden h-auto w-28 shrink-0 sm:block" />
+      <div className="flex flex-wrap items-start gap-4 p-5">
+        <DogEmptyArt art="playful" className="hidden h-auto w-24 shrink-0 sm:block" />
         <div className="min-w-0 flex-1">
           <h2 id="first-steps-title" className="font-display text-xl">
             {firstName ? `Bienvenue parmi nous, ${firstName} !` : "Bienvenue parmi nous !"}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Un petit pas pour bien commencer, à votre rythme. Rien n'est obligatoire.
+            Présentez-nous votre compagnon : son nom suffit pour commencer.
           </p>
-          <div className="mt-3 flex items-center gap-3">
-            <Progress value={percent} className="max-w-48" aria-label={`Premiers pas : ${state.doneCount} sur ${state.total}`} />
-            <span className="text-xs text-muted-foreground">{state.doneCount} sur {state.total}</span>
-          </div>
-        </div>
-      </div>
 
-      <ol className="grid gap-3 p-5 pt-2">
-        <li className="rounded-lg border border-border bg-card p-4">
-          <StepTitle done={state.dogDone} number={1} icon={<Dog className="size-4" aria-hidden />}>
-            Présenter mon compagnon
-          </StepTitle>
-          {state.dogDone ? (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {dogName ? `${dogName} fait désormais partie de la famille de l'association.` : "Votre compagnon est bien enregistré."}{" "}
-              Vous retrouverez sa fiche juste en dessous.
-            </p>
-          ) : (
-            <form className="mt-3 space-y-3" onSubmit={(e) => { e.preventDefault(); addDog.mutate(); }}>
+          <form className="mt-4 space-y-3" aria-label="Présenter mon compagnon"
+            onSubmit={(e) => { e.preventDefault(); addDog.mutate(); }}>
+            <div>
+              <Label htmlFor="fs-dog-name">Son nom</Label>
+              <Input id="fs-dog-name" ref={nameRef} value={dog.name} autoComplete="off" required minLength={2}
+                onChange={(e) => setDog({ ...dog, name: e.target.value })} />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <Label htmlFor="fs-dog-name">Son nom</Label>
-                <Input id="fs-dog-name" value={dog.name} autoComplete="off" required minLength={2}
-                  onChange={(e) => setDog({ ...dog, name: e.target.value })} />
+                <Label htmlFor="fs-dog-breed">Race ou type (facultatif)</Label>
+                <Input id="fs-dog-breed" value={dog.breed} placeholder="Croisé, berger…"
+                  onChange={(e) => setDog({ ...dog, breed: e.target.value })} />
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <Label htmlFor="fs-dog-breed">Race ou type (facultatif)</Label>
-                  <Input id="fs-dog-breed" value={dog.breed} placeholder="Croisé, berger…"
-                    onChange={(e) => setDog({ ...dog, breed: e.target.value })} />
-                </div>
-                <div>
-                  <Label htmlFor="fs-dog-birth">Date de naissance (facultatif)</Label>
-                  <Input id="fs-dog-birth" type="date" value={dog.birth_date}
-                    onChange={(e) => setDog({ ...dog, birth_date: e.target.value })} />
-                </div>
+              <div>
+                <Label htmlFor="fs-dog-birth">Date de naissance (facultatif)</Label>
+                <Input id="fs-dog-birth" type="date" value={dog.birth_date}
+                  onChange={(e) => setDog({ ...dog, birth_date: e.target.value })} />
               </div>
-              {!household ? (
-                <p className="text-xs text-muted-foreground">
-                  Nous créons aussi votre foyer, pour pouvoir l'inscrire aux sorties. Vous pourrez le compléter dans « Mon foyer ».
-                </p>
-              ) : null}
+            </div>
+            {!household ? (
+              <p className="text-xs text-muted-foreground">Votre foyer sera créé en même temps ; vous pourrez le compléter plus tard.</p>
+            ) : null}
+            <div className="flex flex-wrap items-center gap-2">
               <Button type="submit" size="sm" disabled={addDog.isPending}>
                 {addDog.isPending ? "Enregistrement…" : "Présenter mon chien"}
               </Button>
-            </form>
-          )}
-        </li>
-      </ol>
-
-      <div className="flex justify-end px-5 pb-4">
-        <Button variant="ghost" size="sm" onClick={onDismiss}>Je regarderai plus tard</Button>
+              <Button type="button" variant="ghost" size="sm" onClick={onDismiss}>Plus tard</Button>
+            </div>
+          </form>
+        </div>
       </div>
     </section>
-  );
-}
-
-function StepTitle({ done, number, icon, children }: { done: boolean; number: number; icon: ReactNode; children: ReactNode }) {
-  return (
-    <h3 className="flex items-center gap-2 text-sm font-semibold">
-      <span
-        className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs ${done ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
-        aria-hidden
-      >
-        {done ? <Check className="size-3.5" /> : number}
-      </span>
-      {icon}
-      <span>{children}</span>
-      {done ? <span className="sr-only">(fait)</span> : null}
-    </h3>
   );
 }
