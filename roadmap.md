@@ -19,6 +19,7 @@
 - [ ] Tests : le module disparaît après le premier chien, reste accessible après « Plus tard »
 - [ ] Créer deux comptes d'essai (particulier + professionnel) pour les parcours bêta
 - [ ] Tests automatisés : chaque compte d'essai n'accède qu'aux fonctions de son profil
+- [ ] Donner à Aurélien l'accès aux deux comptes d'essai
 
 ## Refonte UX/UI — Lots 1 à 5 (cadrage du 12 nov.)
 - [x] Lot 1 : crème, sable, or ; signatures Bordeaux / Bleu nuit au choix dans Mes préférences ; plus aucun rose ; contrastes vérifiés par test
