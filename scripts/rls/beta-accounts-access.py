@@ -122,15 +122,16 @@ ok = r.status_code >= 400
 if not ok:
     for x in rows(r): delete(P_TOK, f"forms?id=eq.{x['id']}")
 check("Particulier : ne peut pas créer de formulaire", ok, body(r))
-r = ins(P_TOK, "pro_details", {"profile_id": P, "company_name": "essai-acces"})
-ok = r.status_code >= 400
-if not ok:
-    print("      ⚠ ligne d'essai créée dans pro_details (suppression réservée au Bureau) : à retirer", [x["id"] for x in rows(r)])
-check("Particulier : ne peut pas se créer une fiche professionnelle", ok, body(r))
-r = patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": True})
-ok = r.status_code >= 400 or not rows(r) or rows(r)[0].get("can_grant_stamps") is False
-if not ok: patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": False})
-check("Pro : ne peut pas s'accorder lui-même le droit de délivrer des tampons", ok, body(r))
+# Si la règle laissait passer, la ligne créée ne pourrait être retirée que par le Bureau :
+# ce contrôle n'est lancé qu'avec LVDC_ALLOW_PRO_DETAILS_PROBE=1 (penser à nettoyer ensuite).
+if os.environ.get("LVDC_ALLOW_PRO_DETAILS_PROBE") == "1":
+    r = ins(P_TOK, "pro_details", {"profile_id": P, "company_name": "essai-acces"})
+    ok = r.status_code >= 400
+    if not ok:
+        print("      ⚠ ligne d'essai créée dans pro_details (suppression réservée au Bureau) : à retirer", [x["id"] for x in rows(r)])
+    check("Particulier : ne peut pas se créer une fiche professionnelle", ok, body(r))
+else:
+    print("NON LANCÉ  Particulier : création d'une fiche professionnelle (écriture non annulable, voir LVDC_ALLOW_PRO_DETAILS_PROBE)")
 common_denials("Particulier", P_TOK, P, R)
 
 print("— Compte d'essai professionnel —")
@@ -153,6 +154,10 @@ if not ok:
 check("Pro actif : peut préparer un formulaire (brouillon supprimé aussitôt)", not ok and rows(r)[0]["status"] == "DRAFT", body(r))
 r = patch(R_TOK, f"professional_public_profile?profile_id=eq.{R}", {"status": "ACTIVE"})
 check("Pro : ne peut pas valider lui-même sa fiche publique", r.status_code >= 400 or not rows(r), body(r))
+r = patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": True})
+ok = r.status_code >= 400 or not rows(r) or rows(r)[0].get("can_grant_stamps") is False
+if not ok: patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": False})
+check("Pro : ne peut pas s'accorder lui-même le droit de délivrer des tampons", ok, body(r))
 common_denials("Pro", R_TOK, R, P)
 
 failed = [n for n, ok in results if not ok]
