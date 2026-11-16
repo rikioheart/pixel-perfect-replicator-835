@@ -125,8 +125,8 @@ export function ShareLinkButton({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3">
-          <div className="space-y-1">
+        <div className="min-w-0 space-y-3">
+          <div className="min-w-0 space-y-1">
             <Label htmlFor="share-days">Validité en jours (0 = sans limite)</Label>
             <Input
               id="share-days"
@@ -152,22 +152,24 @@ export function ShareLinkButton({
                 return (
                   <li
                     key={share.id}
-                    className="flex items-center gap-2 rounded-md border border-border p-2 text-xs"
+                    className="flex min-w-0 items-center gap-2 rounded-md border border-border p-2 text-xs"
                   >
                     <span className="min-w-0 flex-1 truncate">{`${origin}/partage/${share.token}`}</span>
                     <span
                       className={
-                        state.active ? "font-medium text-foreground" : "text-muted-foreground"
+                        state.active
+                          ? "shrink-0 font-medium text-foreground"
+                          : "shrink-0 text-muted-foreground"
                       }
                     >
                       {state.label}
                     </span>
-                    <span className="text-muted-foreground">{share.view_count} vues</span>
+                    <span className="shrink-0 text-muted-foreground">{share.view_count} vues</span>
                     <Button
                       variant="ghost"
                       size="icon"
                       aria-label={`Copier le lien ${share.label ?? "de partage"}`}
-                      className="size-9"
+                      className="size-9 shrink-0"
                       onClick={() => {
                         void navigator.clipboard?.writeText(`${origin}/partage/${share.token}`);
                         toast.success("Lien copié.");
@@ -179,7 +181,7 @@ export function ShareLinkButton({
                       variant="ghost"
                       size="icon"
                       aria-label={`Désactiver le lien ${share.label ?? "de partage"}`}
-                      className="size-9"
+                      className="size-9 shrink-0"
                       disabled={share.revoked || revoke.isPending}
                       onClick={() => revoke.mutate(share.id)}
                     >
