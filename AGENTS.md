@@ -46,3 +46,4 @@
 - Public UI uses PublicHeader/Footer, PublicPageIntro and scoped styles. Keep auth/private layouts independent to prevent regressions.
 - PublicSeo sets leaf canonicals; sitemap lists editorial routes only, never private/token URLs.
 - Beta test accounts are checked by scripts/rls/beta-accounts-access.py against the real API with sessions minted by `lovable auth-session`; the script refuses any other account and reverts or gates writes. Why: role-isolation tests without touching real members.
+- Recette : tests sur la base de production avec des comptes de test temporaires créés par l'outil de session Lovable, lecture seule par défaut, traces (alertes, fiche people) supprimées et nettoyage journalisé dans audit_logs. Pourquoi : pas d'environnement séparé, aucune donnée de membre ne doit être touchée.
