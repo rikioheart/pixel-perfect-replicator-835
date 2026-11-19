@@ -413,5 +413,5 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 
 ## Évolution structurante (plan du 19/11)
 - [x] Lot 0a — audit lecture seule base déployée (.lovable/qa/lot0-audit-2026-11-19.md)
-- [ ] Lot 0b — environnement de recette isolé — en attente de l'accord d'Aurélien
+- [ ] Lot 0b — environnement de recette isolé — accord donné le 19/11 ; les brouillons de ce projet utilisent la vraie base, donc il faut un remix (base séparée, structure sans données), à lancer par Aurélien
 - [ ] Lots 1 à 6 — après Lot 0b
