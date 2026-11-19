@@ -410,3 +410,8 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Sélecteurs de période dans le corps de page ; en-tête : Alerte, Rechercher, Créer alignés à droite
 - [x] Indicateurs : Pass Terrain par partenaire, engagement bénévole, avancement projets/tâches
 - [x] Fiche exportable « Bilan de l'exercice » pour l'AG
+
+## Évolution structurante (plan du 19/11)
+- [x] Lot 0a — audit lecture seule base déployée (.lovable/qa/lot0-audit-2026-11-19.md)
+- [ ] Lot 0b — environnement de recette isolé — en attente de l'accord d'Aurélien
+- [ ] Lots 1 à 6 — après Lot 0b
