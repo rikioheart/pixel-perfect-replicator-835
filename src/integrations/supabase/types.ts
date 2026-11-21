@@ -4841,8 +4841,16 @@ export type Database = {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
       }
+      can_view_document: {
+        Args: { _doc_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_dog_operational: {
         Args: { _dog_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_event: {
+        Args: { _event_id: string; _user_id: string }
         Returns: boolean
       }
       can_view_participation: {

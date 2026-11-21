@@ -519,6 +519,13 @@
       "when": 1794503426462,
       "tag": "0073_user_preferences_show_recognition",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1795223697238,
+      "tag": "0074_restrict_unvalidated_accounts",
+      "breakpoints": true
     }
   ]
 }

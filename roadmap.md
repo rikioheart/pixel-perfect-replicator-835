@@ -414,4 +414,6 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 ## Évolution structurante (plan du 19/11)
 - [x] Lot 0a — audit lecture seule base déployée (.lovable/qa/lot0-audit-2026-11-19.md)
 - [x] Lot 0b — recette sur base réelle avec comptes fictifs supprimés ensuite (pas de remix) ; fuite PENDING/REFUSED confirmée
-- [ ] Lots 1 à 6 — après Lot 0b
+- [x] Lot 2a — cloisonnement PENDING/REFUSED (projets, tâches, jalons, équipes, aides, événements, documents, commentaires, recherche) ; vérifié par compte fictif supprimé ensuite
+- [ ] Lot 3a — inscriptions bloquées « en attente » (validateurs + alerte) — suivant
+- [ ] Lots 1 à 6 — suite de la feuille de route
