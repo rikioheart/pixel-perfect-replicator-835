@@ -468,6 +468,21 @@ function HowItWorks() {
           </p>
         </div>
         <div>
+          <p className="font-medium text-foreground">Les mots à connaître</p>
+          <dl className="grid gap-1 sm:grid-cols-[9rem_1fr]">
+            <dt className="font-medium text-foreground">Rôle</dt>
+            <dd>ce que la personne peut faire dans toute l'association (ex. Bureau, Particulier).</dd>
+            <dt className="font-medium text-foreground">Fonction</dt>
+            <dd>sa place dans l'association (Présidente, Trésorier, Bénévole…) ; elle ne donne pas de droits à elle seule.</dd>
+            <dt className="font-medium text-foreground">Portée</dt>
+            <dd>sur quoi le droit s'applique : toute l'association ou un seul projet (coordinateur).</dd>
+            <dt className="font-medium text-foreground">Visibilité</dt>
+            <dd>qui peut voir une information : public, adhérents, équipe du projet ou Bureau.</dd>
+            <dt className="font-medium text-foreground">Sensibilité</dt>
+            <dd>le niveau de confidentialité d'un document : public, interne ou sensible.</dd>
+          </dl>
+        </div>
+        <div>
           <p className="font-medium text-foreground">Modifier une permission</p>
           <p>
             Ouvrez un thème, puis activez ou coupez l'interrupteur du rôle concerné. « Tous » ou «
@@ -485,6 +500,10 @@ function HowItWorks() {
             <li>
               Les finances et la validation des adhésions exigent en plus d'être au Bureau : donner
               ces droits à un autre rôle n'ouvre rien.
+            </li>
+            <li>
+              Personne ne peut s'attribuer un rôle à soi-même, ni retirer son propre rôle Bureau ; le
+              dernier membre du Bureau garde toujours le sien.
             </li>
             <li>Les règles sont appliquées par la base de données, pas seulement par l'écran.</li>
             <li>Chaque changement est daté et attribué dans l'historique.</li>

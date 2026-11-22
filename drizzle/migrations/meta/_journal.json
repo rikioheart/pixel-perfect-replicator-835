@@ -526,6 +526,13 @@
       "when": 1795223697238,
       "tag": "0074_restrict_unvalidated_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1795354072289,
+      "tag": "0075_lot1_identity_guards_picker",
+      "breakpoints": true
     }
   ]
 }

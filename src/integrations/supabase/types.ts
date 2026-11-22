@@ -3002,6 +3002,7 @@ export type Database = {
       people: {
         Row: {
           city: string | null
+          contact_type: string | null
           created_at: string
           created_by: string | null
           department: string | null
@@ -3011,11 +3012,13 @@ export type Database = {
           id: string
           last_name: string | null
           notes: string | null
+          organization: string | null
           phone: string | null
           updated_at: string
         }
         Insert: {
           city?: string | null
+          contact_type?: string | null
           created_at?: string
           created_by?: string | null
           department?: string | null
@@ -3025,11 +3028,13 @@ export type Database = {
           id?: string
           last_name?: string | null
           notes?: string | null
+          organization?: string | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
           city?: string | null
+          contact_type?: string | null
           created_at?: string
           created_by?: string | null
           department?: string | null
@@ -3039,6 +3044,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           notes?: string | null
+          organization?: string | null
           phone?: string | null
           updated_at?: string
         }
@@ -5087,6 +5093,15 @@ export type Database = {
       occupied_spots: {
         Args: { _activity_id: string; _event_id: string }
         Returns: number
+      }
+      picker_people: {
+        Args: never
+        Returns: {
+          company: string
+          id: string
+          name: string
+          qualities: string[]
+        }[]
       }
       pro_dog_perm: {
         Args: { _dog_id: string; _section: string; _user_id: string }

@@ -51,6 +51,14 @@ R_TOK, R, r_mail = session("LVDC_PRO_SESSION")
 if p_mail != PART_EMAIL or r_mail != PRO_EMAIL:
     sys.exit(f"Sessions inattendues ({p_mail}, {r_mail}) : ce script ne s'exécute qu'avec les comptes d'essai.")
 
+def picker_checks(label, tok, me, quality):
+    """Sélecteur de membres : noms, structure et qualités seulement ; jamais e-mail ni téléphone."""
+    r = rpc(tok, "picker_people")
+    ok = r.status_code == 200 and all(set(x) <= {"id", "name", "company", "qualities"} for x in rows(r))
+    check(f"{label} : le sélecteur n'expose que nom, structure et qualités", ok, body(r))
+    mine = [x for x in rows(r) if x["id"] == me]
+    check(f"{label} : se retrouve dans le sélecteur avec la qualité {quality}", len(mine) == 1 and quality in mine[0]["qualities"], body(r))
+
 def common_denials(label, tok, me, other):
     """Ce qu'aucun des deux comptes ne doit pouvoir faire : tout ce qui relève du Bureau ou d'autrui."""
     check(f"{label} : n'est pas Bureau", rpc(tok, "is_bureau", {"_user_id": me}).json() is False)
@@ -122,16 +130,13 @@ ok = r.status_code >= 400
 if not ok:
     for x in rows(r): delete(P_TOK, f"forms?id=eq.{x['id']}")
 check("Particulier : ne peut pas créer de formulaire", ok, body(r))
-# Si la règle laissait passer, la ligne créée ne pourrait être retirée que par le Bureau :
-# ce contrôle n'est lancé qu'avec LVDC_ALLOW_PRO_DETAILS_PROBE=1 (penser à nettoyer ensuite).
-if os.environ.get("LVDC_ALLOW_PRO_DETAILS_PROBE") == "1":
-    r = ins(P_TOK, "pro_details", {"profile_id": P, "company_name": "essai-acces"})
-    ok = r.status_code >= 400
-    if not ok:
-        print("      ⚠ ligne d'essai créée dans pro_details (suppression réservée au Bureau) : à retirer", [x["id"] for x in rows(r)])
-    check("Particulier : ne peut pas se créer une fiche professionnelle", ok, body(r))
-else:
-    print("NON LANCÉ  Particulier : création d'une fiche professionnelle (écriture non annulable, voir LVDC_ALLOW_PRO_DETAILS_PROBE)")
+# Refusé par la base depuis le lot 1 (guard_pro_details) ; si cela passait, la ligne serait à retirer par le Bureau.
+r = ins(P_TOK, "pro_details", {"profile_id": P, "company_name": "essai-acces"})
+ok = r.status_code >= 400
+if not ok:
+    print("      ⚠ ligne d'essai créée dans pro_details (suppression réservée au Bureau) : à retirer", [x["id"] for x in rows(r)])
+check("Particulier : ne peut pas se créer une fiche professionnelle", ok, body(r))
+picker_checks("Particulier", P_TOK, P, "PARTICULIER")
 common_denials("Particulier", P_TOK, P, R)
 
 print("— Compte d'essai professionnel —")
@@ -158,6 +163,11 @@ r = patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": True})
 ok = r.status_code >= 400 or not rows(r) or rows(r)[0].get("can_grant_stamps") is False
 if not ok: patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"can_grant_stamps": False})
 check("Pro : ne peut pas s'accorder lui-même le droit de délivrer des tampons", ok, body(r))
+r = patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"partnership_percentage": 50})
+ok = r.status_code >= 400
+if not ok: patch(R_TOK, f"pro_details?profile_id=eq.{R}", {"partnership_percentage": 0})
+check("Pro : ne peut pas modifier lui-même son pourcentage de partenariat", ok, body(r))
+picker_checks("Pro", R_TOK, R, "PRO")
 common_denials("Pro", R_TOK, R, P)
 
 failed = [n for n, ok in results if not ok]

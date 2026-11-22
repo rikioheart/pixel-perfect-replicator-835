@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   CalendarDays,
@@ -9,6 +10,7 @@ import {
   Lightbulb,
   ListPlus,
   Plus,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyPermissions } from "@/lib/permissions";
+import { QuickContactDialog } from "@/components/QuickContactDialog";
 
 type CreateAction = {
   label: string;
@@ -43,7 +46,8 @@ const ACTIONS: CreateAction[] = [
 ];
 
 export function QuickCreateMenu() {
-  const { isBureau, profile } = useAuth();
+  const { isBureau } = useAuth();
+  const [contactOpen, setContactOpen] = useState(false);
   const { can } = useMyPermissions();
   const isPro = useAuth().isPro;
   const actions = ACTIONS.filter((action) => {
@@ -54,6 +58,7 @@ export function QuickCreateMenu() {
   });
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="sm" className="gap-2" aria-label="Créer ou proposer">
@@ -72,7 +77,15 @@ export function QuickCreateMenu() {
             </Link>
           </DropdownMenuItem>
         ))}
+        {isBureau ? (
+          <DropdownMenuItem className="min-h-11" onSelect={() => setContactOpen(true)}>
+            <UserPlus aria-hidden="true" />
+            Contact
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
+    {isBureau ? <QuickContactDialog open={contactOpen} onOpenChange={setContactOpen} /> : null}
+    </>
   );
 }
