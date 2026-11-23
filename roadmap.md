@@ -20,7 +20,7 @@
 - [x] Créer deux comptes d'essai (particulier + professionnel) pour les parcours bêta
 - [x] Tests automatisés : chaque compte d'essai n'accède qu'aux fonctions de son profil
 - [x] Donner à Aurélien l'accès aux deux comptes d'essai
-- [ ] Fiche pro : un particulier peut se créer une fiche pro, un pro peut cocher lui-même « délivre des tampons » (affichage seulement) — correction en attente de l'accord d'Aurélien
+- [x] Fiche pro : un particulier ne peut plus se créer de fiche pro ; tampons, pourcentage et contrat réservés au Bureau (lot 1, 22 nov.)
 
 ## Refonte UX/UI — Lots 1 à 5 (cadrage du 12 nov.)
 - [x] Lot 1 : crème, sable, or ; signatures Bordeaux / Bleu nuit au choix dans Mes préférences ; plus aucun rose ; contrastes vérifiés par test
@@ -415,5 +415,8 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Lot 0a — audit lecture seule base déployée (.lovable/qa/lot0-audit-2026-11-19.md)
 - [x] Lot 0b — recette sur base réelle avec comptes fictifs supprimés ensuite (pas de remix) ; fuite PENDING/REFUSED confirmée
 - [x] Lot 2a — cloisonnement PENDING/REFUSED (projets, tâches, jalons, équipes, aides, événements, documents, commentaires, recherche) ; vérifié par compte fictif supprimé ensuite
+- [x] Lot 1 — fiche pro verrouillée, rôles protégés (pas d'auto-attribution, dernier Bureau gardé), sélecteur multi-qualités, contact rapide Bureau dans « Créer », lexique des droits ; 76/76 tests d'accès réels, 371 tests
+- [ ] Lot 1 — accès des représentants aux coordonnées : en attente de la décision d'Aurélien
+- [ ] Lot 1 — qualité pro cumulable avec particulier : en attente de la décision d'Aurélien
 - [ ] Lot 3a — inscriptions bloquées « en attente » (validateurs + alerte) — suivant
 - [ ] Lots 1 à 6 — suite de la feuille de route
