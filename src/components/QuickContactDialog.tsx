@@ -15,6 +15,8 @@ import {
   EMPTY_CONTACT,
   buildContactInsert,
   contactProblem,
+  exactContactPattern,
+  CONTACT_QUERY_KEYS,
   isOrganization,
   type ContactKind,
 } from "@/lib/quick-contact";
@@ -28,7 +30,7 @@ const WHERE: Record<ContactKind, string> = {
 
 /** Contact sans compte, créé par le Bureau depuis « Créer ». Aucun compte ni adhésion n'est créé. */
 export function QuickContactDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { user } = useAuth();
+  const { user, isBureau, rolesReady } = useAuth();
   const qc = useQueryClient();
   const [kind, setKind] = useState<ContactKind>("PARTICULIER");
   const [form, setForm] = useState(EMPTY_CONTACT);
@@ -38,23 +40,27 @@ export function QuickContactDialog({ open, onOpenChange }: { open: boolean; onOp
 
   const save = useMutation({
     mutationFn: async () => {
+      if (!user || !rolesReady || !isBureau) throw new Error("La création de contacts est réservée au Bureau.");
       const problem = contactProblem(kind, form);
       if (problem) throw new Error(problem);
       const ins = buildContactInsert(kind, form, user?.id ?? null);
       if (ins.table === "people") {
         if (ins.row.email) {
-          const { data } = await supabase.from("people").select("id").ilike("email", ins.row.email).limit(1);
+          const { data, error } = await supabase.from("people").select("id").ilike("email", exactContactPattern(ins.row.email)).limit(1);
+          if (error) throw error;
           if (data?.length) throw new Error("Une fiche existe déjà avec cet e-mail : inutile d'en créer une seconde.");
         }
         const { error } = await supabase.from("people").insert(ins.row);
         if (error) throw error;
       } else if (ins.table === "partners") {
-        const { data } = await supabase.from("partners").select("id").ilike("name", ins.row.name).limit(1);
+        const { data, error: lookupError } = await supabase.from("partners").select("id").ilike("name", exactContactPattern(ins.row.name)).limit(1);
+        if (lookupError) throw lookupError;
         if (data?.length) throw new Error("Ce partenaire est déjà enregistré.");
         const { error } = await supabase.from("partners").insert(ins.row);
         if (error) throw error;
       } else {
-        const { data } = await supabase.from("mairies").select("id").ilike("organization", ins.row.organization).limit(1);
+        const { data, error: lookupError } = await supabase.from("mairies").select("id").ilike("organization", exactContactPattern(ins.row.organization)).limit(1);
+        if (lookupError) throw lookupError;
         if (data?.length) throw new Error("Cette structure est déjà enregistrée.");
         const { error } = await supabase.from("mairies").insert(ins.row);
         if (error) throw error;
@@ -62,8 +68,7 @@ export function QuickContactDialog({ open, onOpenChange }: { open: boolean; onOp
     },
     onSuccess: () => {
       toast.success("Contact ajouté.", { description: WHERE[kind] });
-      void qc.invalidateQueries({ queryKey: ["partners"] });
-      void qc.invalidateQueries({ queryKey: ["mairies"] });
+      for (const key of CONTACT_QUERY_KEYS) void qc.invalidateQueries({ queryKey: [key] });
       setForm(EMPTY_CONTACT);
       onOpenChange(false);
     },

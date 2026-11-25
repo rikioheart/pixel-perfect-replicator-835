@@ -31,6 +31,13 @@ export const isOrganization = (kind: ContactKind) => kind === "PARTENAIRE" || ki
 
 const clean = (v: string) => v.trim() || null;
 
+/** Les caractères de motif doivent rester des caractères littéraux lors de l'anti-doublon. */
+export function exactContactPattern(value: string): string {
+  return value.trim().replace(/[\\%_]/g, (character) => `\\${character}`);
+}
+
+export const CONTACT_QUERY_KEYS = ["partners", "mairies", "inventory-people", "finance-entry-links"] as const;
+
 /** Message à afficher si le minimum manque, sinon null. */
 export function contactProblem(kind: ContactKind, f: ContactForm): string | null {
   if (isOrganization(kind)) {

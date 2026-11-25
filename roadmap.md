@@ -418,5 +418,6 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Lot 1 — fiche pro verrouillée, rôles protégés (pas d'auto-attribution, dernier Bureau gardé), sélecteur multi-qualités, contact rapide Bureau dans « Créer », lexique des droits ; 76/76 tests d'accès réels, 371 tests
 - [ ] Lot 1 — accès des représentants aux coordonnées : en attente de la décision d'Aurélien
 - [ ] Lot 1 — qualité pro cumulable avec particulier : en attente de la décision d'Aurélien
+- [ ] Lot 1 — finalisation demandée le 23/11 : contrôler les droits effectifs et les contacts rapides, rejouer les tests, consigner les décisions restant nécessaires
 - [ ] Lot 3a — inscriptions bloquées « en attente » (validateurs + alerte) — suivant
 - [ ] Lots 1 à 6 — suite de la feuille de route

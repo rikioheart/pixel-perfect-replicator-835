@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { EMPTY_CONTACT, buildContactInsert, contactProblem } from "./quick-contact";
+import { EMPTY_CONTACT, buildContactInsert, contactProblem, exactContactPattern } from "./quick-contact";
 
 describe("contact rapide", () => {
+  it("la recherche anti-doublon ne traite pas % et _ comme des jokers", () => {
+    expect(exactContactPattern("  Truffe_100%  ")).toBe("Truffe\\_100\\%");
+    expect(exactContactPattern("A\\B")).toBe("A\\\\B");
+    expect(exactContactPattern("Mairie de Pau")).toBe("Mairie de Pau");
+  });
   it("une personne demande au moins un prénom ou un nom ; une organisation, son nom", () => {
     expect(contactProblem("PARTICULIER", EMPTY_CONTACT)).not.toBeNull();
     expect(contactProblem("PARTICULIER", { ...EMPTY_CONTACT, lastName: "Durand" })).toBeNull();

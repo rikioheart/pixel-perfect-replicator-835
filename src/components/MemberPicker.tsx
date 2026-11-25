@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +21,10 @@ export type { MemberOption } from "@/lib/member-picker";
 
 /** Adhérents actifs visibles, avec toutes leurs qualités (calculées et filtrées par la base). */
 export function useMemberOptions() {
+  const { user, rolesReady, isBureau, isPro } = useAuth();
   return useQuery({
-    queryKey: ["member-options"],
+    queryKey: ["member-options", user?.id, isBureau, isPro],
+    enabled: Boolean(user) && rolesReady,
     queryFn: async (): Promise<MemberOption[]> => {
       const { data, error } = await supabase.rpc("picker_people");
       if (error) throw error;
@@ -46,7 +49,7 @@ export function MemberPicker({
   onChange: (ids: string[]) => void;
   single?: boolean;
 }) {
-  const { data: members = [] } = useMemberOptions();
+  const { data: members = [], isPending, isError, refetch } = useMemberOptions();
   const [search, setSearch] = useState("");
   const [qualities, setQualities] = useState<Quality[]>([]);
 
@@ -119,7 +122,14 @@ export function MemberPicker({
         </div>
       ) : null}
       <div className="max-h-48 overflow-y-auto rounded-md border border-border">
-        {filtered.length === 0 ? (
+        {isError ? (
+          <div className="space-y-2 p-3 text-sm text-muted-foreground" role="alert">
+            <p>Les personnes n’ont pas pu être chargées.</p>
+            <Button type="button" size="sm" variant="outline" onClick={() => void refetch()}>Réessayer</Button>
+          </div>
+        ) : isPending ? (
+          <p className="p-3 text-sm text-muted-foreground" role="status">Chargement…</p>
+        ) : filtered.length === 0 ? (
           <p className="p-3 text-sm text-muted-foreground">Personne ne correspond pour l'instant.</p>
         ) : (
           filtered.map((member) => (

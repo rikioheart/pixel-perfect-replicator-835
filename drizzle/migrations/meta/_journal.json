@@ -533,6 +533,13 @@
       "when": 1795354072289,
       "tag": "0075_lot1_identity_guards_picker",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1795566378761,
+      "tag": "0076_lot1_effective_permissions",
+      "breakpoints": true
     }
   ]
 }

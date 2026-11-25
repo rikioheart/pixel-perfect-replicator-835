@@ -73,8 +73,8 @@ export function groupByModule(permissions: Permission[]) {
 }
 
 /**
- * Permissions effectives de l'utilisateur connecté (union de ses rôles).
- * Le Bureau conserve un accès complet quoi qu'il arrive.
+ * Permissions effectives du compte, calculées par la même règle que la base.
+ * Les retraits individuels priment sur les rôles, y compris pour le Bureau.
  */
 export function useMyPermissions() {
   const { user, isBureau, isPro } = useAuth();
@@ -83,29 +83,15 @@ export function useMyPermissions() {
     enabled: Boolean(user?.id),
     staleTime: 60_000,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role_permissions:roles(role_permissions(requires_professional, permissions(code)))")
-        .eq("user_id", user!.id);
+      if (!user) return [];
+      const { data, error } = await supabase.rpc("my_permission_codes");
       if (error) throw new Error(error.message);
-      const codes = new Set<string>();
-      for (const row of (data ?? []) as unknown as {
-        role_permissions: {
-          role_permissions: { requires_professional: boolean; permissions: { code: string } | null }[];
-        } | null;
-      }[]) {
-        for (const rp of row.role_permissions?.role_permissions ?? []) {
-          // Miroir de has_permission : un droit « pro » ne vaut que pour un pro validé.
-          if (rp.requires_professional && !isPro) continue;
-          if (rp.permissions?.code) codes.add(rp.permissions.code);
-        }
-      }
-      return [...codes];
+      return (data ?? []).map((row) => row.code);
     },
   });
 
-  const codes = query.data ?? [];
-  const can = (code: string) => isBureau || codes.includes(code);
+  const codes = user && query.isSuccess ? query.data : [];
+  const can = (code: string) => codes.includes(code);
   /** Droit sensible : Bureau ET permission explicite, comme bureau_has_permission en base. */
   const has = (code: string) => isBureau && codes.includes(code);
   return { ...query, codes, can, has };

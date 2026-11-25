@@ -5052,6 +5052,12 @@ export type Database = {
       }
       my_account_deletion_check: { Args: never; Returns: Json }
       my_pass_access: { Args: never; Returns: Json }
+      my_permission_codes: {
+        Args: never
+        Returns: {
+          code: string
+        }[]
+      }
       notify_bureau_members: {
         Args: {
           _entity_id: string
