@@ -416,8 +416,8 @@ Limites : stockage local minimal, effacé à la déconnexion ; pas de dossiers c
 - [x] Lot 0b — recette sur base réelle avec comptes fictifs supprimés ensuite (pas de remix) ; fuite PENDING/REFUSED confirmée
 - [x] Lot 2a — cloisonnement PENDING/REFUSED (projets, tâches, jalons, équipes, aides, événements, documents, commentaires, recherche) ; vérifié par compte fictif supprimé ensuite
 - [x] Lot 1 — fiche pro verrouillée, rôles protégés (pas d'auto-attribution, dernier Bureau gardé), sélecteur multi-qualités, contact rapide Bureau dans « Créer », lexique des droits ; 76/76 tests d'accès réels, 371 tests
-- [ ] Lot 1 — accès des représentants aux coordonnées : en attente de la décision d'Aurélien
-- [ ] Lot 1 — qualité pro cumulable avec particulier : en attente de la décision d'Aurélien
+- [ ] Lot 1 — accès des représentants aux coordonnées avec accord explicite et révocable de l’adhérent (choix du 26/11) : appliquer en base et dans les écrans existants
+- [ ] Lot 1 — qualité pro cumulable avec particulier, après validation Bureau (choix du 26/11) : séparer de l’adhésion et conserver le foyer unique
 - [ ] Lot 1 — finalisation demandée le 23/11 : contrôler les droits effectifs et les contacts rapides, rejouer les tests, consigner les décisions restant nécessaires
 - [ ] Lot 3a — inscriptions bloquées « en attente » (validateurs + alerte) — suivant
 - [ ] Lots 1 à 6 — suite de la feuille de route

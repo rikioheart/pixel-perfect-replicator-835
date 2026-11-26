@@ -540,6 +540,13 @@
       "when": 1795566378761,
       "tag": "0076_lot1_effective_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1795690542037,
+      "tag": "0077_lot1_consent_and_professional_quality",
+      "breakpoints": true
     }
   ]
 }

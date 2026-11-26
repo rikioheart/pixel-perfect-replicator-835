@@ -3086,6 +3086,8 @@ export type Database = {
           description: string | null
           id: string
           partnership_percentage: number
+          pro_review_note: string | null
+          pro_status: string
           professional_category: string | null
           profile_id: string
           siret: string | null
@@ -3101,6 +3103,8 @@ export type Database = {
           description?: string | null
           id?: string
           partnership_percentage?: number
+          pro_review_note?: string | null
+          pro_status?: string
           professional_category?: string | null
           profile_id: string
           siret?: string | null
@@ -3116,6 +3120,8 @@ export type Database = {
           description?: string | null
           id?: string
           partnership_percentage?: number
+          pro_review_note?: string | null
+          pro_status?: string
           professional_category?: string | null
           profile_id?: string
           siret?: string | null
@@ -3478,6 +3484,7 @@ export type Database = {
           person_id: string | null
           phone: string | null
           public_visibility: boolean
+          representative_contact_consent: boolean
           skills: string[]
           skills_visibility: string
           statutory_category: string
@@ -3512,6 +3519,7 @@ export type Database = {
           person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
+          representative_contact_consent?: boolean
           skills?: string[]
           skills_visibility?: string
           statutory_category?: string
@@ -3546,6 +3554,7 @@ export type Database = {
           person_id?: string | null
           phone?: string | null
           public_visibility?: boolean
+          representative_contact_consent?: boolean
           skills?: string[]
           skills_visibility?: string
           statutory_category?: string
@@ -4867,6 +4876,10 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_representative_contacts: {
+        Args: { _member: string; _viewer: string }
+        Returns: boolean
+      }
       can_view_terrain_reservation: {
         Args: { _rid: string; _user_id: string }
         Returns: boolean
@@ -4902,9 +4915,22 @@ export type Database = {
         Args: { _decision: string; _profile_id: string; _reason?: string }
         Returns: Json
       }
+      decide_professional_quality: {
+        Args: { _note?: string; _profile_id: string; _status: string }
+        Returns: undefined
+      }
       delete_inventory_item: {
         Args: { _inventory_id: string }
         Returns: undefined
+      }
+      directory_pro_details: {
+        Args: never
+        Returns: {
+          company_name: string
+          professional_category: string
+          profile_id: string
+          website_url: string
+        }[]
       }
       directory_profiles: {
         Args: { _as_member?: boolean; _ids?: string[] }
