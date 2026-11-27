@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { MEMBERSHIP_TYPE_LABEL } from "@/lib/members";
 import { AccountDeletionCard } from "@/components/AccountDeletionCard";
+import { ProfessionalQualityRequest } from "@/components/ProfessionalQualityRequest";
 import { SidePanel } from "@/components/SidePanel";
 import { SkillsEditor } from "@/components/SkillsEditor";
 import { UserAvatar } from "@/components/UserAvatar";
@@ -69,6 +70,7 @@ type FormState = {
   skills_visibility: FieldVisibility;
   availability_visibility: FieldVisibility;
   public_visibility: boolean;
+  representative_contact_consent: boolean;
 };
 
 const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -96,6 +98,7 @@ function ProfilePage() {
       skills_visibility: profile.skills_visibility ?? "PRIVATE",
       availability_visibility: profile.availability_visibility ?? "PRIVATE",
       public_visibility: profile.public_visibility,
+      representative_contact_consent: profile.representative_contact_consent ?? false,
     };
   }, [profile]);
   const [form, setForm] = useState<FormState | null>(null);
@@ -127,6 +130,7 @@ function ProfilePage() {
           skills_visibility: form.skills_visibility,
           availability_visibility: form.availability_visibility,
           public_visibility: form.public_visibility,
+          representative_contact_consent: form.representative_contact_consent,
         })
         .eq("id", user.id);
       if (error) throw error;
@@ -280,9 +284,16 @@ function ProfilePage() {
                 </Label>
                 <Switch id="pr-listed" checked={form.public_visibility} onCheckedChange={(v) => set("public_visibility", v)} />
               </div>
+              <div className="flex items-start justify-between gap-3">
+                <Label htmlFor="pr-representative" className="leading-snug">
+                  Partager mon e-mail et mon téléphone avec mes représentants
+                  <span className="mt-1 block text-xs font-normal text-muted-foreground">Pour les échanges associatifs avec les représentants de mes catégories uniquement. Accord facultatif, retirable ici à tout moment.</span>
+                </Label>
+                <Switch id="pr-representative" checked={form.representative_contact_consent} onCheckedChange={(value) => set("representative_contact_consent", value)} />
+              </div>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
                 <li>Votre nom affiché reste visible là où vous participez (projets, commentaires).</li>
-                <li>Téléphone et e-mail restent privés : seuls vous et le Bureau les voyez.</li>
+                <li>Téléphone et e-mail restent privés : vous, le Bureau et, seulement avec votre accord, vos représentants.</li>
                 <li>Vos chiens, leur santé, leur comportement et votre foyer n'apparaissent jamais dans votre profil.</li>
               </ul>
               <Field id="pr-phone" label="Téléphone (privé)">
@@ -309,6 +320,10 @@ function ProfilePage() {
                 </Badge>
               </div>
             </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Ma qualité professionnelle</CardTitle></CardHeader>
+            <CardContent><ProfessionalQualityRequest /></CardContent>
           </Card>
         </div>
       </div>

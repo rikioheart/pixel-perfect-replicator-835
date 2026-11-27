@@ -131,11 +131,11 @@ if not ok:
     for x in rows(r): delete(P_TOK, f"forms?id=eq.{x['id']}")
 check("Particulier : ne peut pas créer de formulaire", ok, body(r))
 # Refusé par la base depuis le lot 1 (guard_pro_details) ; si cela passait, la ligne serait à retirer par le Bureau.
-r = ins(P_TOK, "pro_details", {"profile_id": P, "company_name": "essai-acces"})
+r = ins(P_TOK, "pro_details", {"profile_id": P, "company_name": "essai-acces", "pro_status": "VALIDATED"})
 ok = r.status_code >= 400
 if not ok:
     print("      ⚠ ligne d'essai créée dans pro_details (suppression réservée au Bureau) : à retirer", [x["id"] for x in rows(r)])
-check("Particulier : ne peut pas se créer une fiche professionnelle", ok, body(r))
+check("Particulier : ne peut pas s’accorder la qualité professionnelle validée", ok, body(r))
 picker_checks("Particulier", P_TOK, P, "PARTICULIER")
 common_denials("Particulier", P_TOK, P, R)
 

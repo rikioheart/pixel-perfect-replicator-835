@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { PRO_STATUS_LABEL } from "@/lib/pro-card";
 import { humanizeError } from "@/lib/user-messages";
+import { ProfessionalQualityQueue } from "@/components/ProfessionalQualityQueue";
 
 export const Route = createFileRoute("/_authenticated/admin/pros")({
   head: () => ({
@@ -96,6 +97,8 @@ function AdminPros() {
 
   return (
     <AppShell title="Fiches professionnelles" subtitle="Validez les cartes avant publication, gérez les données internes">
+      <ProfessionalQualityQueue />
+      <h2 className="mb-3 font-display text-lg">Cartes publiques</h2>
       <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Filtrer par statut">
         {["PENDING_REVIEW", "ACTIVE", "DRAFT", "SUSPENDED", "ALL"].map((s) => (
           <Button key={s} size="sm" variant={filter === s ? "default" : "outline"} aria-pressed={filter === s} onClick={() => setFilter(s)}>

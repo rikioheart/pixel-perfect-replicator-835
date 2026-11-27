@@ -2,7 +2,7 @@ import { DirectoryTabs } from "@/components/DirectoryTabs";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, Briefcase, Mail } from "lucide-react";
+import { Search, Briefcase, Mail, Phone } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { withContacts } from "@/lib/profile-columns";
+import { directoryQualityMatches } from "@/lib/professional-quality";
 import { fetchDirectoryProfiles } from "@/lib/profile-details";
 import { UserAvatar } from "@/components/UserAvatar";
 import { MemberSummary } from "@/components/MemberSummary";
@@ -56,7 +56,7 @@ export const Route = createFileRoute("/_authenticated/directory")({
 });
 
 function DirectoryPage() {
-  const { isBureau } = useAuth();
+  const { user, isBureau, rolesReady } = useAuth();
   const [search, setSearch] = useState("");
   const { vue } = Route.useSearch();
   const category =
@@ -64,19 +64,23 @@ function DirectoryPage() {
   const [department, setDepartment] = useState("ALL");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["directory", isBureau],
+    queryKey: ["directory", user?.id, isBureau],
+    enabled: Boolean(user) && rolesReady,
     queryFn: async () => {
       // Projection unique de l'annuaire : la base n'envoie que les champs que chacun a rendus visibles.
       const [profiles, pros] = await Promise.all([
         fetchDirectoryProfiles(),
-        supabase.from("pro_details").select("profile_id, company_name, professional_category, website_url"),
+        supabase.rpc("directory_pro_details"),
       ]);
+      if (pros.error) throw pros.error;
       const proMap = new Map((pros.data ?? []).map((p) => [p.profile_id, p]));
-      const contacts = isBureau ? await withContacts(profiles.map((p) => ({ id: p.id }))) : [];
-      const emailOf = new Map(contacts.map((c) => [c.id, c.email]));
+      const contacts = await supabase.rpc("profile_contacts", { _ids: profiles.map((p) => p.id) });
+      if (contacts.error) throw contacts.error;
+      const contactOf = new Map((contacts.data ?? []).map((contact) => [contact.id, contact]));
       return profiles.map((p) => ({
         ...p,
-        email: emailOf.get(p.id) ?? null,
+        email: contactOf.get(p.id)?.email ?? null,
+        phone: contactOf.get(p.id)?.phone ?? null,
         pro: proMap.get(p.id) ?? null,
       }));
     },
@@ -132,12 +136,11 @@ function DirectoryPage() {
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return (data ?? []).filter((person) => {
-      if (!isBureau && !person.public_visibility) return false;
-      const type = (person.membership_type ?? "").toUpperCase();
+      // La projection en base inclut seulement les fiches visibles ou consenties au représentant.
       // Une vue par public (bandeau de l'annuaire) ; les structures partenaires ont leur page.
       if (category === "BUREAU") {
         if (!team?.ids.has(person.id)) return false;
-      } else if (category === "PRO" ? !type.includes("PRO") : type.includes("PRO") || type.includes("PARTENAIRE")) return false;
+      } else if (!directoryQualityMatches(category, person.membership_type, Boolean(person.pro))) return false;
       if (department !== "ALL" && person.department !== department) return false;
       if (!term) return true;
       return `${person.display_name ?? ""} ${person.city ?? ""} ${person.pro?.company_name ?? ""} ${
@@ -268,13 +271,14 @@ function DirectoryPage() {
                           </Button>
                         </Link>
                       ) : null}
-                      {isBureau && person.email ? (
+                      {person.email ? (
                         <a href={`mailto:${person.email}`}>
                           <Button size="sm" variant="ghost" className="rounded-full">
                             <Mail className="mr-2 size-4" /> Contacter
                           </Button>
                         </a>
                       ) : null}
+                      {person.phone ? <Button asChild size="sm" variant="ghost"><a href={`tel:${person.phone.replace(/[^\d+]/g, "")}`}><Phone className="mr-2 size-4" /> Appeler</a></Button> : null}
                     </div>
                   </article>
                 );

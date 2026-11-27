@@ -27,6 +27,7 @@ export type Profile = {
   skills_visibility?: "MEMBERS" | "PRIVATE";
   availability_visibility?: "MEMBERS" | "PRIVATE";
   public_visibility: boolean;
+  representative_contact_consent?: boolean;
   account_choice_at?: string | null;
   deleted_at?: string | null;
 };

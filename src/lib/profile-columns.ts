@@ -7,7 +7,7 @@ import { fetchProfileDetails, type ProfileDetails } from "@/lib/profile-details"
  * directory_profiles (annuaire, selon la visibilité choisie).
  */
 export const PROFILE_COLUMNS =
-  "id, first_name, last_name, display_name, avatar_path, membership_type, membership_status, membership_date, involvement_level, public_visibility, created_at, updated_at, access_level, person_id, hide_sensitive_dogs, account_choice_at, deleted_at";
+  "id, first_name, last_name, display_name, avatar_path, membership_type, membership_status, membership_date, involvement_level, public_visibility, created_at, updated_at, access_level, person_id, hide_sensitive_dogs, account_choice_at, deleted_at, representative_contact_consent";
 
 type Contact = { id: string; email: string | null; phone: string | null };
 
