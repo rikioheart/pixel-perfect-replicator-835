@@ -1,5 +1,13 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Recette isolée et suite du plan — demande du 27 novembre, 11:22 UTC
+- [ ] Lot 0b : préparer une recette isolée à partir de la dernière version, vérifier son isolation et créer uniquement des comptes fictifs ; aucune écriture sur la base réelle.
+- [ ] Finalisation demandée du lot 1 : alerte Bureau, inscription en attente puis décision/liste d’attente/promotion, adhésion complète jusqu’à l’accès membre ; réutiliser les files et notifications existantes.
+- [ ] Lot 2 complet : jalons, catégories thématiques, rattachements, multi-assignations et rôles contextuels, progression unique, panneaux universels, Mindmap classique/détaillée, duplication indépendante.
+- [ ] Tests unitaires et parcours authentifiés autorisés/interdits sur la recette isolée, audit approfondi, rapport de preuves et GO/NO-GO ; ne rien accepter ni publier automatiquement.
+- [ ] Conserver le brouillon existant tant que ses changements n’ont pas été comparés ; aucune suppression pendant la recette.
+- [ ] Audit initial du projet principal : contrôle rapide sans alerte ; analyse approfondie lancée, résultat attendu. Cet audit initial ne valide pas les lots à venir.
+
 ## Sécurité — sélection du 27 novembre 2026
 - [x] Corrections initiales des 21 alertes autorisées avant le nouveau message.
 - [x] Nouvelle sélection à 11:11 : vérifications terminées et uniquement les 16 alertes applicatives marquées corrigées ; aucune autre alerte modifiée depuis ce recentrage.
