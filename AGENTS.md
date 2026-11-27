@@ -13,6 +13,7 @@
 - Schéma : uniquement via l'outil de migration (drizzle/migrations) ; supabase/migrations est un historique figé ; ne jamais écrire drizzle/schema.ts, ni rejouer/supprimer une migration sans comparer au schéma réel. Pourquoi : un seul chemin de migration.
 
 ## Sécurité (A10)
+- Reuse input guards to prevent injection/escalation.
 - Fonctions internes (fidélité, notifications, rappels) : EXECUTE retiré à anon/authenticated ; seuls déclencheurs et service_role les appellent. Pourquoi : empêcher l'attribution forgée de tampons ou notifications.
 - Type et statut d'adhésion modifiables uniquement par le Bureau (trigger guard_profile_membership) ; is_professional exige ACTIVE. Pourquoi : aucune auto-escalade de rôle.
 - Accès Bureau aux dossiers chiens = is_bureau ET permission dogs.read_sensitive. Pourquoi : Bureau ≠ accès illimité.

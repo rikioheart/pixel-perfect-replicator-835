@@ -1,7 +1,8 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
 ## Sécurité — sélection du 27 novembre 2026
-- [ ] Corriger exclusivement les 21 alertes sélectionnées et vérifier les droits réels.
+- [x] Corrections initiales des 21 alertes autorisées avant le nouveau message.
+- [ ] Nouvelle sélection à 11:11 : terminer les vérifications et mettre à jour uniquement les 16 alertes applicatives ; ne plus intervenir sur les cinq alertes précédemment sélectionnées.
 - [ ] Exécuter les tests ciblés, vérifier les protections en base et mettre à jour les alertes sélectionnées.
 
 ## Préparation mise en ligne — comptes et données de test (13 nov.)
