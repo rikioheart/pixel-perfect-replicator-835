@@ -2,8 +2,8 @@
 
 ## Sécurité — sélection du 27 novembre 2026
 - [x] Corrections initiales des 21 alertes autorisées avant le nouveau message.
-- [ ] Nouvelle sélection à 11:11 : terminer les vérifications et mettre à jour uniquement les 16 alertes applicatives ; ne plus intervenir sur les cinq alertes précédemment sélectionnées.
-- [ ] Exécuter les tests ciblés, vérifier les protections en base et mettre à jour les alertes sélectionnées.
+- [x] Nouvelle sélection à 11:11 : vérifications terminées et uniquement les 16 alertes applicatives marquées corrigées ; aucune autre alerte modifiée depuis ce recentrage.
+- [x] 46 tests ciblés, 76 contrôles d’accès bêta, 10 contrôles API ciblés, suite transactionnelle annulée et impression réelle sans injection ; aucun objet fictif conservé.
 
 ## Préparation mise en ligne — comptes et données de test (13 nov.)
 - [x] Compte association = Bureau de secours (actif, rôles Bureau + Fondateur, fonction Fondateur) ; reprend les 5 projets et 8 tâches de démo
