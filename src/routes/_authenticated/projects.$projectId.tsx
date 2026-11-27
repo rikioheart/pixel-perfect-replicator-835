@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
-import { TaskCard, type TaskRow } from "@/components/TaskCard";
+import { type TaskRow } from "@/components/TaskCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,6 +61,8 @@ import { ProjectEquipment } from "@/components/ProjectEquipment";
 import { ProjectCommunications } from "@/components/ProjectCommunications";
 import { ProjectFollowUp } from "@/components/ProjectFollowUp";
 import { humanizeError } from "@/lib/user-messages";
+import { ProjectPlan } from "@/components/project/ProjectPlan";
+import { TaskSidePanel } from "@/components/project/TaskSidePanel";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
   head: () => ({
@@ -78,11 +80,15 @@ export const Route = createFileRoute("/_authenticated/projects/$projectId")({
       },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { tache?: string } =>
+    typeof search["tache"] === "string" && search["tache"] ? { tache: search["tache"] as string } : {},
   component: ProjectDetail,
 });
 
 function ProjectDetail() {
   const { projectId } = Route.useParams();
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
   const { user, isBureau, profile } = useAuth();
   const queryClient = useQueryClient();
   const coordinated = useCoordinatedProjects(user?.id);
@@ -221,9 +227,10 @@ function ProjectDetail() {
               projectId={projectId}
               members={members ?? []}
               userId={user?.id ?? ""}
-              onCreated={() =>
-                queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })
-              }
+              onCreated={() => {
+                void queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] });
+                void queryClient.invalidateQueries({ queryKey: ["project-plan", projectId] });
+              }}
             />
           ) : null}
         </>
@@ -243,29 +250,19 @@ function ProjectDetail() {
             </Badge>
             <Badge variant="outline">Échéance {formatDate(project.deadline)}</Badge>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>Tâches validées ensemble</span>
-                <span>{progress === null ? "—" : `${progress}%`}</span>
-              </div>
-              {progress === null ? null : (
-                <Progress tone="collective" value={progress} aria-label={`Tâches validées ensemble : ${doneCount} sur ${eligibleCount}`} />
-              )}
-              <p className="mt-1 text-xs text-muted-foreground">
-                {progress === null
-                  ? "Calculé automatiquement dès qu'une tâche existe."
-                  : `Calculé à partir des tâches validées (${doneCount} sur ${eligibleCount}, annulées exclues).`}
-              </p>
+          <div>
+            <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+              <span>Avancement du projet</span>
+              <span>{progress === null ? "—" : `${progress}%`}</span>
             </div>
-            <div>
-              <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>Estimation du coordinateur</span>
-                <span>{project.progress_percent ?? 0}%</span>
-              </div>
-              <Progress value={project.progress_percent ?? 0} aria-label="Estimation du coordinateur" />
-              <p className="mt-1 text-xs text-muted-foreground">Valeur déclarée, conservée à part du calcul.</p>
-            </div>
+            {progress === null ? null : (
+              <Progress tone="collective" value={progress} aria-label={`Tâches validées ensemble : ${doneCount} sur ${eligibleCount}`} />
+            )}
+            <p className="mt-1 text-xs text-muted-foreground">
+              {progress === null
+                ? "Calculé automatiquement dès qu'une tâche existe."
+                : `Calculé automatiquement à partir des tâches terminées (${doneCount} sur ${eligibleCount}, annulées exclues).`}
+            </p>
           </div>
           {related && (related.activities.length > 0 || related.events.length > 0 || related.editions.length > 0) ? (
             <div className="space-y-3 border-t border-border pt-4 text-sm">
@@ -320,24 +317,6 @@ function ProjectDetail() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs" htmlFor="progress">
-                  Estimation (%)
-                </Label>
-                <Input
-                  id="progress"
-                  type="number"
-                  min={0}
-                  max={100}
-                  defaultValue={project.progress_percent ?? 0}
-                  className="w-28"
-                  onBlur={(e) =>
-                    updateProject({
-                      progress_percent: Math.max(0, Math.min(100, Number(e.target.value) || 0)),
-                    })
-                  }
-                />
               </div>
             </div>
           ) : null}
@@ -448,26 +427,16 @@ function ProjectDetail() {
             <Link to="/tasks" search={{ projectId }} className="text-sm text-primary hover:underline">Voir dans la liste des tâches</Link>
           </span>
         </div>
-        {(tasks ?? []).length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucune tâche créée pour ce projet.</p>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {tasks?.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                currentUserId={user?.id ?? ""}
-                isBureau={isBureau}
-                canValidate={canValidate}
-                showProject={false}
-                onChanged={() =>
-                  queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] })
-                }
-              />
-            ))}
-          </div>
-        )}
+        <ProjectPlan projectId={projectId} canManage={canValidate} userId={user?.id ?? ""} onOpenTask={(id) => void navigate({ search: { tache: id } })} />
       </div>
+      <TaskSidePanel
+        projectId={projectId}
+        taskId={search.tache}
+        onClose={() => void navigate({ search: {} })}
+        userId={user?.id ?? ""}
+        isBureau={isBureau}
+        canManage={canValidate}
+      />
 
       {project.address || project.contact_email ? (
         <div className="panel mt-6 space-y-3 p-4 text-sm">

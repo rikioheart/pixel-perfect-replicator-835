@@ -3640,28 +3640,40 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          deliverable: string | null
+          description: string | null
           done_at: string | null
           due_date: string | null
           id: string
+          position: number
           project_id: string
+          status: string
           title: string
         }
         Insert: {
           created_at?: string
           created_by?: string | null
+          deliverable?: string | null
+          description?: string | null
           done_at?: string | null
           due_date?: string | null
           id?: string
+          position?: number
           project_id: string
+          status?: string
           title: string
         }
         Update: {
           created_at?: string
           created_by?: string | null
+          deliverable?: string | null
+          description?: string | null
           done_at?: string | null
           due_date?: string | null
           id?: string
+          position?: number
           project_id?: string
+          status?: string
           title?: string
         }
         Relationships: [
@@ -3699,6 +3711,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "project_teams_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_themes: {
+        Row: {
+          color: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          project_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          project_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_themes_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -4188,6 +4235,7 @@ export type Database = {
           description: string | null
           id: string
           is_volunteer_task: boolean
+          milestone_id: string | null
           needs_help: boolean
           parent_task_id: string | null
           priority: string
@@ -4198,6 +4246,7 @@ export type Database = {
           submitted_at: string | null
           team_label: string | null
           terrain_reservation_id: string | null
+          theme_id: string | null
           title: string
           updated_at: string
           validated_at: string | null
@@ -4215,6 +4264,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_volunteer_task?: boolean
+          milestone_id?: string | null
           needs_help?: boolean
           parent_task_id?: string | null
           priority?: string
@@ -4225,6 +4275,7 @@ export type Database = {
           submitted_at?: string | null
           team_label?: string | null
           terrain_reservation_id?: string | null
+          theme_id?: string | null
           title: string
           updated_at?: string
           validated_at?: string | null
@@ -4242,6 +4293,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_volunteer_task?: boolean
+          milestone_id?: string | null
           needs_help?: boolean
           parent_task_id?: string | null
           priority?: string
@@ -4252,6 +4304,7 @@ export type Database = {
           submitted_at?: string | null
           team_label?: string | null
           terrain_reservation_id?: string | null
+          theme_id?: string | null
           title?: string
           updated_at?: string
           validated_at?: string | null
@@ -4274,6 +4327,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tasks_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "project_milestones"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tasks_parent_task_id_fkey"
             columns: ["parent_task_id"]
             isOneToOne: false
@@ -4292,6 +4352,13 @@ export type Database = {
             columns: ["terrain_reservation_id"]
             isOneToOne: false
             referencedRelation: "terrain_reservations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "project_themes"
             referencedColumns: ["id"]
           },
         ]
@@ -4818,6 +4885,10 @@ export type Database = {
         Args: { _id: string; _type: string; _user_id: string }
         Returns: boolean
       }
+      can_assign_task: {
+        Args: { _task_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_edit_dog_indicators: {
         Args: { _dog_id: string; _user_id: string }
         Returns: boolean
@@ -5176,6 +5247,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: number
       }
+      recompute_project_progress: { Args: { _pid: string }; Returns: undefined }
       register_participation: {
         Args: {
           _activity_id: string

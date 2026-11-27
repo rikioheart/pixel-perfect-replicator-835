@@ -39,14 +39,12 @@ export function ProjectFollowUp({
   return (
     <section className="panel p-5" aria-labelledby="followup-title">
       <h2 id="followup-title" className="mb-3 font-display text-lg">Suivi du projet</h2>
-      <Tabs defaultValue="jalons">
+      <Tabs defaultValue="journal">
         <TabsList className="mb-4 flex h-auto flex-wrap">
-          <TabsTrigger value="jalons">Jalons</TabsTrigger>
           <TabsTrigger value="journal">Journal</TabsTrigger>
           <TabsTrigger value="photos">Photos</TabsTrigger>
           <TabsTrigger value="rex">Retour d'expérience</TabsTrigger>
         </TabsList>
-        <TabsContent value="jalons"><Milestones project={project} canManage={canManage} /></TabsContent>
         <TabsContent value="journal"><Journal projectId={project.id} /></TabsContent>
         <TabsContent value="photos"><Photos projectId={project.id} canManage={canManage} /></TabsContent>
         <TabsContent value="rex"><Rex project={project} canManage={canManage} onPatch={onProjectPatch} /></TabsContent>

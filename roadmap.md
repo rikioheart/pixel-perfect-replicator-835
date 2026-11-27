@@ -3,7 +3,8 @@
 ## Recette isolée et suite du plan — demande du 27 novembre, 11:22 UTC
 - [ ] Lot 0b : préparer une recette isolée à partir de la dernière version, vérifier son isolation et créer uniquement des comptes fictifs ; aucune écriture sur la base réelle.
 - [ ] Finalisation demandée du lot 1 : alerte Bureau, inscription en attente puis décision/liste d’attente/promotion, adhésion complète jusqu’à l’accès membre ; réutiliser les files et notifications existantes.
-- [ ] Lot 2 complet : jalons, catégories thématiques, rattachements, multi-assignations et rôles contextuels, progression unique, panneaux universels, Mindmap classique/détaillée, duplication indépendante.
+- [x] Lot 2 (27 nov., projet principal à la demande) : étapes datées avec livrable/statut, catégories par projet, rattachement des tâches, progression automatique unique, panneau de tâche, carte synthétique/détaillée, multi-affectation, duplication/suppression. Reste : essai en navigateur avec un compte coordinateur.
+- [ ] (ancien libellé) Lot 2 complet : jalons, catégories thématiques, rattachements, multi-assignations et rôles contextuels, progression unique, panneaux universels, Mindmap classique/détaillée, duplication indépendante.
 - [ ] Tests unitaires et parcours authentifiés autorisés/interdits sur la recette isolée, audit approfondi, rapport de preuves et GO/NO-GO ; ne rien accepter ni publier automatiquement.
 - [ ] Conserver le brouillon existant tant que ses changements n’ont pas été comparés ; aucune suppression pendant la recette.
 - [x] Audit initial du projet principal reçu : contrôle rapide sans alerte ; analyse approfondie avec 10 alertes (2 critiques, 8 avertissements), à confronter aux protections actuelles avant conclusion ; aucune alerte corrigée ou ignorée dans cette passe. Cet audit initial ne valide pas les lots à venir.
