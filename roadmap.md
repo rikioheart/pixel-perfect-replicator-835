@@ -6,7 +6,7 @@
 - [ ] Lot 2 complet : jalons, catégories thématiques, rattachements, multi-assignations et rôles contextuels, progression unique, panneaux universels, Mindmap classique/détaillée, duplication indépendante.
 - [ ] Tests unitaires et parcours authentifiés autorisés/interdits sur la recette isolée, audit approfondi, rapport de preuves et GO/NO-GO ; ne rien accepter ni publier automatiquement.
 - [ ] Conserver le brouillon existant tant que ses changements n’ont pas été comparés ; aucune suppression pendant la recette.
-- [ ] Audit initial du projet principal : contrôle rapide sans alerte ; analyse approfondie lancée, résultat attendu. Cet audit initial ne valide pas les lots à venir.
+- [x] Audit initial du projet principal reçu : contrôle rapide sans alerte ; analyse approfondie avec 10 alertes (2 critiques, 8 avertissements), à confronter aux protections actuelles avant conclusion ; aucune alerte corrigée ou ignorée dans cette passe. Cet audit initial ne valide pas les lots à venir.
 
 ## Sécurité — sélection du 27 novembre 2026
 - [x] Corrections initiales des 21 alertes autorisées avant le nouveau message.
