@@ -1,0 +1,1 @@
+- Detail pages (project, event): primary actions first, secondary content in Tabs; project default tab "Actions & organisation". Why: less scrolling, lower cognitive load.

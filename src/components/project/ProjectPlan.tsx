@@ -143,6 +143,22 @@ export function ProjectPlan({ projectId, canManage, userId, onOpenTask }: { proj
                       </li>
                     ))}
                   </ul>
+                  {g.id && canManage ? (
+                    <form
+                      className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-2"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const input = e.currentTarget.elements.namedItem("title") as HTMLInputElement;
+                        const title = input.value.trim();
+                        if (title.length < 2) { toast.error("Donnez un titre à la tâche."); return; }
+                        void run(supabase.from("tasks").insert({ project_id: projectId, title, milestone_id: g.id, created_by: userId }), "Tâche ajoutée à l'étape.");
+                        input.value = "";
+                      }}
+                    >
+                      <Input name="title" aria-label={`Nouvelle tâche pour l'étape ${g.title}`} placeholder="Ajouter une tâche à cette étape" className="min-w-0" />
+                      <Button type="submit" size="sm" variant="outline" className="shrink-0"><Plus className="mr-1 size-4" /> Ajouter</Button>
+                    </form>
+                  ) : null}
                 </li>
               );
             })}

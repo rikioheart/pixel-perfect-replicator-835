@@ -1,5 +1,10 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Organisation par onglets — demande du 27 nov.
+- [x] Fiche projet : en-tête compact (avancement) + onglets Actions & organisation (par défaut), Présentation & équipe, Suivi & journal, Matériel & échanges ; ajout de tâche direct dans chaque étape ; bouton carte mentale au format icône.
+- [x] Barre d'actions alignée à droite sur toutes les pages.
+- [x] Fiche événement : ressources et échanges en onglets sous l'inscription.
+
 ## Recette isolée et suite du plan — demande du 27 novembre, 11:22 UTC
 - [ ] Lot 0b : préparer une recette isolée à partir de la dernière version, vérifier son isolation et créer uniquement des comptes fictifs ; aucune écriture sur la base réelle.
 - [ ] Finalisation demandée du lot 1 : alerte Bureau, inscription en attente puis décision/liste d’attente/promotion, adhésion complète jusqu’à l’accès membre ; réutiliser les files et notifications existantes.

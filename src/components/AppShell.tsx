@@ -384,7 +384,7 @@ export function AppShell({
             <h1 className="text-2xl">{title}</h1>
             {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
           </div>
-          <div className="flex max-w-full flex-wrap items-center gap-2">
+          <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2">
             {actions}
             <QuickCreateMenu />
             <div className={cn("hidden items-center gap-2", !compactNav && "md:flex")}>

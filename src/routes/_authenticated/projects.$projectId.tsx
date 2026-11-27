@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Network } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExternalLinks } from "@/components/ExternalLinks";
 import { PlaceInfo } from "@/components/PlaceInfo";
 import { LinkedMairies } from "@/components/LinkedMairies";
@@ -219,8 +221,8 @@ function ProjectDetail() {
         <>
           <AiAssist type="project" id={projectId} actions={["SUMMARY", "INCONSISTENCIES", "MINUTES"]} />
           <ShareLinkButton entityType="project" entityId={projectId} defaultLabel={project.title} />
-          <Button asChild size="sm" variant="outline">
-            <Link to="/mindmap" search={{ projectId }}>Mindmap</Link>
+          <Button asChild size="icon" variant="outline" title="Carte mentale du projet">
+            <Link to="/mindmap" search={{ projectId }} aria-label="Carte mentale du projet"><Network className="size-4" aria-hidden="true" /></Link>
           </Button>
           {isBureau || profile?.membership_status === "ACTIVE" ? (
             <NewTaskDialog
@@ -236,8 +238,7 @@ function ProjectDetail() {
         </>
       }
     >
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="panel space-y-4 p-5 lg:col-span-2">
+      <div className="panel space-y-3 p-4">
           <p className="text-sm text-muted-foreground">
             {project.description || "Aucun objectif renseigné."}
           </p>
@@ -264,6 +265,27 @@ function ProjectDetail() {
                 : `Calculé automatiquement à partir des tâches terminées (${doneCount} sur ${eligibleCount}, annulées exclues).`}
             </p>
           </div>
+      </div>
+
+      <Tabs defaultValue="actions" className="mt-4">
+        <TabsList className="mb-4 flex h-auto flex-wrap justify-start">
+          <TabsTrigger value="actions">Actions & organisation</TabsTrigger>
+          <TabsTrigger value="presentation">Présentation & équipe</TabsTrigger>
+          <TabsTrigger value="suivi">Suivi & journal</TabsTrigger>
+          <TabsTrigger value="echanges">Matériel & échanges</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="actions">
+          <div className="mb-3 flex justify-end">
+            <Link to="/tasks" search={{ projectId }} className="text-sm text-primary hover:underline">Voir dans la liste des tâches</Link>
+          </div>
+          <ProjectPlan projectId={projectId} canManage={canValidate} userId={user?.id ?? ""} onOpenTask={(id) => void navigate({ search: { tache: id } })} />
+        </TabsContent>
+
+        <TabsContent value="presentation" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="panel space-y-4 p-5 lg:col-span-2">
+              <ProjectStorySections project={project} />
           {related && (related.activities.length > 0 || related.events.length > 0 || related.editions.length > 0) ? (
             <div className="space-y-3 border-t border-border pt-4 text-sm">
               {related.activities.length + related.events.length > 0 ? (
@@ -385,8 +407,7 @@ function ProjectDetail() {
               </div>
             </details>
           ) : null}
-        </div>
-
+            </div>
         <div className="panel p-5">
           <h2 className="mb-4 text-lg">Équipe</h2>
           {(members ?? []).length === 0 ? (
@@ -410,42 +431,25 @@ function ProjectDetail() {
             </ul>
           )}
         </div>
-      </div>
-
-      <div className="mt-6 space-y-4">
-        <ProjectStorySections project={project} />
-        <ProjectFollowUp project={project} canManage={canValidate} onProjectPatch={updateProject} />
-        <ProjectContribute projectId={projectId} canModerate={canValidate} />
-        {canValidate ? <ProjectEquipment projectId={projectId} /> : null}
-        {isBureau || isCoordinator || (members ?? []).some((m) => m.user_id === user?.id) ? <ProjectCommunications projectId={projectId} /> : null}
-      </div>
-
-      <div className="mt-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg">Actions du projet</h2>
-          <span className="flex flex-wrap gap-3">
-            <Link to="/tasks" search={{ projectId }} className="text-sm text-primary hover:underline">Voir dans la liste des tâches</Link>
-          </span>
-        </div>
-        <ProjectPlan projectId={projectId} canManage={canValidate} userId={user?.id ?? ""} onOpenTask={(id) => void navigate({ search: { tache: id } })} />
-      </div>
-      <TaskSidePanel
-        projectId={projectId}
-        taskId={search.tache}
-        onClose={() => void navigate({ search: {} })}
-        userId={user?.id ?? ""}
-        isBureau={isBureau}
-        canManage={canValidate}
-      />
-
+          </div>
       {project.address || project.contact_email ? (
-        <div className="panel mt-6 space-y-3 p-4 text-sm">
+        <div className="panel space-y-3 p-4 text-sm">
           <PlaceInfo address={project.address} />
           {project.contact_email ? <p>Contact : <a className="underline" href={`mailto:${project.contact_email}`}>{project.contact_email}</a></p> : null}
         </div>
       ) : null}
-      <div className="panel mt-6 p-4"><LinkedMairies type="project" id={projectId} /></div>
-      <div className="mt-6"><ExternalLinks contextType="PROJECT" contextId={projectId} /></div>
+      <div className="panel p-4"><LinkedMairies type="project" id={projectId} /></div>
+      <div><ExternalLinks contextType="PROJECT" contextId={projectId} /></div>
+        </TabsContent>
+
+        <TabsContent value="suivi" className="space-y-4">
+          <ProjectFollowUp project={project} canManage={canValidate} onProjectPatch={updateProject} />
+          <ProjectContribute projectId={projectId} canModerate={canValidate} />
+        </TabsContent>
+
+        <TabsContent value="echanges" className="space-y-4">
+          {canValidate ? <ProjectEquipment projectId={projectId} /> : null}
+          {isBureau || isCoordinator || (members ?? []).some((m) => m.user_id === user?.id) ? <ProjectCommunications projectId={projectId} /> : null}
       <div className="mt-6">
         <Comments
           entityType="project"
@@ -455,6 +459,18 @@ function ProjectDetail() {
           linkUrl={`/projects/${projectId}`}
         />
       </div>
+
+        </TabsContent>
+      </Tabs>
+      <TaskSidePanel
+        projectId={projectId}
+        taskId={search.tache}
+        onClose={() => void navigate({ search: {} })}
+        userId={user?.id ?? ""}
+        isBureau={isBureau}
+        canManage={canValidate}
+      />
+
     </AppShell>
   );
 }

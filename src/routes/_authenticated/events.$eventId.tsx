@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Comments } from "@/components/Comments";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShareLinkButton } from "@/components/ShareLinkButton";
 import { LoadingState } from "@/components/LoadingState";
 import { useState } from "react";
@@ -213,19 +214,27 @@ function EventDetailPage() {
         </div>
       </div>
 
-      <div className="mt-4"><ExperienceSections item={event} /></div>
       <RegistrationWizard open={wizard} onOpenChange={setWizard} target={{ eventId, title: event.title, dogPolicy: event.dog_policy, maxDogs: event.max_dogs, full: Boolean(spots?.full), waitlist: Boolean(spots?.waitlist) }} />
-      <div className="panel mt-6 p-4"><LinkedMairies type="event" id={eventId} /></div>
-      <div className="mt-6"><ExternalLinks contextType="EVENT" contextId={eventId} /></div>
-      <div className="mt-6">
-        <Comments
-          entityType="event"
-          entityId={eventId}
-          entityTitle={event.title}
-          participants={participations.map((p) => p.user_id)}
-          linkUrl={`/events/${eventId}`}
-        />
-      </div>
+      <Tabs defaultValue="programme" className="mt-6">
+        <TabsList className="mb-4 flex h-auto flex-wrap justify-start">
+          <TabsTrigger value="programme">Programme & ressources</TabsTrigger>
+          <TabsTrigger value="echanges">Échanges</TabsTrigger>
+        </TabsList>
+        <TabsContent value="programme" className="space-y-4">
+          <ExperienceSections item={event} />
+          <div className="panel p-4"><LinkedMairies type="event" id={eventId} /></div>
+          <ExternalLinks contextType="EVENT" contextId={eventId} />
+        </TabsContent>
+        <TabsContent value="echanges">
+          <Comments
+            entityType="event"
+            entityId={eventId}
+            entityTitle={event.title}
+            participants={participations.map((p) => p.user_id)}
+            linkUrl={`/events/${eventId}`}
+          />
+        </TabsContent>
+      </Tabs>
     </AppShell>
   );
 }
