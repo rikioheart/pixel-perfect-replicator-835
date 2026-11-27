@@ -4,6 +4,7 @@ import { Copy, Download, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { publicProUrl } from "@/lib/pro-card";
+import { escapePrintHtml } from "@/lib/security-inputs";
 
 /** QR code pointant uniquement vers l'adresse publique /professionnels/[slug]. */
 export function ProQrCard({ slug, name, published }: { slug: string; name: string; published: boolean }) {
@@ -24,12 +25,12 @@ export function ProQrCard({ slug, name, published }: { slug: string; name: strin
   const print = () => {
     const w = window.open("", "_blank", "width=480,height=640");
     if (!w) { toast.error("Pour imprimer, autorisez l'ouverture de fenêtres dans votre navigateur."); return; }
-    w.document.write(`<!doctype html><html lang="fr"><head><title>Carte ${name}</title>
+    w.document.write(`<!doctype html><html lang="fr"><head><title>Carte ${escapePrintHtml(name)}</title>
       <style>body{font-family:Georgia,serif;display:flex;justify-content:center;padding:24px}
       .card{border:2px solid #6b1d2a;border-radius:16px;padding:24px;text-align:center;width:320px}
       h1{font-size:20px;margin:0 0 4px}p{font-size:12px;color:#333;margin:4px 0}img{width:220px;height:220px}</style></head>
-      <body><div class="card"><p>La Voix du Chien — carte professionnelle</p><h1>${name.replace(/</g, "&lt;")}</h1>
-      <img src="${dataUrl}" alt="QR code"/><p>${url}</p></div>
+      <body><div class="card"><p>La Voix du Chien — carte professionnelle</p><h1>${escapePrintHtml(name)}</h1>
+      <img src="${escapePrintHtml(dataUrl)}" alt="QR code"/><p>${escapePrintHtml(url)}</p></div>
       <script>window.onload=()=>{window.print()}</script></body></html>`);
     w.document.close();
   };

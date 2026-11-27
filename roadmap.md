@@ -1,5 +1,9 @@
 # Roadmap — Refonte collaborative (style Monday/ClickUp)
 
+## Sécurité — sélection du 27 novembre 2026
+- [ ] Corriger exclusivement les 21 alertes sélectionnées et vérifier les droits réels.
+- [ ] Exécuter les tests ciblés, vérifier les protections en base et mettre à jour les alertes sélectionnées.
+
 ## Préparation mise en ligne — comptes et données de test (13 nov.)
 - [x] Compte association = Bureau de secours (actif, rôles Bureau + Fondateur, fonction Fondateur) ; reprend les 5 projets et 8 tâches de démo
 - [x] Marie Berrier : rôle et fonction Fondateur ajoutés

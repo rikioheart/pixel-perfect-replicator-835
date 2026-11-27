@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { canImportMemberships } from "@/lib/security-inputs";
 
 const rowSchema = z.object({
   email: z.string().email(),
@@ -25,8 +26,13 @@ export const importMembers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { data: isBureau } = await context.supabase.rpc("is_bureau", { _user_id: context.userId });
-    if (!isBureau) throw new Error("Accès réservé au Bureau.");
+    const [bureau, validation] = await Promise.all([
+      context.supabase.rpc("is_bureau", { _user_id: context.userId }),
+      context.supabase.rpc("has_permission", { _user_id: context.userId, _permission_code: "members.validate" }),
+    ]);
+    if (bureau.error || validation.error || !canImportMemberships(bureau.data, validation.data)) {
+      throw new Error("Cet import nécessite l'accord du Bureau et le droit de valider les adhésions.");
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 

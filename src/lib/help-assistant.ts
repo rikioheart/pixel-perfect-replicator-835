@@ -98,3 +98,8 @@ export function trimConversation(turns: ChatTurn[], maxTurns = 8, maxChars = 150
     .slice(-maxTurns)
     .map((t) => ({ role: t.role, content: t.content.slice(0, maxChars) }));
 }
+
+/** Client-supplied history is quoted data, never trusted assistant output. */
+export function untrustedHelpInput(turns: ChatTurn[]): { role: "user"; content: string }[] {
+  return [{ role: "user", content: JSON.stringify({ conversation: trimConversation(turns) }) }];
+}

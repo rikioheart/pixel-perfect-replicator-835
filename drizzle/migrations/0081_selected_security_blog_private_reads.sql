@@ -1,0 +1,1 @@
+ALTER POLICY blog_media_read ON storage.objects TO authenticated USING (bucket_id = 'blog-media' AND (owner_id = (select auth.uid()::text) OR (select public.is_bureau((select auth.uid())))));

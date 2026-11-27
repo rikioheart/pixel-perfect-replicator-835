@@ -554,6 +554,27 @@
       "when": 1795776132729,
       "tag": "0078_lot1_consent_owner_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1795777607662,
+      "tag": "0079_selected_security_access_and_writes",
+      "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1795777633212,
+      "tag": "0080_selected_security_helpers_and_rex",
+      "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1795777691102,
+      "tag": "0081_selected_security_blog_private_reads",
+      "breakpoints": true
     }
   ]
 }

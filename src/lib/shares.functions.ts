@@ -32,10 +32,19 @@ export const getSharedEntity = createServerFn({ method: "GET" })
       .maybeSingle();
 
     if (!share) return { status: "missing", payload: null };
+    if (!share.created_by) return { status: "forbidden", payload: null };
     if (share.revoked) return { status: "revoked", payload: null };
     if (share.expires_at && new Date(share.expires_at).getTime() < Date.now()) {
       return { status: "expired", payload: null };
     }
+
+    // Recheck the creator's CURRENT rights before any privileged entity read.
+    const { data: mayShare, error: shareError } = await supabaseAdmin.rpc("can_share_entity", {
+      _user_id: share.created_by,
+      _entity_type: share.entity_type,
+      _entity_id: share.entity_id,
+    });
+    if (shareError || mayShare !== true) return { status: "forbidden", payload: null };
 
     await supabaseAdmin
       .from("public_shares")
@@ -89,12 +98,12 @@ export const getSharedEntity = createServerFn({ method: "GET" })
 
     const { data: row } = await supabaseAdmin
       .from("documents")
-      .select("title, category, url, created_at, visibility")
+      .select("title, category, url, created_at, visibility, sensitivity")
       .eq("id", share.entity_id)
       .maybeSingle();
     if (!row) return { status: "missing", payload: null };
     // Un document réservé au Bureau ne doit jamais sortir, même via un ancien lien.
-    if ((row.visibility ?? "").toUpperCase() === "BUREAU") {
+    if ((row.visibility ?? "").toUpperCase() === "BUREAU" || row.sensitivity === "SENSIBLE") {
       return { status: "forbidden", payload: null };
     }
     return { status: "ok", payload: {
