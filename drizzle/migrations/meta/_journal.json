@@ -575,6 +575,13 @@
       "when": 1795777691102,
       "tag": "0081_selected_security_blog_private_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1795781558106,
+      "tag": "0082_fix_loyalty_oracles_terrain_advantages",
+      "breakpoints": true
     }
   ]
 }

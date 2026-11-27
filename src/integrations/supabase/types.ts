@@ -4899,6 +4899,10 @@ export type Database = {
         Returns: Json
       }
       claim_bureau_bootstrap: { Args: never; Returns: boolean }
+      comment_target_visible_to: {
+        Args: { _id: string; _type: string; _user_id: string }
+        Returns: boolean
+      }
       create_delegation: {
         Args: {
           _code: string
@@ -5126,6 +5130,7 @@ export type Database = {
         Args: { _activity_id: string; _event_id: string }
         Returns: number
       }
+      person_id_of: { Args: { _user_id: string }; Returns: string }
       picker_people: {
         Args: never
         Returns: {
